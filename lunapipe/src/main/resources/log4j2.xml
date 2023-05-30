@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="stdout-appender" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %5p %c{1}: %m%n" />
+        </Console>
+  		
+  		<!-- 
+        <File name="debug-appender" fileName="/logs/lunaops/debug.log" append="true">
+   			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %5p %c{1}: %m%n"/>
+  		</File>
+	 	-->
+ 		 
+  		<RollingFile name="debug-appender" fileName="/home/khispms/app/lunalogs/debug.log" filePattern="/home/khispms/app/lunalogs/debug.log.%d{yyyy-MM-dd-HH-mm-ss}" append="true">
+  		 	<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c{1.} - %msg%n"/>
+  		 	<Policies>
+	  		 	<TimeBasedTriggeringPolicy interval="21600" modulate="true"/>
+	  		 	<!-- <SizeBasedTriggeringPolicy size="50 MB"/>  -->
+  		 	</Policies>
+  		 	<DefaultRolloverStrategy max="120"/>
+		</RollingFile>
+		
+    </Appenders>
+    
+    <Loggers>
+        <Logger name="egovframework" level="DEBUG" additivity="false">
+            <AppenderRef ref="stdout-appender" />
+            <AppenderRef ref="debug-appender" />
+        </Logger>
+        
+        <Logger name="kr.opensoftlab" level="DEBUG" additivity="false">
+            <AppenderRef ref="stdout-appender" />
+            <AppenderRef ref="debug-appender" />
+        </Logger>
+        
+        <Logger name="org.springframework" level="INFO" additivity="false">
+	        <AppenderRef ref="stdout-appender" />
+	        <AppenderRef ref="debug-appender" />
+	    </Logger>
+        
+        <Logger name="jdbc.sqlonly" level="DEBUG" additivity="false">
+            <AppenderRef ref="stdout-appender" />
+            <AppenderRef ref="debug-appender" />
+        </Logger>
+        
+        <Logger name="jdbc.sqltiming" level="DEBUG" additivity="false">
+            <AppenderRef ref="stdout-appender" />
+            <AppenderRef ref="debug-appender" />
+        </Logger>
+        
+        <Logger name="jdbc.audit" level="FATAL" additivity="false">
+            <AppenderRef ref="stdout-appender" />
+            <AppenderRef ref="debug-appender" />
+        </Logger>
+        
+        <Logger name="java.sql" level="DEBUG" additivity="false">
+            <AppenderRef ref="stdout-appender" />
+            <AppenderRef ref="debug-appender" />
+        </Logger>
+        
+        <!-- 쿼리찍기용 -->
+        <Logger name="java.sql.PreparedStatement" level="DEBUG" additivity="false">
+            <AppenderRef ref="stdout-appender" />
+            <AppenderRef ref="debug-appender" />
+        </Logger>
+        
+        <Logger name="java.sql.ResultSet" level="DEBUG" additivity="false">
+            <AppenderRef ref="stdout-appender" />
+            <AppenderRef ref="debug-appender" />
+        </Logger>
+        
+        <Logger name="java.sql.Connection" level="DEBUG" additivity="false">
+            <AppenderRef ref="stdout-appender" />
+            <AppenderRef ref="debug-appender" />
+        </Logger>
+        
+		<Logger name="org.quartz.core.QuartzSchedulerThread" level="ERROR" additivity="false">
+		    <appender-ref ref="stdout-appender" />
+		    <appender-ref ref="debug-appender" />
+		</Logger>
+
+        <Root level="DEBUG">
+            <AppenderRef ref="stdout-appender" />
+            <AppenderRef ref="debug-appender" />
+        </Root>
+    </Loggers>
+</Configuration>

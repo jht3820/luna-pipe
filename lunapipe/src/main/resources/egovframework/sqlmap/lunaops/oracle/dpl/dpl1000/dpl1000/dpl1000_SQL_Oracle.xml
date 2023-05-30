@@ -1,0 +1,1034 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="dpl1000DAO">
+
+	
+	<typeAlias  alias="egovMap" 	type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias alias="dpl1000VO"	type="kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1000VO"/>
+	<typeAlias alias="dpl1300VO"	type="kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1300VO"/>
+	<typeAlias alias="BuildVO"		type="kr.opensoftlab.sdf.jenkins.vo.BuildVO"/>
+	<typeAlias alias="ChangeVO"		type="kr.opensoftlab.sdf.jenkins.vo.ChangeVO"/>
+	<typeAlias alias="ChangePathsVO"	type="kr.opensoftlab.sdf.jenkins.vo.ChangePathsVO"/>
+	
+	
+   	<resultMap id="resultMapSelectDpl1000" class="dpl1000VO">
+		<result property="rn"  				column="RN"/>
+		<result property="dplId"  			column="DPL_ID"/>
+		<result property="dplNm"  			column="DPL_NM"/>
+		<result property="dplVer"  			column="DPL_VER"/>
+		<result property="dplDt"  			column="DPL_DT"/>
+		<result property="dplUsrId"  		column="DPL_USR_ID"/>
+		<result property="dplUsrNm"  		column="DPL_USR_NM"/>
+		<result property="dplDesc" 			column="DPL_DESC"/>
+		<result property="dplStsCd"  		column="DPL_STS_CD"/>
+		<result property="dplStsNm"  		column="DPL_STS_NM"/>
+		<result property="dplTypeCd"  		column="DPL_TYPE_CD"/>
+		<result property="dplTypeNm"  		column="DPL_TYPE_NM"/>
+		<result property="dplAutoAfterCd" 	column="DPL_AUTO_AFTER_CD"/>
+		<result property="dplAutoAfterNm" 	column="DPL_AUTO_AFTER_NM"/>
+		<result property="dplAutoDtm" 		column="DPL_AUTO_DTM"/>
+		<result property="dplStDtm" 		column="DPL_ST_DTM"/>
+		<result property="dplRestoreCd"  	column="DPL_RESTORE_CD"/>
+		<result property="dplRestoreNm"  	column="DPL_RESTORE_NM"/>
+		<result property="signId"  			column="SIGN_ID"/>
+		<result property="signStsCd"  		column="SIGN_STS_CD"/>
+		<result property="signStsNm"  		column="SIGN_STS_NM"/>
+		<result property="signUsrId"        column="SIGN_USR_ID" /> 
+		<result property="signUsrNm"        column="SIGN_USR_NM" /> 
+		<result property="signUsrImg"		column="SIGN_USR_IMG" />
+		<result property="signDtm"			column="SIGN_DTM" />
+		<result property="dplRevisionNum"	column="DPL_REVISION_NUM" />
+		<result property="dplSignTxt"		column="DPL_SIGN_TXT" />
+		<result property="signTxt"			column="SIGN_TXT" />
+		<result property="signRejectTxt"	column="SIGN_REJECT_TXT" />
+		<result property="regDtm"           column="REG_DTM" /> 
+		<result property="regUsrId"         column="REG_USR_ID" /> 
+		<result property="regUsrIp"         column="REG_USR_IP" /> 
+		<result property="modifyDtm"        column="MODIFY_DTM" /> 
+		<result property="modifyUsrId"      column="MODIFY_USR_ID" /> 
+		<result property="modifyUsrIp"      column="MODIFY_USR_IP" /> 
+    </resultMap>
+    
+    
+   	<resultMap id="resultMapSelectDpl1300" class="dpl1300VO">
+		<result property="rn"  					column="RN"/>
+		<result property="dplId"  				column="DPL_ID"/>
+		<result property="dplNm" 				column="DPL_NM" />
+		<result property="dplRevisionNum" 		column="DPL_REVISION_NUM" />
+		<result property="jenId"				column="JEN_ID" />  
+		<result property="jenUsrId"				column="JEN_USR_ID" />  
+		<result property="jenUsrTok"			column="JEN_USR_TOK" />  
+		<result property="jenNm"				column="JEN_NM" />  
+		<result property="jenUrl"				column="JEN_URL" />  
+		<result property="jobUrl"				column="JOB_URL" />  
+		<result property="jobId"				column="JOB_ID" />  
+		<result property="jobRestoreId"			column="JOB_RESTORE_ID" />  
+		<result property="jobTok"				column="JOB_TOK" /> 
+		<result property="jobTypeCd"			column="JOB_TYPE_CD" /> 
+		<result property="jobTypeNm"			column="JOB_TYPE_NM" /> 
+		<result property="jobParameter" 		column="JOB_PARAMETER" />
+		<result property="jobStartOrd"			column="JOB_START_ORD" />
+		<result property="bldNum" 				column="BLD_NUM" />
+		<result property="bldResult"			column="BLD_RESULT" />
+		<result property="bldResultMsg" 		column="BLD_RESULT_MSG" />
+		<result property="bldSeq" 				column="BLD_SEQ" />
+		<result property="bldRestoreNum" 		column="BLD_RESTORE_NUM" />
+		<result property="bldRestoreResult" 	column="BLD_RESTORE_RESULT" />
+		<result property="bldRestoreResultMsg" 	column="BLD_RESTORE_RESULT_MSG" />
+		<result property="bldRestoreSeq" 		column="BLD_RESTORE_SEQ" />
+		<result property="useCd"              	column="USE_CD" /> 
+		<result property="useNm"              	column="USE_NM" />
+		<result property="regDtm"           	column="REG_DTM" /> 
+		<result property="regUsrId"         	column="REG_USR_ID" /> 
+		<result property="regUsrIp"         	column="REG_USR_IP" /> 
+		<result property="modifyDtm"        	column="MODIFY_DTM" /> 
+		<result property="modifyUsrId"      	column="MODIFY_USR_ID" /> 
+		<result property="modifyUsrIp"      	column="MODIFY_USR_IP" /> 
+    </resultMap>
+    
+    
+    <resultMap id="resultMapSelectDpl1400" class="HashMap">
+		<result property="dplId" column="DPL_ID" />
+		<result property="dplNm" column="DPL_NM" />
+		<result property="jenId" column="JEN_ID" />
+		<result property="jobId" column="JOB_ID" />
+		<result property="jobUrl" column="JOB_URL" />
+		<result property="jobRestoreId" column="JOB_RESTORE_ID" />
+		<result property="bldSeq" column="BLD_SEQ" />
+		<result property="bldNum" column="BLD_NUM" />
+		<result property="bldMainNum" column="BLD_MAIN_NUM" />
+		<result property="bldResult" column="BLD_RESULT" />
+		<result property="bldResultMsg" column="BLD_RESULT_MSG" />
+		<result property="bldDurationTm" column="BLD_DURATION_TM" />
+		<result property="bldStartDtm" column="BLD_START_DTM" />
+		<result property="bldConsoleLog" column="BLD_CONSOLE_LOG" jdbcType="CLOB" javaType="java.lang.String"/>
+		<result property="bldRestoreNum" column="BLD_RESTORE_NUM" />
+		<result property="bldRestoreResult" column="BLD_RESTORE_RESULT" />
+		<result property="bldRestoreResultMsg" column="BLD_RESTORE_RESULT_MSG" />
+		<result property="bldConsoleRestoreLog" column="BLD_CONSOLE_RESTORE_LOG" jdbcType="CLOB" javaType="java.lang.String"/>
+		<result property="regDtm" column="REG_DTM" />
+		<result property="regUsrId" column="REG_USR_ID" />
+		<result property="regUsrIp" column="REG_USR_IP" />
+		<result property="modifyDtm" column="MODIFY_DTM" />
+		<result property="modifyUsrId" column="MODIFY_USR_ID" />
+		<result property="modifyUsrIp" column="MODIFY_USR_IP" />
+	</resultMap>
+	
+   	<sql id="dpl1000DAO.selectDpl1000BaseList">
+		<![CDATA[
+		SELECT *
+		FROM (
+			SELECT
+				  ROWNUM RN
+				, A.DPL_ID
+				, A.DPL_NM
+				, A.DPL_VER
+				, A.DPL_DT
+				, A.DPL_USR_ID
+				, SF_ADM2000_USR_INFO(A.DPL_USR_ID, 1) DPL_USR_NM
+				, REGEXP_REPLACE (A.DPL_DESC ,'</br>|<br>|<br/>|</BR>|<BR>|<BR/>' , '\n' ) AS DPL_DESC
+				, A.DPL_STS_CD
+				, SF_CMM1000_COM_CD_INFO('DPL00001', A.DPL_STS_CD, '1') AS DPL_STS_NM
+				, A.DPL_TYPE_CD
+				, SF_CMM1000_COM_CD_INFO('DPL00003', A.DPL_TYPE_CD, '1') AS DPL_TYPE_NM
+				, A.DPL_AUTO_AFTER_CD
+				, SF_CMM1000_COM_CD_INFO('DPL00004', A.DPL_AUTO_AFTER_CD, '1') AS DPL_AUTO_AFTER_NM
+				, A.DPL_AUTO_DTM
+				, TO_DATE(TO_CHAR(A.DPL_DT,'YYYY-MM-DD') || ' ' || TO_CHAR(A.DPL_AUTO_DTM,'HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS DPL_ST_DTM
+				, A.DPL_RESTORE_CD
+				, SF_CMM1000_COM_CD_INFO('DPL00005', A.DPL_RESTORE_CD, '1') AS DPL_RESTORE_NM
+				, A.DPL_REVISION_NUM
+				, B.SIGN_ID
+				, B.SIGN_STS_CD
+                , SF_CMM1000_COM_CD_INFO('REQ00004', B.SIGN_STS_CD, '1') AS SIGN_STS_NM
+                , B.SIGN_USR_ID
+                , SF_ADM2000_USR_INFO(B.SIGN_USR_ID, 1) SIGN_USR_NM
+                , SF_ADM2000_USR_INFO(B.SIGN_USR_ID, 6) SIGN_USR_IMG
+                , REGEXP_REPLACE (A.DPL_SIGN_TXT ,'</br>|<br>|<br/>|</BR>|<BR>|<BR/>' , '\n' ) AS DPL_SIGN_TXT
+                , REGEXP_REPLACE (B.SIGN_TXT ,'</br>|<br>|<br/>|</BR>|<BR>|<BR/>' , '\n' ) AS SIGN_TXT
+                , REGEXP_REPLACE (B.SIGN_REJECT_TXT ,'</br>|<br>|<br/>|</BR>|<BR>|<BR/>' , '\n' ) AS SIGN_REJECT_TXT
+                , B.SIGN_DTM
+                , B.SIGN_REG_USR_ID
+				, SF_ADM2000_USR_INFO(B.SIGN_REG_USR_ID, 1) SIGN_REG_USR_NM
+                , SF_ADM2000_USR_INFO(B.SIGN_REG_USR_ID, 6) SIGN_REG_USR_IMG
+				, A.REG_DTM 
+	            , A.REG_USR_ID 
+	            , A.REG_USR_IP 
+	            , A.MODIFY_DTM 
+	            , A.MODIFY_USR_ID 
+	            , A.MODIFY_USR_IP   
+			FROM DPL1000 A, DPL1200 B
+			WHERE 1=1
+			AND A.DPL_DEL_CD = '02'
+            AND A.DPL_ID = B.DPL_ID(+)
+            AND B.SIGN_DTM = (
+               				SELECT 
+					            	/*+ INDEX_DESC (Z IDX_PRJ_DPL_SIGN_DTM ) */  SIGN_DTM 
+					      	FROM DPL1200 Z 
+						   	WHERE 	1=1
+							AND 	Z.DPL_ID 	= B.DPL_ID
+							AND 	ROWNUM 		= 1    
+       					)
+        	ORDER BY A.DPL_DT DESC, A.REG_DTM DESC	
+		) A
+		]]>
+		WHERE   1=1
+	<isNotEmpty property="searchSelect">
+		<isNotEmpty property="searchTxt">
+			<isEqual property="searchSelect" compareValue="dplVer" prepend="AND">
+			UPPER(A.DPL_VER) LIKE '%'|| UPPER( #searchTxt# )||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="dplNm" prepend="AND">
+			UPPER(A.DPL_NM) LIKE '%'|| UPPER( #searchTxt# )||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="dplUsrNm" prepend="AND">
+				A.DPL_USR_NM LIKE '%'||#searchTxt#||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="dplDesc" prepend="AND">
+				A.DPL_DESC LIKE '%'||#searchTxt#||'%'
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty property="searchCd">
+			<isEqual property="searchSelect" compareValue="dplStsCd" prepend="AND">
+				A.DPL_STS_CD = #searchCd#
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="dplTypeCd" prepend="AND">
+				A.DPL_TYPE_CD = #searchCd#
+			</isEqual>
+		</isNotEmpty>
+	</isNotEmpty>
+	</sql>
+	
+	
+	<sql id="dpl1000DAO.selectDpl1300JobList">
+		SELECT ROWNUM RN
+	            ,A.DPL_ID
+	            ,SF_DPL1000_DPL_INFO(A.DPL_ID,'1') AS DPL_NM
+	            ,F.DPL_REVISION_NUM
+	            ,A.JEN_ID
+	            ,B.JEN_NM
+	            ,B.JEN_URL
+	            ,B.JEN_USR_ID
+                ,B.JEN_USR_TOK
+	            ,A.JOB_ID
+	            ,C.JOB_RESTORE_ID
+	            ,C.JOB_TOK
+	            ,C.JOB_TYPE_CD
+	            ,C.JOB_PARAMETER
+	            ,C.JOB_DESC
+	            ,SF_CMM1000_COM_CD_INFO('DPL00002', C.JOB_TYPE_CD, '1') AS JOB_TYPE_NM
+	            ,A.JOB_START_ORD
+	            ,A.USE_CD
+	            ,SF_CMM1000_COM_CD_INFO('CMM00001', A.USE_CD, '1') as USE_NM
+	            ,D.BLD_NUM
+	            ,D.BLD_RESULT
+	            ,D.BLD_RESULT_MSG
+	            ,D.BLD_SEQ
+	            ,E.BLD_NUM AS BLD_RESTORE_NUM
+	            ,E.BLD_RESULT AS BLD_RESTORE_RESULT
+	            ,E.BLD_RESULT_MSG AS BLD_RESTORE_RESULT_MSG
+	            ,E.BLD_SEQ AS BLD_RESTORE_SEQ
+	            ,A.REG_DTM
+	            ,A.REG_USR_ID
+	            ,A.REG_USR_IP
+	            ,A.MODIFY_DTM
+	            ,A.MODIFY_USR_ID
+	            ,A.MODIFY_USR_IP
+	    FROM DPL1300 A LEFT JOIN JEN1000 B ON(A.JEN_ID = B.JEN_ID)
+		    LEFT JOIN JEN1100 C ON(C.JEN_ID = A.JEN_ID AND C.JOB_ID = A.JOB_ID)
+		    LEFT JOIN DPL1400 D ON(D.DPL_ID = A.DPL_ID AND D.JEN_ID = C.JEN_ID AND D.JOB_ID = C.JOB_ID AND D.BLD_SEQ = SF_DPL1400_LAST_INFO(A.DPL_ID,A.JEN_ID,A.JOB_ID,'8'))
+		    LEFT JOIN (
+		    SELECT *
+		       FROM DPL1400 Y
+		       WHERE 1=1
+		       AND Y.BLD_SEQ = (
+		                   SELECT
+		                               /*+ INDEX_DESC (Z PK_DPL1400 ) */  BLD_SEQ
+		                     FROM
+		                               DPL1400 Z
+		                      WHERE 	1=1
+		                       AND Z.DPL_ID = Y.DPL_ID 
+		                       AND Z.JEN_ID = Y.JEN_ID
+		                       AND Z.JOB_ID = Y.JOB_ID
+		                       AND 	ROWNUM 		= 1
+		                   )
+		   ) E ON (E.DPL_ID = D.DPL_ID AND E.JEN_ID = D.JEN_ID AND E.JOB_ID = C.JOB_RESTORE_ID AND E.BLD_MAIN_NUM = D.BLD_NUM)
+		   INNER JOIN DPL1000 F
+           ON ( A.DPL_ID = F.DPL_ID AND DPL_DEL_CD = '02')
+	    WHERE 1=1
+		    AND A.DPL_ID = #dplId#
+		    AND A.USE_CD = '01'
+		    AND B.USE_CD = '01'
+		    AND C.USE_CD = '01' 
+       <isNotEmpty property="searchSelect">
+			<isNotEmpty property="searchTxt">
+			<isEqual property="searchSelect" compareValue="jobId"> 
+				AND		UPPER( A.JOB_ID ) like '%'|| UPPER( #searchTxt#  )  ||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="jobDesc"> 
+				AND		UPPER( C.JOB_DESC )  like '%'|| UPPER( #searchTxt#  )  ||'%'
+			</isEqual>
+			</isNotEmpty>
+		</isNotEmpty>
+		
+		<isNotEmpty property="searchSelect">
+			<isNotEmpty property="searchCd">
+				<isEqual property="searchSelect" compareValue="jobTypeCd">
+					AND		C.JOB_TYPE_CD = #searchCd#
+				</isEqual>
+			</isNotEmpty>
+		</isNotEmpty>
+			ORDER BY A.JOB_START_ORD
+	</sql>
+	
+	
+	<select id="dpl1000DAO.selectDpl1000DeployVerNormalList" parameterClass="java.util.Map" resultClass="egovMap">
+			/* dpl1000DAO.selectDpl1000DeployVerNormalList - 	배포 계획 정보 일반 목록(No Page) 가져오기  */
+			SELECT 
+				T1.*
+			FROM ( 
+			<include refid="dpl1000DAO.selectDpl1000BaseList"/>
+			) T1
+	</select>
+	
+	
+	<select id="dpl1000DAO.selectDpl1000DeployVerInfoList" parameterClass="dpl1000VO" resultMap="resultMapSelectDpl1000">
+			/* dpl1000DAO.selectDpl1000DeployVerInfoList - 	배포 계획 정보 리스트 조회  */
+			SELECT 
+				T1.*
+			FROM ( 
+			<include refid="dpl1000DAO.selectDpl1000BaseList"/>
+			) T1
+			WHERE T1.RN BETWEEN (#firstIndex#+1) AND #lastIndex#
+	</select>
+	
+	   
+    <select id="dpl1000DAO.selectDpl1000ListCnt" parameterClass="dpl1000VO"  resultClass="java.lang.Integer">
+	    /*dpl1000DAO.selectDpl1000ListCnt 배포 계획 정보 리스트 총건수를 조회한다.*/
+	    SELECT
+			COUNT(*)
+		FROM	(
+			<include refid="dpl1000DAO.selectDpl1000BaseList"/>
+		) T1
+    </select>
+
+	
+	<select id="dpl1000DAO.selectDpl1000DeployVerInfo" parameterClass="java.util.Map" resultClass="egovMap">
+		<![CDATA[ 
+			/* dpl1000DAO.selectDpl1000DeployVerInfo - 	배포 계획 단일 정보 가져오기  */
+			SELECT 
+			T1.*
+			FROM (
+		]]> 
+				<include refid="dpl1000DAO.selectDpl1000BaseList"/>
+		<![CDATA[ 
+			) T1
+			WHERE 1=1
+			AND T1.DPL_ID = #dplId#
+		]]>
+	</select>
+	
+	
+	<select id="dpl1000DAO.selectDpl1300DeployJobList" parameterClass="java.util.Map" resultClass="egovMap">
+			/* dpl1000DAO.selectDpl1300DeployJobList - 	배포 계획 배정 JOB 목록 가져오기  */
+			<include refid="dpl1000DAO.selectDpl1300JobList"/>
+	</select>
+	
+	
+	<select id="dpl1000DAO.selectDpl1300dplJobGridList" parameterClass="dpl1300VO" resultMap="resultMapSelectDpl1300">
+			/* dpl1000DAO.selectDpl1300dplJobGridList - 배포 계획 배정 JOB 목록 가져오기  */
+			SELECT 
+				T1.*
+			FROM ( 
+			<include refid="dpl1000DAO.selectDpl1300JobList"/>
+			) T1
+			WHERE T1.RN BETWEEN (#firstIndex#+1) AND #lastIndex#
+	</select>
+	
+	   
+    <select id="dpl1000DAO.selectDpl1300dplJobGridListCnt" parameterClass="dpl1300VO"  resultClass="java.lang.Integer">
+	    /* dpl1000DAO.selectDpl1300dplJobGridListCnt 배포 계획 배정 JOB 목록 리스트 총건수*/
+	    SELECT
+			COUNT(*)
+		FROM	(
+			<include refid="dpl1000DAO.selectDpl1300JobList"/>
+		) T1
+    </select>
+	
+	
+	<insert id="dpl1000DAO.insertDpl1000DeployVerInfo" parameterClass="java.util.Map">
+		<selectKey resultClass="java.lang.String" keyProperty="newDplId">
+		<![CDATA[
+			/* dpl1000DAO.insertDpl100DeployVerInfo - 배포 계획 ID 발급 */ 
+			SELECT   NVL(
+                SUBSTR(NEW_DPL_ID, 1, 11) || LPAD( (TO_NUMBER(SUBSTR(NEW_DPL_ID, 12, 5)) + 1) , 5, '0')
+            ,   'DPL' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '00001'
+        	) AS NEW_DPL_ID
+				FROM   (
+	            SELECT   MAX(DPL_ID)  AS NEW_DPL_ID
+	            FROM   DPL1000 A
+	            WHERE   1=1
+	            AND      A.DPL_ID LIKE 'DPL' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '%'
+        	)
+		]]>
+		</selectKey>
+		<![CDATA[ 
+			/* dpl1000DAO.insertDpl100DeployVerInfo - 배포 계획 생성 정보 등록  */
+			INSERT INTO DPL1000
+			(
+				DPL_ID							,DPL_NM
+				,DPL_VER				,DPL_DT							,DPL_USR_ID
+				,DPL_DESC				,DPL_STS_CD						,DPL_TYPE_CD
+				,DPL_AUTO_AFTER_CD		,DPL_AUTO_DTM					,DPL_RESTORE_CD
+				,DPL_SIGN_TXT			,DPL_REVISION_NUM				,DPL_DEL_CD
+				,REG_DTM				,REG_USR_ID						,REG_USR_IP		
+					    
+			)
+			VALUES
+			(
+				#newDplId#						,#dplNm#
+				,#dplVer#				,REPLACE(#dplDt#, '-' ,'')		,#dplUsrId#
+				,#dplDesc#  			,#dplStsCd#						,#dplTypeCd#
+				,#dplAutoAfterCd#		,#dplAutoDtm#					,#dplRestoreCd#
+				,#dplSignTxt#			,#dplRevisionNum#				,'02'
+				,SYSDATE				,#regUsrId#						,#regUsrIp#
+			)
+		]]>
+	</insert>
+	
+	
+	<update id="dpl1000DAO.deleteDpl1000DeployVerInfo" parameterClass="java.util.Map" >
+			/* dpl1000DAO.deleteDpl100DeployVerInfo - 배포 계획 정보 삭제  */
+			UPDATE DPL1000 A
+				SET	A.DPL_DEL_CD = '01'
+        	WHERE	1=1
+        	AND		A.DPL_ID = #dplId#
+	</update>
+
+	
+	<update id="dpl1000DAO.updateDpl1000DeployVerInfo" parameterClass="java.util.Map">
+		/* dpl1000DAO.updateDpl1000DeployVerInfo - 배포 계획 정보 수정 */
+		UPDATE DPL1000
+		SET    DPL_NM 			= #dplNm#		 
+			 , DPL_VER			= #dplVer#
+			 , DPL_DT 			= #dplDt#
+			 , DPL_USR_ID 		= #dplUsrId#
+			 , DPL_DESC         = #dplDesc#
+			 , DPL_STS_CD		= #dplStsCd#
+			 , DPL_TYPE_CD		= #dplTypeCd#
+			 , DPL_AUTO_AFTER_CD= #dplAutoAfterCd#
+			 , DPL_AUTO_DTM		= #dplAutoDtm#
+			 , DPL_RESTORE_CD	= #dplRestoreCd#
+			 , DPL_SIGN_TXT		= #dplSignTxt#
+			 , DPL_REVISION_NUM	= #dplRevisionNum#
+			 , MODIFY_DTM		= SYSDATE
+			 , MODIFY_USR_ID	= #regUsrId#	
+			 , MODIFY_USR_IP	= #regUsrIp#
+			
+		WHERE	1=1
+			AND DPL_ID = #dplId#
+	</update>
+
+	
+	<update id="dpl1000DAO.updateDpl1000DplStsCdInfo" parameterClass="java.util.Map">
+		/* dpl1000DAO.updateDpl1000DplStsCdInfo - 배포 계획 배포 상태 수정 */
+		UPDATE DPL1000
+		SET    
+			  DPL_STS_CD		= #dplStsCd#
+			 , MODIFY_DTM		= SYSDATE
+			 , MODIFY_USR_ID	= #modifyUsrId#	
+			 , MODIFY_USR_IP	= #modifyUsrIp#
+		WHERE	1=1
+			AND DPL_ID = #dplId#
+	</update>
+	
+	
+	<update id="dpl1000DAO.updateRefReq4100Info" parameterClass="java.util.Map">
+		/* dpl1000DAO.updateRefReq4100Info - 배포 계획 정보 삭제 시 참조하고 있는 컬럼 정보 데이터 삭제  */
+		UPDATE REQ4100 
+			SET  DPL_ID = NULL
+		WHERE  DPL_ID = #dplId#
+	</update>
+	
+	<select id="dpl1000DAO.selectDpl1000ExcelList" parameterClass="dpl1000VO" resultClass="egovMap">
+		/*dpl1--]000DAO.selectDpl1000ExcelList 요구사항 엑셀목록을 조회한다.*/
+		
+		<include refid="dpl1000DAO.selectDpl1000BaseList"/>		
+	</select>
+
+
+	<sql id="dpl1000DAO.selectDpl1000BuildList">
+		<![CDATA[
+		SELECT
+			 ROWNUM RN
+			, DPL_ID
+			, DPL_NM
+			, DPL_DT
+			, SF_ADM2000_USR_INFO(DPL_USR_ID, 1) DPL_USR_ID
+			, DPL_DESC
+			, DPL_STS_CD
+			, SF_CMM1000_COM_CD_INFO('DPL00001', DPL_STS_CD, '1') AS DPL_STS_NM
+			, DPL_VER
+			, SF_ADM2000_USR_INFO(DPL_USR_ID, 1) AS DPL_USR_NM
+				
+		FROM DPL1000 A 
+		 
+		]]>
+	<isNotEmpty property="searchSelect">
+		<isNotEmpty property="searchTxt">
+		<isEqual property="searchSelect" compareValue="dplNm" prepend="AND">
+			A.DPL_NM LIKE '%'||#searchTxt#||'%'
+		</isEqual>
+		<isEqual property="searchSelect" compareValue="dplUsrId" prepend="AND">
+			SF_ADM2000_USR_INFO(DPL_USR_ID, 1) LIKE '%'||#searchTxt#||'%'
+		</isEqual>
+		<isEqual property="searchSelect" compareValue="dplVer" prepend="AND">
+			A.DPL_VER LIKE '%'||#searchTxt#||'%'
+		</isEqual>
+		</isNotEmpty>
+	</isNotEmpty>
+	</sql>
+	
+	<select id="dpl1000DAO.selectDpl1000BuildInfoList" parameterClass="dpl1000VO" resultMap="resultMapSelectDpl1000">
+			/* dpl1000DAO.selectDpl1000BuildLInfoList - 	배포 계획 정보 리스트 조회  */
+			SELECT 
+				A.*
+			FROM ( 
+			<include refid="dpl1000DAO.selectDpl1000BuildList"/>
+			) A
+			WHERE A.RN BETWEEN (#firstIndex#+1) AND #lastIndex#
+	</select>
+	
+	   
+    <select id="dpl1000DAO.selectDpl1000BuildInfoListCnt" parameterClass="dpl1000VO"  resultClass="java.lang.Integer">
+	    /*dpl1000DAO.selectDpl1000BuildLInfoListCnt 배포 계획 정보 리스트 총건수를 조회한다.*/
+	    SELECT
+			COUNT(*)
+		FROM	(
+			<include refid="dpl1000DAO.selectDpl1000BuildList"/>
+		) A
+    </select>
+	
+	
+	<insert id="dpl1000DAO.insertDpl1300DeployJobInfo" parameterClass="java.util.Map">
+		<![CDATA[ 
+			/* dpl1000DAO.insertDpl1300DeployJobInfo - 배포 JOB 등록  */
+			INSERT INTO DPL1300
+			(
+				DPL_ID							,JEN_ID
+				,JOB_ID					,JOB_START_ORD					,USE_CD
+				,REG_DTM				,REG_USR_ID						,REG_USR_IP		
+					    
+			)
+			VALUES
+			(
+				#dplId#						,#jenId#
+				,#jobId#				,#jobStartOrd#					,'01'
+				,SYSDATE				,#regUsrId#						,#regUsrIp#
+			)
+		]]>
+	</insert>
+	
+	
+	
+	<select id="dpl1000DAO.selectDpl1400DplJobBuildInfo" parameterClass="java.util.Map" resultMap="resultMapSelectDpl1400">
+		<![CDATA[
+			/* dpl1000DAO.selectDpl1400DplJobBuildInfo - 	배포 계획에 배정된 JOB에 해당하는 배포 실행 이력 조회  */
+			SELECT
+				A.DPL_ID
+				,SF_DPL1000_DPL_INFO(A.DPL_ID,'1') AS DPL_NM
+				,A.JEN_ID
+				,A.JOB_ID
+                ,B.JOB_RESTORE_ID
+				,A.BLD_SEQ
+				,A.BLD_NUM
+				,C.BLD_MAIN_NUM
+				,A.BLD_RESULT
+				,A.BLD_RESULT_MSG
+				,A.BLD_DURATION_TM
+				,A.BLD_START_DTM
+				,A.BLD_CONSOLE_LOG
+				,C.BLD_NUM AS BLD_RESTORE_NUM
+				,C.BLD_RESULT AS BLD_RESTORE_RESULT
+                ,C.BLD_RESULT_MSG AS BLD_RESTORE_RESULT_MSG
+                ,C.BLD_CONSOLE_LOG AS BLD_CONSOLE_RESTORE_LOG
+                ,A.REG_DTM
+				,A.REG_USR_ID
+				,A.REG_USR_IP
+				,A.MODIFY_DTM
+				,A.MODIFY_USR_ID
+				,A.MODIFY_USR_IP
+			FROM DPL1400 A LEFT JOIN JEN1100 B ON(B.JEN_ID = A.JEN_ID AND B.JOB_ID = A.JOB_ID)
+               LEFT JOIN (
+               	SELECT *
+                   FROM DPL1400 Y
+                   WHERE 1=1
+                   AND Y.BLD_SEQ = (
+                               SELECT
+                                           /*+ INDEX_DESC (Z PK_DPL1400 ) */  BLD_SEQ
+                                 FROM
+                                           DPL1400 Z
+                                  WHERE 	1=1
+                                   AND Z.DPL_ID = Y.DPL_ID 
+                                   AND Z.JEN_ID = Y.JEN_ID
+                                   AND Z.JOB_ID = Y.JOB_ID
+                                   AND 	ROWNUM 		= 1
+                               )
+               ) C ON (C.DPL_ID = A.DPL_ID AND C.JEN_ID = A.JEN_ID AND C.JOB_ID = B.JOB_RESTORE_ID AND C.BLD_MAIN_NUM = A.BLD_NUM)
+			WHERE 1=1
+				AND A.DPL_ID = #dplId# 
+				AND A.JEN_ID = #jenId#
+				AND A.JOB_ID = #jobId#
+				AND A.BLD_SEQ = (
+               			SELECT 
+					            	/*+ INDEX_DESC (Z PK_DPL1400 ) */  BLD_SEQ
+					      FROM 
+					      			DPL1400 Z 
+						   WHERE 	1=1
+							AND 	Z.DPL_ID 	= A.DPL_ID
+                               AND 	Z.JEN_ID 	= A.JEN_ID
+                               AND 	Z.JOB_ID 	= A.JOB_ID
+							AND 	ROWNUM 		= 1
+       					)
+		]]>
+	</select>
+	
+	
+	<select id="dpl1000DAO.selectDpl1400DplSelBuildInfoAjax" parameterClass="java.util.Map" resultMap="resultMapSelectDpl1400">
+		<![CDATA[
+			/* dpl1000DAO.selectDpl1400DplSelBuildInfoAjax - 배포 실행 이력 단건 조회  */
+			SELECT
+					A.DPL_ID
+					,SF_DPL1000_DPL_INFO(A.DPL_ID,'1') AS DPL_NM
+					,A.JEN_ID
+					,A.JOB_ID
+                    ,B.JOB_RESTORE_ID
+					,A.BLD_SEQ
+					,A.BLD_NUM
+					,A.BLD_MAIN_NUM
+					,A.BLD_RESULT
+					,A.BLD_RESULT_MSG
+					,A.BLD_DURATION_TM
+					,A.BLD_START_DTM
+					,A.BLD_CONSOLE_LOG
+					,'' AS BLD_RESTORE_NUM
+					,'' AS BLD_RESTORE_RESULT
+                    ,'' AS BLD_RESTORE_RESULT_MSG
+                    ,'' AS BLD_CONSOLE_RESTORE_LOG
+                    ,A.REG_DTM
+					,A.REG_USR_ID
+					,A.REG_USR_IP
+					,A.MODIFY_DTM
+					,A.MODIFY_USR_ID
+					,A.MODIFY_USR_IP
+				FROM DPL1400 A LEFT JOIN JEN1100 B ON(B.JEN_ID = A.JEN_ID AND B.JOB_ID = A.JOB_ID)
+				WHERE 1=1
+				AND A.DPL_ID = #dplId# 
+				AND A.JEN_ID = #jenId#
+				AND A.JOB_ID = #jobId#
+				AND A.BLD_SEQ = #bldSeq# 
+		]]>
+	</select>
+	
+	
+	
+	<delete id="dpl1000DAO.deleteDpl1300DplJobList" parameterClass="java.util.Map">
+		/* dpl1000DAO.deleteDpl1300DplJobList - 배포계획에 등록된 Job 삭제  */
+		DELETE FROM	DPL1300 A
+		WHERE	1=1
+			AND	DPL_ID = #dplId# 
+	</delete>
+	
+	
+	
+	<insert id="dpl1000DAO.insertDpl1400DeployJobBuildLogInfo" parameterClass="BuildVO">
+		<selectKey resultClass="java.lang.Integer" keyProperty="bldSeq">
+		<![CDATA[
+			/* dpl1000DAO.insertDpl1400DeployJobBuildLogInfo - 빌드순번 발급 */ 
+			SELECT NVL(MAX(BLD_SEQ)+1,1) AS NEW_BLD_SEQ
+			FROM DPL1400 A
+			WHERE 1=1
+				AND A.DPL_ID = #dplId# 
+				AND A.JEN_ID = #jenId#
+				AND A.JOB_ID = #jobId#
+		]]>
+		</selectKey>
+		<![CDATA[ 
+			/* dpl1000DAO.insertDpl1400DeployJobBuildLogInfo - 배포 실행 이력 등록  */
+			INSERT INTO DPL1400
+			(
+				DPL_ID						,JEN_ID					,JOB_ID
+				,BLD_SEQ				,BLD_NUM					,BLD_MAIN_NUM			,BLD_RESULT
+				,BLD_DURATION_TM		,BLD_START_DTM				,BLD_CONSOLE_LOG		,BLD_RESULT_MSG
+				,REG_DTM				,REG_USR_ID					,REG_USR_IP				,BLD_RESULT_CD
+					    
+			)
+			VALUES
+			(
+				#dplId#					,#jenId#				,#jobId#
+				,#bldSeq#				,#bldNum#					,#bldMainNum#			,#bldResult#
+				,#estimatedDuration#	,#bldStartDtm#				,#bldConsoleLog#		,#bldResultMsg#
+				,SYSDATE				,#regUsrId#					,#regUsrIp#				,#bldResultCd#
+			)
+		]]>
+	</insert>
+	
+	
+    <select id="dpl1000DAO.selectDpl1000DplHistoryList" parameterClass="java.util.Map" resultClass="egovMap">
+		<![CDATA[
+			/* dpl1000DAO.selectDpl1000DplHistoryList - 배포 계획 실행,수정,결재 이력  */
+				SELECT *
+				FROM
+				(
+					SELECT 'BLD' AS TYPE
+						    , A.DPL_ID
+						    , A.JEN_ID
+						    , A.JOB_ID
+						    , A.BLD_SEQ
+						    , A.BLD_NUM
+						    , A.BLD_RESULT AS RESULT
+						    ,SF_CMM1000_COM_CD_INFO('DPL00002', Z.JOB_TYPE_CD, '1') AS TYPE_NM
+						    , A.REG_DTM AS START_DTM
+						    , A.BLD_RESULT_MSG AS RESULT_MSG
+						    , A.REG_USR_ID
+						    , SF_ADM2000_USR_INFO(A.REG_USR_ID, 1) AS REG_USR_NM
+						    , SF_ADM2000_USR_INFO(A.REG_USR_ID, 6) AS REG_USR_IMG
+				    FROM DPL1400 A LEFT JOIN JEN1100 Z ON(Z.JEN_ID = A.JEN_ID AND Z.JOB_ID = A.JOB_ID)
+				    WHERE 1=1
+				    AND A.DPL_ID = #dplId#
+				    UNION ALL
+				    SELECT 'SIG' AS TYPE
+						    , B.DPL_ID
+						    , '' AS JEN_ID
+						    , B.SIGN_TXT AS JOB_ID
+						    , 0 AS BLD_SEQ
+						    , 0 AS BLD_NUM
+						    , B.SIGN_STS_CD AS RESULT
+						    , SF_CMM1000_COM_CD_INFO('REQ00004', B.SIGN_STS_CD, '1') AS TYPE_NM
+						    , B.SIGN_DTM AS START_DTM
+						    , B.SIGN_REJECT_TXT AS RESULT_MSG
+						    , B.SIGN_REG_USR_ID
+						    , SF_ADM2000_USR_INFO(B.SIGN_REG_USR_ID, 1) AS REG_USR_NM
+						    , SF_ADM2000_USR_INFO(B.SIGN_REG_USR_ID, 6) AS REG_USR_IMG
+				    FROM DPL1200 B
+				    WHERE 1=1
+				    AND B.DPL_ID = #dplId#
+	               
+				) C
+				ORDER BY C.START_DTM DESC
+		]]>
+	</select>
+	
+    
+    <select id="dpl1000DAO.selectDpl1400DplBldNumList" parameterClass="java.util.Map" resultClass="egovMap">
+		/* dpl1000DAO.selectDpl1400DplBldNumList - Job 빌드 목록 조회 */
+		SELECT *
+		FROM
+		(
+			SELECT ROWNUM AS RN, T1.*
+		    FROM
+		    (
+				SELECT A.DPL_ID
+						,A.JEN_ID
+						,A.JOB_ID
+						,A.BLD_SEQ
+						,A.BLD_NUM
+						,A.BLD_RESULT
+						,A.BLD_RESULT_MSG
+						,A.BLD_DURATION_TM
+						,A.BLD_START_DTM
+		                ,A.REG_DTM
+						,A.REG_USR_ID
+						, SF_ADM2000_USR_INFO(A.REG_USR_ID, 1) AS REG_USR_NM
+						,A.REG_USR_IP
+						,A.MODIFY_DTM
+						,A.MODIFY_USR_ID
+						,A.MODIFY_USR_IP
+				FROM DPL1400 A JOIN
+		        (
+		        	SELECT Z.DPL_ID, Z.JEN_ID, Z.JOB_ID, Z.BLD_NUM,MAX(BLD_SEQ) AS MAX_BLD_SEQ
+				    FROM DPL1400 Z
+				    WHERE 1=1
+				    GROUP BY Z.DPL_ID, Z.JEN_ID, Z.JOB_ID, Z.BLD_NUM
+		        ) B ON(A.DPL_ID = B.DPL_ID AND A.JEN_ID = B.JEN_ID AND A.JOB_ID = B.JOB_ID AND A.BLD_NUM = B.BLD_NUM AND A.BLD_SEQ = B.MAX_BLD_SEQ)
+				WHERE 1=1
+			        AND A.BLD_NUM > 0
+			        AND A.JEN_ID = #jenId#
+					AND A.JOB_ID = #jobId#
+				ORDER BY A.BLD_NUM DESC
+			) T1
+		) T2
+		WHERE 1=1
+		<![CDATA[
+		AND RN <= 100 /* 100건까지 */
+		]]>
+	</select>
+	
+	
+	<select id="dpl1000DAO.selectDpl1500NewChgId" parameterClass="java.util.Map" resultClass="java.lang.String">
+		<![CDATA[
+			/* dpl1000DAO.selectDpl1500NewChgId - 배포계획 수정이력 CHG_ID 구하기 (새로운 CHG_ID 따기)*/ 
+			SELECT	NVL( 
+							SUBSTR(NEW_CHG_ID, 1, 11) || LPAD( (TO_NUMBER(SUBSTR(NEW_CHG_ID, 12, 5)) + 1) , 5, '0')
+						,	'CHG' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '00001'
+            		) AS NEW_CHG_ID 
+			FROM	(
+			            SELECT	MAX(CHG_ID)  AS NEW_CHG_ID
+			            FROM	DPL1500 A
+			            WHERE	1=1
+                        AND		A.DPL_ID = #dplId#
+			            AND		A.CHG_ID LIKE 'CHG' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '%'
+					)
+		]]>
+	</select>
+	
+	
+	<insert id="dpl1000DAO.insertDpl1500ModifyHistoryInfo" parameterClass="java.util.Map">
+		<![CDATA[ 
+			/* dpl1000DAO.insertDpl1500ModifyHistoryInfo - 배포계획 수정이력 등록  */
+			INSERT INTO DPL1500 A
+	        (
+	        	DPL_ID				,CHG_ID					,CHG_NUM
+	           ,CHG_TYPE_CD				,CHG_NM				,CHG_OPT_TYPE_CD		,CHG_COMMON_CD
+	           ,PRE_VAL					,CHG_VAL			,CHG_USR_ID				,CHG_DTM
+	           ,REG_DTM					,REG_USR_ID			,REG_USR_IP
+	        )
+	        VALUES
+	        (
+	        	 #dplId#			,#chgId#				,#chgNum#
+	        	 ,#chgTypeCd#			,#chgNm#			,#chgOptTypeCd#			,#chgCommonCd#
+	        	 ,#preVal#				,#chgVal#			,#chgUsrId#				,SYSDATE
+	        	 ,SYSDATE				,#regUsrId#			,#regUsrIp#
+	        )
+		]]>
+	</insert>
+	
+	
+	<select id="dpl1000DAO.selectDpl1500ModifyHistoryList" parameterClass="java.util.Map" resultClass="egovMap">
+		<![CDATA[
+			/* dpl1000DAO.selectDpl1500ModifyHistoryList - 배포계획 수정이력 목록 가져오기 */ 
+			SELECT 'MOD' AS TYPE ,
+				A.DPL_ID					,A.CHG_ID			,A.CHG_NUM
+	            ,A.CHG_TYPE_CD				
+	            ,CASE A.CHG_OPT_TYPE_CD
+	            	WHEN '04' THEN SF_REQ4100_REQ_INFO(A.CHG_NM,'1')
+                    ELSE A.CHG_NM
+	            END AS CHG_NM
+	            ,CASE A.CHG_OPT_TYPE_CD
+                	WHEN '02' THEN SF_CMM1000_COM_CD_INFO(A.CHG_COMMON_CD, A.PRE_VAL,'1')
+					WHEN '03' THEN SF_ADM2000_USR_INFO(A.PRE_VAL,'1')
+					WHEN '04' THEN A.CHG_NM
+                    ELSE A.PRE_VAL
+                END AS PRE_VAL
+                ,CASE A.CHG_OPT_TYPE_CD
+                	WHEN '02' THEN SF_CMM1000_COM_CD_INFO(A.CHG_COMMON_CD, A.CHG_VAL,'1')
+					WHEN '03' THEN SF_ADM2000_USR_INFO(A.CHG_VAL,'1')
+                    ELSE A.CHG_VAL
+                END AS CHG_VAL
+                ,A.CHG_USR_ID
+	            ,SF_ADM2000_USR_INFO(A.CHG_USR_ID,'1') AS REG_USR_NM
+				,SF_ADM2000_USR_INFO(A.CHG_USR_ID,'2') AS REG_USR_EMAIL
+                ,SF_ADM2000_USR_INFO(A.CHG_USR_ID,'6') AS REG_USR_IMG
+                ,A.CHG_DTM
+	            ,A.REG_DTM,					A.REG_USR_ID,			A.REG_USR_IP
+			FROM DPL1500 A
+			WHERE 1=1
+			AND A.DPL_ID = #dplId#
+            ORDER BY A.CHG_ID DESC, A.CHG_NUM, A.CHG_DTM DESC
+		]]>	
+	
+	</select>
+	
+	
+	<select id="dpl1000DAO.selectDpl1000AllDplList" parameterClass="java.util.Map" resultClass="egovMap">
+		<![CDATA[
+			/* dpl1000DAO.selectDpl1000AllDplList - 모든 배포계획 자동배포 목록 가져오기 */ 
+			SELECT *
+			FROM (
+				SELECT
+					  ROWNUM RN
+					, A.DPL_ID
+					, A.DPL_NM
+					, A.DPL_VER
+					, A.DPL_DT
+					, A.DPL_USR_ID
+					, A.DPL_REVISION_NUM
+					, A.DPL_DESC
+					, A.DPL_STS_CD
+					, A.DPL_TYPE_CD
+					, A.DPL_AUTO_AFTER_CD
+					, A.DPL_AUTO_DTM
+					, A.DPL_RESTORE_CD
+					, B.SIGN_ID
+					, B.SIGN_STS_CD
+	                , B.SIGN_USR_ID
+	                , B.SIGN_TXT
+	                , B.SIGN_DTM
+	                , B.SIGN_REG_USR_ID
+					, A.REG_DTM 
+		            , A.REG_USR_ID 
+		            , A.REG_USR_IP 
+		            , A.MODIFY_DTM 
+		            , A.MODIFY_USR_ID 
+		            , A.MODIFY_USR_IP   
+	                , TO_DATE(TO_CHAR(A.DPL_DT,'YYYY-MM-DD') || ' ' || TO_CHAR(A.DPL_AUTO_DTM,'HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') AS DPL_ST_DTM
+				FROM DPL1000 A, DPL1200 B, PRJ1000 C
+				WHERE 1=1
+					AND A.DPL_STS_CD = '01'
+	                AND A.DPL_TYPE_CD = '01'
+					AND A.DPL_DEL_CD = '02'
+					AND B.SIGN_STS_CD = '02'
+		            AND A.DPL_ID = B.DPL_ID(+)
+		            AND B.SIGN_DTM = (
+	                			SELECT 
+							            	/*+ INDEX_DESC (Z IDX_PRJ_DPL_SIGN_DTM ) */  SIGN_DTM 
+							      FROM 
+							      			DPL1200 Z 
+								   WHERE 	1=1
+									AND 	Z.DPL_ID 	= B.DPL_ID
+									AND 	ROWNUM 		= 1    
+	        					)
+			) A
+	        WHERE 1=1
+	        AND A.DPL_ST_DTM > SYSDATE
+	        ORDER BY A.DPL_ST_DTM
+		]]>	
+	
+	</select>
+	
+	
+	<insert id="dpl1000DAO.insertDpl1600DeployBuildChgLogInfo" parameterClass="ChangeVO">
+		<![CDATA[ 
+			/* dpl1000DAO.insertDpl1600DeployBuildChgLogInfo - 배포 실행 변경 정보 등록  */
+			INSERT INTO DPL1600
+			(
+				DPL_ID						,JEN_ID					,JOB_ID
+				,BLD_SEQ				,CHG_TIMESTAMP				,CHG_DATE				,CHG_MSG
+				,CHG_REVISION			,CHG_USER
+				,REG_DTM				,REG_USR_ID					,REG_USR_IP		
+					    
+			)
+			VALUES
+			(
+				#dplId#					,#jenId#				,#jobId#
+				,#bldSeq#				,#timestamp#				,#date#					,#msg# 
+				,#revision#				,#user#
+				,SYSDATE				,#regUsrId#					,#regUsrIp#
+			)
+		]]>
+	</insert>
+	
+	
+	<insert id="dpl1000DAO.insertDpl1600DeployBuildChgPathLogInfo" parameterClass="ChangePathsVO">
+		<![CDATA[ 
+			/* dpl1000DAO.insertDpl1600DeployBuildChgPathLogInfo - 배포 변경 파일 정보 등록  */
+			INSERT INTO DPL1700
+			(
+				DPL_ID						,JEN_ID					,JOB_ID
+				,BLD_SEQ				,CHG_REVISION				,EDIT_TYPE_CD			,FILE_PATH
+				,REG_DTM				,REG_USR_ID					,REG_USR_IP		
+					    
+			)
+			VALUES
+			(
+				#dplId#					,#jenId#				,#jobId#
+				,#bldSeq#				,#revision#				,#editTypeCd#			,#filePath#
+				,SYSDATE				,#regUsrId#					,#regUsrIp#
+			)
+		]]>
+	</insert>
+	
+	
+	<select id="dpl1000DAO.selectDpl1600SvnChangeLogsList" parameterClass="java.util.Map" resultClass="egovMap">
+		<![CDATA[
+			/* dpl1000DAO.selectDpl1600SvnChangeLogsList - 배포 실행 변경 정보 목록 조회  */
+			SELECT 
+				A.DPL_ID
+				, A.JEN_ID
+				, A.JOB_ID
+				, A.BLD_SEQ
+				, A.CHG_REVISION
+				, A.CHG_TIMESTAMP
+				, A.CHG_DATE
+				, A.CHG_MSG
+				, A.CHG_USER
+				, A.REG_DTM
+				, A.REG_USR_ID
+				, A.REG_USR_IP
+				, A.MODIFY_DTM
+				, A.MODIFY_USR_ID
+				, A.MODIFY_USR_IP
+			FROM DPL1600 A
+			WHERE 1=1
+				AND A.DPL_ID = #dplId# 
+				AND A.JEN_ID = #jenId#
+				AND A.JOB_ID = #jobId#
+				AND A.BLD_SEQ = #bldSeq# 
+			ORDER BY A.CHG_REVISION DESC
+		]]>
+	</select>
+	
+	
+	<select id="dpl1000DAO.selectDpl1700SvnChangePathList" parameterClass="java.util.Map" resultClass="egovMap">
+		<![CDATA[
+			/* dpl1000DAO.selectDpl1700SvnChangePathList - 배포 변경 파일 목록 조회  */
+			SELECT 
+				A.DPL_ID
+				, A.JEN_ID
+				, A.JOB_ID
+				, A.BLD_SEQ
+				, A.CHG_REVISION
+				, A.FILE_PATH
+				, A.EDIT_TYPE_CD
+				, A.REG_DTM
+				, A.REG_USR_ID
+				, A.REG_USR_IP
+				, A.MODIFY_DTM
+				, A.MODIFY_USR_ID
+				, A.MODIFY_USR_IP
+			FROM DPL1700 A
+			WHERE 1=1
+				AND A.DPL_ID = #dplId# 
+				AND A.JEN_ID = #jenId#
+				AND A.JOB_ID = #jobId#
+				AND A.BLD_SEQ = #bldSeq#
+			ORDER BY REG_DTM DESC
+		]]>
+	</select>
+	
+	
+	<select id="dpl1000DAO.selectDpl1400DplNoneResultList" parameterClass="java.util.Map" resultClass="egovMap">
+		<![CDATA[
+			/* dpl1000DAO.selectDpl1400DplNoneResultList - 완료되지않은 배포 실행 이력 조회  */
+			SELECT
+				Z.DPL_ID
+				,Z.JEN_ID
+				,Z.JOB_ID
+				,Z.BLD_SEQ
+				,Z.BLD_NUM
+				,Z.BLD_MAIN_NUM
+				,Z.BLD_RESULT_CD
+			FROM
+			(
+				SELECT *
+				FROM DPL1400 Y
+				WHERE 1=1
+				AND Y.BLD_SEQ =
+				(
+					SELECT
+					/*+ INDEX_DESC (Z PK_DPL1400 ) */  BLD_SEQ
+					FROM DPL1400 Z
+					WHERE 	1=1
+					AND Z.DPL_ID = Y.DPL_ID 
+					AND Z.JEN_ID = Y.JEN_ID
+					AND Z.JOB_ID = Y.JOB_ID
+					AND ROWNUM = 1
+				)
+			) Z
+			WHERE 1=1
+			AND Z.BLD_RESULT_CD IN ('01','02')
+
+		]]>
+	</select>
+</sqlMap>

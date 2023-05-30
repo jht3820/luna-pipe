@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- - DispatcherServlet application context for Application's web tier. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+                			http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+	
+	<!-- 패키지 내 Controller, Service, Repository 클래스의 auto detect를 위한 mvc 설정 -->
+	<context:component-scan base-package="egovframework,kr.opensoftlab">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+    </context:component-scan>
+    
+    
+	<!-- mvc인터셉터 추가 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/restapi/**" />
+			<bean class="kr.opensoftlab.sdf.interceptor.RestfulInterceptor" />
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/**/*.do" />
+			<bean class="kr.opensoftlab.sdf.interceptor.RequestParamCheckInterceptor" />
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/**/*.do" />
+			<bean class="kr.opensoftlab.sdf.interceptor.AuthenticInterceptor">
+				<property name="permitURLs">
+					<list>
+						<value>/cmm/cmm4000/cmm4000/selectCmm4000View.do</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/**/select*.do" />
+			<mvc:mapping path="/**/insert*.do" />
+			<mvc:mapping path="/**/update*.do" />
+			<mvc:mapping path="/**/delete*.do" />
+			<mvc:mapping path="/**/save*.do" />
+			<bean class="kr.opensoftlab.sdf.interceptor.UserUseControllerLog" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+	<!-- 서블릿컨네이너상의 exception에 대한 오류 페이지를 연결하는 mvc 설정-->
+    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="defaultErrorView" value="err/error"/>
+        <property name="exceptionMappings">
+            <props>
+                <prop key="org.springframework.dao.DataAccessException">err/error</prop>
+                <prop key="org.springframework.transaction.TransactionException">err/error</prop>
+                <prop key="egovframework.rte.fdl.cmmn.exception.EgovBizException">err/error</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <!-- 화면처리용 JSP 파일명의  prefix, suffix 처리에 대한 mvc 설정  -->
+    <bean class="org.springframework.web.servlet.view.UrlBasedViewResolver" p:order="2"
+	    p:viewClass="org.springframework.web.servlet.view.JstlView"
+	    p:prefix="/WEB-INF/jsp/lunaops" p:suffix=".jsp"/>
+    
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="webBindingInitializer">
+			<bean class="egovframework.com.cmm.web.EgovBindingInitializer" />
+		</property>
+	</bean>
+	
+	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
+
+	<!-- For Pagination Tag -->
+    <bean id="imageRenderer" class="kr.opensoftlab.sdf.paging.OslImgPaginationRenderer"/>
+    
+	<!-- View 선택을 bean id로 찾아서 사용하기 위한 리절버 -->
+	<bean id="beanNameViewResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver" p:order="0" />
+	
+	<!-- JSON  View 설정 -->
+	<bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
+		<property name="contentType" value="text/plain;charset=UTF-8"/>
+	</bean>
+</beans>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="log1000DAO">
+	 
+    <typeAlias alias="log1000VO"	type="kr.opensoftlab.lunaops.adm.adm5000.log1000.vo.Log1000VO"/>
+	<typeAlias alias="egovMap"	 	type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	
+	
+   	<resultMap id="resultMapSelectLog1000" class="log1000VO">
+			<result property="rn"			column="RN"/>
+			<result property="logUsrId"   column="LOG_USR_ID"/>
+			<result property="logTime"    column="LOG_TIME"/>
+			<result property="logIp"      column="LOG_IP"/>
+			<result property="logUsrNm"   column="USR_NM"/>
+			<result property="menuId"   column="MENU_ID"/>
+			<result property="menuNm"   column="MENU_NM"/>
+			<result property="menuUrl"   column="MENU_URL"/>
+			<result property="menuCd"   column="MENU_CD"/>
+    </resultMap>
+	
+	
+	
+	<sql id="selectLog1000List">
+				SELECT 
+						T1.LOG_USR_ID
+						, to_char(T1.LOG_TIME,'YYYY-MM-DD HH24:MI:SS') as LOG_TIME /* 로그 일시 */
+						,T1.LOG_IP
+						,T1.LOG_URL
+						,NVL(T2.USR_NM,'-') USR_NM
+						,T1.MENU_ID
+						,T1.MENU_NM
+						,T1.MENU_URL
+						,T1.MENU_CD
+				FROM 
+						LOG1000 T1,
+						ADM2000 T2
+				WHERE T1.LOG_USR_ID = T2.USR_ID 
+				<isNotEmpty property="searchSelect" >
+					<isNotEmpty property="searchTxt">
+					<isEqual property="searchSelect" compareValue="logUsrId">
+						AND		T1.LOG_USR_ID LIKE '%'|| #searchTxt# || '%'
+					</isEqual>
+					<isEqual property="searchSelect" compareValue="logIp">
+						AND		T1.LOG_IP LIKE '%'|| #searchTxt# || '%'
+					</isEqual>
+					<isEqual property="searchSelect" compareValue="usrNm">
+						AND		T2.USR_NM LIKE '%'|| #searchTxt# || '%'
+					</isEqual>
+					</isNotEmpty>
+				</isNotEmpty>
+				<isEqual property="searchSelect" compareValue="menuCd">
+				<isNotEmpty property="searchCd">
+					<isNotEqual property="searchCd" compareValue="09">
+						AND		T1.MENU_CD = #searchCd#
+					</isNotEqual>
+					<isEqual property="searchCd" compareValue="09">
+						AND		T1.MENU_CD = #searchCd#
+					</isEqual>
+				</isNotEmpty>
+				</isEqual>
+				<isNotEmpty property="srchFromDt">
+					AND T1.LOG_TIME &gt;= TO_DATE(#srchFromDt#, 'YYYY-MM-DD')
+				</isNotEmpty>
+				<isNotEmpty property="srchToDt">
+					AND T1.LOG_TIME  &lt;= TO_DATE(#srchToDt#, 'YYYY-MM-DD') + 1
+				</isNotEmpty>
+				ORDER BY T1.LOG_TIME DESC
+    </sql>
+    
+    
+    <select id="log1000DAO.selectLog1000List" parameterClass="log1000VO"  resultClass="egovMap">
+	    /*log1000DAO.selectLog1000List  시스템 사용 이력 로그 목록을 조회한다.*/
+		SELECT *
+		FROM
+			(
+    		SELECT ROWNUM RN,
+    			     A.*
+    		FROM
+    		(
+					<include refid="selectLog1000List"/>
+	    			) A
+	    	)
+	    	WHERE RN BETWEEN (#firstIndex#+1) AND #lastIndex#
+    </select>
+    
+    
+    <select id="log1000DAO.selectLog1000ListCnt" parameterClass="log1000VO"  resultClass="java.lang.Integer">
+	    /*log1000DAO.selectLog1000ListCnt  시스템 사용 이력 로그 목록 총건수를 조회한다.*/
+	    SELECT
+			COUNT(*)
+		FROM	(
+			<include refid="selectLog1000List"/>
+						) A
+    </select>
+	
+	
+	<select id="log1000DAO.selectLog1000ExcelList" parameterClass="log1000VO"  resultClass="egovMap">
+	    /*log1000DAO.selectLog1000ExcelList  시스템 사용 이력 로그 목록엑셀 을 조회한다.*/
+
+		<include refid="selectLog1000List"/>
+
+    </select>
+	
+	
+	<insert id="log1000DAO.insertLog1000SystemUseLog" parameterClass="log1000VO">
+		<![CDATA[ 
+			/* log1000DAO.insertLog1000SystemUseLog - 시스템 사용이력 쌓기  쌓기  */
+			INSERT INTO LOG1000
+            (	
+            	LOG_TIME,	LOG_URL,	LOG_USR_ID,		
+            	LOG_IP,			MENU_ID,	MENU_NM,	MENU_URL,
+            	MENU_CD
+            )
+            VALUES
+            (
+            	SYSDATE,	#logUrl#,	#logUsrId#,	
+            	#logIp#,		#menuId#,	#menuNm#,	#menuUrl#,
+            	#menuCd#
+            )
+		]]>
+	</insert>
+	
+</sqlMap>

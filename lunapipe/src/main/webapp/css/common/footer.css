@@ -1,0 +1,11 @@
+@CHARSET "UTF-8";
+footer{ height:40px; line-height:40px; background:#212830; text-align:center; font-size:14px; clear:both; width:100%; z-index: 100;        position: relative; }
+footer .contents{ color:white; }
+footer .contents .blue_text{ color:#01c5ff; font-weight:bold; }
+ 
+/* 반응형 속성 제거 */
+/*
+@media all and (max-width:875px){
+	footer{ margin-top:100px; }
+}
+*/

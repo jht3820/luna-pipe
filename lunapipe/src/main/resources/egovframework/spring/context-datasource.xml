@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 	xmlns="http://www.springframework.org/schema/beans" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:context="http://www.springframework.org/schema/context"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+							http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+	
+	<!-- JDBC Property import -->
+	<context:property-placeholder location="classpath:/egovframework/egovProps/globals.properties" />
+	
+	<!-- DataSource -->
+	<alias name="dataSource-${Globals.DbType}" alias="oslops.dataSource"/>
+    <alias name="dataSource-${Globals.DbType}" alias="dataSource"/>
+	
+	<bean id="dataSource-mariadb" class="kr.opensoftlab.sdf.commons.dbcp.BasicDataSourceEnDe" destroy-method="close">
+        <property name="driverClassName" 		value="${Globals.lunaops.mariadb.driver}"/>
+        <property name="url" 					value="${Globals.lunaops.mariadb.url}"/>
+        <property name="username" 				value="${Globals.lunaops.mariadb.username}"/>
+        <property name="password" 				value="${Globals.lunaops.mariadb.password}"/>
+      	<property name="maxActive" 				value="${Globals.lunaops.maxActive}" />
+		<property name="maxIdle" 				value="${Globals.lunaops.maxIdle}" />
+		<property name="maxWait" 				value="${Globals.lunaops.maxWait}" />
+		<property name="validationQuery" 		value="${Globals.lunaops.mariadb.validationQuery}"/>
+		<property name="validationQueryTimeout" value="${Globals.lunaops.validationQueryTimeout}"/>
+    </bean>
+    
+</beans>

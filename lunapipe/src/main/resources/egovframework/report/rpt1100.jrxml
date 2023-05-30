@@ -1,0 +1,791 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report3" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="80d20c72-5942-4b22-a747-24fdff16c77a">
+	<property name="ireport.zoom" value="1.2100000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.callouts" value="##Fri Oct 04 16:36:58 KST 2019"/>
+	<style name="td_title" mode="Opaque" forecolor="#000000" backcolor="#D7D7D7" fill="Solid" hAlign="Center" vAlign="Middle" rotation="None" isBlankWhenNull="true" fontName="맑은 고딕" fontSize="12" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true">
+		<pen lineWidth="0.5"/>
+	</style>
+	<style name="td_title_string" fill="Solid" hAlign="Center" vAlign="Middle" isBlankWhenNull="true" fontName="맑은 고딕" fontSize="10" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+	<style name="td_contents_string" mode="Opaque" forecolor="#000000" hAlign="Center" vAlign="Middle" isBlankWhenNull="true" fontName="맑은 고딕" fontSize="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true">
+		<pen lineWidth="0.5"/>
+	</style>
+	<style name="td_contents" forecolor="#000000" hAlign="Center" vAlign="Middle" isBlankWhenNull="true" fontName="맑은 고딕" fontSize="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true">
+		<pen lineWidth="0.5" lineColor="#000000"/>
+	</style>
+	<style name="optTitle" isBlankWhenNull="true" fontName="맑은 고딕" fontSize="9" isBold="true" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true">
+		<pen lineWidth="0.5" lineColor="#000000"/>
+		<paragraph leftIndent="5" spacingBefore="5"/>
+	</style>
+	<style name="table 2" fill="Solid" hAlign="Center" vAlign="Middle" isBlankWhenNull="true" fontName="맑은 고딕" fontSize="11" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true">
+		<pen lineWidth="0.5" lineColor="#000000"/>
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TH" mode="Opaque" backcolor="#F0F8FF" isBlankWhenNull="true" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_CH" mode="Opaque" backcolor="#D7D7D7" fill="Solid" hAlign="Center" vAlign="Middle" isBlankWhenNull="true" fontName="맑은 고딕" fontSize="10" isBold="true" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true">
+		<pen lineWidth="0.5" lineColor="#000000"/>
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TD" mode="Opaque" backcolor="#FFFFFF" fill="Solid" hAlign="Center" vAlign="Middle" isBlankWhenNull="true" fontName="맑은 고딕" fontSize="10" isStrikeThrough="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true">
+		<pen lineWidth="0.5" lineColor="#000000"/>
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="prjDplActionCnt" uuid="3aba6fcf-4c7d-47d4-898b-61060e97c3a1">
+		<queryString language="json">
+			<![CDATA[prjDplActionCnt]]>
+		</queryString>
+		<field name="bldResult" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="bldResultCnt" class="java.lang.Integer">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="bldDurationTmSum" class="java.lang.Integer">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="bldDurationTmSumStr" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="prjDplResultSuccCnt" uuid="e809a443-6b78-4583-8d49-833321aa1e1c">
+		<queryString language="json">
+			<![CDATA[prjDplResultSuccCnt]]>
+		</queryString>
+		<field name="bldResultCnt" class="java.lang.String"/>
+		<field name="bldSuccResultCnt" class="java.lang.String"/>
+		<field name="bldSuccPercent" class="java.lang.String"/>
+		<field name="revisionPathsCnt" class="java.lang.String"/>
+		<field name="bldDurationTmSumStr" class="java.lang.String"/>
+		<field name="dplNm" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="prjJobResultSuccCnt" uuid="761c2bef-c62e-4c8b-810b-6197b89fbbcf">
+		<queryString language="json">
+			<![CDATA[prjJobResultSuccCnt]]>
+		</queryString>
+		<field name="jenNm" class="java.lang.String"/>
+		<field name="jobId" class="java.lang.String"/>
+		<field name="bldResultCnt" class="java.lang.String"/>
+		<field name="bldSuccResultCnt" class="java.lang.String"/>
+		<field name="bldDurationTmSumStr" class="java.lang.String"/>
+		<field name="bldSuccPercent" class="java.lang.String"/>
+		<field name="revisionPathsCnt" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="prjRecentDplLogList" uuid="6176ee40-58b8-491f-80d5-900ab13152e7">
+		<queryString language="json">
+			<![CDATA[prjRecentDplLogList]]>
+		</queryString>
+		<field name="jenNm" class="java.lang.String"/>
+		<field name="dplNm" class="java.lang.String"/>
+		<field name="jobId" class="java.lang.String"/>
+		<field name="bldStartDtm" class="java.lang.String"/>
+		<field name="bldResultMsg" class="java.lang.String"/>
+		<field name="bldUsrNm" class="java.lang.String"/>
+		<field name="bldDurationTmStr" class="java.lang.String"/>
+		<field name="revisionPathsCnt" class="java.lang.String"/>
+	</subDataset>
+	<queryString language="json">
+		<![CDATA[]]>
+	</queryString>
+	<field name="prjNm" class="java.lang.String"/>
+	<field name="reportRangeDtm" class="java.lang.String"/>
+	<field name="prjDplResultSuccCnt" class="java.lang.Object"/>
+	<field name="prjRecentDplLogList" class="java.lang.Object"/>
+	<field name="prjDplActionCnt" class="java.lang.Object"/>
+	<field name="prjJobResultSuccCnt" class="java.lang.Object"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="43" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="555" height="39" isPrintWhenDetailOverflows="true" uuid="f6f48f6a-64da-4e65-9d9c-aad1f991dead"/>
+				<textElement textAlignment="Center">
+					<font fontName="맑은 고딕" size="22" isBold="true" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[배포 보고서]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="30" splitType="Immediate">
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="30" isPrintWhenDetailOverflows="true" uuid="25021152-a062-4893-81b2-8a2e44f549a0"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="97" y="0" width="227" height="30" isPrintWhenDetailOverflows="true" uuid="5aac15e8-aafc-443c-8387-6a6fef5a8065"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="324" y="0" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="a39671c4-e0a6-407e-b7b4-575b5437c02b"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="399" y="0" width="156" height="30" isPrintWhenDetailOverflows="true" uuid="49c7b3ed-729e-444d-8412-04428042ace3"/>
+			</rectangle>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="30" isPrintWhenDetailOverflows="true" uuid="6f39f2d8-7266-40b9-848b-aa75a667ea0f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[프로젝트]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="324" y="0" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="a84cecfd-820c-4fff-b402-02616d760530"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[요청 일시]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="399" y="0" width="156" height="30" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="73a2fbcc-1cc3-4424-9d09-e924f1afe6ae"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{reportRangeDtm}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="97" y="5" width="227" height="20" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="436cbdd2-51df-493f-ac7a-376130ab6e5f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{prjNm}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="226">
+			<printWhenExpression><![CDATA[!$F{prjDplActionCnt}.toString().equals( "[]" )]]></printWhenExpression>
+			<elementGroup>
+				<rectangle>
+					<reportElement style="optTitle" x="0" y="0" width="555" height="25" isPrintWhenDetailOverflows="true" uuid="d75a8758-db2d-4c5f-8922-6c655bc77ccd"/>
+				</rectangle>
+				<staticText>
+					<reportElement style="optTitle" stretchType="RelativeToTallestObject" x="0" y="4" width="121" height="21" isPrintWhenDetailOverflows="true" uuid="f81d921b-f60e-4d9a-8f96-4388a23b1dff"/>
+					<textElement>
+						<font size="9" pdfFontName="HYGoThic-Medium" isPdfEmbedded="true"/>
+						<paragraph lineSpacing="Single" firstLineIndent="5"/>
+					</textElement>
+					<text><![CDATA[- 배포 실행 정보]]></text>
+				</staticText>
+			</elementGroup>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="0" y="25" width="555" height="201" isPrintWhenDetailOverflows="true" uuid="de361d03-55d8-4e3d-9ab1-1c72544eb521"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</rectangle>
+			<pie3DChart>
+				<chart>
+					<reportElement x="15" y="36" width="523" height="176" uuid="468fa77c-86c5-4ff3-a71c-ee2da8263527"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<dataset>
+						<datasetRun subDataset="prjDplActionCnt" uuid="f0303320-430f-4249-ac6a-d38a72673db4">
+							<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("prjDplActionCnt")]]></dataSourceExpression>
+						</datasetRun>
+					</dataset>
+					<keyExpression><![CDATA[$F{bldResult}]]></keyExpression>
+					<valueExpression><![CDATA[$F{bldResultCnt}.intValue()]]></valueExpression>
+					<labelExpression><![CDATA[$F{bldResult}+": "+$F{bldResultCnt}.toString()]]></labelExpression>
+				</pieDataset>
+				<pie3DPlot>
+					<plot backgroundAlpha="1.0"/>
+					<itemLabel/>
+				</pie3DPlot>
+			</pie3DChart>
+		</band>
+		<band height="50" splitType="Prevent">
+			<printWhenExpression><![CDATA[!$F{prjDplActionCnt}.toString().equals( "[]" )]]></printWhenExpression>
+			<componentElement>
+				<reportElement key="table 2" style="table 2" stretchType="RelativeToBandHeight" x="0" y="0" width="555" height="50" forecolor="#000000" uuid="9aea16f6-b9b1-4eab-a338-67e41ceec190"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="prjDplActionCnt" uuid="30c86723-826c-46bb-b939-16afbaa92a16">
+						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("prjDplActionCnt")]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="185" uuid="1db5662f-adec-40eb-8d6e-0bb60fda6e25">
+						<jr:columnHeader style="table 2_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="185" height="30" uuid="cbe1c9e4-b560-4a76-a3df-7bd35ac61e78"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="9" pdfEncoding="UniKS-UCS2-H"/>
+								</textElement>
+								<text><![CDATA[결과]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 2_TD" height="20" rowSpan="1">
+							<textField>
+								<reportElement style="table 2_TD" x="0" y="0" width="185" height="20" uuid="06075007-37d4-49d5-9ad9-41877220d342"/>
+								<textElement>
+									<font size="8" pdfEncoding="UniKS-UCS2-H"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{bldResult}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="185" uuid="1b2a4e32-39fc-4cdf-899f-46aae61c8df8">
+						<jr:columnHeader style="table 2_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="185" height="30" uuid="77379d98-42ae-4ff4-8c09-4034a3cbdf1d"/>
+								<textElement>
+									<font size="9" pdfEncoding="UniKS-UCS2-H"/>
+								</textElement>
+								<text><![CDATA[배포 수]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 2_TD" height="20" rowSpan="1">
+							<textField>
+								<reportElement style="table 2_TD" x="0" y="0" width="185" height="20" uuid="56bba3cc-d367-4b07-9a31-4924c5627d93"/>
+								<textElement>
+									<font size="8" pdfEncoding="UniKS-UCS2-H"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{bldResultCnt}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="185" uuid="84aa6ed2-a081-42bc-af08-2af9855bad51">
+						<jr:columnHeader style="table 2_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="185" height="30" uuid="54e07548-1cd9-4e1b-8773-e767e9a4aa43"/>
+								<textElement>
+									<font size="9" pdfEncoding="UniKS-UCS2-H"/>
+								</textElement>
+								<text><![CDATA[총 소요시간]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 2_TD" height="20" rowSpan="1">
+							<textField>
+								<reportElement style="table 2_TD" x="0" y="0" width="185" height="20" uuid="8aad9ae3-1c7b-4e43-bb1c-317c8d999999"/>
+								<textElement>
+									<font size="8" pdfEncoding="UniKS-UCS2-H"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{bldDurationTmSumStr}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="75" splitType="Stretch">
+			<printWhenExpression><![CDATA[!$F{prjDplResultSuccCnt}.toString().equals( "[]" )]]></printWhenExpression>
+			<elementGroup>
+				<rectangle>
+					<reportElement style="optTitle" x="0" y="0" width="555" height="25" uuid="093c88da-4ecb-4500-aa21-26ca77a21644"/>
+				</rectangle>
+				<staticText>
+					<reportElement style="optTitle" x="0" y="4" width="121" height="21" uuid="08c05120-3450-48a9-a43a-aa865e36f58a"/>
+					<textElement>
+						<font size="9"/>
+						<paragraph lineSpacing="Single" firstLineIndent="5"/>
+					</textElement>
+					<text><![CDATA[- 배포 상세 정보]]></text>
+				</staticText>
+			</elementGroup>
+			<componentElement>
+				<reportElement key="table" x="0" y="25" width="555" height="50" uuid="ad57cf01-eb4d-49b0-83fc-93653d4990ac"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="prjDplResultSuccCnt" uuid="e13d38a3-9ffb-4008-a9f8-0a16565f83d9">
+						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("prjDplResultSuccCnt")]]></dataSourceExpression>
+					</datasetRun>
+					<jr:columnGroup width="555" uuid="3dba2940-3825-48e4-872a-f6f94ed24408">
+						<jr:column width="93" uuid="a2622599-ac1b-41da-b37c-139246bd9e28">
+							<jr:columnHeader height="30" rowSpan="1">
+								<staticText>
+									<reportElement style="table 2_CH" x="0" y="0" width="93" height="30" uuid="155662ca-9579-4c65-9cd9-1d1445cf7047"/>
+									<textElement>
+										<font size="9"/>
+									</textElement>
+									<text><![CDATA[배포 계획]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="30" rowSpan="1">
+								<textField isStretchWithOverflow="true">
+									<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="93" height="30" isPrintWhenDetailOverflows="true" uuid="738d756b-bb0a-4ccc-afc9-89315719aa14"/>
+									<textElement>
+										<font size="8"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{dplNm}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="92" uuid="da54273e-23c4-4018-8d44-8f1ec4d98a37">
+							<jr:columnHeader height="30" rowSpan="1">
+								<staticText>
+									<reportElement style="table 2_CH" x="0" y="0" width="92" height="30" uuid="da147f66-b893-4e7e-a5f6-2933270db7ec"/>
+									<textElement>
+										<font size="9"/>
+									</textElement>
+									<text><![CDATA[배포 수]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="30" rowSpan="1">
+								<textField isStretchWithOverflow="true">
+									<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="92" height="30" isPrintWhenDetailOverflows="true" uuid="a133307e-5da0-45aa-a9e4-ea2a5c972281"/>
+									<textElement>
+										<font size="8"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{bldResultCnt}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="92" uuid="62e12f5d-f573-4015-b529-26c47a4f187e">
+							<jr:columnHeader height="30" rowSpan="1">
+								<staticText>
+									<reportElement style="table 2_CH" x="0" y="0" width="92" height="30" uuid="db2651f0-ba74-4cbb-ac4b-3bca05557180"/>
+									<textElement>
+										<font size="9"/>
+									</textElement>
+									<text><![CDATA[배포 성공 수]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="30" rowSpan="1">
+								<textField isStretchWithOverflow="true">
+									<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="92" height="30" isPrintWhenDetailOverflows="true" uuid="905832ce-c2dd-49f5-a894-de1728c76aa4"/>
+									<textElement>
+										<font size="8"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{bldSuccResultCnt}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="93" uuid="4ad4bbb0-6088-452c-ba02-da8b17b75b9e">
+							<jr:columnHeader height="30" rowSpan="1">
+								<staticText>
+									<reportElement style="table 2_CH" x="0" y="0" width="93" height="30" uuid="89ce43dd-addc-408a-b93f-96524657bcc4"/>
+									<textElement>
+										<font size="9"/>
+									</textElement>
+									<text><![CDATA[배포 성공률]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="30" rowSpan="1">
+								<textField isStretchWithOverflow="true">
+									<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="93" height="30" isPrintWhenDetailOverflows="true" uuid="11fbb006-da72-41d8-b9e8-634f5e2606c1"/>
+									<textElement>
+										<font size="8"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{bldSuccPercent}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="93" uuid="5bd03a9e-a908-4d16-b95d-f0156ebfa0e9">
+							<jr:columnHeader height="30" rowSpan="1">
+								<staticText>
+									<reportElement style="table 2_CH" x="0" y="0" width="93" height="30" uuid="7e020339-67c4-47c9-b33c-603b264fd2d8"/>
+									<textElement>
+										<font size="9"/>
+									</textElement>
+									<text><![CDATA[총 소요시간]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="30" rowSpan="1">
+								<textField isStretchWithOverflow="true">
+									<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="93" height="30" isPrintWhenDetailOverflows="true" uuid="11cbe6d8-38ab-4468-b292-2f053908022c"/>
+									<textElement>
+										<font size="8"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{bldDurationTmSumStr}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="92" uuid="ff8a2fa4-987b-4163-9fed-91f96808e7dc">
+							<jr:columnHeader height="30" rowSpan="1">
+								<staticText>
+									<reportElement style="table 2_CH" x="0" y="0" width="92" height="30" uuid="82230a1b-b5fd-4ccb-a294-fac6b5255936"/>
+									<textElement>
+										<font size="9"/>
+									</textElement>
+									<text><![CDATA[변경된 파일 수]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="30" rowSpan="1">
+								<textField isStretchWithOverflow="true">
+									<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="92" height="30" isPrintWhenDetailOverflows="true" uuid="72b49306-5c80-4f12-b72f-630fcf2fde44"/>
+									<textElement>
+										<font size="8"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{revisionPathsCnt}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:columnGroup>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="75">
+			<printWhenExpression><![CDATA[!$F{prjJobResultSuccCnt}.toString().equals( "[]" )]]></printWhenExpression>
+			<elementGroup>
+				<rectangle>
+					<reportElement style="optTitle" x="0" y="0" width="555" height="25" uuid="1e81b28c-6e0b-475b-996e-0c110ef8f02c"/>
+				</rectangle>
+				<staticText>
+					<reportElement style="optTitle" x="0" y="4" width="121" height="21" uuid="3c8ed4b0-b61a-4e22-b933-4db8dd3703bb"/>
+					<textElement>
+						<font size="9"/>
+						<paragraph lineSpacing="Single" firstLineIndent="5"/>
+					</textElement>
+					<text><![CDATA[- JOB 목록]]></text>
+				</staticText>
+			</elementGroup>
+			<componentElement>
+				<reportElement key="table" x="0" y="25" width="555" height="50" uuid="5d77ff5b-c8b6-4f29-b654-904954f7d85c"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="prjJobResultSuccCnt" uuid="5bf4e830-02c1-49b7-8b48-9fd10391a912">
+						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("prjJobResultSuccCnt")]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="80" uuid="6deaa7a4-2776-42d5-a504-c1ab42c9b2c3">
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="80" height="30" uuid="046b16fa-1537-43b1-bb28-8cb44c791cb0"/>
+								<textElement>
+									<font size="9"/>
+								</textElement>
+								<text><![CDATA[JENKINS]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="30" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="80" height="30" isPrintWhenDetailOverflows="true" uuid="7ac2d15c-9d42-4fe9-ab9c-de6641369687"/>
+								<textElement>
+									<font size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{jenNm}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="80" uuid="7ae53926-e887-4586-ba95-48e117a8a753">
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="80" height="30" uuid="f9447c29-dac2-416b-a81b-e6797bfb5c94"/>
+								<textElement>
+									<font size="9"/>
+								</textElement>
+								<text><![CDATA[JOB]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="30" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="80" height="30" isPrintWhenDetailOverflows="true" uuid="4b8e1e60-1e14-4368-a307-78965e0f2ddd"/>
+								<textElement>
+									<font size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{jobId}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="79" uuid="51a773dd-5173-4817-9bca-01c4837e492c">
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="79" height="30" uuid="2c7a5ac8-35b8-44c8-a8df-b646eb60504f"/>
+								<textElement>
+									<font size="9"/>
+								</textElement>
+								<text><![CDATA[배포 수]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="30" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="79" height="30" isPrintWhenDetailOverflows="true" uuid="4fc69a32-0dbb-4f8d-873d-8b94791f2fa5"/>
+								<textElement>
+									<font size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{bldResultCnt}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="79" uuid="c634cbf5-5c53-40de-ab37-7f013abaa1e4">
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="79" height="30" uuid="5f50475b-8c66-4c2b-9968-983fe7e01edf"/>
+								<textElement>
+									<font size="9"/>
+								</textElement>
+								<text><![CDATA[배포 성공 수]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="30" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="79" height="30" isPrintWhenDetailOverflows="true" uuid="6691917c-47ba-4cbc-8e5f-4db618d6a832"/>
+								<textElement>
+									<font size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{bldSuccResultCnt}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="79" uuid="f40166c9-ed0f-4554-9a7a-0a074d196ac2">
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="79" height="30" uuid="da450ca6-62eb-4696-88f1-faca609eb766"/>
+								<textElement>
+									<font size="9"/>
+								</textElement>
+								<text><![CDATA[배포 성공률]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="30" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="79" height="30" isPrintWhenDetailOverflows="true" uuid="6f787bf7-5efe-45b3-86e9-0d2a597e6b18"/>
+								<textElement>
+									<font size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{bldSuccPercent}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="79" uuid="a09cda22-7bed-44d1-aea8-e0b6323475d2">
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="79" height="30" uuid="03491c70-d2c0-4c08-bd28-a5d025e34b4e"/>
+								<textElement>
+									<font size="9"/>
+								</textElement>
+								<text><![CDATA[총 소요시간]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="30" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="79" height="30" isPrintWhenDetailOverflows="true" uuid="0ca76c2d-e958-4247-bcb8-5b76b828a1a7"/>
+								<textElement>
+									<font size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{bldDurationTmSumStr}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="79" uuid="11b15182-c36f-4dd4-a3f6-d114db6d4643">
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="79" height="30" uuid="b15c5ee7-f6e2-40c4-abae-e3346c9504f5"/>
+								<textElement>
+									<font size="9"/>
+								</textElement>
+								<text><![CDATA[변경된 파일 수]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="30" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="79" height="30" isPrintWhenDetailOverflows="true" uuid="4d9bee7e-c6d2-4a46-9a9a-4de2e763314b"/>
+								<textElement>
+									<font size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{revisionPathsCnt}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="75">
+			<printWhenExpression><![CDATA[!$F{prjRecentDplLogList}.toString().equals( "[]" )]]></printWhenExpression>
+			<elementGroup>
+				<rectangle>
+					<reportElement style="optTitle" x="0" y="0" width="555" height="25" uuid="d152f758-0834-4938-b631-9c431a2d4c54"/>
+				</rectangle>
+				<staticText>
+					<reportElement style="optTitle" x="0" y="4" width="121" height="21" uuid="a1855a78-79f0-4ade-8537-7c76457f9ccc"/>
+					<textElement>
+						<font size="9"/>
+						<paragraph lineSpacing="Single" firstLineIndent="5"/>
+					</textElement>
+					<text><![CDATA[- 최근 배포 이력]]></text>
+				</staticText>
+			</elementGroup>
+			<componentElement>
+				<reportElement key="table" x="0" y="25" width="555" height="50" isPrintWhenDetailOverflows="true" uuid="281577e8-a0e4-4cf8-af3e-4caa458bf5d6"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="prjRecentDplLogList" uuid="45d0ac59-5fad-446c-b744-d29a08bb6f99">
+						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("prjRecentDplLogList")]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="70" uuid="c54d546b-d0b0-43fb-adf4-53bbaab48152">
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="70" height="30" uuid="83702c14-ddef-4518-9ff2-da7bb8c9a44f"/>
+								<textElement>
+									<font size="9"/>
+								</textElement>
+								<text><![CDATA[배포 계획]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="20" isPrintWhenDetailOverflows="true" uuid="87953bca-4291-457d-b7b3-7bc14e52252d"/>
+								<textElement>
+									<font size="8" pdfFontName="HYGoThic-Medium" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{dplNm}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="4610476d-09a1-4763-b691-4bb4fb44f8d6">
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="69" height="30" uuid="cd51b361-ccbc-49b7-9557-13c9653d6a20"/>
+								<textElement>
+									<font size="9"/>
+								</textElement>
+								<text><![CDATA[JENKINS]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="69" height="20" isPrintWhenDetailOverflows="true" uuid="ba282c02-f4c8-4b6a-8eb8-813ff807043c"/>
+								<textElement>
+									<font size="8" pdfFontName="HYGoThic-Medium" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{jenNm}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="0143b57e-f2ec-4b3b-9e68-f6d068d900ad">
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="69" height="30" uuid="16cc08d6-6e0e-4afa-95b4-dbbf02383d68"/>
+								<textElement>
+									<font size="9"/>
+								</textElement>
+								<text><![CDATA[JOB]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="69" height="20" isPrintWhenDetailOverflows="true" uuid="730707fe-ce7a-475c-9d39-c6981e278671"/>
+								<textElement>
+									<font size="8" pdfFontName="HYGoThic-Medium" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{jobId}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="70" uuid="c2e67838-ae4c-4ee1-ba47-85b6164e5c1a">
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="70" height="30" uuid="3340afea-9230-4d91-8e9a-dfd64447075e"/>
+								<textElement>
+									<font size="9"/>
+								</textElement>
+								<text><![CDATA[배포 일시]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="20" isPrintWhenDetailOverflows="true" uuid="272c8e7c-8e5d-4cd4-a8c1-6e09d3ee430a"/>
+								<textElement>
+									<font size="7" pdfFontName="HYGoThic-Medium" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{bldStartDtm}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="70" uuid="04ac0a21-5150-476a-8705-2ee5c6e91f5a">
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="70" height="30" uuid="e7d2a246-824f-49e5-a07d-ef7561814156"/>
+								<textElement>
+									<font size="9"/>
+								</textElement>
+								<text><![CDATA[배포 결과]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="20" isPrintWhenDetailOverflows="true" uuid="a1d4aeae-c43c-4e9c-9687-7147ddb4ed38"/>
+								<textElement>
+									<font size="8" pdfFontName="HYGoThic-Medium" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{bldResultMsg}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="ce7163a5-3c25-454a-9fb3-ba5e063dff5e">
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="69" height="30" uuid="831974b0-ba9d-4789-93d0-21c8c787f576"/>
+								<textElement>
+									<font size="9"/>
+								</textElement>
+								<text><![CDATA[배포자]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="69" height="20" isPrintWhenDetailOverflows="true" uuid="afd77093-e181-40d5-ab87-ae24a9fae139"/>
+								<textElement>
+									<font size="8" pdfFontName="HYGoThic-Medium" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{bldUsrNm}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="fb2807b4-ed3d-4f26-a012-fbe0c946a41e">
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="69" height="30" uuid="b69cbfdc-0105-4ebe-be51-98d9fbf60a7c"/>
+								<textElement>
+									<font size="9"/>
+								</textElement>
+								<text><![CDATA[소요시간]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="69" height="20" isPrintWhenDetailOverflows="true" uuid="2d4fbfba-d0f8-463b-bc8d-f6f1687f9bd2"/>
+								<textElement>
+									<font size="8" pdfFontName="HYGoThic-Medium" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{bldDurationTmStr}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="69" uuid="18f658e7-e3b2-4b26-87e6-27fdc8bbf8b8">
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement style="table 2_CH" x="0" y="0" width="69" height="30" uuid="a0d1770a-12ca-44d4-9654-98d60bc88d3f"/>
+								<textElement>
+									<font size="9"/>
+								</textElement>
+								<text><![CDATA[변경된 파일 수]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement style="table 2_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="69" height="20" isPrintWhenDetailOverflows="true" uuid="ad3890fc-2f64-4dba-8c4a-ef36eabc4ba6"/>
+								<textElement>
+									<font size="8" pdfFontName="HYGoThic-Medium" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{revisionPathsCnt}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="45">
+			<textField>
+				<reportElement x="50" y="10" width="230" height="20" uuid="7bb5c8e8-8a92-41d5-9aa6-702291877aa2"/>
+				<textElement textAlignment="Right">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}+"  / "]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="280" y="10" width="225" height="20" uuid="f0212f6f-a462-42af-8327-3afcc9d2eaa7"/>
+				<textElement>
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

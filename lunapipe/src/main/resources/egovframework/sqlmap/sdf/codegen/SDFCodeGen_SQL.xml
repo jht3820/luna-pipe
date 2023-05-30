@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="SDFCodeGenDAO">
+	
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+
+	<select id="sdfCodeGenDAO.selectTableMetaInfoList" parameterClass="egovframework.sdf.codegen.bean.SearchVO" resultClass="egovMap">
+		<![CDATA[					
+			SELECT	A.TABLE_NAME
+				,	A.COLUMN_NAME
+			    ,	A.DATA_TYPE
+			    ,	A.DATA_LENGTH
+			             ,	( 	SELECT 	NEW_COLUMN_NAME 
+			             		FROM 	EGMIS_TBL_INFO Z 
+			                     WHERE 	Z.NEW_TABLE_NAME = TABLE_NAME 
+			                     AND 	UPPER(Z.NEW_COLUMN_ID) = COLUMN_NAME 
+			             	) AS COLUMN_COMMENT
+			             ,	( 	SELECT 	PK 
+			             		FROM 	EGMIS_TBL_INFO Z 
+			                     WHERE 	Z.NEW_TABLE_NAME = TABLE_NAME 
+			                     AND 	UPPER(Z.NEW_COLUMN_ID) = COLUMN_NAME 
+			             	) AS PK   
+			             ,	( 	SELECT 	COL_SEQ 
+			             		FROM 	EGMIS_TBL_INFO Z 
+			                     WHERE 	Z.NEW_TABLE_NAME = TABLE_NAME 
+			                     AND 	UPPER(Z.NEW_COLUMN_ID) = COLUMN_NAME 
+			             	) AS COL_SEQ    			             	             	
+			FROM	All_TAB_COLUMNS A
+			WHERE	1=1
+		]]>
+		<isNotEmpty property="tableName">
+			AND		A.TABLE_NAME = UPPER(#tableName#)
+		</isNotEmpty>
+		order by COL_SEQ
+	</select>	
+	
+</sqlMap>

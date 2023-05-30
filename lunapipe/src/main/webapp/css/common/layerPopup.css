@@ -1,0 +1,145 @@
+@charset "UTF-8";
+
+.user_pop_wrap{ width:100%; }
+.layer_popup_box { max-height:100%; position: fixed; z-index: 90101; width: 540px; height: 444px; top: 0; right: 0; bottom: 0; left: 0; margin: auto;}
+.bg { position: fixed; z-index: 9005; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.3); }
+.layer_popup_box .bg { position: fixed; z-index: 9005; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.3); }
+.layer_popup_box .close_btn { position: absolute; z-index: 9007; top: 14px; right: 20px; width: 16px; height: 16px; background: url(/images/login/x_black.png) no-repeat; cursor: pointer; }
+.layer_popup_box .ajax_box { position: relative; z-index: 9006; width: 100%; height: 100%; background: white;box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+.layer_popup_box .close_btn.white{ top: 12px; width: 18px; height: 18px; background: url(/images/login/x_white.png) no-repeat; }
+
+.top_fixed {position:fixed; z-index:910000; width:100%;height:100%; top:0; left:0; margin: auto; display:none;}
+.top_fixed .top_bg{position:fixed; z-index:910000; top:0; left:0; width:100%; height:100%; background: rgba(0, 0, 0, 0.3);}
+.top_fixed .top_bg .fixed_loading{width:100px; height:100px; position:absolute; top:calc(50% - 50px); left:calc(50% - 50px);}
+.top_fixed .top_bg .loading_bg {width: 75px; height: 75px; background-color: #fff; border-radius: 100px; position: absolute; top: calc(50% - 75px); left: calc(50% - 75px);}
+.top_fixed .top_bg .top_str {position: absolute;z-index: 909990;top: calc(50% - 10px);left: calc(50% - 16px);color:#9a8c8c;}
+.layer_popup_box .button_normal {  height: 22px; line-height: 22px; text-align: center; font-weight: bold; font-size: 1em; border-radius: 5px; box-shadow: 1px 1px 1px #ccd4eb; margin: 0 auto; border: 1px solid #b8b8b8; cursor: pointer; }
+.layer_popup_box .button_normal.popup_btn {
+    background: #fff;
+    color: #000;
+    border: 1px solid #ccc;
+    display: inline-block;
+    min-width: 71px;
+    height: 40px;
+    line-height: 40px;
+    padding: 0px 10px;
+    width: auto;
+}
+.layer_popup_box .button_normal.note_btn {float: left;width: 100px;min-width: 100px;display: inline-block;border-radius: 3px;}
+.note_leftBtn {float: left;display: inline-block;height: 20px;line-height: 20px;}
+.note_rightBtn {float: right;display: inline-block;height: 20px;}
+.layer_popup_box .note_rightBtn .button_normal.note_btn {margin-left: 10px;}
+
+/* 팝업창 */
+.layer_popup_box .popup {overflow-y:auto; display: block; width: 100%; height:100%; background: #fff; font-size: 0.75em; z-index: 9002; }
+.layer_popup_box .pop_title { width: 100%; height: 40px; padding: 0px 15px; background: #4b73eb; color: #fff; font-size: 1.3em; line-height:40px; font-weight: bold;}
+/* .pop_sub → padding: 30px 20px 에서  20px 20px 변경*/
+.layer_popup_box .pop_sub { width: 100%;  padding: 20px 20px; text-align: center; }
+	
+	/* .pop_left → font-weight: bold; 추가 */
+	.layer_popup_box .pop_left { float: left; width: 28%; padding: 20px 25px; background: #f9f9f9; border-top: 1px solid #ccc; border-right: 1px solid #ccc; text-align: left; font-weight: bold;}
+	
+	/* .pop_right → padding: 12px 15px; 에서  padding: 7px 5px 7px 6px; 변경*/
+	.layer_popup_box .pop_right { float: left; width: 72%; padding: 7px 5px 7px 6px; border-top: 1px solid #ccc; text-align: left; }
+	.layer_popup_box .bottom_line { border-bottom: 1px solid #ccc; }
+	
+	/* input[type="text"].input_txt → height: 28px 에서 100% 변경 , font-size:12px 에서 13px 변경 */
+	.layer_popup_box input[type="text"].input_txt { float:left; width: 100%; height: 100%; border: 1px solid #ccc; margin-right: 1%; font-size:13px;}		
+	.layer_popup_box .pop_note { display: inline-block; width: 100%;  margin-top: 20px; }
+	.layer_popup_box .note_title { font-size: 1em; font-weight: bold; text-align: left; margin-bottom: 9px;width: 100%;float: left; }
+	
+	/* 추가 */
+	/* .layer_popup_box .pop_left, .layer_popup_box .pop_right { height: 50px; } */
+	
+	/* 김정환 추가 */
+	.layer_popup_box input[type="password"].input_txt { float:left; width: 263px; height: 28px; border: 1px solid #ccc; margin-right: 1%; font-size:12px;}
+	
+	.layer_popup_box .note_size { font-size: 1.25em; line-height: 1.6; }
+
+	/* .btn_div → margin-top: 14px 에서 17px 변경 */
+	.layer_popup_box .btn_div {width:100%; display: inline-block; margin-top: 17px; }
+	.layer_popup_box .save_btn{ margin-right:1%; }
+	.layer_popup_box .complete_btn{background:#4b73eb; color:#fff; border:1px solid #345BCF;}
+	.layer_popup_box .save_btn,
+	.layer_popup_box .exit_btn { display: inline-block; min-width: 71px; height: 40px; line-height:40px; padding: 0px 10px; width:auto; }
+	/* .save_btn css 추가 */
+	.layer_popup_box .save_btn { background: #fff; color: #000; border: 1px solid #ccc;}
+	
+	/* .layer_popup_box .save_btn:hover,
+	.layer_popup_box .exit_btn:hover { color: #fff; background: #4b73eb; border: 1px solid #4b73eb; } */
+	
+/* textarea 클래스 */	
+/* textarea header에 넣어야하는값 (왼쪽)*/
+.textarea_height{height:333px;}
+
+/* 오른쪽에 있는 textarea 
+ * font-size: 12px 에서 13px 변경
+ */
+.layer_popup_box .pop_right .input_note{float:left;width:100%; height:307px; padding:10px; resize:none; font-size:13px;border: 1px solid #c6c9d0;border-radius: .1875rem; overflow-y:auto;}
+
+/* 한줄을 다 차지하는 textarea */
+.layer_popup_box .input_note { width: 100%; height: 180px; padding: 10px;/*  font-size :1.1em;  */border: 1px solid #c6c9d0;border-radius: .1875rem; overflow-y:auto; resize: none; }
+.pop_sub textarea:disabled { background: #eee; }
+.layer_popup_box .textarea_readonly{background: #eee;}
+
+/* 리스트 */
+.layer_popup_box .pop_list{width:100%; margin-top:20px; padding:10px;border:1px solid #ccc; overflow:auto; height:60px;}
+.layer_popup_box .pop_list .list_line { margin-bottom: 2px; }
+.layer_popup_box .pop_list .img_span { width: 20px; height: 20px; vertical-align: middle; }
+.layer_popup_box .pop_list .span_margin { margin-right: 10px; }
+
+/*오른쪽에 체크박스가 존재할때 감싸야 하는 폼*/
+.layer_popup_box .chk_div{line-height:28px; height:28px; width:100%;}
+
+/* 숫자만 나오는 input */
+/* .layer_popup_box span{display:inline-block; float:left; padding:0; vertical-align:middle;} */
+.layer_popup_box input[type="number"]:not(.req4105_input_text, .req4106_input_text, .input_txt.ord){width:100%;height: 100% border:1px solid #ccc; padding:0 10px;font-size:12px;}
+.layer_popup_box .list_line{margin-bottom:2px;}
+
+/* 달력 input 박스*/
+.layer_popup_box .calendar_input{width:130px;height: 28px;padding: 0px 10px; border:1px solid #ccc;}
+
+/* 파일 input 박스 */
+.layer_popup_box .pop_file{display:inline-block; width:100%; margin-top:20px;    position: relative;}
+.layer_popup_box .input_file{float:left; display:inline-block; width:88%; min-width:80%; height:28px; line-height:28px; margin-right:5px; border:1px solid #ccc;}
+
+/* 라디오 버튼 header에 넣어야하는 값 (왼쪽)*/
+.radio_height{padding:12px 25px !important;}
+
+/* 라디오버튼 커스터마이징 */
+.layer_popup_box .readonly{float:left; width:263px; height:28px; line-height:1; border:1px solid #ccc; font-size:12px; margin-right:1%;}
+.layer_popup_box input:read-only{background:#eee;}
+.layer_popup_box input[readonly]{background:#eee;}
+.layer_popup_box input[type="radio"] {position: absolute;width: 1px;height: 1px;padding: 0;margin: -1px;overflow: hidden;clip: rect(0, 0, 0, 0);border: 0;}
+.layer_popup_box input[type="radio"]+label {display: inline-block;position: relative;padding-left: 30px;cursor: pointer;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;}
+.layer_popup_box input[type="radio"]+label:before {content: '';position: absolute;left: 11px;top: 1px;width: 12px;height: 12px;text-align: center;background: 0;border: 1px solid #e0e0e0;border-radius: 100%;}
+.layer_popup_box input[type="radio"]+label:active:before,
+.layer_popup_box input[type="radio"]:checked+label:active:before { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px 1px 3px rgba(0, 0, 0, 0.1); }
+.layer_popup_box input[type="radio"]:checked+label:before { background: 0; border-color: #9e9e9e; }
+.layer_popup_box input[type="radio"]:checked+label:after {content: '';position: absolute;top: 5px;left: 15px;width: 6px;height: 6px;background: #ccc;border-radius: 100%;box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.3);}
+/* 라디오버튼 End */
+
+/*셀렉트 박스*/
+.layer_popup_box .search_select{margin:0; width:100%; height:28px; font-size:1em;}
+.layer_popup_box .search_select select{ display: block;width: 100%;border: 1px solid #ccc; height:28px; line-height:28px; font-size:12px;}
+/*셀렉트 박스*/
+
+/*팝업내용 - 테이블 형식으로 출력*/
+.pop_menu_info_wrap { overflow-y: auto; float: left; width: 80%; min-height: 600px; padding: 20px 36px; margin-left: 6px; vertical-align: middle; font-size: 0.75em; box-sizing: border-box;}
+.pop_menu_row {float: left;width: 50%;}
+/* .pop_menu_row .pop_menu_col1 → padding-top: 3px 에서 5px 변경 */
+.pop_menu_row .pop_menu_col1 {float: left;clear: both; padding-left:10px; padding-top: 5px; width: 28%; height: 38px; line-height: 30px; background: #f9f9f9;border-width: 0 1px 1px 0;border-style: solid;border-color: #ddd; text-align: left;}
+.pop_menu_row .pop_menu_col2 {float: left; padding: 5px; width: 72%; height: 38px;line-height: 0px;border-bottom: 1px solid #ddd;}
+.pop_sub input[type="text"] { vertical-align: middle; margin-top: 0; height: 100%; font-size: 1em; width: 100%; min-width: 150px; padding-left: 4px;border: 1px solid #c6c9d0;border-radius: .1875rem;}
+.pop_sub input[type="number"]  { vertical-align: middle; margin-top: 0; height: 100%; font-size: 1em; width: 100%; min-width: 150px; padding-left: 4px;border: 1px solid #c6c9d0;border-radius: .1875rem;}
+.pop_sub input[type="password"] { vertical-align: middle; margin-top: 0; height: 100%; font-size: 1em; width: 100%; min-width: 150px; padding-left: 4px;border: 1px solid #c6c9d0;border-radius: .1875rem;}
+.pop_menu_oneRow{ width: 100%;}
+.pop_menu_halfRow{ width: 50%;}
+.pop_menu_row .pop_oneRow_col1{width: 14%;}
+.pop_menu_row .pop_oneRow_col2{width: 86%;text-align: left;}
+.pop_sub .first_menu_row {border-top: 1px solid #ddd;}
+.pop_menu_row .pop_menu_col1_right {border-left: 1px solid #ddd; }
+.pop_menu_row .pop_menu_col1_left {border-right: 1px solid #ddd; }
+
+/* 팝업창 필수 입력값 */
+.required_info{color:red; font-weight: bold; }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="cmm1000DAO">
+	
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+
+	<select id="cmm1000DAO.selectCmm1000MultiCommonCodeList" parameterClass="java.util.HashMap" resultClass="egovMap">
+		<![CDATA[					
+			SELECT	A.MST_CD
+				,	A.SUB_CD
+			    ,	A.SUB_CD_NM	
+				,	SF_ADM1000_MST_CD_NM(MST_CD) AS MST_CD_NM
+			FROM	CMM1000 A
+			WHERE	1=1
+		]]>
+		<isNotEmpty property="mstCds">
+			AND		A.MST_CD IN ($mstCds$)
+		</isNotEmpty>
+		<isNotEqual property="useYn" compareValue="A">
+			AND		A.USE_YN = #useYn#
+		</isNotEqual>
+			ORDER BY MST_CD, ORD
+	</select>	
+	
+</sqlMap>

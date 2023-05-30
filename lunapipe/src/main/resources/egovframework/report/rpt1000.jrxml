@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report3" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="80d20c72-5942-4b22-a747-24fdff16c77a">
+	<property name="ireport.zoom" value="1.2100000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.callouts" value="##Fri Oct 04 16:36:58 KST 2019"/>
+	<style name="td_title" mode="Opaque" forecolor="#000000" backcolor="#D7D7D7" fill="Solid" hAlign="Center" vAlign="Middle" rotation="None" fontName="맑은 고딕" fontSize="12" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H">
+		<pen lineWidth="0.5"/>
+	</style>
+	<style name="td_title_string" fill="Solid" hAlign="Center" vAlign="Middle" fontName="맑은 고딕" fontSize="11" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+	<style name="td_contents_string" mode="Opaque" forecolor="#000000" hAlign="Center" vAlign="Middle" isBlankWhenNull="true" fontName="맑은 고딕" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H">
+		<pen lineWidth="0.5"/>
+	</style>
+	<style name="td_contents" forecolor="#000000" hAlign="Center" vAlign="Middle" isBlankWhenNull="true" fontName="맑은 고딕" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<pen lineWidth="0.5" lineColor="#000000"/>
+	</style>
+	<subDataset name="dataset1" uuid="3aba6fcf-4c7d-47d4-898b-61060e97c3a1"/>
+	<queryString language="json">
+		<![CDATA[]]>
+	</queryString>
+	<field name="prjNm" class="java.lang.String"/>
+	<field name="regDtm" class="java.lang.String"/>
+	<field name="reqUsrNm" class="java.lang.String"/>
+	<field name="reqUsrDeptNm" class="java.lang.String"/>
+	<field name="reqUsrPositionNm" class="java.lang.String"/>
+	<field name="reqNewTypeAllNm" class="java.lang.String"/>
+	<field name="reqGrundTxt" class="java.lang.String"/>
+	<field name="reqDesc" class="java.lang.String"/>
+	<field name="addItemReqContentTxt" class="java.lang.String"/>
+	<field name="addItemReqWorkTypeNm" class="java.lang.String"/>
+	<field name="addItemReqActionDtm" class="java.lang.String"/>
+	<field name="addItemReqWorkTxt" class="java.lang.String"/>
+	<field name="addItemReqDoneContent" class="java.lang.String"/>
+	<field name="addItemFileList" class="java.lang.String"/>
+	<field name="addItemLastChargeNm" class="java.lang.String"/>
+	<field name="addItemReqDoneDtm" class="java.lang.String"/>
+	<field name="addItemReqActionContentTxt" class="java.lang.String"/>
+	<field name="addItemReqSignDept" class="java.lang.String"/>
+	<field name="addItemReqSignPositionNm" class="java.lang.String"/>
+	<field name="addItemReqSignUsrNm" class="java.lang.String"/>
+	<field name="reqUsrEmail" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="43" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="555" height="39" isPrintWhenDetailOverflows="true" uuid="f6f48f6a-64da-4e65-9d9c-aad1f991dead"/>
+				<textElement textAlignment="Center">
+					<font fontName="맑은 고딕" size="22" isBold="true" pdfFontName="HYGoThic-Medium" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[요구사항 요청 처리 결과서]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="30" splitType="Immediate">
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="30" isPrintWhenDetailOverflows="true" uuid="25021152-a062-4893-81b2-8a2e44f549a0"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="97" y="0" width="227" height="30" isPrintWhenDetailOverflows="true" uuid="5aac15e8-aafc-443c-8387-6a6fef5a8065"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="324" y="0" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="a39671c4-e0a6-407e-b7b4-575b5437c02b"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="399" y="0" width="156" height="30" isPrintWhenDetailOverflows="true" uuid="49c7b3ed-729e-444d-8412-04428042ace3"/>
+			</rectangle>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="30" isPrintWhenDetailOverflows="true" uuid="6f39f2d8-7266-40b9-848b-aa75a667ea0f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[대상 프로젝트]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="324" y="0" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="a84cecfd-820c-4fff-b402-02616d760530"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[요청 일시]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="399" y="0" width="156" height="30" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="73a2fbcc-1cc3-4424-9d09-e924f1afe6ae"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{regDtm}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="97" y="5" width="227" height="20" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="436cbdd2-51df-493f-ac7a-376130ab6e5f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{prjNm}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="60" splitType="Prevent">
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="60" isPrintWhenDetailOverflows="true" uuid="f0da0ca2-17c2-4559-93a2-b0472a4a93a7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="172" y="0" width="383" height="30" isPrintWhenDetailOverflows="true" uuid="884efa22-869e-4526-ab2c-0e6c6ca2e856"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="97" y="0" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="22a6f27c-0155-4a3a-bdc6-a97ba10ef183"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="97" y="30" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="e5626f8b-634a-41ea-9054-16ddd2ee08c5"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="172" y="30" width="152" height="30" isPrintWhenDetailOverflows="true" uuid="23e42e2e-287c-4a03-afe7-d71929f547c6"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="324" y="30" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="2805fd36-023f-442b-9e38-98da93119b94"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="399" y="30" width="156" height="30" isPrintWhenDetailOverflows="true" uuid="bbe62d43-a86e-4d4f-9d8a-4199c510a965"/>
+			</rectangle>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="60" isPrintWhenDetailOverflows="true" uuid="f2c464ee-5f16-4362-9bdc-a8d37a91bdda"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[요청자]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="97" y="0" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="a5b0c893-2e96-4bc6-a64c-93d23f707388"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[부서]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="97" y="30" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="90670e9f-d2e2-4f51-bf93-ddd9b07c8e50"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[이메일]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="324" y="30" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="daae8abc-892c-4e04-9db8-b9f32ba89766"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[성명]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="172" y="0" width="383" height="30" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="b0a8eeac-d6dd-473e-8aca-7f6e74b62e09"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{reqUsrDeptNm}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="172" y="30" width="152" height="30" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="ac0bba7d-ec76-4593-a8e0-c8dba9574e4f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{reqUsrEmail}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="399" y="30" width="156" height="30" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="0ca47eca-129e-42d6-a7f2-399d84a2cd55"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{reqUsrNm}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="50" splitType="Stretch">
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="50" isPrintWhenDetailOverflows="true" uuid="e69ca6e1-141f-4bed-87a2-98208117536a"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="97" y="0" width="458" height="50" isPrintWhenDetailOverflows="true" uuid="ce65a47a-5910-4bd7-99af-a49c9a35c599"/>
+			</rectangle>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="50" isPrintWhenDetailOverflows="true" uuid="d2112c24-546f-46c0-b591-1a82d8407a2f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[요청 내용]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="115" y="5" width="440" height="40" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="d8a808e8-60d2-49c9-948a-4860e7b34ca1"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{reqDesc}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="100">
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="100" isPrintWhenDetailOverflows="true" uuid="c9884ea1-d3f4-4765-9bf2-38f90e103eb4"/>
+			</rectangle>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="100" isPrintWhenDetailOverflows="true" uuid="07d964f1-e851-4493-93bc-ef7e14a34a81"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[요청 내용 분석]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="97" y="0" width="458" height="100" isPrintWhenDetailOverflows="true" uuid="9e4fd3f4-aa1a-4c38-a09d-89e971a1a756"/>
+			</rectangle>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="115" y="5" width="440" height="90" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="a553e01c-a2a6-4aba-8d39-71cdc7f9cd62"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{addItemReqContentTxt}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="50">
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="50" isPrintWhenDetailOverflows="true" uuid="16129cf5-a05b-444f-ad7d-1704e0b059e1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[요청 내용]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="50" isPrintWhenDetailOverflows="true" uuid="fb591419-f01d-40c5-a2a9-2d4a24183b18"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="97" y="0" width="458" height="50" isPrintWhenDetailOverflows="true" uuid="e67cc7e6-6a63-400d-9619-4ec38ac177d9"/>
+			</rectangle>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="115" y="5" width="440" height="40" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="ff1bab54-6df9-46e6-8662-81ee1837541d"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{addItemReqWorkTxt}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="50" isPrintWhenDetailOverflows="true" uuid="049b241d-c557-4565-bb19-bb02cc3f190e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[작업 지시]]></text>
+			</staticText>
+		</band>
+		<band height="70">
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="70" isPrintWhenDetailOverflows="true" uuid="83fea45e-52a0-4030-b25d-4715925e1dd1"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="97" y="0" width="458" height="70" isPrintWhenDetailOverflows="true" uuid="f992c541-47f1-4154-adfe-9a54721d226b"/>
+			</rectangle>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="70" isPrintWhenDetailOverflows="true" uuid="cc5d2fc6-f5a2-406b-b22e-7f5856d40e9b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[유지보수 내역]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="115" y="5" width="440" height="60" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="83c76542-95ab-4739-ad62-38c3bfbad93c"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{addItemReqDoneContent}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="60">
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="97" y="0" width="458" height="60" isPrintWhenDetailOverflows="true" uuid="22fdb6ca-a161-4e17-add4-4dfd2ce36ce8"/>
+			</rectangle>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="115" y="5" width="440" height="50" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="5d905c47-ceb7-44e2-9ea8-cb0629f62a5f"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{addItemFileList}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="60" isPrintWhenDetailOverflows="true" uuid="baaf56f7-6330-4ad4-ac4a-9838a5aefcb7"/>
+			</rectangle>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="60" isPrintWhenDetailOverflows="true" uuid="bd405ce4-4813-4cb0-9323-0a3a90f121de"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[첨부 파일 목록]]></text>
+			</staticText>
+		</band>
+		<band height="30">
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="97" y="0" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="f0ba22ae-5b30-4283-9ff5-58b42cbd2508"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="172" y="0" width="152" height="30" isPrintWhenDetailOverflows="true" uuid="c494420c-0a8a-48fb-9e20-6fbb1f21ce61"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="324" y="0" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="684958c4-2795-42ea-bd66-c67ff449ec42"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="399" y="0" width="156" height="30" isPrintWhenDetailOverflows="true" uuid="555236f8-1c57-4add-9f8c-e70081aa0722"/>
+			</rectangle>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="97" y="0" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="31bf1b62-0dfd-4888-884b-db60949d7253"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[유지보수 담당]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="324" y="0" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="c81eb669-8de2-4a64-8d34-92a310ee7504"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[조치 완료일]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="172" y="0" width="152" height="30" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="e396e260-dead-4ce7-9f23-984001cd74a5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{addItemLastChargeNm}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="399" y="0" width="156" height="30" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="7f6df3ae-e6e6-4023-991b-bf5e56988008"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{addItemReqDoneDtm}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="30" isPrintWhenDetailOverflows="true" uuid="f374dc61-ae0d-4cff-8217-83516bfd83a6"/>
+			</rectangle>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="30" isPrintWhenDetailOverflows="true" uuid="aa640c22-dc6a-49c7-a1d4-95ede02f90e6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[유지보수 정보]]></text>
+			</staticText>
+		</band>
+		<band height="50">
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="50" isPrintWhenDetailOverflows="true" uuid="5e3e97d7-550d-45f7-85fe-4eb1de0be31b"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="97" y="0" width="458" height="50" isPrintWhenDetailOverflows="true" uuid="accfff64-81c7-44ec-9a1f-a3435c1e0607"/>
+			</rectangle>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="50" isPrintWhenDetailOverflows="true" uuid="3749df25-89a0-47c4-9a75-b81b69921b5d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[성과 측정
+(결과)]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="115" y="5" width="440" height="40" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="2295aac4-3142-4223-b5d5-8ab947be74f1"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{addItemReqActionContentTxt}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="60" splitType="Prevent">
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="60" isPrintWhenDetailOverflows="true" uuid="abe2b779-f424-401c-bab8-eacab39ac501"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="97" y="0" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="eb1c4f26-3906-410e-b969-b8bf1c3345fb"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="172" y="0" width="383" height="30" isPrintWhenDetailOverflows="true" uuid="dd2f85aa-5572-413c-84d0-71c6ef52467e"/>
+			</rectangle>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="97" y="0" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="48815242-1c9b-41ed-997a-3ace81c969a2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[사업부서]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="172" y="0" width="383" height="30" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="38c74ada-4d2a-4cba-89ef-fc7276bb0ad8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{addItemReqSignDept}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="0" y="0" width="97" height="60" isPrintWhenDetailOverflows="true" uuid="d1ff0e16-9163-436b-952a-af6a31a82a38"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[담당자 확인]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="97" y="30" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="a987cf3c-d680-4113-b460-06e6a38c14dd"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="172" y="30" width="152" height="30" isPrintWhenDetailOverflows="true" uuid="15ccab25-a7ce-46f5-8d23-add77048217a"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_title" stretchType="RelativeToTallestObject" x="324" y="30" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="c1caa122-9d36-4135-be7c-7ad77ea02ee3"/>
+			</rectangle>
+			<rectangle>
+				<reportElement style="td_contents" stretchType="RelativeToTallestObject" x="399" y="30" width="156" height="30" isPrintWhenDetailOverflows="true" uuid="b3f4b27f-e68d-47b8-bb7e-3a9c9a8e61df"/>
+			</rectangle>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="97" y="30" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="65e31da7-85f2-4050-bbed-93ecfe2d71b7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[직급]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="td_title_string" stretchType="RelativeToTallestObject" x="324" y="30" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="4a9868a7-a801-484b-9153-ede8f3fdbfdf"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<text><![CDATA[성명]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="172" y="30" width="152" height="30" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="87ee7668-1221-43df-81ae-46ece730df48"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{addItemReqSignPositionNm}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="td_contents_string" stretchType="RelativeToBandHeight" mode="Transparent" x="399" y="30" width="156" height="30" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="f5de5d27-88c0-4ce8-8de4-466c907b2486"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="맑은 고딕" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="UniKS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{addItemReqSignUsrNm}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="45">
+			<textField>
+				<reportElement x="50" y="10" width="230" height="20" uuid="7bb5c8e8-8a92-41d5-9aa6-702291877aa2"/>
+				<textElement textAlignment="Right">
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}+"  / "]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="280" y="10" width="225" height="20" uuid="f0212f6f-a462-42af-8327-3afcc9d2eaa7"/>
+				<textElement>
+					<font fontName="맑은 고딕"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

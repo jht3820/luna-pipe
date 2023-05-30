@@ -1,0 +1,79 @@
+#-----------------------------------------------------------------------
+#
+#   globals.properties : 시스템
+#
+#-----------------------------------------------------------------------
+#   1.  key = value 구조입니다.
+#   2.  key값은 공백문자를 포함불가, value값은 공백문자를 가능
+#   3.  key값으로 한글을 사용불가,   value값은 한글사용이 가능
+#   4.  줄을 바꿀 필요가 있으면 '\'를 라인의 끝에 추가(만약  '\'문자를 사용해야 하는 경우는 '\\'를 사용)
+#   5.  Windows에서의 디렉토리 표시 : '\\' or '/'  ('\' 사용하면 안됨)
+#   6.  Unix에서의 디렉토리 표시 : '/'
+#   7.  주석문 처리는  #사용
+#   8.  value값 뒤에 스페이스가 존재하는 경우 서블릿에서 참조할때는 에러발생할 수 있으므로 trim()하거나 마지막 공백없이 properties 값을 설정할것
+#-----------------------------------------------------------------------
+
+#운영서버 타입(WINDOWS, UNIX)
+Globals.OsType=WINDOWS
+
+#DB서버 타입(oracle, mariadb, cubrid) - datasource 및 sqlMap 파일 지정에 사용됨
+Globals.DbType=mariadb
+
+Globals.DbType2=mariadb-usr
+
+#솔루션 모드(dev : 개발, real : 운영, test : 테스트)
+Globals.lunaops.mode=real
+
+#AuthenticInterceptor 사용여부(Y: 사용, N : 미사용)
+Globals.lunaops.auth=Y
+
+#UserUseControllerLog 사용여부(Y: 사용, N : 미사용)
+Globals.lunaops.systemLog=Y
+
+#개발서버 DB
+Globals.lunaops.mariadb.driver=org.mariadb.jdbc.Driver
+Globals.lunaops.mariadb.url=MARIADB URL
+Globals.lunaops.mariadb.username=DB 계정 아이디
+Globals.lunaops.mariadb.password=DB 계정 비밀번호
+Globals.lunaops.mariadb.validationQuery=select 1 from dual
+
+# 연동 DB 접속정보
+Globals.lunaops.mariadbUsr.driver=org.mariadb.jdbc.Driver
+Globals.lunaops.mariadbUsr.url=연동대상 MARIADB URL
+Globals.lunaops.mariadbUsr.username=DB 계정 아이디
+Globals.lunaops.mariadbUsr.password=DB 계정 비밀번호
+Globals.lunaops.mariadbUsr.validationQuery=select 1 from dual
+
+# 연동 스케줄링 시간
+# 매일 3시 30분에 배치 실행
+Globals.lunaops.mariadbUsr.schedCron=0 30 3 1/1 * ? *
+
+Globals.lunaops.maxActive=20
+Globals.lunaops.maxIdle=10
+Globals.lunaops.maxWait=10000
+Globals.lunaops.validationQueryTimeout=10
+
+# 파일 업로드 경로(경로 설정은 반드시 절대경로를 사용해야함, 경로 뒤에 /를 붙여 주어야함.)
+Globals.fileStorePath=파일 업로드 경로 입력
+
+#파일 확장자(화이트리스트)
+Globals.fileExtsn = doc|docx|hwp|pdf|ppt|pptx|xls|xlsx|zip|jpg|jpeg|png|gif|css|css2|csv|htm|htm2|html|js|avi|mp3|mpeg|mpg|psd|rar|spl|swf|tar|text|tga|tgz|tif|tiff|txt|wav|wav2|bmp|jar|zip|eml|cell|show
+
+#파일 단건 MAX SIZE (1.1GB)
+Globals.lunaops.fileInfoMaxSize=1181116007
+
+#첨부파일 압축 다운로드 MAX SIZE (1.0 GB)
+Globals.lunaops.zipFileMaxSize=1073741824
+
+#1회 요청 파일 SUM MAX SIZE (1.1GB)
+Globals.lunaops.fileSumMaxSize=1181116007
+
+#Http - Jenkins api 요청 시도 제한 시간 (초)
+Globals.http.connectTimeout=5
+
+# 솔루션 URL(http포함)
+Globals.project.url=솔루션 URL 입력
+
+#github/gitlab api 주소
+Globals.github.endpoint=GITHUB api URL
+Globals.gitlab.endpoint=GITLAB api URL

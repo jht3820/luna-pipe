@@ -1,0 +1,16 @@
+@CHARSET "UTF-8";
+
+table {
+    border: 1px solid #ccc;
+    border-collapse: collapse;
+}
+td {
+    padding: 5px;
+    text-align: center;
+    width: 125px;
+}
+
+tr:first-child > td{
+    font-weight:bold;
+    background-color:skyblue !important;
+}

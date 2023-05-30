@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="SDFTobeConverterDAO">
+	
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+
+	<select id="sDFTobeConverterDAO.selectTableInfoList" resultClass="egovMap">
+		<![CDATA[	
+			SELECT 
+       			A.NEW_TABLE_NAME,
+           		 A.COL_SEQ,
+		        A.NEW_COLUMN_ID,
+		        A.OLD_TABLE_NAME,
+		        A.OLD_COLUMN_ID                  
+			FROM EGMIS_TBL_INFO A
+			WHERE	1=1
+		]]>
+	      GROUP BY A.NEW_TABLE_NAME,  A.COL_SEQ, A.NEW_COLUMN_ID,  A.OLD_TABLE_NAME, A.OLD_COLUMN_ID
+	      ORDER BY A.NEW_TABLE_NAME,  A.COL_SEQ
+	</select>	
+	
+	<select id="sDFTobeConverterDAO.selectTableInfoList1" resultClass="egovMap">
+		<![CDATA[	
+			SELECT 
+       			A.NEW_TABLE_NAME,
+           		A.NEW_TABLE_COMMENT,
+		        A.NEW_COLUMN_ID,
+		        A.OLD_TABLE_NAME,
+		        A.OLD_COLUMN_ID                  
+			FROM EGMIS_TBL_INFO A
+			WHERE	1=1
+		]]>
+			<isNotEmpty property="tableName">
+				AND		UPPER(#tableName#) IN (UPPER(A.NEW_TABLE_NAME), 
+											   UPPER(A.OLD_TABLE_NAME),
+											   UPPER(A.NEW_COLUMN_ID),
+											   UPPER(A.OLD_COLUMN_ID))
+			</isNotEmpty>
+
+	</select>		
+	
+</sqlMap>
