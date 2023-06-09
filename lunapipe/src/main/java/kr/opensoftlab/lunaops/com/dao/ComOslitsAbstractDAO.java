@@ -16,7 +16,7 @@ import egovframework.rte.psl.dataaccess.EgovAbstractDAO;
 @Repository("comEgmisAbstractDAO")
 public class ComOslitsAbstractDAO extends EgovAbstractDAO{
 
-	@Resource(name="oslops.sqlMapClient")
+	@Resource(name="lunaops.sqlMapClient")
 	public void setSuperSqlMapClient(SqlMapClient sqlMapClient) {
         super.setSuperSqlMapClient(sqlMapClient);
     }

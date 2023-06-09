@@ -6,10 +6,12 @@
 						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
 						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
 
+	<!-- Oracle db 트랜잭션 / 2015.12.22 추가 - 정형택 -->
 	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-	  <property name="dataSource" ref="oslops.dataSource"/>
+	  <property name="dataSource" ref="lunaops.dataSource"/>
 	</bean>
 	  
+	<!-- Select문의 경우 1분이상 조회시 타임아웃으로 떨어지도록 설정 -->  
 	<tx:advice id="txAdvice" transaction-manager="txManager">
 		<tx:attributes>	 
 	   		<tx:method name="insert*" 	propagation="REQUIRED" rollback-for="Exception"/>
