@@ -6,7 +6,7 @@
 	<bean name="egovIdGnrService"
 		class="egovframework.rte.fdl.idgnr.impl.EgovTableIdGnrService"
 		destroy-method="destroy">
-		<property name="dataSource" ref="oslops.dataSource" />
+		<property name="dataSource" ref="lunaops.dataSource" />
 		<property name="strategy" ref="mixPrefixSample" />
 		<property name="blockSize" 	value="10"/>
 		<property name="table"	   	value="IDS"/>
@@ -23,7 +23,7 @@
 	<bean name="egovFileIdGnrService"
 		class="egovframework.rte.fdl.idgnr.impl.EgovTableIdGnrService"
 		destroy-method="destroy">
-		<property name="dataSource" ref="oslops.dataSource" />
+		<property name="dataSource" ref="lunaops.dataSource" />
 		<property name="strategy" ref="fileStrategy" />
 		<property name="blockSize" 	value="1"/>
 		<property name="table"	   	value="COMTNCOPSEQ"/>

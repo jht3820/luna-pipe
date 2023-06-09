@@ -27,7 +27,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  */
 public abstract class EgovComAbstractDAO extends EgovAbstractDAO{
 
-	@Resource(name="oslops.sqlMapClient")
+	@Resource(name="lunaops.sqlMapClient")
 	public void setSuperSqlMapClient(SqlMapClient sqlMapClient) {
         super.setSuperSqlMapClient(sqlMapClient);
     }
