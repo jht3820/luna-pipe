@@ -3,8 +3,8 @@
 
 <sqlMap namespace="jen1000DAO">
 	<typeAlias alias="egovMap" 		type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
-	<typeAlias alias="Jen1000VO"	type="kr.opensoftlab.lunaops.stm.jen1000.jen1000.vo.Jen1000VO"/>
-	<typeAlias alias="Jen1100VO"	type="kr.opensoftlab.lunaops.stm.jen1000.jen1000.vo.Jen1100VO"/>
+	<typeAlias alias="Jen1000VO"	type="kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1000VO"/>
+	<typeAlias alias="Jen1100VO"	type="kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1100VO"/>
 
 	<resultMap id="resultMapSelectJen1000" class="Jen1000VO">
 		<result property="rn"  			      column="RN"/>
@@ -64,7 +64,7 @@
 		            JEN_URL ,
 		            REPLACE (JEN_DESC ,'<br>' , '&nbsp;&nbsp;&nbsp;&nbsp;' ) AS JEN_DESC ,                 /* JENKINS JOB Comment */ 
 		            USE_CD ,                  /* 사용여부(코드 : CMM00001) */
-		            SF_CMM1000_COM_CD_INFO('CMM00001', USE_CD, '1') as USE_NM ,
+		            SF_CMM1001_COM_CD_INFO('CMM00001', USE_CD, '1') as USE_NM ,
 		            DEL_CD , 
 		            REG_DTM ,                 /* 최초등록 일시 */ 
 		            REG_USR_ID ,              /* 최초등록자 ID */ 
@@ -112,11 +112,11 @@
 		            NVL(A.JOB_RESTORE_ID,'-') AS JOB_RESTORE_ID ,
 		            A.JOB_TOK ,
 		            A.JOB_TYPE_CD ,
-		            SF_CMM1000_COM_CD_INFO('DPL00002', A.JOB_TYPE_CD, '1') AS JOB_TYPE_NM ,
+		            SF_CMM1001_COM_CD_INFO('DPL00002', A.JOB_TYPE_CD, '1') AS JOB_TYPE_NM ,
 		            A.JOB_PARAMETER,
 		            A.JOB_DESC ,
 		            A.USE_CD ,                  /* 사용여부(코드 : CMM00001) */
-		            SF_CMM1000_COM_CD_INFO('CMM00001', A.USE_CD, '1') AS USE_NM , 
+		            SF_CMM1001_COM_CD_INFO('CMM00001', A.USE_CD, '1') AS USE_NM , 
 		            A.REG_DTM ,                 /* 최초등록 일시 */ 
 		            A.REG_USR_ID ,              /* 최초등록자 ID */ 
 		            A.REG_USR_IP ,              /* 최초등록자 IP */ 

@@ -3,7 +3,7 @@
 
 <sqlMap namespace="log1000DAO">
 	 
-    <typeAlias alias="log1000VO"	type="kr.opensoftlab.lunaops.adm.adm5000.log1000.vo.Log1000VO"/>
+    <typeAlias alias="log1000VO"	type="kr.opensoftlab.lunaops.log.log1000.log1000.vo.Log1000VO"/>
 	<typeAlias alias="egovMap"	 	type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
 	
 	
@@ -32,10 +32,7 @@
 						,T1.MENU_NM
 						,T1.MENU_URL
 						,T1.MENU_CD
-				FROM 
-						LOG1000 T1,
-						ADM2000 T2
-				WHERE T1.LOG_USR_ID = T2.USR_ID 
+				FROM LOG1000 T1 LEFT JOIN USR1000 T2 ON (T1.LOG_USR_ID = T2.USR_ID)
 				<isNotEmpty property="searchSelect" >
 					<isNotEmpty property="searchTxt">
 					<isEqual property="searchSelect" compareValue="logUsrId">
@@ -49,16 +46,6 @@
 					</isEqual>
 					</isNotEmpty>
 				</isNotEmpty>
-				<isEqual property="searchSelect" compareValue="menuCd">
-				<isNotEmpty property="searchCd">
-					<isNotEqual property="searchCd" compareValue="09">
-						AND		T1.MENU_CD = #searchCd#
-					</isNotEqual>
-					<isEqual property="searchCd" compareValue="09">
-						AND		T1.MENU_CD = #searchCd#
-					</isEqual>
-				</isNotEmpty>
-				</isEqual>
 				<isNotEmpty property="srchFromDt">
 					AND T1.LOG_TIME &gt;= TO_DATE(#srchFromDt#, 'YYYY-MM-DD')
 				</isNotEmpty>
@@ -108,15 +95,11 @@
 			/* log1000DAO.insertLog1000SystemUseLog - 시스템 사용이력 쌓기  쌓기  */
 			INSERT INTO LOG1000
             (	
-            	LOG_TIME,	LOG_URL,	LOG_USR_ID,		
-            	LOG_IP,			MENU_ID,	MENU_NM,	MENU_URL,
-            	MENU_CD
+            	LOG_TIME,	LOG_URL,	LOG_USR_ID,		LOG_IP
             )
             VALUES
             (
-            	SYSDATE,	#logUrl#,	#logUsrId#,	
-            	#logIp#,		#menuId#,	#menuNm#,	#menuUrl#,
-            	#menuCd#
+            	SYSDATE,	#logUrl#,	#logUsrId#,		#logIp#
             )
 		]]>
 	</insert>
