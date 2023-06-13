@@ -3,7 +3,7 @@
 
 <sqlMap namespace="rep1000DAO">
 	<typeAlias alias="egovMap" 		type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
-	<typeAlias alias="rep1000VO"	type="kr.opensoftlab.lunaops.stm.rep1000.rep1000.vo.Rep1000VO"/>
+	<typeAlias alias="rep1000VO"	type="kr.opensoftlab.lunaops.rep.rep1000.rep1000.vo.Rep1000VO"/>
 	<typeAlias alias="RepVO"	type="kr.opensoftlab.sdf.rep.com.vo.RepVO"/>
 
 	<resultMap id="resultMapSelectRep1000" class="rep1000VO">
@@ -46,12 +46,12 @@
 		            REP_ID ,               /* 소스저장소 Repository 코드 */ 
 		            REP_NM ,               /* 소스저장소 Repository 명 */ 
 		            REP_TYPE_CD ,			/*소스저장소 종류 */
-		            SF_CMM1000_COM_CD_INFO('REP00001', REP_TYPE_CD, '1') as REP_TYPE_NM ,
+		            SF_CMM1001_COM_CD_INFO('REP00001', REP_TYPE_CD, '1') as REP_TYPE_NM ,
 		            REPLACE (REP_TXT ,'<br>' , '&nbsp;&nbsp;&nbsp;&nbsp;' ) AS REP_TXT  ,                  /* 소스저장소 RepositoryI Comment */ 
 		            SVN_REP_URL ,              /* SVN Repository URL */ 
 		            GIT_REP_URL ,              /* GIT Repository URL */ 
 		            USE_CD ,                   /* 사용여부(코드 : CMM00001) */
-		            SF_CMM1000_COM_CD_INFO('CMM00001', USE_CD, '1') as USE_NM ,
+		            SF_CMM1001_COM_CD_INFO('CMM00001', USE_CD, '1') as USE_NM ,
 		            GIT_USR_AUTH_TYPE_CD , 
 				    TO_CHAR(REG_DTM, 'YYYY-MM-DD HH24:MI:SS') AS REG_DTM ,       /* 최초등록 일시 */ 
 		            REG_USR_ID ,               /* 최초등록자 ID */ 
