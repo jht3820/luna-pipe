@@ -25,7 +25,7 @@ import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.service.Dpl1000Service;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1000VO;
-import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1300VO;
+import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.sdf.jenkins.AutoBuildInit;
 import kr.opensoftlab.sdf.jenkins.JenkinsClient;
@@ -104,7 +104,7 @@ public class Dpl1000Controller {
  			
  			if( "update".equals(pageType) || "select".equals(pageType)){
  				dpl1000DplInfo = dpl1000Service.selectDpl1000DeployVerInfo(paramMap);
- 				dpl1000DplJobList = dpl1000Service.selectDpl1300DeployJobList(paramMap);
+ 				dpl1000DplJobList = dpl1000Service.selectDpl1100DeployJobList(paramMap);
  				
  				dpl1000DplJobListJson = (new GsonBuilder().serializeNulls().create()).toJsonTree(dpl1000DplJobList).toString();
  				
@@ -113,7 +113,7 @@ public class Dpl1000Controller {
  					paramMap.put("jenId", (String) jobMap.get("jenId"));
  					paramMap.put("jobId", (String) jobMap.get("jobId"));
  					
- 					List<Map> dpl1000DplJobParamList = dpl1000Service.selectDpl1800JenParameterList(paramMap);
+ 					List<Map> dpl1000DplJobParamList = dpl1000Service.selectDpl1101JenParameterList(paramMap);
  					dpl1000DplJobParamMap.put(jobMap.get("jobId"), dpl1000DplJobParamList);
  					
  				}
@@ -152,7 +152,7 @@ public class Dpl1000Controller {
  			
  			
  			Map dpl1000DplInfo = dpl1000Service.selectDpl1000DeployVerInfo(paramMap);
- 			List<Map> dpl1000DplJobList = dpl1000Service.selectDpl1300DeployJobList(paramMap);
+ 			List<Map> dpl1000DplJobList = dpl1000Service.selectDpl1100DeployJobList(paramMap);
 			
  			model.put("dpl1000DplInfo", dpl1000DplInfo);
  			model.put("dpl1000DplJobList", dpl1000DplJobList);
@@ -185,14 +185,14 @@ public class Dpl1000Controller {
 
      
      @SuppressWarnings({ "unchecked", "rawtypes" })
-     @RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1800JobParamList.do")
-     public ModelAndView selectDpl1800JobParamList(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+     @RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1101JobParamList.do")
+     public ModelAndView selectDpl1101JobParamList(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
     	 try{
     		 
     		 
     		 Map paramMap = RequestConvertor.requestParamToMap(request, true);
     		 
-			List<Map> dpl1800JobParamList = dpl1000Service.selectDpl1800JenParameterList(paramMap);
+			List<Map> dpl1800JobParamList = dpl1000Service.selectDpl1101JenParameterList(paramMap);
     		 
     		 
     		 model.addAttribute("jobParamList", dpl1800JobParamList);
@@ -304,8 +304,8 @@ public class Dpl1000Controller {
     }
 	
 	
-	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1300DplJobListAjax.do")
-    public ModelAndView selectDpl1300DplJobListAjax(@ModelAttribute("dpl1300VO") Dpl1300VO dpl1300VO, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1100DplJobListAjax.do")
+    public ModelAndView selectDpl1100DplJobListAjax(@ModelAttribute("dpl1300VO") Dpl1100VO dpl1300VO, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
     	try{
 
     		
@@ -332,12 +332,12 @@ public class Dpl1000Controller {
         	
         	
         	PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(dpl1300VO); 
-			List<Dpl1300VO> dpl1300List = null;
+			List<Dpl1100VO> dpl1300List = null;
 			
         	
-        	dpl1300List = (List<Dpl1300VO>) dpl1000Service.selectDpl1300dplJobGridList(dpl1300VO);
+        	dpl1300List = (List<Dpl1100VO>) dpl1000Service.selectDpl1100dplJobGridList(dpl1300VO);
         	
-			int totCnt = dpl1000Service.selectDpl1300dplJobGridListCnt(dpl1300VO);
+			int totCnt = dpl1000Service.selectDpl1100dplJobGridListCnt(dpl1300VO);
 					
         	paginationInfo.setTotalRecordCount(totCnt);
         	
@@ -359,7 +359,7 @@ public class Dpl1000Controller {
         	return new ModelAndView("jsonView", model);
     	}
     	catch(Exception ex){
-    		Log.error("selectDpl1300DplJobListAjax()", ex);
+    		Log.error("selectDpl1100DplJobListAjax()", ex);
     		
     		
     		model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
@@ -524,10 +524,7 @@ public class Dpl1000Controller {
         	List<Map> dplDplHistoryList = dpl1000Service.selectDpl1000DplHistoryList(paramMap);
         	
         	
-        	List<Map> dplModifyHistoryList = dpl1000Service.selectDpl1500ModifyHistoryList(paramMap);
-        	
-        	
-			List<Map> jobList = dpl1000Service.selectDpl1300DeployJobList(paramMap);
+			List<Map> jobList = dpl1000Service.selectDpl1100DeployJobList(paramMap);
 			
  			Map dpl1000DplJobParamMap = new HashMap<>();
 			for(int i = 0 ; i<jobList.size();i++) {
@@ -535,13 +532,12 @@ public class Dpl1000Controller {
 				paramMap.put("jenId", (String) jobMap.get("jenId"));
 				paramMap.put("jobId", (String) jobMap.get("jobId"));
 				
-				List<Map> dpl1000DplJobParamList = dpl1000Service.selectDpl1800JenParameterList(paramMap);
+				List<Map> dpl1000DplJobParamList = dpl1000Service.selectDpl1101JenParameterList(paramMap);
 				dpl1000DplJobParamMap.put(jobMap.get("jobId"), dpl1000DplJobParamList);
 				
 			}
 			
         	model.addAttribute("dplDplHistoryList", dplDplHistoryList);
-        	model.addAttribute("dplModifyHistoryList", dplModifyHistoryList);
         	model.addAttribute("jobList", jobList);
         	model.addAttribute("jobParamList", dpl1000DplJobParamMap);
         	
@@ -561,15 +557,15 @@ public class Dpl1000Controller {
 	
 	
 	@SuppressWarnings({"rawtypes" })
-	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1400DplSelBuildConsoleLogAjax.do")
-	public ModelAndView selectDpl1400DplSelBuildConsoleLogAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1200DplSelBuildConsoleLogAjax.do")
+	public ModelAndView selectDpl1200DplSelBuildConsoleLogAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try{
 			
     		
     		Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
     		
     		
-    		Map dpl1400InfoMap = dpl1000Service.selectDpl1400DplSelBuildInfoAjax(paramMap);
+    		Map dpl1400InfoMap = dpl1000Service.selectDpl1200DplSelBuildInfoAjax(paramMap);
  			
     		model.addAttribute("dpl1400InfoMap", dpl1400InfoMap);
 			
@@ -578,7 +574,7 @@ public class Dpl1000Controller {
 			return new ModelAndView("jsonView", model);
 		}
 		catch(Exception ex){
-			Log.error("selectDpl1400DplSelBuildConsoleLogAjax()", ex);
+			Log.error("selectDpl1200DplSelBuildConsoleLogAjax()", ex);
 			
 			
 			model.addAttribute("errorYn", "Y");
@@ -589,18 +585,18 @@ public class Dpl1000Controller {
 	
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1600DplSvnChangeLogListAjax.do")
-	public ModelAndView selectDpl1600DplSvnChangeLogListAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1201DplSvnChangeLogListAjax.do")
+	public ModelAndView selectDpl1201DplSvnChangeLogListAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try{
 			
 			
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 			
 			
-			List<Map> svnChangeLogList = dpl1000Service.selectDpl1600SvnChangeLogsList(paramMap);
+			List<Map> svnChangeLogList = dpl1000Service.selectDpl1201SvnChangeLogsList(paramMap);
 			
 			
-			List<Map> svnChangePathsList = dpl1000Service.selectDpl1700SvnChangePathList(paramMap);
+			List<Map> svnChangePathsList = dpl1000Service.selectDpl1202SvnChangePathList(paramMap);
 			
 			model.addAttribute("svnChangeLogList", svnChangeLogList);
 			model.addAttribute("svnChangePathsList", svnChangePathsList);
@@ -611,7 +607,7 @@ public class Dpl1000Controller {
 			return new ModelAndView("jsonView", model);
 		}
 		catch(Exception ex){
-			Log.error("selectDpl1600DplSvnChangeLogListAjax()", ex);
+			Log.error("selectDpl1201DplSvnChangeLogListAjax()", ex);
 			
 			
 			model.addAttribute("errorYn", "Y");
