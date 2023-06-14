@@ -4,8 +4,6 @@
 
 <sqlMapConfig>
 		
-	<sqlMap resource="egovframework/sqlmap/lunaops/oracle/stm/jen1000/jen1000/jen1000_SQL_Oracle.xml"></sqlMap>
+	<sqlMap resource="egovframework/sqlmap/lunaops/oracle/jen/jen1000/jen1000/jen1000_SQL_Oracle.xml"></sqlMap>
 	
 </sqlMapConfig>
-
-
