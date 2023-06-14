@@ -13,7 +13,7 @@
     <!-- <sqlMap resource="egovframework/sqlmap/rte/sample/EgovSample_Sample_SQL_Mysql.xml"/> -->
     <!-- <sqlMap resource="egovframework/sqlmap/rte/sample/EgovSample_Sample_SQL_Oracle.xml"/> -->
     
-	<sqlMap resource="egovframework/sqlmap/lunaops/oracle/stm/rep2000/rep2000/rep2000_SQL_Oracle.xml"/>
+	<sqlMap resource="egovframework/sqlmap/lunaops/oracle/rep/rep1000/rep1000/rep1000_SQL_Oracle.xml"/>
 	
 </sqlMapConfig>
 
