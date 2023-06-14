@@ -70,8 +70,8 @@ public class Jen1000Controller {
 	
 	
 
-	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000JobView.do")
-	public String selectJen1000JobView( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000View.do")
+	public String selectJen1000View( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		return "/jen/jen1000/jen1000/jen1000";
 	}
 
@@ -807,12 +807,6 @@ public class Jen1000Controller {
 			
 			return new ModelAndView("jsonView");
 		}
-	}
-
-	
-	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1002JobView.do")
-	public String selectJen1002JobView( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-		return "/jen/jen1000/jen1000/jen1002";
 	}
 	
 	
