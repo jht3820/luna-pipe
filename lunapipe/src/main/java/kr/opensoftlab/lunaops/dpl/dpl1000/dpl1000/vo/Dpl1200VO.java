@@ -5,13 +5,13 @@ import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.service.Dpl1000Service;
 import kr.opensoftlab.sdf.jenkins.JenkinsClient;
 import kr.opensoftlab.sdf.jenkins.service.BuildService;
 
-public class Dpl1400VO extends PageVO{
+public class Dpl1200VO extends PageVO{
 	private String rn;
 	
-	
+	//빌드 대상 (main = JOB_ID, sub = JOB_RESTORE_ID)
 	private String dplTargetType = "main";
 	
-	
+	/** 상세 기본 Defind */
 	private String dplId;
 	private String jenId;
 	private String jobId;
@@ -34,7 +34,6 @@ public class Dpl1400VO extends PageVO{
 	private String dplTypeCd;
 	private String dplAutoAfterCd;
 	private String dplRestoreCd;
-	
 	
 	private int buildActionCnt = 1; 
 			
