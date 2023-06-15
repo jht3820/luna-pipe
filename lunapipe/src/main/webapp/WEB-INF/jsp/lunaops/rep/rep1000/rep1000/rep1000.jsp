@@ -2,7 +2,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ include file="/WEB-INF/jsp/lunaops/top/header.jsp" %>
-<jsp:include page="/WEB-INF/jsp/lunaops/top/aside.jsp" />
 
 <link rel='stylesheet' href='<c:url value='/css/lunaops/stm.css'/>' type='text/css'>
 <style type="text/css">
