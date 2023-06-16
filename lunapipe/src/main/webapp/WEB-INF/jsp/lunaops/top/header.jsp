@@ -54,16 +54,4 @@
 	
 </head>
 <body>
-	<form name="hidPrjForm" method="post">
-		<input type="hidden" name="menuUrl">
-		<input type="hidden" name="menuId">
-		<input type="hidden" name="menuNm">
-		<input type="hidden" name="prjGrpId">
-		<input type="hidden" name="prjId">
-	</form>
-
-	<header>
-		<link rel="stylesheet" href="<c:url value='/css/menu/header.css'/>">
-		<script src="<c:url value='/js/menu/header.js'/>" ></script>
-	</header>
 	<section>
