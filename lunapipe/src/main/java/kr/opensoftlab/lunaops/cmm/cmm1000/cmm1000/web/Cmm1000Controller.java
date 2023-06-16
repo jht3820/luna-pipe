@@ -1,9 +1,7 @@
 package kr.opensoftlab.lunaops.cmm.cmm1000.cmm1000.web;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -37,76 +35,35 @@ public class Cmm1000Controller {
     private Cmm1000Service cmm1000Service;
 
 	
-	@SuppressWarnings({ "rawtypes", "unchecked", "finally" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(method = RequestMethod.POST, value = "/cmm/cmm1000/cmm1000/selectCmm1000MultiCommonCodeList.do")
-	public ModelAndView selectCmm1000MultiCommonCodeList(
-			HttpServletRequest request, HttpServletResponse response,
-			ModelMap modelMap) throws Exception {
+	public ModelAndView selectCmm1000MultiCommonCodeList(HttpServletRequest request, HttpServletResponse response, ModelMap modelMap) throws Exception {
 		
-		String code = "";
-		String text = "";
-
-		String mstCdStr = (String) request.getParameter("mstCdStr");
-		StringTokenizer st = new StringTokenizer(mstCdStr, "|");
-
+		Map paramMap = RequestConvertor.requestParamToMap(request,true);
+				
+		
 		Map rtnMap = new HashMap();
-
 		try {
 			
-			Map<String, String> param = RequestConvertor.requestParamToMap(
-					request, true);
-			param.put("mstCds", param.get("mstCds").replaceAll("&apos;", "'"));
+			Map commonCodeList = cmm1000Service.selectCmm1000MultiCommonCodeList(paramMap);
 
-			
-			List<Map> commonCodeList = cmm1000Service.selectCmm1000MultiCommonCodeList(param);
-
-			
-			while (st.hasMoreElements()) {
-
-				
-				String mstCd = st.nextElement().toString();
-				code = "";
-				text = "";
-
-				for (Map comboMap : commonCodeList) {
-					if (mstCd.equals(comboMap.get("mstCd"))) {
-						code += comboMap.get("subCd") + "|";
-						text += comboMap.get("subCdNm") + "|";
-						
-						
-						
-					}
-				}
-
-				
-				if (code.length() > 0) {
-					code = code.substring(0, code.length() - 1);
-					text = text.substring(0, text.length() - 1);
-				}
-
-				
-				rtnMap.put("mstCd" + mstCd + "code", code);
-				rtnMap.put("mstCd" + mstCd + "text", text);
-				
-				
-				
-				
+			if(commonCodeList == null || commonCodeList.size() == 0){
+				rtnMap = new HashMap();
+				rtnMap.put("ERROR_CODE", "-1");
+				rtnMap.put("ERROR_MSG", egovMessageSource.getMessage("cmm1000.fail.cmmCom.select"));
+			}else{
+				rtnMap.put("commonCodeList", commonCodeList);
+				rtnMap.put("ERROR_CODE", "1");
+				rtnMap.put("ERROR_MSG", egovMessageSource.getMessage("cmm1000.success.cmmCom.select"));
 			}
 
-			rtnMap.put("commonCodeList", commonCodeList);
-			rtnMap.put("ERROR_CODE", "1");
-			rtnMap.put("ERROR_MSG", egovMessageSource.getMessage("cmm1000.success.cmmCom.select"));
-
-			
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		}catch(Exception e){
+			Log.debug(e);
 			rtnMap = new HashMap();
 			rtnMap.put("ERROR_CODE", "-1");
 			rtnMap.put("ERROR_MSG", egovMessageSource.getMessage("cmm1000.fail.cmmCom.select"));
-
-		} finally {
-			return new ModelAndView("jsonView", rtnMap);
 		}
+		
+		return new ModelAndView("jsonView", rtnMap);
 	}
 }
