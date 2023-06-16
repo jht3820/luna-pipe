@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import egovframework.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.service.Dpl1000Service;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1000VO;
-import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1300VO;
+import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.sdf.excel.ExcelDataListResultHandler;
 import kr.opensoftlab.sdf.jenkins.vo.AutoBuildVO;
@@ -63,19 +63,19 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 	
 	
 	@SuppressWarnings({"rawtypes" })
-	public List selectDpl1300DeployJobList(Map inputMap)  throws Exception{
-		return dpl1000DAO.selectDpl1300DeployJobList(inputMap);
+	public List selectDpl1100DeployJobList(Map inputMap)  throws Exception{
+		return dpl1000DAO.selectDpl1100DeployJobList(inputMap);
 	}
 	
 	
 	@SuppressWarnings("unchecked")
-	public List<Dpl1300VO> selectDpl1300dplJobGridList(Dpl1300VO dpl1300VO)  throws Exception{
-		return dpl1000DAO.selectDpl1300dplJobGridList(dpl1300VO);
+	public List<Dpl1100VO> selectDpl1100dplJobGridList(Dpl1100VO dpl1300VO)  throws Exception{
+		return dpl1000DAO.selectDpl1100dplJobGridList(dpl1300VO);
 	} 
 	
 	
-	public int selectDpl1300dplJobGridListCnt(Dpl1300VO dpl1300VO) throws Exception {
-		return dpl1000DAO.selectDpl1300dplJobGridListCnt(dpl1300VO);
+	public int selectDpl1100dplJobGridListCnt(Dpl1100VO dpl1300VO) throws Exception {
+		return dpl1000DAO.selectDpl1100dplJobGridListCnt(dpl1300VO);
 	}
 	
 	
@@ -127,7 +127,7 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
     		jobInfo.put("prjId", prjId);
     		jobInfo.put("dplId", dplId);
     		
-    		dpl1000DAO.insertDpl1300DeployJobInfo(jobInfo);
+    		dpl1000DAO.insertDpl1100DeployJobInfo(jobInfo);
     		List jobParamList = (ArrayList<HashMap>) jobInfo.get("paramList");
     		
     		if(null != jobParamList && jobParamList.size() != 0) {
@@ -140,7 +140,7 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 	    	    	paramMap.put("regUsrId", paramMap.get("regUsrId"));
 	    	    	paramMap.put("regUsrIp", paramMap.get("regUsrIp"));
 	    			
-	    			dpl1000DAO.insertDpl1800ParameterInfo(paramInfo);
+	    			dpl1000DAO.insertDpl1101ParameterInfo(paramInfo);
 	    		}
     		}
     	}
@@ -157,11 +157,6 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void updateDpl1000DeployVerInfo(Map paramMap) throws Exception{
-		
-		
-		
-		this.insertDpl1500DplInfoModifyList(paramMap);
-		
 		
 		Map rtnMap = new HashMap();
 		for( Object key : paramMap.keySet() ) {
@@ -190,7 +185,7 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 		Map beforeDplInfo = dpl1000DAO.selectDpl1000DeployVerInfo(paramMap);
 		
 		
-		dpl1000DAO.deleteDpl1300DplJobList(paramMap);
+		dpl1000DAO.deleteDpl1100DplJobList(paramMap);
 		
 		
 		
@@ -215,13 +210,13 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
     		jobInfo.put("prjId", prjId);
     		jobInfo.put("dplId", dplId);
     		
-    		dpl1000DAO.insertDpl1300DeployJobInfo(jobInfo);
+    		dpl1000DAO.insertDpl1100DeployJobInfo(jobInfo);
 
     		
     		List jobParamList = (ArrayList<HashMap>) jobInfo.get("paramList");
     		
     		
-    		dpl1000DAO.deleteDpl1800ParameterInfo(jobInfo);
+    		dpl1000DAO.deleteDpl1101ParameterInfo(jobInfo);
     		if(null != jobParamList && jobParamList.size() != 0) {
 	    		for(int jobIdx=0; jobIdx<jobParamList.size(); jobIdx++){
 	    			HashMap paramInfo = (HashMap) jobParamList.get(jobIdx);
@@ -232,7 +227,7 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 	    	    	paramMap.put("regUsrId", paramMap.get("regUsrId"));
 	    	    	paramMap.put("regUsrIp", paramMap.get("regUsrIp"));
 	    			
-	    			dpl1000DAO.insertDpl1800ParameterInfo(paramInfo);
+	    			dpl1000DAO.insertDpl1101ParameterInfo(paramInfo);
 	    		}
     		}
     	}
@@ -250,34 +245,10 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 	}
 	
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes"})
 	public void updateDpl1000DplStsCdInfo(Map paramMap) throws Exception{
 		
-		Map beforeDplInfo = dpl1000DAO.selectDpl1000DeployVerInfo(paramMap);
-		
-		
 		dpl1000DAO.updateDpl1000DplStsCdInfo(paramMap);
-		
-		
-		String newChgId = dpl1000DAO.selectDpl1500NewChgId(paramMap);
-		paramMap.put("chgId", newChgId);
-		
-		
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.putAll(paramMap);
-		
-		
-		map.put("chgNum", 0);
-		map.put("chgTypeCd", "01");
-		map.put("chgNm", "배포 상태");	
-		map.put("preVal", beforeDplInfo.get("dplStsCd")); 
-		map.put("chgVal", paramMap.get("dplStsCd"));	
-		map.put("chgOptTypeCd", "02");	
-		map.put("chgCommonCd", "DPL00001");	
-		map.put("chgUsrId", paramMap.get("regUsrId"));
-		
-		
-		dpl1000DAO.insertDpl1500ModifyHistoryInfo(map);
 	}
 	
 	
@@ -351,25 +322,25 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 	
 	
 	@SuppressWarnings({"rawtypes" })
-	public Map selectDpl1400DplJobBuildInfo(Map map)  throws Exception{
-		return dpl1000DAO.selectDpl1400DplJobBuildInfo(map);
+	public Map selectDpl1200DplJobBuildInfo(Map map)  throws Exception{
+		return dpl1000DAO.selectDpl1200DplJobBuildInfo(map);
 	}
 	
 	
 	@SuppressWarnings({"rawtypes" })
-	public Map selectDpl1400DplSelBuildInfoAjax(Map map)  throws Exception{
-		return dpl1000DAO.selectDpl1400DplSelBuildInfoAjax(map);
+	public Map selectDpl1200DplSelBuildInfoAjax(Map map)  throws Exception{
+		return dpl1000DAO.selectDpl1200DplSelBuildInfoAjax(map);
 	}
 	
 	
 	@SuppressWarnings("rawtypes")
-	public void deleteDpl1300DplJobList(Map paramMap)  throws Exception{
-		dpl1000DAO.deleteDpl1300DplJobList(paramMap);
+	public void deleteDpl1100DplJobList(Map paramMap)  throws Exception{
+		dpl1000DAO.deleteDpl1100DplJobList(paramMap);
 	}
 	
 	
-	public int insertDpl1400DeployJobBuildLogInfo(BuildVO buildVo) throws Exception{
-		int bldSeq = dpl1000DAO.insertDpl1400DeployJobBuildLogInfo(buildVo);
+	public int insertDpl1200DeployJobBuildLogInfo(BuildVO buildVo) throws Exception{
+		int bldSeq = dpl1000DAO.insertDpl1200DeployJobBuildLogInfo(buildVo);
 		
 		
 		List<ChangeVO> changeSetList = buildVo.getChangeSetList();
@@ -389,14 +360,14 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 						changePathInfo.setRevision(changeSetInfo.getRevision());
 						
 						
-						dpl1000DAO.insertDpl1600DeployBuildChgPathLogInfo(changePathInfo);
+						dpl1000DAO.insertDpl1201DeployBuildChgPathLogInfo(changePathInfo);
 					}
 				}
 				
 				changeSetInfo.setBldSeq(bldSeq);
 				
 				
-				dpl1000DAO.insertDpl1600DeployBuildChgLogInfo(changeSetInfo);
+				dpl1000DAO.insertDpl1201DeployBuildChgLogInfo(changeSetInfo);
 			}
 		}
 		
@@ -405,7 +376,7 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 	
 	
 	@SuppressWarnings({"rawtypes", "unchecked" })
-	public Map selectDpl1300ToJen1000JobInfo(Map map)  throws Exception{
+	public Map selectDpl1100ToJen1000JobInfo(Map map)  throws Exception{
 		return jen1000Service.selectJen1000JobInfo(map);
 	}
 	
@@ -430,126 +401,8 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 	
 	
 	@SuppressWarnings({"rawtypes" })
-	public List selectDpl1400DplBldNumList(Map inputMap)  throws Exception{
-		return dpl1000DAO.selectDpl1400DplBldNumList(inputMap);
-	}
-	
-		
-	@SuppressWarnings("rawtypes")
-	public String selectDpl1500NewChgId(Map paramMap) throws Exception{
-		return dpl1000DAO.selectDpl1500NewChgId(paramMap);
-	}
-	
-		
-	@SuppressWarnings("rawtypes")
-	public String insertDpl1500ModifyHistoryInfo(Map paramMap) throws Exception{
-		return dpl1000DAO.insertDpl1500ModifyHistoryInfo(paramMap);
-	}
-	
-	
-		
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void insertDpl1500DplInfoModifyList(Map paramMap) throws Exception{
-		
-		Map beforeDplInfo = dpl1000DAO.selectDpl1000DeployVerInfo(paramMap);
-		
-		
-		String newChgId = dpl1000DAO.selectDpl1500NewChgId(paramMap);
-		paramMap.put("chgId", newChgId);
-		
-		
-		int chgNum = 0;
-		
-		for( Object key : paramMap.keySet() ) {
-				String jsonVal = "";
-				if(paramMap.get(key) instanceof ArrayList){
-					jsonVal = paramMap.get(key).toString();
-				}else{
-					jsonVal = (String) paramMap.get(key);
-				}
-				
-				JSONObject jsonObj = null;
-				
-				
-				Map defaultReqInfo = new HashMap();
-				
-				
-				try{
-					jsonObj = new JSONObject(jsonVal);
-				}catch(JSONException jsonE){
-					defaultReqInfo.put(key, paramMap.get(key).toString());
-					continue;
-				}catch(Exception e){
-					continue;
-				}
-				
-				String modifyset = String.valueOf(jsonObj.get("modifySetCd"));
-				
-				
-				if("02".equals(modifyset)){
-					continue;
-				}
-				
-				
-				String paramVal = String.valueOf(jsonObj.get("optVal"));
-				
-				
-				String opttarget = String.valueOf(jsonObj.get("chgDetailOptTarget"));
-				String dplInfoVal = "";
-				String chgTypeCd = "00";
-				
-				
-				if("01".equals(opttarget)){
-					
-					if(beforeDplInfo.containsKey(key)){
-						dplInfoVal = String.valueOf(beforeDplInfo.get(key));
-						chgTypeCd = "01";	
-					}else{
-						continue;
-					}
-				}
-				
-				
-				if(paramVal == null || "".equals(paramVal) || "undefined".equals(paramVal)){
-					
-					paramVal = "";
-				}
-				if(dplInfoVal == null || "".equals(dplInfoVal) || "null".equals(dplInfoVal)){
-					dplInfoVal = "";
-				}
-				
-				
-				
-				if(!(paramVal).equals(dplInfoVal)){
-					
-					Map<String, Object> map = new HashMap<String, Object>();
-					map.putAll(paramMap);
-					
-					
-					map.put("chgNum", chgNum);
-					map.put("chgTypeCd", chgTypeCd);
-					map.put("chgNm", jsonObj.get("optNm"));	
-					map.put("preVal", dplInfoVal); 
-					map.put("chgVal", jsonObj.get("optVal"));	
-					map.put("chgOptTypeCd", jsonObj.get("chgDetailOptType"));	
-					map.put("chgCommonCd", jsonObj.get("chgDetailCommonCd"));	
-					map.put("chgUsrId", paramMap.get("regUsrId"));
-					
-					
-					dpl1000DAO.insertDpl1500ModifyHistoryInfo(map);
-					
-					
-					chgNum++;
-				}
-		}
-		
-	}
-	
-	
-		
-	@SuppressWarnings("rawtypes")
-	public List selectDpl1500ModifyHistoryList(Map paramMap) throws Exception{
-		return dpl1000DAO.selectDpl1500ModifyHistoryList(paramMap);
+	public List selectDpl1200DplBldNumList(Map inputMap)  throws Exception{
+		return dpl1000DAO.selectDpl1200DplBldNumList(inputMap);
 	}
 	
 		
@@ -560,47 +413,47 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 	
 
 	
-	public void insertDpl1600DeployBuildChgLogInfo(ChangeVO changeSetInfo) throws Exception{
-		dpl1000DAO.insertDpl1600DeployBuildChgLogInfo(changeSetInfo);
+	public void insertDpl1201DeployBuildChgLogInfo(ChangeVO changeSetInfo) throws Exception{
+		dpl1000DAO.insertDpl1201DeployBuildChgLogInfo(changeSetInfo);
 	}
 	
-	public void insertDpl1600DeployBuildChgPathLogInfo(ChangePathsVO ChangePathInfo) throws Exception{
-		dpl1000DAO.insertDpl1600DeployBuildChgPathLogInfo(ChangePathInfo);
+	public void insertDpl1201DeployBuildChgPathLogInfo(ChangePathsVO ChangePathInfo) throws Exception{
+		dpl1000DAO.insertDpl1201DeployBuildChgPathLogInfo(ChangePathInfo);
 	}
 	
 
 	
 	@SuppressWarnings({"rawtypes" })
-	public List selectDpl1600SvnChangeLogsList(Map paramMap)  throws Exception{
-		return dpl1000DAO.selectDpl1600SvnChangeLogsList(paramMap);
+	public List selectDpl1201SvnChangeLogsList(Map paramMap)  throws Exception{
+		return dpl1000DAO.selectDpl1201SvnChangeLogsList(paramMap);
 	}
 	
 	
 	@SuppressWarnings({"rawtypes" })
-	public List selectDpl1700SvnChangePathList(Map paramMap)  throws Exception{
-		return dpl1000DAO.selectDpl1700SvnChangePathList(paramMap);
+	public List selectDpl1202SvnChangePathList(Map paramMap)  throws Exception{
+		return dpl1000DAO.selectDpl1202SvnChangePathList(paramMap);
 	}
 
 	
 	@SuppressWarnings({"rawtypes" })
-	public List selectDpl1400DplNoneResultList(Map paramMap)  throws Exception{
-		return dpl1000DAO.selectDpl1400DplNoneResultList(paramMap);
+	public List selectDpl1200DplNoneResultList(Map paramMap)  throws Exception{
+		return dpl1000DAO.selectDpl1200DplNoneResultList(paramMap);
 	}
 	@SuppressWarnings({"rawtypes" })
-	public List selectDpl1800JenParameterList(Map paramMap)  throws Exception{
-		return dpl1000DAO.selectDpl1800JenParameterList(paramMap);
+	public List selectDpl1101JenParameterList(Map paramMap)  throws Exception{
+		return dpl1000DAO.selectDpl1101JenParameterList(paramMap);
 	}
 	
 	
 	@SuppressWarnings("rawtypes")
-	public String insertDpl1800ParameterInfo(Map paramMap) throws Exception{
-		return dpl1000DAO.insertDpl1800ParameterInfo(paramMap);
+	public String insertDpl1101ParameterInfo(Map paramMap) throws Exception{
+		return dpl1000DAO.insertDpl1101ParameterInfo(paramMap);
 	}
 
 	
 	
 	@SuppressWarnings("rawtypes")
-	public void deleteDpl1800ParameterInfo(Map paramMap) throws Exception{
-		dpl1000DAO.deleteDpl1800ParameterInfo(paramMap);
+	public void deleteDpl1101ParameterInfo(Map paramMap) throws Exception{
+		dpl1000DAO.deleteDpl1101ParameterInfo(paramMap);
     }
 }
