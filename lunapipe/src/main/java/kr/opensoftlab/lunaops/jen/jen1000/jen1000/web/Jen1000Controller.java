@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.log4j.Logger;
@@ -24,7 +23,6 @@ import egovframework.com.cmm.service.EgovProperties;
 import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 import kr.opensoftlab.lunaops.com.exception.UserDefineException;
-import kr.opensoftlab.lunaops.com.vo.LoginVO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1000VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1100VO;
@@ -200,10 +198,10 @@ public class Jen1000Controller {
 
 			List<Jen1000VO> jen1000List = null;
 
-			HttpSession ss = request.getSession();
-			LoginVO loginVO = (LoginVO) ss.getAttribute("loginVO");
+			
+			
 
-			jen1000VO.setLoginUsrId(loginVO.getUsrId());
+			
 
 			
 			int totCnt = 0;
@@ -266,10 +264,10 @@ public class Jen1000Controller {
 
 			List<Jen1100VO> jen1000List = null;
 
-			HttpSession ss = request.getSession();
-			LoginVO loginVO = (LoginVO) ss.getAttribute("loginVO");
+			
+			
 
-			jen1100VO.setLoginUsrId(loginVO.getUsrId());
+			
 
 			
 			int totCnt = 0;
@@ -331,8 +329,8 @@ public class Jen1000Controller {
 	
 	
 	@SuppressWarnings("rawtypes")
-	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000JobDetailAjax.do")
-	public ModelAndView selectJen1000JobDetailAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1100JobDetailAjax.do")
+	public ModelAndView selectJen1100JobDetailAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try{
 			
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
@@ -348,7 +346,7 @@ public class Jen1000Controller {
 			return new ModelAndView("jsonView");
 		}
 		catch(Exception ex){
-			Log.error("selectJen1000JobDetailAjax()", ex);
+			Log.error("selectJen1100JobDetailAjax()", ex);
 			
 			
 			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
@@ -359,12 +357,10 @@ public class Jen1000Controller {
 
 
 	
-	@RequestMapping(value="/jen/jen1000/jen1000/saveJen1001JenkinsInfoAjax.do")
-	public ModelAndView saveJen1001JenkinsInfoAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+	@RequestMapping(value="/jen/jen1000/jen1000/saveJen1000JenkinsInfoAjax.do")
+	public ModelAndView saveJen1000JenkinsInfoAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 
 		try{
-
-
 			
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 
@@ -462,7 +458,7 @@ public class Jen1000Controller {
 			return new ModelAndView("jsonView");
 		}
 		catch(Exception ex){
-			Log.error("saveJen1001JenkinsInfoAjax()", ex);
+			Log.error("saveJen1000JenkinsInfoAjax()", ex);
 
 			
 			model.addAttribute("errorYn", "Y");
@@ -472,8 +468,8 @@ public class Jen1000Controller {
 	}
 	
 	
-	@RequestMapping(value="/jen/jen1000/jen1000/saveJen1002JobInfoAjax.do")
-	public ModelAndView saveJen1002JobInfoAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+	@RequestMapping(value="/jen/jen1000/jen1000/saveJen1100JobInfoAjax.do")
+	public ModelAndView saveJen1100JobInfoAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		
 		try{
 			
@@ -612,7 +608,7 @@ public class Jen1000Controller {
 			return new ModelAndView("jsonView");
 		}
 		catch(Exception ex){
-			Log.error("saveJen1002JobInfoAjax()", ex);
+			Log.error("saveJen1100JobInfoAjax()", ex);
 			
 			
 			model.addAttribute("errorYn", "Y");
@@ -754,7 +750,7 @@ public class Jen1000Controller {
 			
 			String jobUrl=(String)jobMap.get("jobUrl");
 			
-			
+
 			
 			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
 			
