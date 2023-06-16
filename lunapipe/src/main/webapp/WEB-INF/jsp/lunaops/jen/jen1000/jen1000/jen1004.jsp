@@ -79,7 +79,7 @@ function fnPopJobConsoleLogLoad(thisObj){
 	
 	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/dpl/dpl1000/dpl1000/selectDpl1400DplSelBuildConsoleLogAjax.do'/>","loadingShow":false}
+			{"url":"<c:url value='/dpl/dpl1000/dpl1000/selectDpl1200DplSelBuildConsoleLogAjax.do'/>","loadingShow":false}
 			,{prjId:prjId, dplId: dplId, jenId: jenId, jobId: jobId, bldSeq: bldSeq});
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
