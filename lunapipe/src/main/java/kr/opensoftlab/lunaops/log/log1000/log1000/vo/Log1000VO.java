@@ -20,13 +20,8 @@ public class Log1000VO extends PageVO {
 	private String logIp;
 	private String logTime;
 	private String logUrl;
-	private String menuId;
-	private String menuNm;
-	private String menuUrl;
-	private String menuCd;
-	
-	
-	
+	private String logType;
+	private String logAjaxCd;
 	
 	public String getLogUrl() {
 		return logUrl;
@@ -106,42 +101,17 @@ public class Log1000VO extends PageVO {
 	public void setLogTime(String logTime) {
 		this.logTime = logTime;
 	}
-	public String getMenuId() {
-		return menuId;
+	public String getLogType() {
+		return logType;
 	}
-	public void setMenuId(String menuId) {
-		this.menuId = menuId;
+	public void setLogType(String logType) {
+		this.logType = logType;
 	}
-	public String getMenuNm() {
-		return menuNm;
+	public String getLogAjaxCd() {
+		return logAjaxCd;
 	}
-	public void setMenuNm(String menuNm) {
-		this.menuNm = menuNm;
+	public void setLogAjaxCd(String logAjaxCd) {
+		this.logAjaxCd = logAjaxCd;
 	}
-	public String getMenuUrl() {
-		return menuUrl;
-	}
-	public void setMenuUrl(String menuUrl) {
-		this.menuUrl = menuUrl;
-	}
-	public String getMenuCd() {
-		return menuCd;
-	}
-	public void setMenuCd(String menuCd) {
-		this.menuCd = menuCd;
-	}
-	
-	
-
-	
-
-
-	
-	
-	
-	
-	
-	
-	
 	
 }
