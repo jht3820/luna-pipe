@@ -6,6 +6,6 @@ public interface Log1000Service {
 	
 	
 	
-	void insertLog1000AuthLoginLog(Log1000VO log1000vo) throws Exception;
+	void insertLog1000SystemUseLog(Log1000VO log1000vo) throws Exception;
 	
 }
