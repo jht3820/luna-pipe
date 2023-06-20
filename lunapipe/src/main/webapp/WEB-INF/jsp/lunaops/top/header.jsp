@@ -51,7 +51,7 @@
 	<script src="<c:url value='/js/common/common.js'/>" ></script>
 	<!-- select2 -->
 	<link href="/vendors/select2/css/select2.css" rel="stylesheet">
-	
+	<link rel="stylesheet" href="<c:url value='/css/common/footer.css'/>">
 </head>
 <body>
 	<section>
