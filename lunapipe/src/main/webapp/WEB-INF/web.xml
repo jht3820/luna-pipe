@@ -1,115 +1,164 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:web="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd http://java.sun.com/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee" id="WebApp_ID" version="2.5">
-  <display-name>lunaops</display-name>
-  <filter>
-    <filter-name>encodingFilter</filter-name>
-    <filter-class>
+<web-app id="WebApp_ID" version="2.5" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd">
+	<display-name>lunaops</display-name>
+	<!-- 
+	<security-constraint>
+	    <web-resource-collection>
+	        <web-resource-name>SSL Forward</web-resource-name>
+	        <url-pattern>/*</url-pattern>
+	    </web-resource-collection>
+	    <user-data-constraint>
+	        <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+	    </user-data-constraint>
+	</security-constraint>
+	 -->
+	<!-- 인코딩 필터 설정 -->
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>
 			org.springframework.web.filter.CharacterEncodingFilter
 		</filter-class>
-    <init-param>
-      <param-name>encoding</param-name>
-      <param-value>utf-8</param-value>
-    </init-param>
-  </filter>
-  <filter-mapping>
-    <filter-name>encodingFilter</filter-name>
-    <url-pattern>*.do</url-pattern>
-  </filter-mapping>
-  <filter>
-    <filter-name>HTMLTagFilter</filter-name>
-    <filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>utf-8</param-value>
+		</init-param>
+	</filter>    
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+
+	<!-- URL에서 <c:out 사용하여 XSS 공격 방어하기로 하여 HTMLTagFilter 사용 안함	 -->
+	<!-- egovframework.rte.ptl.mvc.filter.HTMLTagFilter -->
+	<filter>
+        <filter-name>HTMLTagFilter</filter-name>
+        <filter-class>
     		egovframework.com.cmm.filter.HTMLTagFilter        
         </filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>HTMLTagFilter</filter-name>
-    <url-pattern>*.do</url-pattern>
-  </filter-mapping>
-  <context-param>
-    <param-name>contextConfigLocation</param-name>
-    <param-value>
+    </filter>
+	<filter-mapping>
+        <filter-name>HTMLTagFilter</filter-name>
+        <url-pattern>*.do</url-pattern>
+    </filter-mapping>
+    	
+    <!-- 스프링 컨테이너 기동 -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
 			classpath*:egovframework/spring/context-*.xml
+			<!-- classpath*:egovframework/spring/context-aspect.xml;
+			classpath*:egovframework/spring/context-common.xml;
+			classpath*:egovframework/spring/context-datasource.xml;
+			classpath*:egovframework/spring/context-idgen.xml;
+			classpath*:egovframework/spring/context-properties.xml;
+			classpath*:egovframework/spring/context-sqlMap.xml;
+			classpath*:egovframework/spring/context-transaction.xml;
+			classpath*:egovframework/spring/context-osl.xml -->
 		</param-value>
-  </context-param>
-  <listener>
-    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-  </listener>
-  <listener>
-    <listener-class>egovframework.com.cmm.listener.SesssionEventListener</listener-class>
-  </listener>
-  <servlet>
-    <servlet-name>action</servlet-name>
-    <servlet-class>
+	</context-param>
+	
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+
+  	<listener>
+		<listener-class>egovframework.com.cmm.listener.SesssionEventListener</listener-class>
+	</listener>
+<!--	
+
+	<listener>
+    	<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+	</listener>
+-->
+
+
+	<!-- 서블릿 설정 -->	
+	<servlet>
+		<servlet-name>action</servlet-name>
+		<servlet-class>
 			org.springframework.web.servlet.DispatcherServlet
 		</servlet-class>
-    <init-param>
-      <param-name>contextConfigLocation</param-name>
-      <param-value>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>
 				/WEB-INF/config/egovframework/springmvc/dispatcher-servlet.xml,
 			</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>action</servlet-name>
-    <url-pattern>/</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>default</servlet-name>
-    <url-pattern>/css/*</url-pattern>
-    <url-pattern>/etc/*</url-pattern>
-    <url-pattern>/fonts/*</url-pattern>
-    <url-pattern>/images/*</url-pattern>
-    <url-pattern>/js/*</url-pattern>
-    <url-pattern>/vendors/*</url-pattern>
-    <url-pattern>/less/*</url-pattern>
-    <url-pattern>/index.html</url-pattern>
-  </servlet-mapping>
-  <welcome-file-list>
-    <welcome-file>index.html</welcome-file>
-  </welcome-file-list>
-  <login-config>
-    <auth-method>BASIC</auth-method>
-  </login-config>
-  <session-config>
-    <session-timeout>120</session-timeout>
-  </session-config>
-  <security-constraint>
-    <web-resource-collection>
-      <web-resource-name>Restricted methods</web-resource-name>
-      <url-pattern>/*</url-pattern>
-      <http-method>HEAD</http-method>
-      <http-method>PUT</http-method>
-      <http-method>DELETE</http-method>
-      <http-method>OPTION</http-method>
-      <http-method>TRACE</http-method>
-      <http-method>CONNECT</http-method>
-      <http-method>PATCH</http-method>
-    </web-resource-collection>
-    <auth-constraint/>
-  </security-constraint>
-  <error-page>
-    <exception-type>java.lang.Throwable</exception-type>
-    <location>/WEB-INF/jsp/lunaops/err/error.jsp</location>
-  </error-page>
-  <error-page>
-    <error-code>400</error-code>
-    <location>/WEB-INF/jsp/lunaops/err/error.jsp</location>
-  </error-page>
-  <error-page>
-    <error-code>401</error-code>
-    <location>/WEB-INF/jsp/lunaops/err/error.jsp</location>
-  </error-page>
-  <error-page>
-    <error-code>403</error-code>
-    <location>/WEB-INF/jsp/lunaops/err/error.jsp</location>
-  </error-page>
-  <error-page>
-    <error-code>404</error-code>
-    <location>/WEB-INF/jsp/lunaops/err/error.jsp</location>
-  </error-page>
-  <error-page>
-    <error-code>500</error-code>
-    <location>/WEB-INF/jsp/lunaops/err/error.jsp</location>
-  </error-page>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>action</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+ 	
+ 	<!-- 전체 서블릿 매핑을 위해 디폴트 서블릿으로 특정 요청은 디폴트 서블릿이 처리하여 직접 파일에 접근할 수 있도록 제외시킴 -->
+	<servlet-mapping>
+      <servlet-name>default</servlet-name>
+       <url-pattern>/css/*</url-pattern>
+       <url-pattern>/etc/*</url-pattern>
+       <url-pattern>/fonts/*</url-pattern>
+       <url-pattern>/images/*</url-pattern>
+       <url-pattern>/js/*</url-pattern>
+       <url-pattern>/vendors/*</url-pattern>
+       <!-- 루트 경로처리 하는 페이지 일반 요청으로 지정 -->
+       <url-pattern>/index.html</url-pattern>
+   </servlet-mapping>
+   	
+	<!-- 웰컴페이지 설정 -->
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+	<login-config>
+		<auth-method>BASIC</auth-method>
+	</login-config>
+	
+	<!-- 세션 타임아웃 설정 및 jsessionid 제거-->
+	<session-config>
+    	<session-timeout>120</session-timeout>
+    	<!-- <tracking-mode>COOKIE</tracking-mode> -->
+  	</session-config>
+
+	<!-- HTTP 메소드 접근 허용 설정 : POST, GET 제외 모두 차단 -->
+	<security-constraint> 
+		<web-resource-collection>
+			<web-resource-name>Restricted methods</web-resource-name> 
+			<url-pattern>/*</url-pattern>
+			<http-method>HEAD</http-method>
+			<http-method>PUT</http-method>
+			<http-method>DELETE</http-method> 
+			<http-method>OPTION</http-method>
+			<http-method>TRACE</http-method>
+			<http-method>CONNECT</http-method>
+			<http-method>PATCH</http-method>
+		</web-resource-collection> 
+		<auth-constraint /> 
+	</security-constraint>
+
+	<!-- 에러페이지 설정 -->
+  	<error-page>
+    	<exception-type>java.lang.Throwable</exception-type>
+    	<location>/WEB-INF/jsp/lunaops/err/error.jsp</location>
+  	</error-page>
+  	<error-page>
+    	<error-code>400</error-code>
+    	<location>/WEB-INF/jsp/lunaops/err/error.jsp</location>
+  	</error-page>
+  	<error-page>
+    	<error-code>401</error-code>
+    	<location>/WEB-INF/jsp/lunaops/err/error.jsp</location>
+  	</error-page>
+  	<error-page>
+    	<error-code>403</error-code>
+    	<location>/WEB-INF/jsp/lunaops/err/error.jsp</location>
+  	</error-page>
+  	<error-page>
+    	<error-code>404</error-code>
+    	<location>/WEB-INF/jsp/lunaops/err/error.jsp</location>
+  	</error-page>
+  	<error-page>
+    	<error-code>500</error-code>
+    	<location>/WEB-INF/jsp/lunaops/err/error.jsp</location>
+  	</error-page>
 </web-app>
