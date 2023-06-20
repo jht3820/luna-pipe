@@ -23,18 +23,10 @@
 			<mvc:mapping path="/**/*.do" />
 			<bean class="kr.opensoftlab.sdf.interceptor.RequestParamCheckInterceptor" />
 		</mvc:interceptor>
-		<!-- 
 		<mvc:interceptor>
 			<mvc:mapping path="/**/*.do" />
-			<bean class="kr.opensoftlab.sdf.interceptor.AuthenticInterceptor">
-				<property name="permitURLs">
-					<list>
-						<value>/cmm/cmm4000/cmm4000/selectCmm4000View.do</value>
-					</list>
-				</property>
-			</bean>
+			<bean class="kr.opensoftlab.sdf.interceptor.AuthenticInterceptor" />
 		</mvc:interceptor>
-		 -->
 		<mvc:interceptor>
 			<mvc:mapping path="/**/select*.do" />
 			<mvc:mapping path="/**/insert*.do" />
