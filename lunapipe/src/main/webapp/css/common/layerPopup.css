@@ -57,7 +57,7 @@
 	.layer_popup_box .note_size { font-size: 1.25em; line-height: 1.6; }
 
 	/* .btn_div → margin-top: 14px 에서 17px 변경 */
-	.layer_popup_box .btn_div {width:100%; display: inline-block; margin-top: 17px; }
+	.layer_popup_box .btn_div {width:100%; display: inline-block; margin-top: 17px;text-align: center; }
 	.layer_popup_box .save_btn{ margin-right:1%; }
 	.layer_popup_box .complete_btn{background:#4b73eb; color:#fff; border:1px solid #345BCF;}
 	.layer_popup_box .save_btn,
