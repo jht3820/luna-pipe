@@ -1,0 +1,113 @@
+@charset "UTF-8";
+
+.tab_contents.menu{
+    display: inline-block;
+    width: 1550px;
+    height: auto;
+    padding: 10px;
+    background: #fff;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+.sub_title {
+    font-weight: bold;
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    border-left: none;
+    border-right: none;
+    padding: 6px 5px;
+    height: 30px;
+}
+.result-success {color: #4b73eb;}
+.result-authException {color: #fba450;}
+.result-fail, .result-exception {color: #ff5643;}
+
+/* rep1002 */
+
+/* rep1002 */
+.rep1002Pop_sub{
+	width: 100%;
+    padding: 20px 20px;
+    text-align: center;
+}
+.rep1002FrameBox{
+	width: 100%;
+	border: 1px solid #ccc;
+	display: inline-block;
+	margin:1px 0;
+}
+.rep1002SearchFrame {
+    height: 42px;
+    line-height: 42px;
+    text-align: left;
+    padding: 0 15px;
+}
+.rep1002RevisionFrame {
+    height: 255px;
+    padding: 5px;
+    position: relative;
+}
+.rep1002CommitLogFrame {
+    height: 100px;
+}
+.rep1002FileTreeFrame {
+    height: 100%;
+    width:350px;
+    float: left;
+    overflow: auto;
+}
+.rep1002FileListFrame {
+    height: 100%;
+    width: 907px;
+    margin-left: 3px;
+    float: right;
+    padding: 5px;
+}
+.rep1002RepositoryName {
+    display: inline-block;
+    height: 35px;
+    line-height: 35px;
+    padding: 0 10px;
+    border: 1px solid #000;
+    margin: 0px 10px;
+}
+.rep1002RevisionSearchRange {
+    display: inline-block;
+}
+textarea.svnCommitLogDetail {
+    width: 100%;
+    height: 100%;
+    resize: none;
+    border: none;
+    padding: 10px;
+}
+.rep1002FileMainFrame {
+    display: block;
+    width: 100%;
+    height: 300px;
+    position: relative;
+}
+div.svn_mask_repList {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    text-align: center;
+    font-size: 12pt;
+    padding-top: 60px;
+	z-index: 2;
+	top: 0;
+    left: 0;
+}
+div.svn_mask_content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    text-align: center;
+    font-size: 12pt;
+    padding-top: 10%;
+	z-index: 2;
+}
