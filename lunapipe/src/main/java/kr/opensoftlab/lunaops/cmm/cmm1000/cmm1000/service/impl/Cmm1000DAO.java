@@ -15,6 +15,6 @@ public class Cmm1000DAO extends ComOslitsAbstractDAO {
     
     @SuppressWarnings("rawtypes")
     public List selectCmm1000MultiCommonCodeList(Map param) throws Exception {
-    	return list("cmm9100DAO.selectCmm1000MultiCommonCodeList", param);   
+    	return list("cmm1000DAO.selectCmm1000MultiCommonCodeList", param);   
     }
 }
