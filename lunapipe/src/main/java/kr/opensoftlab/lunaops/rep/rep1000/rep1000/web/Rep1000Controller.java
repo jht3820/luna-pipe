@@ -24,7 +24,6 @@ import egovframework.com.cmm.service.EgovProperties;
 import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 import kr.opensoftlab.lunaops.com.exception.UserDefineException;
-import kr.opensoftlab.lunaops.com.vo.LoginVO;
 import kr.opensoftlab.lunaops.rep.rep1000.rep1000.service.Rep1000Service;
 import kr.opensoftlab.lunaops.rep.rep1000.rep1000.vo.Rep1000VO;
 import kr.opensoftlab.sdf.rep.com.RepModule;
@@ -113,19 +112,6 @@ public class Rep1000Controller {
 			PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(rep1000VO);  
 
 			List<Rep1000VO> rep1000List = null;
-
-			HttpSession ss = request.getSession();
-			LoginVO loginVO = (LoginVO) ss.getAttribute("loginVO");
-
-			
-			String prjId = paramMap.get("prjId");
-			
-			
-			if(prjId == null) {
-				prjId = (String) ss.getAttribute("selPrjId");
-			}
-			
-			rep1000VO.setLoginUsrId(loginVO.getUsrId());
 
 			
 			int totCnt = 0;
@@ -242,8 +228,8 @@ public class Rep1000Controller {
 	
 	
 	@SuppressWarnings("unused")
-	@RequestMapping(value="/rep/rep1000/rep1000/saveSvn2000InfoAjax.do")
-	public ModelAndView saveSvn2000InfoAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+	@RequestMapping(value="/rep/rep1000/rep1000/saveRep1000InfoAjax.do")
+	public ModelAndView saveRep1000InfoAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 
 		try{
 			
@@ -353,7 +339,7 @@ public class Rep1000Controller {
 			return new ModelAndView("jsonView");
 		}
 		catch(Exception ex){
-			Log.error("saveSvn2000InfoAjax()", ex);
+			Log.error("saveRep1000InfoAjax()", ex);
 
 			
 			model.addAttribute("saveYN", "N");
@@ -363,23 +349,39 @@ public class Rep1000Controller {
 	}
 	
 	
+	@SuppressWarnings("rawtypes")
 	@RequestMapping(value="/rep/rep1000/rep1000/deleteRep1000InfoAjax.do")
 	public ModelAndView deleteRep1000InfoAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-
 		try{
-
 			
-			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			Map<String, Object> paramMap = RequestConvertor.requestParamToMapAddSelInfoList(request, true, "repId");
 			
-			int useCount = rep1000Service.selectRep1000UseCountInfo(paramMap);
-			if(useCount==0){
-				rep1000Service.deleteRep1000Info(paramMap);
+			List paramRepIds = (List) paramMap.get("list");
+			
+			
+			int paramRepIdCnt = 0;
+			if(paramRepIds != null) {
+				paramRepIdCnt = paramRepIds.size();
+			}
+			
+			
+			int succCnt = rep1000Service.deleteRep1000List(paramMap);
+			
+			if(paramRepIdCnt != 0 && succCnt > 0){
+				model.addAttribute("errorYn", "N");
 				
-				model.addAttribute("message", egovMessageSource.getMessage("success.common.delete"));
-			}else{
+				String addMsg = "";
 				
-				model.addAttribute("saveYN", "N");
-				model.addAttribute("message", egovMessageSource.getMessage("fail.common.existInfo"));
+				if(succCnt != paramRepIdCnt) {
+					addMsg = "</br>(구성항목에 배정되어있는 저장소 삭제 대상에서 제외)";
+				}
+				
+				
+				model.addAttribute("message", "선택된 데이터 "+paramRepIdCnt+"건 중 "+succCnt+"건이 삭제되었습니다."+addMsg);
+			}else {
+				model.addAttribute("errorYn", "Y");
+				
+				model.addAttribute("message", "삭제 대상 저장소가 없습니다.");
 			}
 			
 			return new ModelAndView("jsonView");
@@ -388,7 +390,7 @@ public class Rep1000Controller {
 			Log.error("deleteRep1000InfoAjax()", ex);
 
 			
-			model.addAttribute("saveYN", "N");
+			model.addAttribute("errorYn", "Y");
 			model.addAttribute("message", egovMessageSource.getMessage("fail.common.save"));
 			return new ModelAndView("jsonView");
 		}
@@ -689,10 +691,6 @@ public class Rep1000Controller {
 			
 			Map paramMap = RequestConvertor.requestParamToMap(request,true);
 
-			
-			HttpSession ss = request.getSession();
-			paramMap.put("prjId", ss.getAttribute("selPrjId"));
-			paramMap.put("authGrpId", ss.getAttribute("selAuthGrpId"));
 			Long revision =0l;
 			
 			if(paramMap.get("revision")!=null){
