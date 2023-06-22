@@ -1,0 +1,64 @@
+@charset "UTF-8";
+
+/* stm3000 */
+.tab_contents.menu{
+    display: inline-block;
+    width: 1550px;
+    height: auto;
+    padding: 10px;
+    background: #fff;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+.sub_title {
+    font-weight: bold;
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    border-left: none;
+    border-right: none;
+    padding: 6px 5px;
+    height: 30px;
+}
+.main_frame { display: inline-block; height: auto; background: #fff;}
+.main_frame.left { width : 740px;float: left;}
+.main_frame.middle {
+    width: 87px;
+    height: 790px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.main_frame.right { width : 700px;float: right;} /* 760 */
+.frame_contents { display: inline-block; width: 100%; height: auto; padding: 10px; background: #fff; border-radius: 5px; border: 1px solid #ccc; }
+.main_frame.left > .frame_contents:first-child {
+    margin-bottom: 20px;
+}
+.jobAddDelBtn{width:50px;}
+.main_frame.middle > .jobAddDelBtn:first-child{margin-bottom:20px;}
+.sub_title > small {
+    font-size: 0.7rem;
+}
+
+.frame_contents.selectJobFrame{
+	height: 795px;
+}
+.jenkinsSelBeforeHideFrame {
+    position: relative;
+    display: inline-block;
+}
+.hideMaskFrame {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    color: #fff;
+    font-weight: 700;
+    font-size: 13pt;
+    background-color: rgba(0, 0, 0, 0.85);
+    padding-top: 25%;
+    border-radius: 2px;
+}
+#btn_job_select { width: 52px; height: 100%; padding-top: 3px;}
+.result-success {color: #4b73eb;}
+.result-authException {color: #fba450;}
+.result-fail, .result-exception {color: #ff5643;}
