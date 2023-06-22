@@ -96,11 +96,6 @@ var layer_popup = function(url, data,loadingShow){
 	
 	//AJAX 전송 오류 함수
 	ajaxObj.setFnError(function(xhr, status, err){
-		if(xhr.status == '999'){
-    		alert('세션이 만료되어 로그인 페이지로 이동합니다.');
-    		document.location.href="/cmm/cmm4000/cmm4000/selectCmm4000View.do"
-    		return;
-    	}
 		if(xhr.status == '404'){
 			console.log(err);
     		toast.push('팝업 페이지에서 오류가 발생했습니다.');
@@ -119,27 +114,5 @@ var layer_popup = function(url, data,loadingShow){
 	//AJAX 전송
 	ajaxObj.send();
 	
-	/*$(".layer_popup_box .ajax_box").load(url, data, function(response, status, xhr){
-
-		if(xhr.status == '999'){
-    		alert('세션이 만료되어 로그인 페이지로 이동합니다.');
-    		document.location.href="/cmm/cmm4000/cmm4000/selectCmm4000View.do"
-    		return;
-    	}
-		if(xhr.status == '404'){
-    		alert('팝업 페이지에서 오류가 발생했습니다.');
-    		gfnShowLoadingBar(false);
-    		gfnLayerPopupClose();
-    		return false;
-    	}
-		$(".layer_popup_box").show();
-		$("body").addClass("bhpf");
-		xhr.complete(function(){
-        	gfnShowLoadingBar(false);
-        	//마우스 드래그로 팝업창 움직일 수 있도록  jQuery UI
-        	$('.ajax_box').draggable({ handle: ".popup_title_box, .pop_title, .header_title" });
-        });
-		
-	});*/
 	return layerBoxDivId;
 }
