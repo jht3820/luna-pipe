@@ -17,8 +17,8 @@ public class Log1000ServiceImpl extends EgovAbstractServiceImpl implements Log10
     private Log1000DAO log1000DAO;  
 
     
-	public void insertLog1000AuthLoginLog(Log1000VO log1000vo) throws Exception{
-		log1000DAO.insertLog1000AuthLoginLog(log1000vo);
+	public void insertLog1000SystemUseLog(Log1000VO log1000vo) throws Exception{
+		log1000DAO.insertLog1000SystemUseLog(log1000vo);
 	}
 	
 }
