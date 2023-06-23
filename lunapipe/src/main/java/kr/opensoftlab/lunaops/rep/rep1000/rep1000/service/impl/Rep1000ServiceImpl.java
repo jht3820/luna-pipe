@@ -1,5 +1,6 @@
 package kr.opensoftlab.lunaops.rep.rep1000.rep1000.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -151,5 +152,34 @@ public class Rep1000ServiceImpl extends EgovAbstractServiceImpl implements Rep10
 	@Override
 	public void deleteRep1000Info(Map<String, String> paramMap) throws Exception{
 		rep1000DAO.deleteRep1000Info(paramMap);
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public int deleteRep1000List(Map<String, Object> paramMap) throws Exception{
+		List<Map> paramRepIds = (List<Map>) paramMap.get("list");
+		
+		
+		int delCount = 0;
+		
+		
+		if(paramRepIds != null) {
+			for(Map paramRepMap : paramRepIds) {
+				String repId = (String) paramRepMap.get("repId");
+				
+				Map newMap = new HashMap<>();
+				newMap.put("repId", repId);
+				
+				
+				int useCount = rep1000DAO.selectRep1000UseCountInfo(newMap);
+				
+				if(useCount == 0){
+					rep1000DAO.deleteRep1000Info(newMap);
+					delCount++;
+				}
+			}
+		}
+		return delCount;
 	}
 }
