@@ -7,19 +7,6 @@
 	<typeAlias alias="egovMap"	 	type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
 	
 	
-   	<resultMap id="resultMapSelectLog1000" class="log1000VO">
-			<result property="rn"			column="RN"/>
-			<result property="logUsrId"   column="LOG_USR_ID"/>
-			<result property="logTime"    column="LOG_TIME"/>
-			<result property="logIp"      column="LOG_IP"/>
-			<result property="logUsrNm"   column="USR_NM"/>
-			<result property="menuId"   column="MENU_ID"/>
-			<result property="menuNm"   column="MENU_NM"/>
-			<result property="menuUrl"   column="MENU_URL"/>
-			<result property="menuCd"   column="MENU_CD"/>
-    </resultMap>
-	
-	
 	
 	<sql id="selectLog1000List">
 				SELECT 
@@ -28,10 +15,6 @@
 						,T1.LOG_IP
 						,T1.LOG_URL
 						,NVL(T2.USR_NM,'-') USR_NM
-						,T1.MENU_ID
-						,T1.MENU_NM
-						,T1.MENU_URL
-						,T1.MENU_CD
 				FROM LOG1000 T1 LEFT JOIN USR1000 T2 ON (T1.LOG_USR_ID = T2.USR_ID)
 				<isNotEmpty property="searchSelect" >
 					<isNotEmpty property="searchTxt">
@@ -95,11 +78,13 @@
 			/* log1000DAO.insertLog1000SystemUseLog - 시스템 사용이력 쌓기  쌓기  */
 			INSERT INTO LOG1000
             (	
-            	LOG_TIME,	LOG_URL,	LOG_USR_ID,		LOG_IP
+            	LOG_SEQ
+            	,LOG_TIME,	LOG_URL,	LOG_USR_ID,		LOG_IP,		LOG_TYPE,	LOG_AJAX_CD
             )
             VALUES
             (
-            	SYSDATE,	#logUrl#,	#logUsrId#,		#logIp#
+            	LIC_SEQ.NEXTVAL
+            	,SYSDATE,	#logUrl#,	#logUsrId#,		#logIp#,	#logType#,	#logAjaxCd#
             )
 		]]>
 	</insert>
