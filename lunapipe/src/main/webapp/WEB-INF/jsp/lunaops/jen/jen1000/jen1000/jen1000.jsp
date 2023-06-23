@@ -3,7 +3,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ include file="/WEB-INF/jsp/lunaops/top/header.jsp" %>
 
-<link rel='stylesheet' href='<c:url value='/css/lunaops/stm.css'/>' type='text/css'>
+<link rel='stylesheet' href='<c:url value='/css/lunaops/jen.css'/>' type='text/css'>
 <style type="text/css">
 	.accptFont{color:#4b73eb !important;text-shadow: none !important;}
 	.rejectFont{color:#eb4b6a !important;text-shadow: none !important;}
@@ -11,41 +11,33 @@
 	
 </style>
 <script>
-var leftGrid,rightGrid;
-var mySearchLeft,mySearchRight;
+var jenkinsGrid, jobGrid, selJobGrid;
+var jenkinsSearchObj, jobSearchObj, selJobSearchObj;
 
 
 $(function(){
 	
-	fnAxGrid5ViewLeft();
-	fnSearchBoxControlLeft();
+	fnJenkinsGridSetting();
+	fnJenkinsSearchSetting();
 	
 	
-	fnAxGrid5ViewRight();
-	fnSearchBoxControlRight();
+	fnJobGridSetting();
+	fnJobSearchSetting();
 	
 	
-	gfnGuideStack("add",fnStm3000GuideShow);
+	fnSelJobGridSetting();
+	fnSelJobSearchSetting();
+	
+	
+	gfnGuideStack("add",fnJen1000GuideShow);
 });
 
 
-
-function fnSelectChg(){
-	var selVal = $("#searchSelect option:selected").val();
-	if(selVal == '0'){
-		$("#searchTxt").val("");
-		$("#searchTxt").attr("readonly", true);
-	}else{
-		$("#searchTxt").attr("readonly", false);
-	}
-}
-
-
-function fnAxGrid5ViewLeft(){
-	leftGrid = new ax5.ui.grid();
+function fnJenkinsGridSetting(){
+	jenkinsGrid = new ax5.ui.grid();
  
-        leftGrid.setConfig({
-            target: $('[data-ax5grid="grid_left"]'),
+        jenkinsGrid.setConfig({
+            target: $('[data-ax5grid="jenkinsGrid"]'),
             
             sortable:false,
             header: {align:"center",columnHeight: 30},
@@ -79,17 +71,20 @@ function fnAxGrid5ViewLeft(){
                 columnHeight: 30,
                 onClick:function(){
                 	
-                    this.self.select(leftGrid.selectedDataIndexs[0]);
+                    this.self.select(jenkinsGrid.selectedDataIndexs[0]);
                 	
                 	
                     this.self.select(this.doindex);
                 	
+                	
+                	$("#selJenkinsNm").text(this.item.jenNm);
+                	
                 	 
- 					fnInRightGridListSet(0,mySearchRight.getParam()+"&jenId="+this.item.jenId,false);
+ 					fnInJobGridListSet(0,jobSearchObj.getParam()+"&jenId="+this.item.jenId,false);
                 },
                 onDBLClick:function(){
                 		var data = {"jenNm": this.item.jenNm,"jenId": this.item.jenId, "jenUrl": this.item.jenUrl, "jenUsrId":this.item.jenUsrId, "jenUsrTok": this.item.jenUsrTok};
-						gfnLayerPopupOpen('/stm/stm3000/stm3000/selectStm3003JenkinsDetailView.do',data,"1200","595",'scroll');
+						gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1003JenkinsDetailView.do',data,"1200","595",'scroll');
                 }
             },
             contextMenu: {
@@ -133,16 +128,16 @@ function fnAxGrid5ViewLeft(){
                 nextIcon: '<i class="fa fa-caret-right" aria-hidden="true"></i>',
                 lastIcon: '<i class="fa fa-step-forward" aria-hidden="true"></i>',
                 onChange: function () {
-                   fnInLeftGridListSet(this.page.selectPage,mySearchLeft.getParam());
+                   fnInJenkinsGridDataSet(this.page.selectPage,jenkinsSearchObj.getParam());
                 }
             } 
         });
         
- 		fnInLeftGridListSet();
+ 		fnInJenkinsGridDataSet();
 }
 
 
-function fnInLeftGridListSet(_pageNo,ajaxParam){
+function fnInJenkinsGridDataSet(_pageNo,ajaxParam){
      	
      	
      	if(gfnIsNull(ajaxParam)){
@@ -152,13 +147,13 @@ function fnInLeftGridListSet(_pageNo,ajaxParam){
      	
      	if(!gfnIsNull(_pageNo)){
      		ajaxParam += "&pageNo="+_pageNo;
-     	}else if(typeof leftGrid.page.currentPage != "undefined"){
-     		ajaxParam += "&pageNo="+leftGrid.page.currentPage;
+     	}else if(typeof jenkinsGrid.page.currentPage != "undefined"){
+     		ajaxParam += "&pageNo="+jenkinsGrid.page.currentPage;
      	}
      	
      	
 		var ajaxObj = new gfnAjaxRequestAction(
-				{"url":"<c:url value='/stm/stm3000/stm3000/selectStm3000JenkinsListAjax.do'/>","loadingShow":true}
+				{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000JenkinsListAjax.do'/>","loadingShow":true}
 				,ajaxParam);
 		
 		ajaxObj.setFnSuccess(function(data){
@@ -166,7 +161,7 @@ function fnInLeftGridListSet(_pageNo,ajaxParam){
 			var list = data.list;
 			var page = data.page;
 			
-		   	leftGrid.setData({
+		   	jenkinsGrid.setData({
 		             	list:list,
 		             	page: {
 		                  currentPage: _pageNo || 0,
@@ -178,25 +173,15 @@ function fnInLeftGridListSet(_pageNo,ajaxParam){
 		});
 		
 		
-		ajaxObj.setFnError(function(xhr, status, err){
-			
-           	if(status == "999"){
-           		alert('세션이 만료되어 로그인 페이지로 이동합니다.');
-        		document.location.href="<c:url value='/cmm/cmm4000/cmm4000/selectCmm4000View.do'/>";
-        		return;
-           	}
-		});
-		
-		
 		ajaxObj.send();
 }
 
 
-function fnAxGrid5ViewRight(){
-	rightGrid = new ax5.ui.grid();
+function fnJobGridSetting(){
+	jobGrid = new ax5.ui.grid();
  
-        rightGrid.setConfig({
-            target: $('[data-ax5grid="grid_right"]'),
+        jobGrid.setConfig({
+            target: $('[data-ax5grid="jobGrid"]'),
             showRowSelector: true,
             sortable:false,
             header: {align:"center",columnHeight: 30},
@@ -241,7 +226,7 @@ function fnAxGrid5ViewRight(){
                 columnHeight: 30,
                 onDBLClick:function(){
                 		var data = {"jenId": this.item.jenId, "jobId": this.item.jobId};
-						gfnLayerPopupOpen('/stm/stm3000/stm3000/selectStm3004JobDetailView.do',data,"1200", "870",'scroll');
+						gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1004JobDetailView.do',data,"1200", "870",'scroll');
                 }
             } ,
             page: {
@@ -253,21 +238,21 @@ function fnAxGrid5ViewRight(){
                 nextIcon: '<i class="fa fa-caret-right" aria-hidden="true"></i>',
                 lastIcon: '<i class="fa fa-step-forward" aria-hidden="true"></i>',
                 onChange: function () {
-                	var item = leftGrid.getList('selected')[0];
+                	var item = jenkinsGrid.getList('selected')[0];
 					if(gfnIsNull(item)){
-						toast.push('좌측 목록에서 JENKINS를 선택해주세요.');
+						toast.push('상단 목록에서 JENKINS를 선택해주세요.');
 						return;
 					}
 					
 					
-		            fnInRightGridListSet(this.page.selectPage,mySearchRight.getParam()+"&jenId="+item.jenId,true);
+		            fnInJobGridListSet(this.page.selectPage,jobSearchObj.getParam()+"&jenId="+item.jenId,true);
                 }
             } 
         });
 }
 
 
-function fnInRightGridListSet(_pageNo,ajaxParam,loadingShow){
+function fnInJobGridListSet(_pageNo,ajaxParam,loadingShow){
      	
      	
      	if(gfnIsNull(ajaxParam)){
@@ -277,13 +262,13 @@ function fnInRightGridListSet(_pageNo,ajaxParam,loadingShow){
      	
      	if(!gfnIsNull(_pageNo)){
      		ajaxParam += "&pageNo="+_pageNo;
-     	}else if(typeof leftGrid.page.currentPage != "undefined"){
-     		ajaxParam += "&pageNo="+rightGrid.page.currentPage;
+     	}else if(typeof jenkinsGrid.page.currentPage != "undefined"){
+     		ajaxParam += "&pageNo="+jobGrid.page.currentPage;
      	}
      	
      	
 		var ajaxObj = new gfnAjaxRequestAction(
-				{"url":"<c:url value='/stm/stm3000/stm3000/selectStm3000JobListAjax.do'/>","loadingShow":loadingShow}
+				{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000JobListAjax.do'/>","loadingShow":loadingShow}
 				,ajaxParam);
 		
 		ajaxObj.setFnSuccess(function(data){
@@ -291,7 +276,7 @@ function fnInRightGridListSet(_pageNo,ajaxParam,loadingShow){
 			var list = data.list;
 			var page = data.page;
 			
-		   	rightGrid.setData({
+		   	jobGrid.setData({
 		             	list:list,
 		             	page: {
 		                  currentPage: _pageNo || 0,
@@ -303,36 +288,26 @@ function fnInRightGridListSet(_pageNo,ajaxParam,loadingShow){
 		});
 		
 		
-		ajaxObj.setFnError(function(xhr, status, err){
-			
-           	if(status == "999"){
-           		alert('세션이 만료되어 로그인 페이지로 이동합니다.');
-        		document.location.href="<c:url value='/cmm/cmm4000/cmm4000/selectCmm4000View.do'/>";
-        		return;
-           	}
-		});
-		
-		
 		ajaxObj.send();
 }
 
 
 
-function fnDeleteStm3000JenkinsInfo(jenId){
+function fnDeleteJen1000JenkinsInfo(jenId){
 	
 	var ajaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/stm/stm3000/stm3000/deleteStm3000JenkinsInfoAjax.do'/>"}
+			{"url":"<c:url value='/jen/jen1000/jen1000/deleteJen1000JenkinsInfoAjax.do'/>"}
 			,{ "jenId" : jenId });
 	
 	ajaxObj.setFnSuccess(function(data){
 		data = JSON.parse(data);
 		jAlert(data.message, "알림창");
-		fnInLeftGridListSet();
+		fnInJenkinsGridDataSet();
 		
-		var gridList = rightGrid.getList();
+		var gridList = jobGrid.getList();
 		if(!gfnIsNull(gridList) && gridList.length > 0){
 			$.each(gridList,function(){
-				rightGrid.removeRow(0);
+				jobGrid.removeRow(0);
 			});
 		}
 	});
@@ -348,16 +323,16 @@ function fnDeleteStm3000JenkinsInfo(jenId){
 } 
 
 
-function fnDeleteStm3000JobInfo(jenId, jobId){
+function fnDeleteJen1000JobInfo(jenId, jobId){
 	
 	var ajaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/stm/stm3000/stm3000/deleteStm3000JobInfoAjax.do'/>"}
+			{"url":"<c:url value='/jen/jen1000/jen1000/deleteJen1000JobInfoAjax.do'/>"}
 			,{ "jenId" : jenId, "jobId" : jobId });
 	
 	ajaxObj.setFnSuccess(function(data){
 		data = JSON.parse(data);
 		jAlert(data.message, "알림창");
-		fnInRightGridListSet(0,mySearchRight.getParam()+"&jenId="+jenId);
+		fnInJobGridListSet(0,jobSearchObj.getParam()+"&jenId="+jenId);
 	});
 	
 	
@@ -371,14 +346,14 @@ function fnDeleteStm3000JobInfo(jenId, jobId){
 } 
 
 
-function fnSearchBoxControlLeft(){
-	mySearchLeft = new AXSearch();
+function fnJenkinsSearchSetting(){
+	jenkinsSearchObj = new AXSearch();
 
 	var fnObjSearch = {
 		pageStart: function(){
 			
-			mySearchLeft.setConfig({
-				targetID:"AXSearchTarget_left",
+			jenkinsSearchObj.setConfig({
+				targetID:"AXSearchTarget-jenkins",
 				theme : "AXSearch",
 				rows:[
 					{display:true, addClass:"", style:"", list:[
@@ -392,102 +367,81 @@ function fnSearchBoxControlLeft(){
                             ],onChange: function(selectedObject, value){
                             	
     							if(!gfnIsNull(selectedObject.optionAll) && selectedObject.optionAll == true){
-									axdom("#" + mySearchLeft.getItemId("searchTxt")).attr("readonly", "readonly");	
-									axdom("#" + mySearchLeft.getItemId("searchTxt")).val('');	
+									axdom("#" + jenkinsSearchObj.getItemId("searchTxt")).attr("readonly", "readonly");	
+									axdom("#" + jenkinsSearchObj.getItemId("searchTxt")).val('');	
 								}else{
-									axdom("#" + mySearchLeft.getItemId("searchTxt")).removeAttr("readonly");
+									axdom("#" + jenkinsSearchObj.getItemId("searchTxt")).removeAttr("readonly");
 								}
 								
 								
 								if(!gfnIsNull(selectedObject.optionCommonCode)){
-									gfnCommonSetting(mySearchLeft,selectedObject.optionCommonCode,"searchCd","searchTxt");
+									gfnCommonSetting(jenkinsSearchObj,selectedObject.optionCommonCode,"searchCd","searchTxt");
 								}else{
 									
-									axdom("#" + mySearchLeft.getItemId("searchTxt")).show();
-									axdom("#" + mySearchLeft.getItemId("searchCd")).hide();
+									axdom("#" + jenkinsSearchObj.getItemId("searchTxt")).show();
+									axdom("#" + jenkinsSearchObj.getItemId("searchCd")).hide();
 								}
     						},
 
 						},
-						{label:"", labelWidth:"", type:"inputText", width:"120", key:"searchTxt", addClass:"secondItem sendBtn", valueBoxStyle:"padding-left:0px;", value:"",
+						{label:"", labelWidth:"", type:"inputText", width:"128", key:"searchTxt", addClass:"secondItem sendBtn", valueBoxStyle:"padding-left:0px;", value:"",
 							onkeyup:function(e){
 								if(e.keyCode == '13' ){
-									axdom("#" + mySearchLeft.getItemId("btn_search_jenkins")).click();
+									axdom("#" + jenkinsSearchObj.getItemId("btn_search_jenkins")).click();
 								}
 							} 
 						},
 						{label:"", labelWidth:"", type:"selectBox", width:"100", key:"searchCd", addClass:"selectBox", valueBoxStyle:"padding-left:0px;", value:"01",
 							options:[]
 						},
-						
-						
-						{label:"<i class='fas fa-list-ol'></i>&nbsp;목록 수&nbsp;", labelWidth:"60", type:"selectBox", width:"", key:"pageSize", addClass:"", valueBoxStyle:"", value:"30",
-							options:[
-							         	{optionValue:15, optionText:"15"},
-		                                {optionValue:30, optionText:"30"},
-		                                {optionValue:50, optionText:"50"},
-		                                {optionValue:100, optionText:"100"},
-		                                {optionValue:300, optionText:"300"},
-		                                {optionValue:600, optionText:"600"},
-		                                {optionValue:1000, optionText:"1000"},
-		                                {optionValue:5000, optionText:"5000"},
-		                                {optionValue:10000, optionText:"10000"},
-		                                
-		                            ],onChange: function(selectedObject, value){
-		                            	fnInLeftGridListSet(0,$('form#searchFrm').serialize()+"&"+mySearchLeft.getParam());
-		    						}
-						},
-						{label:"<i class='fas fa-arrows-alt-v'></i>&nbsp;목록 높이&nbsp;", labelWidth:"60", type:"selectBox", width:"", key:"gridHeight", addClass:"", valueBoxStyle:"", value:"600",
-							options:[
-							         	{optionValue:300, optionText:"300px"},
-		                                {optionValue:600, optionText:"600px"},
-		                                {optionValue:1000, optionText:"1000px"},
-		                                {optionValue:1200, optionText:"1200px"},
-		                                {optionValue:2000, optionText:"2000px"},
-		                                
-		                            ],onChange: function(selectedObject, value){
-		                            	leftGrid.setHeight(value);
-		    						}
-						},
 						{label:"", labelWidth:"", type:"button", width:"80",style:"float:right;", key:"btn_search_jenkins_connect",valueBoxStyle:"padding:5px;", value:"<span>전체 접속확인</span>",
        							onclick:function(){
        								
-       								var gridLen = leftGrid.getList().length;
+       								var gridLen = jenkinsGrid.getList().length;
        								
        								
        								if(gridLen > 0){
        									
-       									fnSelectStm3000AllConfirmConnect(0);
+       									fnSelectJen1000AllConfirmConnect(0);
        								}
-                    	}}
+                    	}},
+						{label:"", labelWidth:"", type:"button", width:"100",style:"float:right;", key:"btn_search_jenkins_connect",valueBoxStyle:"padding:5px;", value:"<i class='fas fa-angle-double-right' aria-hidden='true'></i>&nbsp;<span>선택 접속확인</span>",
+   							onclick:function(){
+   								var item = jenkinsGrid.getList('selected')[0];
+   								if(gfnIsNull(item)){
+   									toast.push('확인 할 목록을 선택하세요.');
+   									return;
+   								}
+   								fnSelectJen1000ConfirmConnect(item.jenId,  jenkinsGrid.getList('selected')[0].__index );
+                		}}
 					]},
 					{display:true, addClass:"", style:"", list:[
                     						
 						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_print_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-print' aria-hidden='true'></i>&nbsp;<span>프린트</span>",
 							onclick:function(){
-								$(leftGrid.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
+								$(jenkinsGrid.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
 						}},
 						{label:"", labelWidth:"", type:"button", width:"55",style:"float:right;", key:"btn_excel_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-file-excel' aria-hidden='true'></i>&nbsp;<span>엑셀</span>",
 							onclick:function(){
-								leftGrid.exportExcel("JENKINS_LIST.xls");
+								jenkinsGrid.exportExcel("JENKINS_LIST.xls");
 						}},
 						{label : "",labelWidth : "",type : "button",width : "55",key : "btn_delete_jenkins",style : "float:right;",valueBoxStyle : "padding:5px;",value : "<i class='fa fa-trash-alt' aria-hidden='true'></i>&nbsp;<span>삭제</span>",
 							onclick : function() {
-								var item = leftGrid.getList('selected')[0];
+								var item = jenkinsGrid.getList('selected')[0];
 								if(gfnIsNull(item)){
 									toast.push('삭제 할 목록을 선택하세요.');
 									return;
 								}
 								jConfirm("JENKINS를 삭제하시겠습니까?</br>연관된 모든 정보가 함께 삭제됩니다.", "알림창", function( result ) {
 									if( result ){
-										fnDeleteStm3000JenkinsInfo(item.jenId);
+										fnDeleteJen1000JenkinsInfo(item.jenId);
 									}
 								});
 							}
 						},
 						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_update_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-edit' aria-hidden='true'></i>&nbsp;<span>수정</span>",
 							onclick:function(){
-								var item = leftGrid.getList('selected')[0];
+								var item = jenkinsGrid.getList('selected')[0];
 								if(gfnIsNull(item)){
 									toast.push('수정 할 목록을 선택하세요.');
 									return;
@@ -495,29 +449,24 @@ function fnSearchBoxControlLeft(){
 								
 								var data = {"popupGb": "update", "jenId": item.jenId};
         	                	
-								gfnLayerPopupOpen('/stm/stm3000/stm3000/selectStm3001JenkinsDetailView.do',data,"650","735",'scroll');
+								gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1001JenkinsDetailView.do',data,"650","590",'scroll');
 						}},
 						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_insert_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-save' aria-hidden='true'></i>&nbsp;<span>등록</span>",
 							onclick:function(){
 								var data = {
 									"popupGb": "insert"
 								};
-								gfnLayerPopupOpen('/stm/stm3000/stm3000/selectStm3001JenkinsDetailView.do',data,"650","590",'scroll');
+								gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1001JenkinsDetailView.do',data,"650","590",'scroll');
 						}},
 						{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_jenkins",style:"float:right;",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 							onclick:function(){
 								
-					            fnInLeftGridListSet(0,mySearchLeft.getParam());
-						}},
-						{label:"", labelWidth:"", type:"button", width:"100",style:"float:right;", key:"btn_search_jenkins_connect",valueBoxStyle:"padding:5px;", value:"<i class='fas fa-angle-double-right' aria-hidden='true'></i>&nbsp;<span>선택 접속확인</span>",
-       							onclick:function(){
-       								var item = leftGrid.getList('selected')[0];
-       								if(gfnIsNull(item)){
-       									toast.push('확인 할 목록을 선택하세요.');
-       									return;
-       								}
-       								fnSelectStm3000ConfirmConnect(item.jenId,  leftGrid.getList('selected')[0].__index );
-                    	}}
+					            fnInJenkinsGridDataSet(0,jenkinsSearchObj.getParam());
+								
+								
+								axdom("#" + jobSearchObj.getItemId("searchSelect")).val(0).change();
+					            jobGrid.setData([]);
+						}}
                     	]
                   		},
 				]
@@ -530,25 +479,22 @@ function fnSearchBoxControlLeft(){
 		
 		fnObjSearch.pageStart();
 		
-		axdom("#" + mySearchLeft.getItemId("searchTxt")).attr("readonly", "readonly");
+		axdom("#" + jenkinsSearchObj.getItemId("searchTxt")).attr("readonly", "readonly");
 		
 		
-		axdom("#" + mySearchLeft.getItemId("searchCd")).hide();
-
-		
-		fnBtnAuthCheck(mySearchLeft);
+		axdom("#" + jenkinsSearchObj.getItemId("searchCd")).hide();
 	});
 }
 
 
-function fnSearchBoxControlRight(){
-	mySearchRight = new AXSearch();
+function fnJobSearchSetting(){
+	jobSearchObj = new AXSearch();
 
 	var fnObjSearch = {
 		pageStart: function(){
 			
-			mySearchRight.setConfig({
-				targetID:"AXSearchTarget_right",
+			jobSearchObj.setConfig({
+				targetID:"AXSearchTarget-job",
 				theme : "AXSearch",
 				rows:[
 					{display:true, addClass:"", style:"", list:[
@@ -562,115 +508,87 @@ function fnSearchBoxControlRight(){
                             ],onChange: function(selectedObject, value){
                             	
     							if(!gfnIsNull(selectedObject.optionAll) && selectedObject.optionAll == true){
-									axdom("#" + mySearchRight.getItemId("searchTxt")).attr("readonly", "readonly");	
-									axdom("#" + mySearchRight.getItemId("searchTxt")).val('');	
+									axdom("#" + jobSearchObj.getItemId("searchTxt")).attr("readonly", "readonly");	
+									axdom("#" + jobSearchObj.getItemId("searchTxt")).val('');	
 								}else{
-									axdom("#" + mySearchRight.getItemId("searchTxt")).removeAttr("readonly");
+									axdom("#" + jobSearchObj.getItemId("searchTxt")).removeAttr("readonly");
 								}
 								
 								
 								if(!gfnIsNull(selectedObject.optionCommonCode)){
-									gfnCommonSetting(mySearchRight,selectedObject.optionCommonCode,"searchCd","searchTxt");
+									gfnCommonSetting(jobSearchObj,selectedObject.optionCommonCode,"searchCd","searchTxt");
 								}else{
 									
-									axdom("#" + mySearchRight.getItemId("searchTxt")).show();
-									axdom("#" + mySearchRight.getItemId("searchCd")).hide();
+									axdom("#" + jobSearchObj.getItemId("searchTxt")).show();
+									axdom("#" + jobSearchObj.getItemId("searchCd")).hide();
 								}
     						},
 
 						},
-						{label:"", labelWidth:"", type:"inputText", width:"120", key:"searchTxt", addClass:"secondItem sendBtn", valueBoxStyle:"padding-left:0px;", value:"",
+						{label:"", labelWidth:"", type:"inputText", width:"148", key:"searchTxt", addClass:"secondItem sendBtn", valueBoxStyle:"padding-left:0px;", value:"",
 							onkeyup:function(e){
 								if(e.keyCode == '13' ){
-									axdom("#" + mySearchRight.getItemId("btn_search_jenkins")).click();
+									axdom("#" + jobSearchObj.getItemId("btn_search_jenkins")).click();
 								}
 							} 
 						},
 						{label:"", labelWidth:"", type:"selectBox", width:"100", key:"searchCd", addClass:"selectBox", valueBoxStyle:"padding-left:0px;", value:"01",
 							options:[]
 						},
-						
-						
-						{label:"<i class='fas fa-list-ol'></i>&nbsp;목록 수&nbsp;", labelWidth:"60", type:"selectBox", width:"", key:"pageSize", addClass:"", valueBoxStyle:"", value:"30",
-							options:[
-							         	{optionValue:15, optionText:"15"},
-		                                {optionValue:30, optionText:"30"},
-		                                {optionValue:50, optionText:"50"},
-		                                {optionValue:100, optionText:"100"},
-		                                {optionValue:300, optionText:"300"},
-		                                {optionValue:600, optionText:"600"},
-		                                {optionValue:1000, optionText:"1000"},
-		                                {optionValue:5000, optionText:"5000"},
-		                                {optionValue:10000, optionText:"10000"},
-		                                
-		                            ],onChange: function(selectedObject, value){
-		                            	var item = leftGrid.getList('selected')[0];
-										if(gfnIsNull(item)){
-											toast.push('좌측 목록에서 JENKINS를 선택해주세요.');
-											return;
-										}
-										
-										
-							            fnInRightGridListSet(0,mySearchRight.getParam()+"&jenId="+item.jenId);
-		    						}
-						},
-						{label:"<i class='fas fa-arrows-alt-v'></i>&nbsp;목록 높이&nbsp;", labelWidth:"60", type:"selectBox", width:"", key:"gridHeight", addClass:"", valueBoxStyle:"", value:"600",
-							options:[
-							         	{optionValue:300, optionText:"300px"},
-		                                {optionValue:600, optionText:"600px"},
-		                                {optionValue:1000, optionText:"1000px"},
-		                                {optionValue:1200, optionText:"1200px"},
-		                                {optionValue:2000, optionText:"2000px"},
-		                                
-		                            ],onChange: function(selectedObject, value){
-		                            	rightGrid.setHeight(value);
-		    						}
-						},
 						{label:"", labelWidth:"", type:"button", width:"80",style:"float:right;", key:"btn_search_jenkins_connect",valueBoxStyle:"padding:5px;", value:"<span>전체 접속확인</span>",
        							onclick:function(){
        								
-       								var gridLen = rightGrid.getList().length;
+       								var gridLen = jobGrid.getList().length;
        								
        								
        								if(gridLen > 0){
        									
-										var gridJobInfo = rightGrid.getList()[0];
+										var gridJobInfo = jobGrid.getList()[0];
 										var jenId = gridJobInfo.jenId;
 										var jobId = gridJobInfo.jobId;
        									
-       									fnSelectStm3000JobConfirmConnect("all",jenId, jobId, 0);
+       									fnSelectJen1000JobConfirmConnect("all",jenId, jobId, 0);
        								}else{
        									toast.push("JOB이 존재하지 않습니다.");
        								}
-                    	}}
+                    	}},
+						{label:"", labelWidth:"", type:"button", width:"100",style:"float:right;", key:"btn_search_jenkins_connect",valueBoxStyle:"padding:5px;", value:"<i class='fas fa-angle-double-right' aria-hidden='true'></i>&nbsp;<span>선택 접속확인</span>",
+   							onclick:function(){
+   								var item = (!gfnIsNull(Object.keys(jobGrid.focusedColumn)))? jobGrid.list[jobGrid.focusedColumn[Object.keys(jobGrid.focusedColumn)].doindex]:null;
+   								if(gfnIsNull(item)){
+   									toast.push('확인 할 목록을 선택하세요.');
+   									return;
+   								}
+   								fnSelectJen1000JobConfirmConnect("normal",item.jenId,item.jobId, jobGrid.focusedColumn[Object.keys(jobGrid.focusedColumn)].doindex );
+                		}}
 					]},
 					{display:true, addClass:"", style:"", list:[
                     						
 						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_print_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-print' aria-hidden='true'></i>&nbsp;<span>프린트</span>",
 							onclick:function(){
-								$(rightGrid.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
+								$(jobGrid.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
 						}},
 						{label:"", labelWidth:"", type:"button", width:"55",style:"float:right;", key:"btn_excel_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-file-excel' aria-hidden='true'></i>&nbsp;<span>엑셀</span>",
 							onclick:function(){
-								rightGrid.exportExcel("JENKINS-JOB_LIST.xls");
+								jobGrid.exportExcel("JENKINS-JOB_LIST.xls");
 						}},
 						{label : "",labelWidth : "",type : "button",width : "55",key : "btn_delete_jenkins",style : "float:right;",valueBoxStyle : "padding:5px;",value : "<i class='fa fa-trash-alt' aria-hidden='true'></i>&nbsp;<span>삭제</span>",
 							onclick : function() {
-								var item = (!gfnIsNull(Object.keys(rightGrid.focusedColumn)))? rightGrid.list[rightGrid.focusedColumn[Object.keys(rightGrid.focusedColumn)].doindex]:null;
+								var item = (!gfnIsNull(Object.keys(jobGrid.focusedColumn)))? jobGrid.list[jobGrid.focusedColumn[Object.keys(jobGrid.focusedColumn)].doindex]:null;
 								if(gfnIsNull(item)){
 									toast.push('삭제 할 목록을 선택하세요.');
 									return;
 								}
 								jConfirm("JOB을 삭제하시겠습니까?</br>연관된 모든 정보가 함께 삭제됩니다.", "알림창", function( result ) {
 									if( result ){
-										fnDeleteStm3000JobInfo(item.jenId,item.jobId);
+										fnDeleteJen1000JobInfo(item.jenId,item.jobId);
 									}
 								});
 							}
 						},
 						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_update_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-edit' aria-hidden='true'></i>&nbsp;<span>수정</span>",
 							onclick:function(){
-								var item = (!gfnIsNull(Object.keys(rightGrid.focusedColumn)))? rightGrid.list[rightGrid.focusedColumn[Object.keys(rightGrid.focusedColumn)].doindex]:null;
+								var item = (!gfnIsNull(Object.keys(jobGrid.focusedColumn)))? jobGrid.list[jobGrid.focusedColumn[Object.keys(jobGrid.focusedColumn)].doindex]:null;
 								if(gfnIsNull(item)){
 									toast.push('수정 할 목록을 선택하세요.');
 									return;
@@ -678,37 +596,28 @@ function fnSearchBoxControlRight(){
 
 								var data = {"popupGb": "update", "jenId": item.jenId, "jobId": item.jobId};
         	                	
-								gfnLayerPopupOpen('/stm/stm3000/stm3000/selectStm3002JobDetailView.do',data,"650","585",'scroll',false);
+								gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1002JobDetailView.do',data,"650","585",'scroll',false);
 						}},
 						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_insert_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-save' aria-hidden='true'></i>&nbsp;<span>등록</span>",
 							onclick:function(){
-								var item = leftGrid.getList('selected')[0];
+								var item = jenkinsGrid.getList('selected')[0];
 								var data = {
 									"popupGb": "insert",
 									"selJenId": (!gfnIsNull(item))? item.jenId : null
 								};
-								gfnLayerPopupOpen('/stm/stm3000/stm3000/selectStm3002JobDetailView.do',data,"1000","540",'scroll',false);
+								gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1002JobDetailView.do',data,"1000","540",'scroll',false);
 						}},
 						{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_jenkins",style:"float:right;",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 							onclick:function(){
-								var item = leftGrid.getList('selected')[0];
+								var item = jenkinsGrid.getList('selected')[0];
 								if(gfnIsNull(item)){
-									toast.push('좌측 목록에서 JENKINS를 선택해주세요.');
+									toast.push('상단 목록에서 JENKINS를 선택해주세요.');
 									return;
 								}
 								
 								
-					            fnInRightGridListSet(0,mySearchRight.getParam()+"&jenId="+item.jenId);
-						}},
-						{label:"", labelWidth:"", type:"button", width:"100",style:"float:right;", key:"btn_search_jenkins_connect",valueBoxStyle:"padding:5px;", value:"<i class='fas fa-angle-double-right' aria-hidden='true'></i>&nbsp;<span>선택 접속확인</span>",
-       							onclick:function(){
-       								var item = (!gfnIsNull(Object.keys(rightGrid.focusedColumn)))? rightGrid.list[rightGrid.focusedColumn[Object.keys(rightGrid.focusedColumn)].doindex]:null;
-       								if(gfnIsNull(item)){
-       									toast.push('확인 할 목록을 선택하세요.');
-       									return;
-       								}
-       								fnSelectStm3000JobConfirmConnect("normal",item.jenId,item.jobId, rightGrid.focusedColumn[Object.keys(rightGrid.focusedColumn)].doindex );
-                    	}}
+					            fnInJobGridListSet(0,jobSearchObj.getParam()+"&jenId="+item.jenId);
+						}}
                     	]
                   		},
 				]
@@ -721,32 +630,123 @@ function fnSearchBoxControlRight(){
 		
 		fnObjSearch.pageStart();
 		
-		axdom("#" + mySearchRight.getItemId("searchTxt")).attr("readonly", "readonly");
+		axdom("#" + jobSearchObj.getItemId("searchTxt")).attr("readonly", "readonly");
 		
 		
-		axdom("#" + mySearchRight.getItemId("searchCd")).hide();
-
-		
-		fnBtnAuthCheck(mySearchRight);
+		axdom("#" + jobSearchObj.getItemId("searchCd")).hide();
 	});
 }
 
 
-function fnSelectStm3000ConfirmConnect(jenId,index){
-	leftGrid.setValue(index, "result", "progress");
+
+function fnSelJobGridSetting(){
+	selJobGrid = new ax5.ui.grid();
+
+  selJobGrid.setConfig({
+      target: $('[data-ax5grid="selJobGrid"]'),
+      showRowSelector: true,
+      sortable:false,
+      header: {align:"center",columnHeight: 30},
+      columns: [
+      	{key: "jenNm", label: "JENKINS NAME", width: 180, align: "center"},
+			{key: "jobTypeNm", label: "JOB TYPE", width: 95, align: "center"},
+			{key: "jobId", label: "JOB ID", width: 170, align: "center"},
+			{key: "jobRestoreId", label: "원복 JOB ID", width: 170, align: "center"},
+			{key: "jobParameter", label: "JOB 매개변수", width: 150, align: "center"
+				,formatter:function(){
+					var jobParameter = this.item.jobParameter;
+					
+					if(gfnIsNull(jobParameter)){
+						jobParameter = '-';
+					}
+					return jobParameter;
+				}
+			},
+			{key: "useNm", label: "사용유무", width: 80, align: "center"}
+      ],
+      body: {
+          align: "center",
+          columnHeight: 30,
+          onDBLClick:function(){
+          	var data = {"jenId": this.item.jenId, "jobId": this.item.jobId};
+				gfnLayerPopupOpen('/jen/jen1000/jen1000/selectStm3004JobDetailView.do',data,"1200", "870",'scroll');
+          }
+      } ,
+      page: {
+          navigationItemCount: 9,
+          height: 30,
+          display: true,
+          firstIcon: '<i class="fa fa-step-backward" aria-hidden="true"></i>',
+          prevIcon: '<i class="fa fa-caret-left" aria-hidden="true"></i>',
+          nextIcon: '<i class="fa fa-caret-right" aria-hidden="true"></i>',
+          lastIcon: '<i class="fa fa-step-forward" aria-hidden="true"></i>',
+          onChange: function () {
+	            var item = jenkinsGrid.getList('selected')[0];
+				if(gfnIsNull(item)){
+					toast.push('상단 목록에서 JENKINS를 선택해주세요.');
+					return;
+				}
+	
+				
+		        fnInJobGridListSet(this.page.selectPage,jobSearchObj.getParam()+"&jenId="+item.jenId,true);
+          }
+      } 
+  });
+}
+
+
+
+function fnSelJobSearchSetting(){
+	selJobSearchObj = new AXSearch();
+
+	var fnObjSearch = {
+		pageStart: function(){
+			
+			selJobSearchObj.setConfig({
+				targetID:"AXSearchTarget-selJob",
+				theme : "AXSearch",
+				rows:[
+					{display:true, addClass:"", style:"", list:[
+						{label:"", labelWidth:"", type:"button", width:"125", key:"btn_search_jenkins",style:"float:right;",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-indent' aria-hidden='true'></i>&nbsp;<span>빌드 파라미터 입력</span>",
+							onclick:function(){
+								var item = jenkinsGrid.getList('selected')[0];
+								
+						}}
+                  	]
+                		},
+				]
+			});
+		}
+		
+	};
+	
+	jQuery(document.body).ready(function(){
+		
+		fnObjSearch.pageStart();
+		
+		axdom("#" + selJobSearchObj.getItemId("searchTxt")).attr("readonly", "readonly");
+		
+		
+		axdom("#" + selJobSearchObj.getItemId("searchCd")).hide();
+	});
+}
+
+
+function fnSelectJen1000ConfirmConnect(jenId,index){
+	jenkinsGrid.setValue(index, "result", "progress");
 	
 	
 	var jenkinsConnAjaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/stm/stm3000/stm3000/selectStm3000ConfirmConnect.do'/>","loadingShow":false}
+			{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000ConfirmConnect.do'/>","loadingShow":false}
 			,{ "jenId" : jenId });
 	
 	jenkinsConnAjaxObj.setFnSuccess(function(data){
 		data = JSON.parse(data);
 		if(data.MSG_CD=="JENKINS_OK"){
-			leftGrid.setValue(index, "result", "success");
+			jenkinsGrid.setValue(index, "result", "success");
 			toast.push("접속 상태 정상");
 		}else{
-			leftGrid.setValue(index, "result", "fail");
+			jenkinsGrid.setValue(index, "result", "fail");
 			toast.push(data.MSG_CD);
 		}
 		
@@ -763,39 +763,39 @@ function fnSelectStm3000ConfirmConnect(jenId,index){
 } 
 
 
-function fnSelectStm3000AllConfirmConnect(index){
+function fnSelectJen1000AllConfirmConnect(index){
 	
 	if(index == -1){
 		return false;
 	}
 	
-	if(index >= leftGrid.getList().length){
+	if(index >= jenkinsGrid.getList().length){
 		return false;
 	}
 	
-	leftGrid.setValue(index, "result", "progress");
+	jenkinsGrid.setValue(index, "result", "progress");
 	
 	
-	var gridJenkinsInfo = leftGrid.getList()[index];
+	var gridJenkinsInfo = jenkinsGrid.getList()[index];
 	var jenId = gridJenkinsInfo.jenId;
 	
 	
 	var jenkinsConnAjaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/stm/stm3000/stm3000/selectStm3000ConfirmConnect.do'/>","loadingShow":false}
+			{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000ConfirmConnect.do'/>","loadingShow":false}
 			,{ "jenId" : jenId });
 	
 	jenkinsConnAjaxObj.setFnSuccess(function(data){
 		data = JSON.parse(data);
 		if(data.MSG_CD=="JENKINS_OK"){
-			leftGrid.setValue(index, "result", "success");
+			jenkinsGrid.setValue(index, "result", "success");
 			toast.push(gridJenkinsInfo.jenNm+": 접속 상태 정상");
 		}else{
-			leftGrid.setValue(index, "result", "fail");
+			jenkinsGrid.setValue(index, "result", "fail");
 			toast.push(gridJenkinsInfo.jenNm+": "+data.MSG_CD);
 			
 		}
 		
-		fnSelectStm3000AllConfirmConnect(++index);
+		fnSelectJen1000AllConfirmConnect(++index);
 	});
 	
 	
@@ -809,7 +809,7 @@ function fnSelectStm3000AllConfirmConnect(index){
 }
 
 
-function fnSelectStm3000JobConfirmConnect(type,jenId, jobId, index){
+function fnSelectJen1000JobConfirmConnect(type,jenId, jobId, index){
 	
 	if(type == "all"){
 		
@@ -818,37 +818,37 @@ function fnSelectStm3000JobConfirmConnect(type,jenId, jobId, index){
 		}
 	}
 	
-	rightGrid.setValue(index, "result", "progress");
+	jobGrid.setValue(index, "result", "progress");
 	
 	
-	var gridJobInfo = rightGrid.getList()[index];
+	var gridJobInfo = jobGrid.getList()[index];
 	
 	var jenkinsConnAjaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/stm/stm3000/stm3000/selectStm3000JobConfirmConnect.do'/>","loadingShow":false}
+			{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000JobConfirmConnect.do'/>","loadingShow":false}
 			,{ "jenId" : jenId, "jobId" : jobId });
 	
 	jenkinsConnAjaxObj.setFnSuccess(function(data){
 		data = JSON.parse(data);
 		if(data.MSG_CD=="JENKINS_OK"){
-			rightGrid.setValue(index, "result", "success");
+			jobGrid.setValue(index, "result", "success");
 			toast.push(gridJobInfo.jobId+": 접속 상태 정상");
 		}else{
-			rightGrid.setValue(index, "result", "fail");
+			jobGrid.setValue(index, "result", "fail");
 			toast.push(gridJobInfo.jobId+": "+data.MSG_CD);
 		}
 		if(type == "all"){
 			
-			if((++index) >= rightGrid.getList().length){
+			if((++index) >= jobGrid.getList().length){
 				return false;
 			}
 			
 			
-			var inGridJobInfo = rightGrid.getList()[index];
+			var inGridJobInfo = jobGrid.getList()[index];
 			var jenId = inGridJobInfo.jenId;
 			var jobId = inGridJobInfo.jobId;
 			
 			
-			fnSelectStm3000JobConfirmConnect("all",jenId, jobId,index);
+			fnSelectJen1000JobConfirmConnect("all",jenId, jobId,index);
 		}
 		
 	});
@@ -864,7 +864,8 @@ function fnSelectStm3000JobConfirmConnect(type,jenId, jobId, index){
 }
 
 
-function fnStm3000GuideShow(){
+
+function fnJen1000GuideShow(){
 	var mainObj = $(".main_contents");
 	
 	
@@ -872,7 +873,7 @@ function fnStm3000GuideShow(){
 		return false;
 	}
 	
-	var guideBoxInfo = globals_guideContents["stm3000"];
+	var guideBoxInfo = globals_guideContents["jen1000"];
 	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
 }
 </script>
@@ -882,25 +883,41 @@ function fnStm3000GuideShow(){
 	<form:form commandName="jen1000VO" id="searchFrm" name="searchFrm" method="post" onsubmit="return false;">
 		
 	</form:form>
-	<div class="stm3000_title"><c:out value="${sessionScope.selMenuNm }"/></div>
-	<div class = "tab_contents menu" > <!-- class="main_frame" -->
-		<div class="frame_contents left">
-			<div class="sub_title">
-				JENKINS 관리
+	<div class = "tab_contents menu" >
+		<div class="main_frame left">
+			<div class="frame_contents">
+				<div class="sub_title">
+					JENKINS 관리
+				</div>
+				<div id="AXSearchTarget-jenkins" guide="jen1000JenkinsBtn"></div>
+				<div class="dpl_wrap white">
+					<input type="hidden" name="strInSql" id="strInSql" />
+					<div data-ax5grid="jenkinsGrid" data-ax5grid-config="{}" style="height: 200px;" guide="jen1000JenkinsList"></div>	
+				</div>
 			</div>
-			<div id="AXSearchTarget_left" guide="stm3000JenkinsBtn"></div><br>
-			<div class="dpl_wrap white">
-				<input type="hidden" name="strInSql" id="strInSql" />
-				<div data-ax5grid="grid_left" data-ax5grid-config="{}" style="height: 600px;" guide="stm3000JenkinsList"></div>	
+			<div class="frame_contents">
+				<div class="sub_title">
+					JOB 관리 <small>[선택 JENKINS: <span id="selJenkinsNm">-</span>]</small>
+				</div>
+				<div id="AXSearchTarget-job" guide="jen1000JobBtn"></div>
+				<div class="dpl_wrap white">
+					<div data-ax5grid="jobGrid" data-ax5grid-config="{}" style="height: 300px;" guide="jen1000JobList"></div>	
+				</div>
 			</div>
 		</div>
-		<div class="frame_contents right">
-			<div class="sub_title">
-				JOB 관리
-			</div>
-			<div id="AXSearchTarget_right" guide="stm3000JobBtn"></div><br>
-			<div class="dpl_wrap white">
-				<div data-ax5grid="grid_right" data-ax5grid-config="{}" style="height: 600px;" guide="stm3000JobList"></div>	
+		<div class="main_frame middle">
+			<button type="button" class="AXButton jobAddDelBtn"><i class="fa fa-arrow-alt-circle-right"></i>&nbsp;추가</button>
+			<button type="button" class="AXButton jobAddDelBtn"><i class="fa fa-arrow-alt-circle-left"></i>&nbsp;제거</button>
+		</div>
+		<div class="main_frame right">
+			<div class="frame_contents selectJobFrame">
+				<div class="sub_title">
+					선택 JENKINS&JOB 목록
+				</div>
+				<div id="AXSearchTarget-selJob"></div>
+				<div class="dpl_wrap white">
+					<div data-ax5grid="selJobGrid" data-ax5grid-config="{}" style="height: 700px;"></div>	
+				</div>
 			</div>
 		</div>
 	</div>
