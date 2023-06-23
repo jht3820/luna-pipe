@@ -10,12 +10,12 @@
 			SELECT	A.MST_CD
 				,	A.SUB_CD
 			    ,	A.SUB_CD_NM	
-				,	SF_CMM1000_MST_CD_NM(MST_CD) AS MST_CD_NM
-			FROM	CMM1000 A
+				 ,	(SELECT MST_CD_NM FROM CMM1000 WHERE MST_CD = A.MST_CD) AS MST_CD_NM
+			FROM	CMM1001 A
 			WHERE	1=1
 		]]>
-		<isNotEmpty property="mstCds">
-			AND		A.MST_CD IN ($mstCds$)
+		<isNotEmpty property="mstCd">
+			AND		A.MST_CD IN #mstCd#
 		</isNotEmpty>
 		<isNotEqual property="useYn" compareValue="A">
 			AND		A.USE_YN = #useYn#

@@ -29,4 +29,7 @@ public interface Rep1000Service {
 
 	
 	void deleteRep1000Info(Map<String, String> paramMap) throws Exception;
+	
+	
+	int deleteRep1000List(Map<String, Object> paramMap) throws Exception;
 }
