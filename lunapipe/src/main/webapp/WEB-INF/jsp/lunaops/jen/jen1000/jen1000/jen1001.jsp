@@ -28,7 +28,7 @@ var arrChkObj = {
 			        "jenDesc":{"type":"length","msg":"Jenkins 설명은 2000byte까지 입력이 가능합니다.","max":2000} 
 			};
 			
-globals_guideChkFn = fnStm3001GuideShow;			
+globals_guideChkFn = fnJen1001GuideShow;			
 
 $(document).ready(function() {
 
@@ -42,14 +42,12 @@ $(document).ready(function() {
 	*	5. 동기 비동기모드 선택 (true:비동기 통신, false:동기 통신)
 	*	마스터 코드 = REQ00001:요구사항 타입, REQ00002:중요도 , CMM00001:
 	*/
-	var mstCdStrArr = "CMM00001";
-	var strUseYn = 'Y';
-	var arrObj = [ $("#useCd")];
-	var arrComboType = [ ""];
-	gfnGetMultiCommonCodeDataForm(mstCdStrArr, strUseYn, arrObj, arrComboType , false);
-	
-	//탭인덱스 부여
-	//gfnSetFormAllObjTabIndex(document.getElementById("jen1000PopupFrm"));
+	// 팝업 공통코드 select 세팅
+	var commonCodeArr = [
+		{mstCd: "CMM00001", useYn: "Y", targetObj: "#useCd", comboType:"OS"} // 사용유무
+	];
+	//공통코드 채우기
+	gfnGetMultiCommonCodeDataForm(commonCodeArr , true);
 	
 	// 유효성 체크
 	gfnInputValChk(arrChkObj);
@@ -74,7 +72,7 @@ $(document).ready(function() {
  	function fnSelectJen1001JobInfo(jenId){
 		//AJAX 설정
 		var ajaxObj = new gfnAjaxRequestAction(
-				{"url":"<c:url value='/stm/stm3000/stm3000/selectStm3000JenkinsDetailAjax.do'/>",loadingShow:false}
+				{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000JenkinsDetailAjax.do'/>",loadingShow:false}
 				,{ "jenId" : jenId });
 		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
@@ -138,7 +136,7 @@ function fnInsertReqInfoAjax(formId){
 			
 			//AJAX 설정
 			var ajaxObj = new gfnAjaxRequestAction(
-					{"url":"<c:url value='/stm/stm3000/stm3000/saveStm3001JenkinsInfoAjax.do'/>"
+					{"url":"<c:url value='/jen/jen1000/jen1000/saveJen1000JenkinsInfoAjax.do'/>"
 						,"contentType":false
 						,"processData":false
 						,"cache":false}
@@ -167,8 +165,8 @@ function fnInsertReqInfoAjax(formId){
 		    	}
 		    	
 		    	//그리드 새로고침
-				fnInLeftGridListSet(leftGrid.page.currentPage,$('form#searchFrm').serialize()+"&"+mySearchLeft.getParam());
-		    	
+				fnInJenkinsGridDataSet(jenkinsGrid.page.currentPage,$('form#searchFrm').serialize()+"&"+jenkinsSearchObj.getParam());
+				
 				jAlert(data.message, '알림창');
 				gfnLayerPopupClose();
 			});
@@ -184,7 +182,7 @@ function fnInsertReqInfoAjax(formId){
 	});
 }
 
-function fnStm3001GuideShow(){
+function fnJen1001GuideShow(){
 	var mainObj = $(".popup");
 	
 	//mainObj가 없는경우 false return
@@ -192,7 +190,7 @@ function fnStm3001GuideShow(){
 		return false;
 	}
 	//guide box setting
-	var guideBoxInfo = globals_guideContents["stm3001"];
+	var guideBoxInfo = globals_guideContents["jen1001"];
 	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
 }
 
@@ -202,7 +200,6 @@ function fnStm3001GuideShow(){
 <form id="jen1000PopupFrm" name="jen1000PopupFrm" method="post">
 	<input type="hidden" name="popupGb" id="popupGb" value="${param.popupGb}"/>
 	<input type="hidden" name="jenId" id="jenId" value="${param.jenId}" />
-	<input type="hidden" name="prjId" id="prjId" value="${sessionScope.selPrjId}"/>
 	<input type="hidden" name="reqStatusCd" id="reqStatusCd" value="01"/>
 
 	<div class="pop_title">JENKINS 설정 등록</div>
