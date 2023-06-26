@@ -43,22 +43,22 @@
 	<sql id="selectRep1000List">
 		<![CDATA[
 			SELECT
-		            REP_ID ,               /* 소스저장소 Repository 코드 */ 
-		            REP_NM ,               /* 소스저장소 Repository 명 */ 
-		            REP_TYPE_CD ,			/*소스저장소 종류 */
+		            REP_ID ,                
+		            REP_NM ,                
+		            REP_TYPE_CD ,			
 		            SF_CMM1001_COM_CD_INFO('REP00001', REP_TYPE_CD, '1') as REP_TYPE_NM ,
-		            REPLACE (REP_TXT ,'<br>' , '&nbsp;&nbsp;&nbsp;&nbsp;' ) AS REP_TXT  ,                  /* 소스저장소 RepositoryI Comment */ 
-		            SVN_REP_URL ,              /* SVN Repository URL */ 
-		            GIT_REP_URL ,              /* GIT Repository URL */ 
-		            USE_CD ,                   /* 사용여부(코드 : CMM00001) */
+		            REPLACE (REP_TXT ,'<br>' , '&nbsp;&nbsp;&nbsp;&nbsp;' ) AS REP_TXT  ,                   
+		            SVN_REP_URL ,               
+		            GIT_REP_URL ,               
+		            USE_CD ,                   
 		            SF_CMM1001_COM_CD_INFO('CMM00001', USE_CD, '1') as USE_NM ,
 		            GIT_USR_AUTH_TYPE_CD , 
-				    TO_CHAR(REG_DTM, 'YYYY-MM-DD HH24:MI:SS') AS REG_DTM ,       /* 최초등록 일시 */ 
-		            REG_USR_ID ,               /* 최초등록자 ID */ 
-		            REG_USR_IP ,               /* 최초등록자 IP */ 
-		            MODIFY_DTM ,               /* 최종수정일시 */ 
-		            MODIFY_USR_ID ,            /* 최종수정자 ID */ 
-		            MODIFY_USR_IP              /* 최종수정자 IP */ 
+				    TO_CHAR(REG_DTM, 'YYYY-MM-DD HH24:MI:SS') AS REG_DTM ,        
+		            REG_USR_ID ,                
+		            REG_USR_IP ,                
+		            MODIFY_DTM ,                
+		            MODIFY_USR_ID ,             
+		            MODIFY_USR_IP               
 			FROM
 		            REP1000
 			WHERE   1=1
@@ -89,7 +89,7 @@
     
     
     <select id="rep1000DAO.selectRep1000RepositoryList" parameterClass="rep1000VO"  resultMap="resultMapSelectRep1000">
-	    /*rep1000DAO.selectRep1000RepositoryList 소스저장소 repository 목록을 조회한다.*/
+	    
 		SELECT *
 		FROM
 			(
@@ -105,7 +105,7 @@
     
     
     <select id="rep1000DAO.selectRep1000RepositoryListCnt" parameterClass="rep1000VO"  resultClass="java.lang.Integer">
-	    /*rep1000DAO.selectRep1000RepositoryListCnt repository 목록 총건수를 조회한다.*/
+	    
 	    	SELECT
 					COUNT(*)
 			FROM	(
@@ -115,27 +115,27 @@
     
   
 	<select id="rep1000DAO.selectRep1000Info" parameterClass="java.util.Map"  resultMap="resultMapRepVO">
-		/* rep1000DAO.selectRep1000Info - 소스저장소 repository 정보를 조회한다. */
+		
 			SELECT
-			            REP_ID,              /* 소스저장소 Repository 코드 */ 
-			            REP_NM,              /* 소스저장소 Repository 명 */
-			            REP_TYPE_CD,			/* 소스저장소 종류*/ 
-			            REP_TXT,                 /* SVN RepositoryI Comment */ 
-			            SVN_REP_URL,             /* SVN Repository URL */ 
-			            SVN_USR_ID,              /* SVN 사용자 ID */ 
-			            SVN_USR_PW,              /* SVN 사용자 암호 */ 
-			            GIT_USR_AUTH_TYPE_CD,	/* GIT 사용자 인증 종류 */
-			            GIT_REP_URL,             /* GIT Repository URL */ 
-			            GIT_USR_ID,              /* GIT 사용자 ID */ 
-			            GIT_USR_PW,              /* GIT 사용자 암호 */
-			            GIT_USR_TK,				/* GIT 사용자 접근 토큰 */ 
-			            USE_CD,                  /* 사용여부(코드 : CMM00001) */ 
-			            REG_DTM,                 /* 최초등록 일시 */ 
-			            REG_USR_ID,              /* 최초등록자 ID */ 
-			            REG_USR_IP,              /* 최초등록자 IP */ 
-			            MODIFY_DTM,              /* 최종수정일시 */ 
-			            MODIFY_USR_ID,           /* 최종수정자 ID */ 
-			            MODIFY_USR_IP            /* 최종수정자 IP */ 
+			            REP_ID,               
+			            REP_NM,              
+			            REP_TYPE_CD,			 
+			            REP_TXT,                  
+			            SVN_REP_URL,              
+			            SVN_USR_ID,               
+			            SVN_USR_PW,               
+			            GIT_USR_AUTH_TYPE_CD,	
+			            GIT_REP_URL,              
+			            GIT_USR_ID,               
+			            GIT_USR_PW,              
+			            GIT_USR_TK,				 
+			            USE_CD,                   
+			            REG_DTM,                  
+			            REG_USR_ID,               
+			            REG_USR_IP,               
+			            MODIFY_DTM,               
+			            MODIFY_USR_ID,            
+			            MODIFY_USR_IP             
 			FROM
 			            REP1000
 			WHERE       1=1
@@ -146,7 +146,7 @@
     <insert id="rep1000DAO.insertRep1000Info" parameterClass="java.util.Map">
 		<selectKey resultClass="java.lang.String" keyProperty="newRepId">
 		<![CDATA[
-			/* rep1000DAO.insertRep1000Info - 소스저장소 Repository 등록(새로운 REP_ID 따기)*/ 
+			 
 			SELECT	NVL( 
 							SUBSTR(NEW_REP_ID, 1, 11) || LPAD( (TO_NUMBER(SUBSTR(NEW_REP_ID, 12, 5)) + 1) , 5, '0')
 						,	'REP' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '00001'
@@ -160,36 +160,36 @@
 		]]>
 		</selectKey>
 
-			/* rep1000DAO.insertRep1000Info  - 소스저장소 Repository */ 
+			 
 			INSERT     INTO     REP1000
 					(
-					            REP_ID             , /* 소스저장소 Repository 코드 */ 
-					            REP_NM             , /* 소스저장소 Repository 명 */ 
-					            REP_TYPE_CD			, /* 소스저장소 종류 */
-					            REP_TXT                , /* 소스저장소 RepositoryI Comment */
+					            REP_ID             ,  
+					            REP_NM             ,  
+					            REP_TYPE_CD			, 
+					            REP_TXT                , 
 					            <isEqual property="repTypeCd" compareValue="02">
-						            SVN_REP_URL            , /* SVN Repository URL */ 
-						            SVN_USR_ID             , /* SVN 사용자 ID */ 
-						            SVN_USR_PW             , /* SVN 사용자 암호 */ 
+						            SVN_REP_URL            ,  
+						            SVN_USR_ID             ,  
+						            SVN_USR_PW             ,  
 					            </isEqual>
 					            <isEqual property="repTypeCd" compareValue="01">
-						            GIT_USR_AUTH_TYPE_CD,	/* GIT 사용자 인증 종류 */
-						            GIT_REP_URL            , /* GIT Repository URL */ 
+						            GIT_USR_AUTH_TYPE_CD,	
+						            GIT_REP_URL            ,  
 						            <isEqual property="gitUsrAuthTypeCd" compareValue="02">
-							            GIT_USR_ID             , /* GIT 사용자 ID */ 
-							            GIT_USR_PW             , /* GIT 사용자 암호 */ 
+							            GIT_USR_ID             ,  
+							            GIT_USR_PW             ,  
 						            </isEqual>
 						            <isEqual property="gitUsrAuthTypeCd" compareValue="01">
-						            	GIT_USR_TK             , /* GIT 사용자 접근 토큰 */ 
+						            	GIT_USR_TK             ,  
 						            </isEqual>
 					            </isEqual>
-					            USE_CD                 , /* 사용여부(코드 : CMM00001) */ 
-					            REG_DTM                , /* 최초등록 일시 */ 
-					            REG_USR_ID             , /* 최초등록자 ID */ 
-					            REG_USR_IP             , /* 최초등록자 IP */ 
-					            MODIFY_DTM             , /* 최종수정일시 */ 
-					            MODIFY_USR_ID          , /* 최종수정자 ID */ 
-					            MODIFY_USR_IP           /* 최종수정자 IP */ 
+					            USE_CD                 ,  
+					            REG_DTM                ,  
+					            REG_USR_ID             ,  
+					            REG_USR_IP             ,  
+					            MODIFY_DTM             ,  
+					            MODIFY_USR_ID          ,  
+					            MODIFY_USR_IP            
 					)
 			VALUES
 					(
@@ -226,50 +226,50 @@
     
 	
 	<update id="rep1000DAO.updateRep1000Info" parameterClass="java.util.Map">
-		/* rep1000DAO.updateRep1000Info - 소스저장소 repository 정보 수정 */ 
+		 
 			 UPDATE     REP1000     SET 
-			            REP_NM = #repNm#             , /* 소스저장소 Repository 명 */
-			            REP_TYPE_CD = #repTypeCd# 			, /* 소스저장소 종류 */
-			            REP_TXT = #repTxt#                  , /* 소스저장소 RepositoryI Comment */ 
+			            REP_NM = #repNm#             , 
+			            REP_TYPE_CD = #repTypeCd# 			, 
+			            REP_TXT = #repTxt#                  ,  
 			            <isEqual property="repTypeCd" compareValue="02">
-				            SVN_REP_URL = #svnRepUrl#           , /* SVN Repository URL */ 
-				            SVN_USR_ID = #svnUsrId#             , /* SVN 사용자 ID */ 
-				            SVN_USR_PW = #svnUsrPw#             , /* SVN 사용자 암호 */
+				            SVN_REP_URL = #svnRepUrl#           ,  
+				            SVN_USR_ID = #svnUsrId#             ,  
+				            SVN_USR_PW = #svnUsrPw#             , 
 			            </isEqual> 
 			            <isEqual property="repTypeCd" compareValue="01">
-				            GIT_USR_AUTH_TYPE_CD = #gitUsrAuthTypeCd#	,	/* GIT 사용자 인증 종류 */
-				            GIT_REP_URL = #gitRepUrl#           , /* GIT Repository URL */ 
+				            GIT_USR_AUTH_TYPE_CD = #gitUsrAuthTypeCd#	,	
+				            GIT_REP_URL = #gitRepUrl#           ,  
 							<isEqual property="gitUsrAuthTypeCd" compareValue="02">
-					            GIT_USR_ID = #gitUsrId#             , /* GIT 사용자 ID */ 
-				            	GIT_USR_PW = #gitUsrPw#             , /* GIT 사용자 암호 */ 
+					            GIT_USR_ID = #gitUsrId#             ,  
+				            	GIT_USR_PW = #gitUsrPw#             ,  
 				            </isEqual>
 				            <isEqual property="gitUsrAuthTypeCd" compareValue="01">
-								GIT_USR_TK = #gitUsrTk#             , /* GIT 사용자 암호 */
+								GIT_USR_TK = #gitUsrTk#             , 
 				            </isEqual>
 			            </isEqual> 
-			            USE_CD = #useCd#                    , /* 사용여부(코드 : CMM00001) */ 
-			            MODIFY_DTM = SYSDATE                , /* 최종수정일시 */ 
-			            MODIFY_USR_ID = #modifyUsrId#       , /* 최종수정자 ID */ 
-			            MODIFY_USR_IP = #modifyUsrIp#         /* 최종수정자 IP */ 
+			            USE_CD = #useCd#                    ,  
+			            MODIFY_DTM = SYSDATE                ,  
+			            MODIFY_USR_ID = #modifyUsrId#       ,  
+			            MODIFY_USR_IP = #modifyUsrIp#          
 			WHERE
 						1=1
-          	AND   		REP_ID = #repId#              /* 소스저장소 Repository ID */ 
+          	AND   		REP_ID = #repId#               
 	</update>
 	
 	
 	<delete id="rep1000DAO.deleteRep1000Info" parameterClass="java.util.Map">
 		DELETE FROM	REP1000 A
 		WHERE	1=1
-		AND   	REP_ID = #repId#              /* 소스저장소 Repository ID */ 
+		AND   	REP_ID = #repId#               
 	</delete>
 	
 	
 	
 	<select id="rep1000DAO.selectRep1000UseCountInfo" parameterClass="java.util.Map"  resultClass="java.lang.Integer">
 		SELECT	COUNT(1) AS CNT
-	   FROM 	REP1100 A
+	   FROM 	REP1001 A
        WHERE    1=1
-		AND   	REP_ID = #repId#              /* 소스저장소 Repository ID */ 
+		AND   	REP_ID = #repId#               
         AND     ROWNUM = 1
 	</select>
 		
