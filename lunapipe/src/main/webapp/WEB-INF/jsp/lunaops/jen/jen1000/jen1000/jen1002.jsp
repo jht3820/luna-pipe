@@ -4,20 +4,16 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %> 
 <html lang="ko">
 <title>OpenSoftLab</title>
-<script src="<c:url value='/js/common/oslFile.js'/>"></script>
-<script src="<c:url value='/js/common/comOslops.js'/>"></script>
-<link rel='stylesheet' href='<c:url value='/css/common/fileUpload.css'/>' type='text/css'>
 <link rel='stylesheet' href='<c:url value='/css/ztree/zTreeStyle/zTreeStyle.css'/>' type='text/css'>
 <script type="text/javascript" src="/js/ztree/jquery.ztree.all.min.js"></script>
 <style>
-.layer_popup_box .popup.stm3002-popup .close_btn{top:12px; width:18px; height:18px; background:url(/images/login/x_white.png) no-repeat}
-.layer_popup_box .popup.stm3002-popup .pop-left,
-.layer_popup_box .popup.stm3002-popup .pop-right { 
+.layer_popup_box .popup.jen1002-popup .pop-left,
+.layer_popup_box .popup.jen1002-popup .pop-right { 
 	width: calc(50% - 10px);
 	overflow: hidden;
 	float: left;
 }
-.layer_popup_box .popup.stm3002-popup .pop-right {
+.layer_popup_box .popup.jen1002-popup .pop-right {
 	margin-left: 20px;
 } 
 .ztree {
@@ -26,15 +22,15 @@
 
 /*익스플로러 적용 위해 !important 추가*/
 /* 팝업에 따라 pop_menu_col1, pop_menu_col2 높이 변경 */
-.popup.stm3002-popup .pop_menu_row .pop_menu_col1 { width: 23%; height: 45px; padding-left: 6px; }
-.popup.stm3002-popup .pop_menu_row .pop_menu_col2 { width: 77%; height: 45px; }
-.popup.stm3002-popup .pop_menu_row .pop_menu_col1.menu_col1_subStyle { width: 46%; }
-.popup.stm3002-popup .pop_menu_row .pop_menu_col2.menu_col2_subStyle { width: 54%; }
+.popup.jen1002-popup .pop_menu_row .pop_menu_col1 { width: 23%; height: 45px; padding-left: 6px; }
+.popup.jen1002-popup .pop_menu_row .pop_menu_col2 { width: 77%; height: 45px; }
+.popup.jen1002-popup .pop_menu_row .pop_menu_col1.menu_col1_subStyle { width: 46%; }
+.popup.jen1002-popup .pop_menu_row .pop_menu_col2.menu_col2_subStyle { width: 54%; }
 
-.layer_popup_box .popup.stm3002-popup input[type="password"].input_txt {width:100%; height:100%;}
-.popup.stm3002-popup .pop_sub .display_none { display: none;}
+.layer_popup_box .popup.jen1002-popup input[type="password"].input_txt {width:100%; height:100%;}
+.popup.jen1002-popup .pop_sub .display_none { display: none;}
 
-.popup.stm3002-popup .ztree-title{
+.popup.jen1002-popup .ztree-title{
     float: left;
     padding-left: 10px;
     padding-top: 5px;
@@ -47,7 +43,7 @@
     border-color: #ddd;
     text-align: left;
 }
-.popup.stm3002-popup .ztree{
+.popup.jen1002-popup .ztree{
     border: 1px solid #ccc;
     border-radius: 0.185rem;
     padding: 5px;
@@ -56,7 +52,7 @@
     margin: 5px 5px 0 5px;
     height: 352px;
 }
-.popup.stm3002-popup .hideMaskFrame {
+.popup.jen1002-popup .hideMaskFrame {
     position: absolute;
     width: 960px;
     height: 360px;
@@ -104,7 +100,7 @@ var beforeJobTypeCd;
 //원복Id
 var selJobRestoreId;
 
-globals_guideChkFn = fnStm3001GuideShow;			
+globals_guideChkFn = fnJen1002GuideShow;			
 
 $(document).ready(function() {
 	/* 	
@@ -116,11 +112,13 @@ $(document).ready(function() {
 	*	5. 동기 비동기모드 선택 (true:비동기 통신, false:동기 통신)
 	*	마스터 코드 = REQ00001:요구사항 타입, REQ00002:중요도 , CMM00001:
 	*/
-	var mstCdStrArr = "CMM00001|DPL00002";
-	var strUseYn = 'Y';
-	var arrObj = [ $("#useCd"), $("#jobTypeCd")];
-	var arrComboType = ["",""];
-	gfnGetMultiCommonCodeDataForm(mstCdStrArr, strUseYn, arrObj, arrComboType , false);
+	// 팝업 공통코드 select 세팅
+	var commonCodeArr = [
+		{mstCd: "DPL00002", useYn: "Y",targetObj: "#jobTypeCd", comboType:"OS"}, // JOB 타입
+		{mstCd: "CMM00001", useYn: "Y",targetObj: "#useCd", comboType:"OS"} // 사용유무
+	];
+	//공통코드 채우기
+	gfnGetMultiCommonCodeDataForm(commonCodeArr , true);
 	
 	//탭인덱스 부여
 	//gfnSetFormAllObjTabIndex(document.getElementById("jen1100PopupFrm"));
@@ -157,7 +155,7 @@ $(document).ready(function() {
 		var jobId = '${param.jobId}';
 		fnSelectJen1001JobInfo(jenId,jobId);
 		
-		$(".popup.stm3002-popup .pop-left").css({width: "100%"});
+		$(".popup.jen1002-popup .pop-left").css({width: "100%"});
 		$("#jobDiv").removeClass('display_none');
 	}
 	
@@ -185,7 +183,7 @@ $(document).ready(function() {
 			return false;	
 		}	
 
-		fnInsertReqInfoAjax("jen1100PopupFrm");
+		fnInsertJobInfoAjax("jen1100PopupFrm");
 
 	});
 	
@@ -206,7 +204,7 @@ $(document).ready(function() {
 function fnSelectJen1001JobInfo(jenId, jobId){
 	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/stm/stm3000/stm3000/selectStm3000JobDetailAjax.do'/>",loadingShow:false}
+			{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1100JobDetailAjax.do'/>",loadingShow:false}
 			,{ "jenId" : jenId, "jobId" : jobId });
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
@@ -246,7 +244,7 @@ function fnSelectJen1001JobInfo(jenId, jobId){
 } 
 
 //JOB 등록
-function fnInsertReqInfoAjax(formId){
+function fnInsertJobInfoAjax(formId){
 	//jenkins 연결 확인
 	if(jenkinsChk == false){
 		jAlert("JENKINS 연결을 확인해주세요.");
@@ -283,7 +281,7 @@ function fnInsertReqInfoAjax(formId){
 			
 			//AJAX 설정
 			var ajaxObj = new gfnAjaxRequestAction(
-					{"url":"<c:url value='/stm/stm3000/stm3000/saveStm3002JobInfoAjax.do'/>"
+					{"url":"<c:url value='/jen/jen1000/jen1000/saveJen1100JobInfoAjax.do'/>"
 						,"contentType":false
 						,"processData":false
 						,"cache":false}
@@ -312,7 +310,7 @@ function fnInsertReqInfoAjax(formId){
 		    	}
 		    	
 		    	//그리드 새로고침
-				fnInRightGridListSet(0,mySearchRight.getParam()+"&jenId="+jenId);
+				fnInJobGridListSet(0,jobSearchObj.getParam()+"&jenId="+jenId);
 		    	
 		    	
 				jAlert(data.message, '알림창');
@@ -330,7 +328,7 @@ function fnInsertReqInfoAjax(formId){
 	});	
 }
 
-function fnStm3001GuideShow(){
+function fnJen1002GuideShow(){
 	var mainObj = $(".popup");
 	
 	//mainObj가 없는경우 false return
@@ -338,7 +336,7 @@ function fnStm3001GuideShow(){
 		return false;
 	}
 	//guide box setting
-	var guideBoxInfo = globals_guideContents["stm3001"];
+	var guideBoxInfo = globals_guideContents["jen1002"];
 	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
 }
 
@@ -368,7 +366,7 @@ function fnJenIdSelecetd(){
 
 		//AJAX 설정
 		var ajaxObj = new gfnAjaxRequestAction(
-				{"url":"<c:url value='/stm/stm3000/stm3000/selectStm3000URLConnect.do'/>","loadingShow":true}
+				{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000URLConnect.do'/>","loadingShow":true}
 				, param );
 		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
@@ -449,7 +447,7 @@ function fnJenIdSelecetd(){
 				        async: {
 							enable: true, // async 사용여부 (true:사용, false:미사용)
 							contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-							url:"<c:url value='/stm/stm3000/stm3000/selectStm3000SubURLConnect.do'/>",
+							url:"<c:url value='/jen/jen1000/jen1000/selectJen1000SubURLConnect.do'/>",
 							autoParam:["jobId","url"],	// 노드의 값을 서버로 보낼경우 배열형식으로 autoParam에 세팅
 							otherParam:{"jenId":jenIdValue,"jenUsrTok" : jenUsrTok,"jenUsrId" : jenUsrId},  // 노드의 값을 제외한 다른 값을 서버로 보낼 경우 otherParam에 세팅
 							dataType: "json",
@@ -622,12 +620,12 @@ function fnTreeFilter(treeId, parentNode, result) {
   
 </script>
 
-<div class="popup stm3002-popup" >
+<div class="popup jen1002-popup" >
 <form id="jen1100PopupFrm" name="jen1100PopupFrm" method="post">
 	<input type="hidden" name="popupGb" id="popupGb" value="${param.popupGb}"/>
 
-	<div class="pop_title">JENKINS 설정 등록</div>
-	<div class="pop_sub" guide="jenkinsInfo" >
+	<div class="pop_title">JOB 설정 등록</div>
+	<div class="pop_sub" guide="jobInfo" >
 		<div class="hideMaskFrame" id="hideMaskFrame">JENKINS를 선택해주세요</div>
 		<div class="pop-left">
 			<div class="pop_menu_row pop_menu_oneRow first_menu_row">
