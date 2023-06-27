@@ -47,8 +47,8 @@ div.contentsFrame > pre > code{    height: 100%;width: 100%;font-size: 10pt;}
     margin-top: 5px;
     padding-left: 10px;
 }
-span.text-stm-add {background-color: #1f4acc;}
-span.text-stm-del {background-color: #af3022;}
+span.text-rep-add {background-color: #1f4acc;}
+span.text-rep-del {background-color: #af3022;}
 .codeLineFrame {
     width: 30px;
     /* height:100%; */
@@ -111,7 +111,7 @@ span.text-stm-del {background-color: #af3022;}
 		fnGetFileContent();
 		
 		/* 닫기버튼 클릭 시 팝업 창 사라지기*/
-		$('#btn_cancle_stm2006').click(function() {
+		$('#btn_cancle_rep1006').click(function() {
 			gfnLayerPopupClose();
 		});
 	});
@@ -130,7 +130,7 @@ span.text-stm-del {background-color: #af3022;}
 	 	/* 그리드 데이터 가져오기 */
 	  	//AJAX 설정
 		var ajaxObj = new gfnAjaxRequestAction(
-				{"url":"<c:url value='/stm/stm2000/stm2000/selectStm2006FileDiffContentAjax.do'/>","loadingShow":false}
+				{"url":"<c:url value='/rep/rep1000/rep1000/selectRep1006FileDiffContentAjax.do'/>","loadingShow":false}
 				, {"revision" : '${param.revision}',"commitId" : '${param.commitId}' ,  "path" : '${param.path}', "repId" : '${param.repId}', "diffRevision": '${param.diffRevision}', "diffCommitId": '${param.diffCommitId}'});
 		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
@@ -146,11 +146,11 @@ span.text-stm-del {background-color: #af3022;}
 				
 				if(repTypeCd != '03'){
 					//리비전 정보 넣기
-					$("span#stm2006Revision").text(data.revision);
-					$("span#stm2006DiffRevision").text(data.diffRevision);
+					$("span#rep1006Revision").text(data.revision);
+					$("span#rep1006DiffRevision").text(data.diffRevision);
 				}else{
-					$("span#stm2006Revision").text(data.commitId);
-					$("span#stm2006DiffRevision").text(data.diffCommitId);
+					$("span#rep1006Revision").text(data.commitId);
+					$("span#rep1006DiffRevision").text(data.diffCommitId);
 				}
 				
 
@@ -173,9 +173,9 @@ span.text-stm-del {background-color: #af3022;}
 			            oldVal += arr[1];
 			            newVal += arr[1];
 			        } else if (arr[0] == -1) { //이전 값에서 제거
-			            oldVal += "<span class='text-stm-del'>" + arr[1] + "</span>";
+			            oldVal += "<span class='text-rep-del'>" + arr[1] + "</span>";
 			        } else { //변경 값에서 추가
-			            newVal += "<span class='text-stm-add'>" + arr[1] + "</span>";
+			            newVal += "<span class='text-rep-add'>" + arr[1] + "</span>";
 			        }
 			    }
 				
@@ -204,8 +204,8 @@ span.text-stm-del {background-color: #af3022;}
 					
 					//스크롤 색상변경 계산
 					$.each(leftCodeLine, function(idx, map){
-						//text-stm-del 있는지 체크
-						if(map.indexOf('text-stm-add') != -1){
+						//text-rep-del 있는지 체크
+						if(map.indexOf('text-rep-add') != -1){
 							
 							//해당 라인 스크롤 위치 구하기
 							var targetLineScrollTop = ((idx+1)*codeScrollLine);
@@ -231,8 +231,8 @@ span.text-stm-del {background-color: #af3022;}
 					
 					//스크롤 색상변경 계산
 					$.each(rightCodeLine, function(idx, map){
-						//text-stm-del 있는지 체크
-						if(map.indexOf('text-stm-del') != -1){
+						//text-rep-del 있는지 체크
+						if(map.indexOf('text-rep-del') != -1){
 							
 							//해당 라인 스크롤 위치 구하기 (기본 Top 84px)
 							var targetLineScrollTop = ((idx+1)*codeScrollLine);
@@ -275,7 +275,7 @@ span.text-stm-del {background-color: #af3022;}
 			 	$("#repFileDiffFrameMask").hide();
 			}else{
 				// 그외 접속 불가인경우 팝업창 닫기
-				$("#btn_cancle_stm2006").click();
+				$("#btn_cancle_rep1006").click();
 				jAlert("소스저장소 연결에 실패했습니다.", "알림창");
 			}
 			
@@ -297,18 +297,18 @@ span.text-stm-del {background-color: #af3022;}
 				<img class="fixed_loading" src="/images/loading.gif" style="width: 100px;height: 100px;">
 			</div>
 			<div id="contentsFrameLeft" class="contentsFrame">
-				<div class="contentTopRevisionInfo">Revision: <span id="stm2006Revision"></span></div>
+				<div class="contentTopRevisionInfo">Revision: <span id="rep1006Revision"></span></div>
 				<div class="codeLineFrame" id="codeLineFrameLeft"></div>
 				<pre id="preFileContentLeft"><code id="fileContentLeft"></code></pre>
 			</div>
 			<div id="contentsFrameRight" class="contentsFrame">
-				<div class="contentTopRevisionInfo">Revision: <span id="stm2006DiffRevision"></span></div>
+				<div class="contentTopRevisionInfo">Revision: <span id="rep1006DiffRevision"></span></div>
 				<div class="codeLineFrame" id="codeLineFrameRight"></div>
 				<pre id="preFileContentRight"><code id="fileContentRight"></code></pre>
 			</div>
 		</div>
 		<div class="btn_div fileMainBtnFrame">
-			<div class="button_normal exit_btn" id="btn_cancle_stm2006">닫기</div>
+			<div class="button_normal exit_btn" id="btn_cancle_rep1006">닫기</div>
 		</div>
 	</div>
 </html>
