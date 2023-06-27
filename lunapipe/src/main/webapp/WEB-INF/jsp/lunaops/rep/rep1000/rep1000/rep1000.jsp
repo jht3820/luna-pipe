@@ -3,7 +3,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ include file="/WEB-INF/jsp/lunaops/top/header.jsp" %>
 
-<link rel='stylesheet' href='<c:url value='/css/lunaops/stm.css'/>' type='text/css'>
+<link rel='stylesheet' href='<c:url value='/css/lunaops/rep.css'/>' type='text/css'>
 <style type="text/css">
 	.accptFont{color:#4b73eb !important;text-shadow: none !important;}
 	.rejectFont{color:#eb4b6a !important;text-shadow: none !important;}
@@ -11,36 +11,53 @@
 	.tab_contents.menu{width:1500px;}
 </style>
 <script>
-var mySearch;
+var repGridObj;
+var repSearchObj;
 
-$(function(){
+$(function(){	
 	//그리드 검색 호출
-	fnAxGrid5View();
+	fnRepGridSetting();
 	fnSearchBoxControl();
 	
 	//가이드 상자 호출
-	gfnGuideStack("add",fnStm2000GuideShow);
+	gfnGuideStack("add",fnRep1000GuideShow);
+	
+	//전송 버튼
+	$("#repDataSendBtn").click(function(){
+		//팝업이 아닌 경우 동작 안함
+		if(opener){
+			//선택한 저장소
+			var chkList = repGridObj.getList('selected');
+			
+			if (gfnIsNull(chkList)) {
+				jAlert("선택한 저장소가 없습니다.", "알림창");
+				return false;
+			}
+			
+			//저장소 데이터
+			var selRepList = [];
+			
+			opener.parent.tmp(chkList);
+			window.close();
+		}else{
+			jAlert("비정상적인 페이지 호출입니다.</br>데이터를 전달하려는 대상이 없습니다.");
+		}
+	});
+	
+	//닫기 버튼
+	$("#repCloseBtn").click(function(){
+		window.close();
+	});
 });
 
-
-//검색조건 변경되었을때 이벤트
-function fnSelectChg(){
-	var selVal = $("#searchSelect option:selected").val();
-	if(selVal == '0'){
-		$("#searchTxt").val("");
-		$("#searchTxt").attr("readonly", true);
-	}else{
-		$("#searchTxt").attr("readonly", false);
-	}
-}
-
 //axisj5 그리드
-function fnAxGrid5View(){
-	firstGrid = new ax5.ui.grid();
+function fnRepGridSetting(){
+	repGridObj = new ax5.ui.grid();
  
-	firstGrid.setConfig({
+	repGridObj.setConfig({
 		target: $('[data-ax5grid="first-grid"]'),
 		sortable:false,
+		showRowSelector: true,
 		header: {align:"center",columnHeight: 30},
 		columns: [
 			{key: "result", label: "접속확인 결과", width: 120, align: "center"
@@ -110,9 +127,13 @@ function fnAxGrid5View(){
          body: {
              align: "center",
              columnHeight: 30,
+             onClick: function () {
+        		// 클릭 이벤트
+   				repGridObj.select(this.doindex, {selected: !this.item.__selected__});	
+             },
              onDBLClick:function(){
-             	var data = {"prjId":"${sessionScope.selPrjId}", "repId": firstGrid.list[this.doindex].repId};
- 				gfnLayerPopupOpen('/stm/stm2000/stm2000/selectStm2002View.do',data,"1300","850", "scroll");	
+             	var data = {"repId": repGridObj.list[this.doindex].repId};
+ 				gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1002View.do',data,"1300","850", "scroll");	
              	
              }
          },
@@ -125,7 +146,7 @@ function fnAxGrid5View(){
              nextIcon: '<i class="fa fa-caret-right" aria-hidden="true"></i>',
              lastIcon: '<i class="fa fa-step-forward" aria-hidden="true"></i>',
              onChange: function () {
-                fnInGridListSet(this.page.selectPage,mySearch.getParam());
+				fnInGridListSet(this.page.selectPage,repSearchObj.getParam());
              }
          } 
 		});
@@ -145,13 +166,13 @@ function fnInGridListSet(_pageNo,ajaxParam){
    	//페이지 세팅
    	if(!gfnIsNull(_pageNo)){
    		ajaxParam += "&pageNo="+_pageNo;
-   	}else if(typeof firstGrid.page.currentPage != "undefined"){
-   		ajaxParam += "&pageNo="+firstGrid.page.currentPage;
+   	}else if(typeof repGridObj.page.currentPage != "undefined"){
+   		ajaxParam += "&pageNo="+repGridObj.page.currentPage;
    	}
     	
    	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/stm/stm2000/stm2000/selectStm2000RepositoryListAjaxView.do'/>","loadingShow":true}
+			{"url":"<c:url value='/rep/rep1000/rep1000/selectRep1000RepositoryListAjaxView.do'/>","loadingShow":true}
 			,ajaxParam);
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
@@ -159,7 +180,7 @@ function fnInGridListSet(_pageNo,ajaxParam){
 		var list = data.list;
 		var page = data.page;
 		
-	   	firstGrid.setData({
+	   	repGridObj.setData({
 	             	list:list,
 	             	page: {
 	                  currentPage: _pageNo || 0,
@@ -170,32 +191,26 @@ function fnInGridListSet(_pageNo,ajaxParam){
 	             });
 	});
 	
-	//AJAX 전송 오류 함수
-	ajaxObj.setFnError(function(xhr, status, err){
-		//세션이 만료된 경우 로그인 페이지로 이동
-          	if(status == "999"){
-          		alert('세션이 만료되어 로그인 페이지로 이동합니다.');
-       		document.location.href="<c:url value='/cmm/cmm4000/cmm4000/selectCmm4000View.do'/>";
-       		return;
-          	}
-	});
-	
 	//AJAX 전송
 	ajaxObj.send();
 }
 /**
- * SVN Repository 삭제
+ * Repository 삭제
  */
-function fnDeleteStm2000Info(repId){
+function fnDeleteRep1000Info(repIds){
 	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/stm/stm2000/stm2000/deleteStm2000InfoAjax.do'/>"}
-			,{ "repId" : repId });
+			{"url":"<c:url value='/rep/rep1000/rep1000/deleteRep1000InfoAjax.do'/>"}
+			,repIds);
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
 		data = JSON.parse(data);
 		jAlert(data.message, "알림창");
-		axdom("#" + mySearch.getItemId("btn_search_svn")).click();
+		
+		//삭제된 데이터 1건 이상인경우
+		if(errorYn == "N"){
+			axdom("#" + repSearchObj.getItemId("btn_search_rep")).click();
+		}
 	});
 	
 	//AJAX 전송 오류 함수
@@ -210,34 +225,15 @@ function fnDeleteStm2000Info(repId){
 //검색 상자
 function fnSearchBoxControl(){
 	var pageID = "AXSearch";
-	mySearch = new AXSearch();
+	repSearchObj = new AXSearch();
 
 	var fnObjSearch = {
 		pageStart: function(){
 			//검색도구 설정 01 ---------------------------------------------------------
-			mySearch.setConfig({
+			repSearchObj.setConfig({
 				targetID:"AXSearchTarget",
 				theme : "AXSearch",
 				rows:[
-					{display:true, addClass:"", style:"", list:[
-						{label:"", labelWidth:"", type:"button", width:"80",style:"float:right;", key:"btn_search_jenkins_connect",valueBoxStyle:"padding:5px;", value:"<span>전체 접속확인</span>",
-   							onclick:function(){
-   								//그리드 목록 갯수
-   								var gridLen = firstGrid.getList().length;
-   								
-   								//1개 이상인경우 체크
-   								if(gridLen > 0){
-   									//job 정보
-									var gridJobInfo = firstGrid.getList()[0];
-									var repId = gridJobInfo.repId;
-   									//전체 svn conn 확인
-   									fnSelectStm2000AllConfirmConnect(repId, 0);
-   								}else{
-   									toast.push("등록된 저장소가 존재하지 않습니다.");
-   								}
-                		}}
-					  ]
-					},
 					{display:true, addClass:"", style:"", list:[
 						{label:"<i class='fa fa-search'></i>&nbsp;", labelWidth:"50", type:"selectBox", width:"", key:"searchSelect", addClass:"", valueBoxStyle:"", value:"all",
 							options:[
@@ -250,19 +246,19 @@ function fnSearchBoxControl(){
                             ],onChange: function(selectedObject, value){
                             	//선택 값이 전체목록인지 확인 후 입력 상자를 readonly처리
     							if(!gfnIsNull(selectedObject.optionAll) && selectedObject.optionAll == true){
-									axdom("#" + mySearch.getItemId("searchTxt")).attr("readonly", "readonly");	
-									axdom("#" + mySearch.getItemId("searchTxt")).val('');	
+									axdom("#" + repSearchObj.getItemId("searchTxt")).attr("readonly", "readonly");	
+									axdom("#" + repSearchObj.getItemId("searchTxt")).val('');	
 								}else{
-									axdom("#" + mySearch.getItemId("searchTxt")).removeAttr("readonly");
+									axdom("#" + repSearchObj.getItemId("searchTxt")).removeAttr("readonly");
 								}
 								
 								//공통코드 처리 후 select box 세팅이 필요한 경우 사용
 								if(!gfnIsNull(selectedObject.optionCommonCode)){
-									gfnCommonSetting(mySearch,selectedObject.optionCommonCode,"searchCd","searchTxt");
+									gfnCommonSetting(repSearchObj,selectedObject.optionCommonCode,"searchCd","searchTxt");
 								}else{
 									//공통코드 처리(추가 selectbox 작업이 아닌 경우 type=text를 나타낸다.)
-									axdom("#" + mySearch.getItemId("searchTxt")).show();
-									axdom("#" + mySearch.getItemId("searchCd")).hide();
+									axdom("#" + repSearchObj.getItemId("searchTxt")).show();
+									axdom("#" + repSearchObj.getItemId("searchCd")).hide();
 								}
     						},
 
@@ -270,64 +266,40 @@ function fnSearchBoxControl(){
 						{label:"", labelWidth:"", type:"inputText", width:"225", key:"searchTxt", addClass:"secondItem sendBtn", valueBoxStyle:"padding-left:0px;", value:"",
 							onkeyup:function(e){
 								if(e.keyCode == '13' ){
-									axdom("#" + mySearch.getItemId("btn_search_svn")).click();
+									axdom("#" + repSearchObj.getItemId("btn_search_rep")).click();
 								}
 							} 
 						},
 						{label:"", labelWidth:"", type:"selectBox", width:"100", key:"searchCd", addClass:"selectBox", valueBoxStyle:"padding-left:0px;", value:"01",
 							options:[]
 						},
-						
-						
-						{label:"<i class='fas fa-list-ol'></i>&nbsp;목록 수&nbsp;", labelWidth:"60", type:"selectBox", width:"", key:"pageSize", addClass:"", valueBoxStyle:"", value:"30",
-							options:[
-							         	{optionValue:15, optionText:"15"},
-		                                {optionValue:30, optionText:"30"},
-		                                {optionValue:50, optionText:"50"},
-		                                {optionValue:100, optionText:"100"},
-		                                {optionValue:300, optionText:"300"},
-		                                {optionValue:600, optionText:"600"},
-		                                {optionValue:1000, optionText:"1000"},
-		                                {optionValue:5000, optionText:"5000"},
-		                                {optionValue:10000, optionText:"10000"},
-		                                
-		                            ],onChange: function(selectedObject, value){
-		                            	fnInGridListSet(0,$('form#searchFrm').serialize()+"&"+mySearch.getParam());
-		    						}
-						},
-						{label:"<i class='fas fa-arrows-alt-v'></i>&nbsp;목록 높이&nbsp;", labelWidth:"60", type:"selectBox", width:"", key:"gridHeight", addClass:"", valueBoxStyle:"", value:"600",
-							options:[
-							         	{optionValue:300, optionText:"300px"},
-		                                {optionValue:600, optionText:"600px"},
-		                                {optionValue:1000, optionText:"1000px"},
-		                                {optionValue:1200, optionText:"1200px"},
-		                                {optionValue:2000, optionText:"2000px"},
-		                                
-		                            ],onChange: function(selectedObject, value){
-		                            	firstGrid.setHeight(value);
-		    						}
-						},
-						
 						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_print_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-print' aria-hidden='true'></i>&nbsp;<span>프린트</span>",
 							onclick:function(){
-								$(firstGrid.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
+								$(repGridObj.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
 						}},
 						
 						{label:"", labelWidth:"", type:"button", width:"55",style:"float:right;", key:"btn_excel_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-file-excel' aria-hidden='true'></i>&nbsp;<span>엑셀</span>",
 							onclick:function(){
-								firstGrid.exportExcel("<c:out value='${sessionScope.selMenuNm }'/>.xls");
+								repGridObj.exportExcel("저장소 목록.xls");
 						}},
 						
 						{label : "",labelWidth : "",type : "button",width : "55",key : "btn_delete_svn",style : "float:right;",valueBoxStyle : "padding:5px;",value : "<i class='fa fa-trash-alt' aria-hidden='true'></i>&nbsp;<span>삭제</span>",
 							onclick : function() {
-								var item = (!gfnIsNull(Object.keys(firstGrid.focusedColumn)))? firstGrid.list[firstGrid.focusedColumn[Object.keys(firstGrid.focusedColumn)].doindex]:null;
-								if(gfnIsNull(item)){
-									toast.push('삭제 할 목록을 선택하세요.');
-									return;
+								var chkList = repGridObj.getList('selected');
+								
+								if (gfnIsNull(chkList)) {
+									jAlert("선택한 저장소가 없습니다.", "알림창");
+									return false;
 								}
-								jConfirm("삭제 하시겠습니까?</br>배정된 프로젝트가 있는 경우 삭제가 불가능합니다.","알림", function(result){
+								
+								jConfirm("저장소 "+chkList.length+"개를 삭제 하시겠습니까?</br>배정된 구성항목이 있는 경우 삭제 대상에서 제외됩니다.","알림", function(result){
 									if(result){
-										fnDeleteStm2000Info(item.repId);
+										var repIdListStr = "";
+										$.each(chkList, function(idx, map){
+											repIdListStr += "&repId="+map.repId;
+										});
+										
+										fnDeleteRep1000Info(repIdListStr);
 									}
 								});
 							}
@@ -335,15 +307,20 @@ function fnSearchBoxControl(){
 						
 						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_update_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-edit' aria-hidden='true'></i>&nbsp;<span>수정</span>",
 							onclick:function(){
-								var item = (!gfnIsNull(Object.keys(firstGrid.focusedColumn)))? firstGrid.list[firstGrid.focusedColumn[Object.keys(firstGrid.focusedColumn)].doindex]:null;
-								if(gfnIsNull(item)){
-									toast.push('수정 할 목록을 선택하세요.');
-									return;
+								var chkList = repGridObj.getList('selected');
+								
+								if (gfnIsNull(chkList)) {
+									jAlert("선택한 저장소가 없습니다.", "알림창");
+									return false;
+								}
+								if(chkList.length > 1){
+									jAlert("1개의 저장소만 선택해주세요.", "알림창");
+									return false;
 								}
 								
-								var data = {"popupGb": "update", "repId": item.repId};
+								var data = {"popupGb": "update", "repId": chkList[0].repId};
         	                	
-								gfnLayerPopupOpen('/stm/stm2000/stm2000/selectStm2001RepositoryDetailView.do',data,"650","630",'scroll');
+								gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"650","630",'scroll');
 						}},
 						
 						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_insert_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-save' aria-hidden='true'></i>&nbsp;<span>등록</span>",
@@ -351,12 +328,12 @@ function fnSearchBoxControl(){
 								var data = {
 									"popupGb": "insert"
 								};
-								gfnLayerPopupOpen('/stm/stm2000/stm2000/selectStm2001RepositoryDetailView.do',data,"650","630",'scroll');
+								gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"650","630",'scroll');
 						}},
-						{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_svn",style:"float:right;", valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
+						{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_rep",style:"float:right;", valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 							onclick:function(){
 								/* 검색 조건 설정 후 reload */
-	 							var pars = mySearch.getParam();
+	 							var pars = repSearchObj.getParam();
 							    var ajaxParam = $('form#searchFrm').serialize();
 
 							    if(!gfnIsNull(pars)){
@@ -366,26 +343,51 @@ function fnSearchBoxControl(){
 					            fnInGridListSet(0,ajaxParam);
 					            
 					            //폼 데이터 변경
-								$('#searchSelect').val(axdom("#" + mySearch.getItemId("searchSelect")).val());
-								$('#searchCd').val(axdom("#" + mySearch.getItemId("searchCd")).val());
-								$('#searchTxt').val(axdom("#" + mySearch.getItemId("searchTxt")).val());
+								$('#searchSelect').val(axdom("#" + repSearchObj.getItemId("searchSelect")).val());
+								$('#searchCd').val(axdom("#" + repSearchObj.getItemId("searchCd")).val());
+								$('#searchTxt').val(axdom("#" + repSearchObj.getItemId("searchTxt")).val());
 						}},
+						{label:"", labelWidth:"", type:"button", width:"100",style:"float:right;", key:"btn_search_jenkins_connect",valueBoxStyle:"padding:5px;", value:"<i class='fas fa-angle-double-right' aria-hidden='true'></i>&nbsp;<span>전체 접속확인</span>",
+   							onclick:function(){
+   								//그리드 목록 갯수
+   								var gridLen = repGridObj.getList().length;
+   								
+   								//1개 이상인경우 체크
+   								if(gridLen > 0){
+   									//job 정보
+									var repGridListData = repGridObj.getList()[0];
+									var repId = repGridListData.repId;
+   									//전체 svn conn 확인
+   									fnSelectRep1000AllConfirmConnect(repId, 0);
+   								}else{
+   									toast.push("등록된 저장소가 존재하지 않습니다.");
+   								}
+                		}},
 						{label:"", labelWidth:"", type:"button", width:"100",style:"float:right;", key:"btn_connect_svn",valueBoxStyle:"padding:5px;", value:"<i class='fas fa-angle-double-right' aria-hidden='true'></i>&nbsp;<span>선택 접속확인</span>",
 							onclick:function(){
-								var item = (!gfnIsNull(Object.keys(firstGrid.focusedColumn)))? firstGrid.list[firstGrid.focusedColumn[Object.keys(firstGrid.focusedColumn)].doindex]:null;
-								if(gfnIsNull(item)){
-									toast.push('확인 할 목록을 선택하세요.');
-									return;
+								var chkList = repGridObj.getList('selected');
+								if (gfnIsNull(chkList)) {
+									jAlert("선택한 저장소가 없습니다.", "알림창");
+									return false;
 								}
-								fnSelectStm2000ConfirmConnect(item.repId,  firstGrid.focusedColumn[Object.keys(firstGrid.focusedColumn)].doindex );
-						}}    
+								
+								//접속확인 index 목록
+								var idxList = [];
+								
+								//선택 저장소 loop
+								$.each(chkList, function(idx, map){
+									idxList.push(map.__original_index);
+								});
+								
+								fnSelectRep1000ConfirmConnect(idxList );
+						}}
 					]}
 				]
 			});
 		}
 		/*,
 		search1: function(){
-			var pars = mySearch.getParam();
+			var pars = repSearchObj.getParam();
 			fnAxGridView(pars);
 		}
 		*/
@@ -395,49 +397,61 @@ function fnSearchBoxControl(){
 		
 		fnObjSearch.pageStart();
 		//검색 상자 로드 후 텍스트 입력 폼 readonly 처리
-		axdom("#" + mySearch.getItemId("searchTxt")).attr("readonly", "readonly");
+		axdom("#" + repSearchObj.getItemId("searchTxt")).attr("readonly", "readonly");
 		
 		//공통코드 selectBox hide 처리
-		axdom("#" + mySearch.getItemId("searchCd")).hide();
-
-		//버튼 권한 확인
-		fnBtnAuthCheck(mySearch);
+		axdom("#" + repSearchObj.getItemId("searchCd")).hide();
 	});
 }
 
 /**
  * 
  */
-function fnSelectStm2000ConfirmConnect(repId,index){
+function fnSelectRep1000ConfirmConnect(indexList){
+	if(gfnIsNull(indexList) || indexList.length == 0){
+		return false;
+	}
+	
+	//첫번째 index 빼기
+	var targetIdx = indexList[0];
+	
+	//index 제거
+	indexList.splice(0, 1);
+	
+	//소스저장소 정보
+	var repGridListData = repGridObj.getList()[targetIdx];
+	
 	//ajax동작전 progress 주입
-	firstGrid.setValue(index, "result", "progress");
-	firstGrid.setValue(index, "resultMsg", "확인중");
+	repGridObj.setValue(targetIdx, "result", "progress");
+	repGridObj.setValue(targetIdx, "resultMsg", "확인중");
 	
 	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/stm/stm2000/stm2000/selectStm2000ConfirmConnect.do'/>","loadingShow":false}
-			,{ "repId" : repId , "gitRepUrlCheckCd": "Y"});
+			{"url":"<c:url value='/rep/rep1000/rep1000/selectRep1000ConfirmConnect.do'/>","loadingShow":false}
+			,{ "repId" : repGridListData.repId , "gitRepUrlCheckCd": "Y"});
 	
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
 		data = JSON.parse(data);
 		if(data.MSG_CD =="REP_OK"){
-			firstGrid.setValue(index, "result", "success");
-			firstGrid.setValue(index, "resultMsg", "접속성공");
+			repGridObj.setValue(targetIdx, "result", "success");
+			repGridObj.setValue(targetIdx, "resultMsg", "접속성공");
 			
 		}else if(data.MSG_CD =="SVN_EXCEPTION"){
-			firstGrid.setValue(index, "result", "exception");
-			firstGrid.setValue(index, "resultMsg", "SVN 접속오류");
+			repGridObj.setValue(targetIdx, "result", "exception");
+			repGridObj.setValue(targetIdx, "resultMsg", "SVN 접속오류");
 		}else if(data.MSG_CD =="SVN_AUTHENTICATION_EXCEPTION"){
-			firstGrid.setValue(index, "result", "authException");
-			firstGrid.setValue(index, "resultMsg", "사용자 권한없음");
+			repGridObj.setValue(targetIdx, "result", "authException");
+			repGridObj.setValue(targetIdx, "resultMsg", "사용자 권한없음");
 		}else{
-			firstGrid.setValue(index, "result", "fail");
-			firstGrid.setValue(index, "resultMsg", "기타 오류");
+			repGridObj.setValue(targetIdx, "result", "fail");
+			repGridObj.setValue(targetIdx, "resultMsg", "기타 오류");
 		}
 		if(data.saveYN == "N"){
 			jAlert(data.message,"경고");
 		}
+		
+		fnSelectRep1000ConfirmConnect(indexList);
 	});
 	
 	//AJAX 전송
@@ -446,21 +460,21 @@ function fnSelectStm2000ConfirmConnect(repId,index){
 
 
 //저장소 전체 접속 확인
-function fnSelectStm2000AllConfirmConnect(repId, index){
+function fnSelectRep1000AllConfirmConnect(repId, index){
 	// 재귀 멈춤 조건
 	//index -1인경우 return
 	if(index == -1){
 		return false;
 	}
 	
-	firstGrid.setValue(index, "result", "progress");
+	repGridObj.setValue(index, "result", "progress");
 	
-	//job 정보
-	var gridJobInfo = firstGrid.getList()[index];
+	//소스저장소 정보
+	var repGridListData = repGridObj.getList()[index];
 	
 	//AJAX 설정
 	var repConnAjaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/stm/stm2000/stm2000/selectStm2000ConfirmConnect.do'/>","loadingShow":false}
+			{"url":"<c:url value='/rep/rep1000/rep1000/selectRep1000ConfirmConnect.do'/>","loadingShow":false}
 			,{ "repId" : repId });
 	//AJAX 전송 성공 함수
 	repConnAjaxObj.setFnSuccess(function(data){
@@ -468,30 +482,30 @@ function fnSelectStm2000AllConfirmConnect(repId, index){
 		
 		//return 값 확인
 		if(data.MSG_CD =="REP_OK"){	//접속 성공
-			firstGrid.setValue(index, "result", "success");
-			firstGrid.setValue(index, "resultMsg", "접속성공");
+			repGridObj.setValue(index, "result", "success");
+			repGridObj.setValue(index, "resultMsg", "접속성공");
 		}else if(data.MSG_CD =="SVN_EXCEPTION"){ //URL 및 입력 값 오류
-			firstGrid.setValue(index, "result", "exception");
-			firstGrid.setValue(index, "resultMsg", "SVN 접속오류");
+			repGridObj.setValue(index, "result", "exception");
+			repGridObj.setValue(index, "resultMsg", "SVN 접속오류");
 		}else if(data.MSG_CD =="SVN_AUTHENTICATION_EXCEPTION"){ //권한 오류
-			firstGrid.setValue(index, "result", "authException");
-			firstGrid.setValue(index, "resultMsg", "사용자 권한없음");
+			repGridObj.setValue(index, "result", "authException");
+			repGridObj.setValue(index, "resultMsg", "사용자 권한없음");
 		}else{ //그 외 오류
-			firstGrid.setValue(index, "result", "fail");
-			firstGrid.setValue(index, "resultMsg", "기타 오류");
+			repGridObj.setValue(index, "result", "fail");
+			repGridObj.setValue(index, "resultMsg", "기타 오류");
 		} 	
 		
 		//index가 현재 grid갯수보다 크면 return
-		if((++index) >= firstGrid.getList().length){
+		if((++index) >= repGridObj.getList().length){
 			return false;
 		}
 		
 		//job 정보
-		var inGridJobInfo = firstGrid.getList()[index];
-		var repId = inGridJobInfo.repId;
+		var repGridListData = repGridObj.getList()[index];
+		var repId = repGridListData.repId;
 		
 		//실패해도 다음 job 체크
-		fnSelectStm2000AllConfirmConnect(repId, index);
+		fnSelectRep1000AllConfirmConnect(repId, index);
 		
 	});
 	
@@ -505,7 +519,7 @@ function fnSelectStm2000AllConfirmConnect(repId, index){
 	repConnAjaxObj.send();
 }
 //가이드 상자
-function fnStm2000GuideShow(){
+function fnRep1000GuideShow(){
 	var mainObj = $(".main_contents");
 	
 	//mainObj가 없는경우 false return
@@ -513,21 +527,26 @@ function fnStm2000GuideShow(){
 		return false;
 	}
 	//guide box setting
-	var guideBoxInfo = globals_guideContents["stm2000"];
+	var guideBoxInfo = globals_guideContents["rep1000"];
 	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
 }
 </script>
 
 
 <div class="main_contents" style="height: auto;" >
-	<form:form commandName="req1000VO" id="searchFrm" name="searchFrm" method="post" onsubmit="return false;">
+	<form:form commandName="rep1000VO" id="searchFrm" name="searchFrm" method="post" onsubmit="return false;">
 	</form:form>
-	<div class="stm2000_title"><c:out value="${sessionScope.selMenuNm }"/></div>
 	<div class="tab_contents menu">
-		<input type="hidden" name="strInSql" id="strInSql" />
-		<div id="AXSearchTarget" style="border-top:1px solid #ccc;" guide="stm2000button" ></div>
-		<br />
-		<div data-ax5grid="first-grid" data-ax5grid-config="{}" style="height: 600px;"></div>	
+		<div class="sub_title">
+			소스저장소 관리
+		</div>
+		<div id="AXSearchTarget" guide="rep1000button" ></div>
+		<div data-ax5grid="first-grid" data-ax5grid-config="{}" style="height: 600px;"></div>
+		<div class="btnFrame">
+			<div class="mainPopupBtn" id="repDataSendBtn"><i class="fas fa-paperclip"></i>&nbsp;소스저장소 연결</div>
+			<div class="mainPopupBtn" id="repCloseBtn"><i class="fas fa-times-circle"></i>&nbsp;닫기</div>
+		</div>
+			
 	</div>
 </div>
 		
