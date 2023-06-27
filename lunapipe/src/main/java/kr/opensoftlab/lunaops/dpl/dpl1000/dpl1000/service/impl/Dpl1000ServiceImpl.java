@@ -377,7 +377,7 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 	
 	@SuppressWarnings({"rawtypes", "unchecked" })
 	public Map selectDpl1100ToJen1000JobInfo(Map map)  throws Exception{
-		return jen1000Service.selectJen1000JobInfo(map);
+		return jen1000Service.selectJen1100JobInfo(map);
 	}
 	
 	

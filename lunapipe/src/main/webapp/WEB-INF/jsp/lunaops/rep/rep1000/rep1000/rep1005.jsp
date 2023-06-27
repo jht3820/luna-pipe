@@ -4,41 +4,41 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html lang="ko">
 <title>OpenSoftLab</title>
-<link rel='stylesheet' href='<c:url value='/css/lunaops/stm2002.css'/>' type='text/css'>
+<link rel='stylesheet' href='<c:url value='/css/lunaops/rep.css'/>' type='text/css'>
 <style type="text/css">
 .layer_popup_box .pop_left, .layer_popup_box .pop_right { height: 54px; }
 .button_normal { width: 39px; height: 22px; line-height: 22px; text-align: center; font-weight: bold; font-size: 1em; border-radius: 5px; box-shadow: 1px 1px 1px #ccd4eb; margin: 0 auto; border: 1px solid #b8b8b8; cursor: pointer; }
 div.pop_sub .pop_left {width:28%;} /* common.css pop_left width값 오버라이딩 */
 div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이딩 */
 .input_txt {padding-left: 5px;}
-.stm2005GridFrame {position: relative;}
+.rep1005GridFrame {position: relative;}
 </style>
 <script type="text/javascript">
 
 	var popSearch;
-	var stm2005PathGrid;
+	var rep1005PathGrid;
 	
 	$(document).ready(function() {
 		//그리드 및 검색 상자 호출
-		fnStm2005PopSearchView(); // AXISJ Grid 초기화 실행 부분들
+		fnRep1005PopSearchView(); // AXISJ Grid 초기화 실행 부분들
 		
 		//검색 상자 세팅
 		fnSvnPopupSearchControl();
 		
 		/* 선택 */
-		$("#btnPopStm2005Select").click(function(){
+		$("#btnPopRep1005Select").click(function(){
 			fnRevisionSelect();
 		});
 		
 		/* 취소 */
-		$('#btnPopStm2005Cancle').click(function() {
+		$('#btnPopRep1005Cancle').click(function() {
 			gfnLayerPopupClose();
 		});
 	});
 	
 	//비교 대상 리비전 선택
 	function fnRevisionSelect(){
-		var item = (!gfnIsNull(Object.keys(stm2005PathGrid.focusedColumn)))? stm2005PathGrid.list[stm2005PathGrid.focusedColumn[Object.keys(stm2005PathGrid.focusedColumn)].doindex]:null;
+		var item = (!gfnIsNull(Object.keys(rep1005PathGrid.focusedColumn)))? rep1005PathGrid.list[rep1005PathGrid.focusedColumn[Object.keys(rep1005PathGrid.focusedColumn)].doindex]:null;
 		
 		if(gfnIsNull(item)){
 			toast.push('비교 대상 리비전을 선택해주세요.');
@@ -46,13 +46,13 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 		}
 		
 		//파일 내용 비교
-		var data = {"prjId":"${parm.selPrjId}", "repId": "${param.repId}", "repTypeCd": "${param.repTypeCd}", "revision": "${param.selRevision}", "diffRevision": item.revision, "commitId": "${param.selCommitId}", "diffCommitId": item.commitId, "path": "<c:out value='${param.filePath}'/>", "fileName": "<c:out value='${param.fileName}'/>"};
-		gfnLayerPopupOpen('/stm/stm2000/stm2000/selectStm2006View.do',data,"1200","780",'scroll');	
+		var data = {"repId": "${param.repId}", "repTypeCd": "${param.repTypeCd}", "revision": "${param.selRevision}", "diffRevision": item.revision, "commitId": "${param.selCommitId}", "diffCommitId": item.commitId, "path": "<c:out value='${param.filePath}'/>", "fileName": "<c:out value='${param.fileName}'/>"};
+		gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1006View.do',data,"1200","780",'scroll');	
 	}
 
 	//axisj5 그리드
-	function fnStm2005PopSearchView(){
-		stm2005PathGrid = new ax5.ui.grid();
+	function fnRep1005PopSearchView(){
+		rep1005PathGrid = new ax5.ui.grid();
 	 	var columns = [];
 	 	var repTypeCd = "${param.repTypeCd}";
 	 	if(repTypeCd == "03"){
@@ -71,8 +71,8 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 	         ];
 		}
 	 	
-		stm2005PathGrid.setConfig({
-			target: $('[data-ax5grid="stm2005-grid"]'),
+		rep1005PathGrid.setConfig({
+			target: $('[data-ax5grid="rep1005-grid"]'),
 			sortable:false,
 			header: {align:"center",columnHeight: 30},
 			frozenColumnIndex: 4,
@@ -82,7 +82,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 				columnHeight: 30,
 	            onClick:function(){
 	            	//커밋로그
-					$("#svnCommitLogDetailStm2005").val(this.item.comment);
+					$("#svnCommitLogDetailRep1005").val(this.item.comment);
 	            },
 	            onDBLClick:function(){
 	            	fnRevisionSelect();
@@ -99,37 +99,37 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 				onChange: function () {
 					/* 검색 조건 설정 후 reload */
 					var pars = filePathSearchObj.getParam();
-					var ajaxParam = $('form#stm2005PopupFrm').serialize();
+					var ajaxParam = $('form#rep1005PopupFrm').serialize();
 
 					if(!gfnIsNull(pars)){
 						ajaxParam += "&"+pars;
 					}
-					fnStm2005PopSearchListSet(this.page.selectPage, ajaxParam);
+					fnRep1005PopSearchListSet(this.page.selectPage, ajaxParam);
 				}
 	        } 
 		});
 	}
 	
 	//그리드 데이터 넣는 함수
-	function fnStm2005PopSearchListSet(_pageNo,ajaxParam){
+	function fnRep1005PopSearchListSet(_pageNo,ajaxParam){
 		/* 그리드 데이터 가져오기 */
 	   	//파라미터 세팅
 	   	if(gfnIsNull(ajaxParam)){
-	 			ajaxParam = $('form#stm2005PopupFrm').serialize()+ "&"+filePathSearchObj.getParam();
+	 			ajaxParam = $('form#rep1005PopupFrm').serialize()+ "&"+filePathSearchObj.getParam();
 	 	}
 	   	
 	   	//페이지 세팅
 	   	if(!gfnIsNull(_pageNo)){
 	   		ajaxParam += "&pageNo="+_pageNo;
-	   	}else if(typeof stm2005PathGrid.page.currentPage != "undefined"){
-	   		ajaxParam += "&pageNo="+stm2005PathGrid.page.currentPage;
+	   	}else if(typeof rep1005PathGrid.page.currentPage != "undefined"){
+	   		ajaxParam += "&pageNo="+rep1005PathGrid.page.currentPage;
 	   	}
 	    
 	   	//mask show
 	   	$("#repPathGridList").show();
 	   	//AJAX 설정
 		var ajaxObj = new gfnAjaxRequestAction(
-				{"url":"<c:url value='/stm/stm2000/stm2000/selectStm2002RepositoryPageListAjaxView.do'/>","loadingShow": false}
+				{"url":"<c:url value='/rep/rep1000/rep1000/selectRep1002RepositoryPageListAjaxView.do'/>","loadingShow": false}
 				,ajaxParam);
 		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
@@ -142,7 +142,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 			var list = data.list;
 			var page = data.page;
 			
-		   	stm2005PathGrid.setData({
+		   	rep1005PathGrid.setData({
              	list:list,
              	page: {
 					currentPage: _pageNo || 0,
@@ -200,37 +200,37 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 			                            ],onChange: function(selectedObject, value){
 			                            	/* 검색 조건 설정 후 reload */
 				 							var pars = filePathSearchObj.getParam();
-										    var ajaxParam = $('form#stm2005PopupFrm').serialize();
+										    var ajaxParam = $('form#rep1005PopupFrm').serialize();
 
 										    if(!gfnIsNull(pars)){
 										    	ajaxParam += "&"+pars;
 										    }
 											
-								            fnStm2005PopSearchListSet(0,ajaxParam);
+								            fnRep1005PopSearchListSet(0,ajaxParam);
 			    						}
 							},
 							searchItem1,
 							searchItem2,
 							{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_print_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-print' aria-hidden='true'></i>&nbsp;<span>프린트</span>",
 								onclick:function(){
-									$(stm2005PathGrid.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
+									$(rep1005PathGrid.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
 							}},
 							
 							{label:"", labelWidth:"", type:"button", width:"55",style:"float:right;", key:"btn_excel_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-file-excel' aria-hidden='true'></i>&nbsp;<span>엑셀</span>",
 								onclick:function(){
-									stm2005PathGrid.exportExcel("<c:out value='${sessionScope.selMenuNm }'/>.xls");
+									rep1005PathGrid.exportExcel("<c:out value='${sessionScope.selMenuNm }'/>.xls");
 							}},
 							{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_svn",style:"float:right;", valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 								onclick:function(){
 									/* 검색 조건 설정 후 reload */
 		 							var pars = filePathSearchObj.getParam();
-								    var ajaxParam = $('form#stm2005PopupFrm').serialize();
+								    var ajaxParam = $('form#rep1005PopupFrm').serialize();
 
 								    if(!gfnIsNull(pars)){
 								    	ajaxParam += "&"+pars;
 								    }
 									
-						            fnStm2005PopSearchListSet(0,ajaxParam);
+						            fnRep1005PopSearchListSet(0,ajaxParam);
 							}}
 						]}
 					]
@@ -242,41 +242,37 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 			
 			fnObjSearch.pageStart();
 			
-			//버튼 권한 확인
-			fnBtnAuthCheck(filePathSearchObj);
-			
 			//리비전 범위 세팅하기 - 최초 100개
 			axdom("#" + filePathSearchObj.getItemId("startRevisionVal")).val('<c:out value="${param.startRevision}" />');
 			axdom("#" + filePathSearchObj.getItemId("endRevisionVal")).val('<c:out value="${param.lastRevision}" />');
 
 			//그리드 데이터 불러오기
-			fnStm2005PopSearchListSet();
+			fnRep1005PopSearchListSet();
 		});
 	}
 </script>
 
 <div class="popup">
-	<form id="stm2005PopupFrm" name="stm2005PopupFrm" method="post">
-		<input type="hidden" name="prjId" id="prjId" value="${param.prjId}"/>
+	<form id="rep1005PopupFrm" name="rep1005PopupFrm" method="post">
 		<input type="hidden" name="repId" id="repId" value="${param.repId}" />
 		<input type="hidden" name="filePath" id="filePath" value="${param.filePath}" />
 	</form>
 	<div class="pop_title">[ <c:out value="${param.fileName}"/> ] 비교 대상 파일 리비전 선택</div>
-	<div class="stm2005Pop_sub">
-		<div class="stm2002SearchFrame stm2002FrameBox" id="filePathSearchTarget"></div>
-		<div class="stm2005GridFrame">
+	<div class="rep1005Pop_sub">
+		<div class="rep1002SearchFrame rep1002FrameBox" id="filePathSearchTarget"></div>
+		<div class="rep1005GridFrame">
 			<div class="svn_mask_repList" id="repPathGridList">
 				데이터를 조회중입니다.<br><br>
 				<img class="fixed_loading" src="/images/loading.gif" style="width: 100px;height: 100px;">
 			</div>
-			<div data-ax5grid="stm2005-grid" data-ax5grid-config="{}" style="height: 380px;"></div>
+			<div data-ax5grid="rep1005-grid" data-ax5grid-config="{}" style="height: 380px;"></div>
 		</div>		
-		<div class="stm2002CommitLogFrame stm2002FrameBox">
-			<textarea id="svnCommitLogDetailStm2005" class="svnCommitLogDetail" readonly="readonly"></textarea>
+		<div class="rep1002CommitLogFrame rep1002FrameBox">
+			<textarea id="svnCommitLogDetailRep1005" class="svnCommitLogDetail" readonly="readonly"></textarea>
 		</div>
 		<div class="btn_div">
-			<div class="button_normal save_btn" id="btnPopStm2005Select" >선택</div>		
-			<div class="button_normal exit_btn" id="btnPopStm2005Cancle" >닫기</div>
+			<div class="button_normal save_btn" id="btnPopRep1005Select" >선택</div>		
+			<div class="button_normal exit_btn" id="btnPopRep1005Cancle" >닫기</div>
 		</div>
 	</div>
 	</form>
