@@ -109,12 +109,6 @@ function fnPopJobConsoleLogLoad(thisObj){
 	//AJAX 전송 오류 함수
 	ajaxObj.setFnError(function(xhr, status, err){
 		$("#dplPopBuildConsoleLog").html("콘솔 내용 조회 오류");
-		//세션이 만료된 경우 로그인 페이지로 이동
-       	if(status == "999"){
-       		alert('세션이 만료되어 로그인 페이지로 이동합니다.');
-    		document.location.href="<c:url value='/cmm/cmm4000/cmm4000/selectCmm4000View.do'/>";
-    		return;
-       	}
 	});
 	
 	//AJAX 전송
