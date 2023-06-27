@@ -152,6 +152,92 @@ public class Jen1000Controller {
 	}
 	
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000JenkinsJobListAjax.do")
+	public ModelAndView selectJen1000JenkinsJobListAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+
+			
+			Map jenMap = jen1000Service.selectJen1000JenkinsInfo(paramMap);
+
+			
+			String userId= (String)jenMap.get("jenUsrId");
+			String tokenId= (String)jenMap.get("jenUsrTok");
+			String jenUrl = (String)jenMap.get("jenUrl");
+			String upperJobId = (String)paramMap.get("jobId");
+			String jobUrl = (String)paramMap.get("jobUrl");
+			
+			
+			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
+			
+			
+			if(tokenId == null || "".equals(tokenId)){
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+				return new ModelAndView("jsonView");
+			}
+			
+			String deTokenId = CommonScrty.decryptedAria(tokenId, salt);
+			
+			
+			jenkinsClient.setUser(userId);
+			jenkinsClient.setPassword(deTokenId);
+			String url ="";
+			if(null != jobUrl && !"".equals(jobUrl)) {
+				String[] urlSplit = jobUrl.split("/job/");
+				String chkUrl = urlSplit[0];
+				for(int i=1; i<(urlSplit.length-1);i++) {
+					chkUrl += "/job/" + urlSplit[i];
+				}
+				url = chkUrl+"/api/json";
+			}else {
+				url = (String)jenUrl + "/api/json";
+			}
+			
+			String content = "";
+
+			content = jenkinsClient.excuteHttpClientJenkins(url);
+
+			Map jenkinsMap= jenkinsClient.getJenkinsParser(content );
+			List jobList =  (List) jenkinsMap.get("jobs");
+
+			if(null!=jobList) {
+				for (int i = 0 ; i< jobList.size();i++) {
+					Map job = (HashMap) jobList.get(i);
+					job.put("jobId", job.get("name"));
+					job.put("upperJobId", upperJobId);
+					jobList.set(i, job);
+				}
+			}
+			
+			model.addAttribute("jenMap", jenkinsMap);
+			
+			
+			model.addAttribute("list", jobList);
+			model.addAttribute("MSG_CD", JENKINS_OK);
+			
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("selectJen1000URLConnect()", ex);
+			if( ex instanceof HttpHostConnectException){
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+			}else if( ex instanceof ParseException){
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+			}else if( ex instanceof IllegalArgumentException){
+				model.addAttribute("MSG_CD", JENKINS_WORNING_URL);
+			}else if( ex instanceof UserDefineException){
+					model.addAttribute("MSG_CD", ex.getMessage());
+			}else{
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+			}
+			
+			return new ModelAndView("jsonView");
+		}
+	}
+	
+	
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1004JobDetailView.do")
 	public String selectJen1004JenkinsDetailView( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try{
@@ -271,11 +357,11 @@ public class Jen1000Controller {
 
 			
 			int totCnt = 0;
-			jen1000List =   jen1000Service.selectJen1000JobList(jen1100VO);
+			jen1000List =   jen1000Service.selectJen1100JobList(jen1100VO);
 
 
 			
-			totCnt =  jen1000Service.selectJen1000JobListCnt(jen1100VO);
+			totCnt =  jen1000Service.selectJen1100JobListCnt(jen1100VO);
 			paginationInfo.setTotalRecordCount(totCnt);
 
 			model.addAttribute("list", jen1000List);
@@ -336,7 +422,7 @@ public class Jen1000Controller {
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 			
 			
-			Map jobMap = jen1000Service.selectJen1000JobInfo(paramMap);
+			Map jobMap = jen1000Service.selectJen1100JobInfo(paramMap);
 			
 			model.addAttribute("jobInfo", jobMap);
 			
@@ -481,7 +567,7 @@ public class Jen1000Controller {
 			
 			if(!"update".equals(type)){
 				
-				int jobCheck = jen1000Service.selectJen1000JobUseCountInfo(paramMap);
+				int jobCheck = jen1000Service.selectJen1100JobUseCountInfo(paramMap);
 				
 				if(jobCheck > 0){
 					
@@ -652,9 +738,9 @@ public class Jen1000Controller {
 		
 		try{
 			
-			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			Map<String, Object> paramMap = RequestConvertor.requestParamToMapAddSelInfoList(request, true, "jobId");
 			
-			jen1000Service.deleteJen1000JobInfo(paramMap);
+			jen1000Service.deleteJen1100JobList(paramMap);
 			
 			
 			model.addAttribute("message", egovMessageSource.getMessage("success.common.delete"));
@@ -741,7 +827,7 @@ public class Jen1000Controller {
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 			
 			
-			Map jobMap = jen1000Service.selectJen1000JobInfo(paramMap);
+			Map jobMap = jen1000Service.selectJen1100JobInfo(paramMap);
 			
 			
 			String jenUsrId=(String)jobMap.get("jenUsrId");
@@ -871,7 +957,7 @@ public class Jen1000Controller {
 			paramMap.put("restoreSelJobType", "03");
 			
 			
-			List<Map> jobRestoreList = jen1000Service.selectJen1000JobNormalList(paramMap);
+			List<Map> jobRestoreList = jen1000Service.selectJen1100JobNormalList(paramMap);
 			
 			model.addAttribute("jobRestoreList", jobRestoreList);
 			return new ModelAndView("jsonView");
@@ -949,7 +1035,7 @@ public class Jen1000Controller {
 			paramMap.put("restoreSelJobType", "03");
 			
 			
-			List<Map> jobRestoreList = jen1000Service.selectJen1000JobNormalList(paramMap);
+			List<Map> jobRestoreList = jen1000Service.selectJen1100JobNormalList(paramMap);
 			
 			model.addAttribute("jobRestoreList", jobRestoreList);
 			return new ModelAndView("jsonView");
