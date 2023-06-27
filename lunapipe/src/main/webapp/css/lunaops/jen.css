@@ -1,6 +1,11 @@
 @charset "UTF-8";
 
-/* stm3000 */
+/* job 상태 색상 */
+.job-color-red {color: #ff1a00;}
+.job-color-blue {color: #4b73eb;}
+.job-color-yellow {color: #fba450;}
+
+/* jen1000 */
 .tab_contents.menu{
     display: inline-block;
     width: 1550px;
@@ -62,3 +67,36 @@
 .result-success {color: #4b73eb;}
 .result-authException {color: #fba450;}
 .result-fail, .result-exception {color: #ff5643;}
+
+/* jen1004 */
+.sub_title_btn {
+    position: absolute;
+    top: 2px;
+}
+.sub_title_btn.right {
+    right: 5px;
+}
+.frame_contents.full_screen{
+	position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index:2;}
+.full_screen #contentsFrame{height: 95%;}
+.dplFullScreanBtn {
+    display: inline-block;
+    width: 40px;
+    margin: 0 5px;
+    height: 29px;
+    text-align: center;
+    font-size: 14pt;
+    float: right;
+    line-height: 29px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    cursor: pointer;
+}
+.dplFullScreanBtn:hover{    background: #e8e8e8;
+    text-decoration: none;
+    color: #6e7a85;}
