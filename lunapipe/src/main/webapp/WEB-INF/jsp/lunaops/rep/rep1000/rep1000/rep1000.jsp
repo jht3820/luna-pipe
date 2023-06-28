@@ -55,7 +55,7 @@ function fnRepGridSetting(){
 	repGridObj = new ax5.ui.grid();
  
 	repGridObj.setConfig({
-		target: $('[data-ax5grid="first-grid"]'),
+		target: $('[data-ax5grid="repGridTarget"]'),
 		sortable:false,
 		showRowSelector: true,
 		header: {align:"center",columnHeight: 30},
@@ -379,7 +379,7 @@ function fnSearchBoxControl(){
 									idxList.push(map.__original_index);
 								});
 								
-								fnSelectRep1000ConfirmConnect(idxList );
+								fnSelectRep1000ConfirmConnect(idxList);
 						}}
 					]}
 				]
@@ -405,7 +405,7 @@ function fnSearchBoxControl(){
 }
 
 /**
- * 
+ * 선택 소스저장소 연결 체크
  */
 function fnSelectRep1000ConfirmConnect(indexList){
 	if(gfnIsNull(indexList) || indexList.length == 0){
@@ -541,7 +541,7 @@ function fnRep1000GuideShow(){
 			소스저장소 관리
 		</div>
 		<div id="AXSearchTarget" guide="rep1000button" ></div>
-		<div data-ax5grid="first-grid" data-ax5grid-config="{}" style="height: 600px;"></div>
+		<div data-ax5grid="repGridTarget" data-ax5grid-config="{}" style="height: 600px;"></div>
 		<div class="btnFrame">
 			<div class="mainPopupBtn" id="repDataSendBtn"><i class="fas fa-paperclip"></i>&nbsp;소스저장소 연결</div>
 			<div class="mainPopupBtn" id="repCloseBtn"><i class="fas fa-times-circle"></i>&nbsp;닫기</div>

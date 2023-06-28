@@ -71,6 +71,7 @@ div[id^=AXSearchTarget],div[id^=AXGridTarget]{font-size:0.75em;}
 .btnFrame {
     display: flex;
     justify-content: center;
+    width: 100%;
     height: 50px;
     align-items: flex-end;
 }
