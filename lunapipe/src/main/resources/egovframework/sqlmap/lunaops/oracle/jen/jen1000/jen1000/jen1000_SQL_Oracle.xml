@@ -58,21 +58,21 @@
 	<sql id="selectJen1000JenkinsList">
 		<![CDATA[
 			SELECT
-		            JEN_ID ,                   
-		            JEN_NM ,                   
-		            JEN_USR_ID ,               
-		            JEN_USR_TOK ,              
+		            JEN_ID ,                  /* JENKINS JOB 코드 */ 
+		            JEN_NM ,                  /* JENKINS JOB 명 */ 
+		            JEN_USR_ID ,              /* JENKINS 사용자 ID */ 
+		            JEN_USR_TOK ,             /* JENKINS 사용자 TOKEN KEY */ 
 		            JEN_URL ,
-		            REPLACE (JEN_DESC ,'<br>' , '&nbsp;&nbsp;&nbsp;&nbsp;' ) AS JEN_DESC ,                  
-		            USE_CD ,                  
+		            REPLACE (JEN_DESC ,'<br>' , '&nbsp;&nbsp;&nbsp;&nbsp;' ) AS JEN_DESC ,                 /* JENKINS JOB Comment */ 
+		            USE_CD ,                  /* 사용여부(코드 : CMM00001) */
 		            SF_CMM1001_COM_CD_INFO('CMM00001', USE_CD, '1') as USE_NM ,
 		            DEL_CD , 
-		            REG_DTM ,                  
-		            REG_USR_ID ,               
-		            REG_USR_IP ,               
-		            MODIFY_DTM ,               
-		            MODIFY_USR_ID ,            
-		            MODIFY_USR_IP                           
+		            REG_DTM ,                 /* 최초등록 일시 */ 
+		            REG_USR_ID ,              /* 최초등록자 ID */ 
+		            REG_USR_IP ,              /* 최초등록자 IP */ 
+		            MODIFY_DTM ,              /* 최종수정일시 */ 
+		            MODIFY_USR_ID ,           /* 최종수정자 ID */ 
+		            MODIFY_USR_IP             /* 최종수정자 IP */              
 				   
 			FROM
 		            JEN1000
@@ -101,13 +101,13 @@
     
     
 	
-	<sql id="selectJen1000JobList">
+	<sql id="selectJen1100JobList">
 		<![CDATA[
 			SELECT
-		            A.JEN_ID ,                  
-		            B.JEN_NM ,                   
-		            B.JEN_USR_ID ,               
-		            B.JEN_USR_TOK ,              
+		            A.JEN_ID ,                  /* JENKINS JOB 코드 */
+		            B.JEN_NM ,                  /* JENKINS JOB 명 */ 
+		            B.JEN_USR_ID ,              /* JENKINS 사용자 ID */ 
+		            B.JEN_USR_TOK ,             /* JENKINS 사용자 TOKEN KEY */ 
 		            B.JEN_URL , 
 		            A.JOB_ID ,
 		            NVL(A.JOB_RESTORE_ID,'-') AS JOB_RESTORE_ID ,
@@ -117,14 +117,14 @@
 		            A.JOB_PARAMETER,
 		            A.JOB_DESC ,
 		            A.JOB_URL ,
-		            A.USE_CD ,                  
+		            A.USE_CD ,                  /* 사용여부(코드 : CMM00001) */
 		            SF_CMM1001_COM_CD_INFO('CMM00001', A.USE_CD, '1') AS USE_NM , 
-		            A.REG_DTM ,                  
-		            A.REG_USR_ID ,               
-		            A.REG_USR_IP ,               
-		            A.MODIFY_DTM ,               
-		            A.MODIFY_USR_ID ,            
-		            A.MODIFY_USR_IP                           
+		            A.REG_DTM ,                 /* 최초등록 일시 */ 
+		            A.REG_USR_ID ,              /* 최초등록자 ID */ 
+		            A.REG_USR_IP ,              /* 최초등록자 IP */ 
+		            A.MODIFY_DTM ,              /* 최종수정일시 */ 
+		            A.MODIFY_USR_ID ,           /* 최종수정자 ID */ 
+		            A.MODIFY_USR_IP             /* 최종수정자 IP */              
 			FROM
 		            JEN1100 A LEFT JOIN JEN1000 B ON(A.JEN_ID = B.JEN_ID)
 			WHERE   1=1
@@ -172,7 +172,7 @@
     
     
     <select id="jen1000DAO.selectJen1000JenkinsNormalList" parameterClass="java.util.Map"  resultClass="egovMap">
-	    
+	    /* jen1000DAO.selectJen1000JenkinsNormalList Jenkins 일반 목록을 조회한다.*/
 		SELECT *
 		FROM
 			(
@@ -186,8 +186,8 @@
     </select>
     
     
-    <select id="jen1000DAO.selectJen1000JobNormalList" parameterClass="java.util.Map"  resultClass="egovMap">
-	    
+    <select id="jen1000DAO.selectJen1100JobNormalList" parameterClass="java.util.Map"  resultClass="egovMap">
+	    /* jen1000DAO.selectJen1100JobNormalList Job 일반 목록을 조회한다.*/
 		SELECT *
 		FROM
 			(
@@ -195,14 +195,14 @@
     			     A.*
     		FROM
     		(
-					<include refid="selectJen1000JobList"/>
+					<include refid="selectJen1100JobList"/>
 	    			) A
 	    	)
     </select>
     
     
     <select id="jen1000DAO.selectJen1000JenkinsList" parameterClass="Jen1000VO"  resultMap="resultMapSelectJen1000">
-	    
+	    /* jen1000DAO.selectJen1000JenkinsList Jenkins 목록을 조회한다.*/
 		SELECT *
 		FROM
 			(
@@ -218,7 +218,7 @@
     
     
     <select id="jen1000DAO.selectJen1000JenkinsListCnt" parameterClass="Jen1000VO"  resultClass="java.lang.Integer">
-	    
+	    /*jen1000DAO.selectJen1000JenkinsListCnt Jenkins 목록 총건수를 조회한다.*/
 	    	SELECT
 					COUNT(*)
 			FROM	(
@@ -227,8 +227,8 @@
     </select>
     
     
-    <select id="jen1000DAO.selectJen1000JobList" parameterClass="Jen1100VO"  resultMap="resultMapSelectJen1100">
-	    
+    <select id="jen1000DAO.selectJen1100JobList" parameterClass="Jen1100VO"  resultMap="resultMapSelectJen1100">
+	    /* jen1000DAO.selectJen1100JobList job 목록을 조회한다.*/
 		SELECT *
 		FROM
 			(
@@ -236,26 +236,26 @@
     			     A.*
     		FROM
     		(
-					<include refid="selectJen1000JobList"/>
+					<include refid="selectJen1100JobList"/>
 	    			) A
 	    	)
 	    	 WHERE RN BETWEEN (#firstIndex#+1) AND #lastIndex#
     </select>
     
     
-    <select id="jen1000DAO.selectJen1000JobListCnt" parameterClass="Jen1100VO"  resultClass="java.lang.Integer">
-	    
+    <select id="jen1000DAO.selectJen1100JobListCnt" parameterClass="Jen1100VO"  resultClass="java.lang.Integer">
+	    /*jen1000DAO.selectJen1100JobListCnt job 목록 총건수를 조회한다.*/
 	    	SELECT
 					COUNT(*)
 			FROM	(
-						<include refid="selectJen1000JobList"/>
+						<include refid="selectJen1100JobList"/>
 					) A
     </select>
     
 	 
      
 	<select id="jen1000DAO.selectJen1000JenkinsInfo" parameterClass="java.util.Map"  resultClass="egovMap">
-		
+		/* jen1000DAO.selectJen1000JenkinsInfo - Jenkins 정보 조회 */
 		SELECT *
 		FROM (
 			<include refid="selectJen1000JenkinsList"/>
@@ -265,11 +265,11 @@
 	</select>
 	 
      
-	<select id="jen1000DAO.selectJen1000JobInfo" parameterClass="java.util.Map"  resultClass="egovMap">
-		
+	<select id="jen1000DAO.selectJen1100JobInfo" parameterClass="java.util.Map"  resultClass="egovMap">
+		/* jen1000DAO.selectJen1100JobInfo - Job 정보 조회(단건) */
 		SELECT *
 		FROM (
-			<include refid="selectJen1000JobList"/>
+			<include refid="selectJen1100JobList"/>
 		) T1
 		WHERE 1=1
 			AND T1.JOB_ID = #jobId#
@@ -279,7 +279,7 @@
 	<insert id="jen1000DAO.insertJen1000JenkinsInfo" parameterClass="java.util.Map">
 		<selectKey resultClass="java.lang.String" keyProperty="newJenId">
 		<![CDATA[
-			 
+			/* jen1000DAO.insertJen1000JenkinsInfo - Jenkins 등록(새로운 JEN_ID 따기)*/ 
 			SELECT	NVL( 
 							SUBSTR(NEW_JEN_ID, 1, 11) || LPAD( (TO_NUMBER(SUBSTR(NEW_JEN_ID, 12, 5)) + 1) , 5, '0')
 						,	'JEN' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '00001'
@@ -293,23 +293,23 @@
 		]]>
 		</selectKey>
 		<![CDATA[ 
-			 
+			/* jen1000DAO.insertJen1000JenkinsInfo  - Jenkins 등록 */ 
 				INSERT     INTO     JEN1000
 					(
-					            JEN_ID              ,  
-					            JEN_NM              ,  
-					            JEN_USR_ID          ,  
-					            JEN_USR_TOK         ,  
-					            JEN_URL             ,  
-					            JEN_DESC            ,  
-					            USE_CD              ,  
-					            DEL_CD				, 
-					            REG_DTM             ,  
-					            REG_USR_ID          ,  
-					            REG_USR_IP          ,  
-					            MODIFY_DTM          ,  
-					            MODIFY_USR_ID       ,  
-					            MODIFY_USR_IP         
+					            JEN_ID              , /* JENKINS JOB 코드 */ 
+					            JEN_NM              , /* JENKINS JOB 명 */ 
+					            JEN_USR_ID          , /* JENKINS 사용자 ID */ 
+					            JEN_USR_TOK         , /* JENKINS 사용자 TOKEN KEY */ 
+					            JEN_URL             , /* JENKINS JOB URL */ 
+					            JEN_DESC            , /* JENKINS JOB Comment */ 
+					            USE_CD              , /* 사용유무(코드 : CMM00001) */ 
+					            DEL_CD				, /* 삭제유무(코드 : CMM00001) */
+					            REG_DTM             , /* 최초등록 일시 */ 
+					            REG_USR_ID          , /* 최초등록자 ID */ 
+					            REG_USR_IP          , /* 최초등록자 IP */ 
+					            MODIFY_DTM          , /* 최종수정일시 */ 
+					            MODIFY_USR_ID       , /* 최종수정자 ID */ 
+					            MODIFY_USR_IP        /* 최종수정자 IP */ 
 					)
 				VALUES
 					(
@@ -333,26 +333,26 @@
 	</insert>
 	
 	  
-	<insert id="jen1000DAO.insertJen1000JobInfo" parameterClass="java.util.Map">
+	<insert id="jen1000DAO.insertJen1100JobInfo" parameterClass="java.util.Map">
 		<![CDATA[ 
-			 
+			/* jen1000DAO.insertJen1100JobInfo  - Job 등록  */ 
 				INSERT     INTO     JEN1100
 					(
-					            JEN_ID              ,  
-					            JOB_ID 				, 
-					            JOB_RESTORE_ID 		, 
-					            JOB_TOK 			, 
-					            JOB_TYPE_CD			, 
-					            JOB_PARAMETER 		, 
-					            JOB_DESC 			, 
-					            JOB_URL 			, 
-					            USE_CD              ,  
-					            REG_DTM             ,  
-					            REG_USR_ID          ,  
-					            REG_USR_IP          ,  
-					            MODIFY_DTM          ,  
-					            MODIFY_USR_ID       ,  
-					            MODIFY_USR_IP         
+					            JEN_ID              , /* JENKINS JOB 코드 */ 
+					            JOB_ID 				, /* JOB ID */
+					            JOB_RESTORE_ID 		, /* 원복 JOB ID */
+					            JOB_TOK 			, /* JOB TOKEN KEY */
+					            JOB_TYPE_CD			, /* JOB TYPE */
+					            JOB_PARAMETER 		, /* JOB 매개변수 */
+					            JOB_DESC 			, /* JOB DESC */
+					            JOB_URL 			, /* JOB URL */
+					            USE_CD              , /* 사용여부(코드 : CMM00001) */ 
+					            REG_DTM             , /* 최초등록 일시 */ 
+					            REG_USR_ID          , /* 최초등록자 ID */ 
+					            REG_USR_IP          , /* 최초등록자 IP */ 
+					            MODIFY_DTM          , /* 최종수정일시 */ 
+					            MODIFY_USR_ID       , /* 최종수정자 ID */ 
+					            MODIFY_USR_IP        /* 최종수정자 IP */ 
 					)
 				VALUES
 					(
@@ -378,61 +378,61 @@
     
 	
 	<update id="jen1000DAO.updateJen1000JenkinsInfo" parameterClass="java.util.Map">
-		 
+		/* jen1000DAO.updateJen1000JenkinsInfo - Jenkins 정보 수정 */ 
 			UPDATE     JEN1000     SET 
 
-			           JEN_ID = #jenId#              ,  
-			           JEN_NM = #jenNm#              ,  
-			           JEN_USR_ID = #jenUsrId#       ,  
-			           JEN_USR_TOK = #jenUsrTok#     ,  
-			           JEN_URL = #jenUrl#            ,  
-			           JEN_DESC = #jenDesc#            ,  
-			           USE_CD = #useCd#              ,  
-			           MODIFY_DTM = SYSDATE          ,  
-			           MODIFY_USR_ID = #modifyUsrId# ,  
-			           MODIFY_USR_IP = #modifyUsrIp#    
+			           JEN_ID = #jenId#              , /* JENKINS JOB 코드 */ 
+			           JEN_NM = #jenNm#              , /* JENKINS JOB 명 */ 
+			           JEN_USR_ID = #jenUsrId#       , /* JENKINS 사용자 ID */ 
+			           JEN_USR_TOK = #jenUsrTok#     , /* JENKINS 사용자 TOKEN KEY */ 
+			           JEN_URL = #jenUrl#            , /* JENKINS JOB URL */ 
+			           JEN_DESC = #jenDesc#            , /* JENKINS JOB Comment */ 
+			           USE_CD = #useCd#              , /* 사용여부(코드 : CMM00001) */ 
+			           MODIFY_DTM = SYSDATE          , /* 최종수정일시 */ 
+			           MODIFY_USR_ID = #modifyUsrId# , /* 최종수정자 ID */ 
+			           MODIFY_USR_IP = #modifyUsrIp#   /* 최종수정자 IP */ 
 			WHERE
 					   1=1
-			  AND	   JEN_ID 		= 	#jenId#                 
+			  AND	   JEN_ID 		= 	#jenId#                /* JENKINS JOB 코드 */ 
 	</update>
     
 	
-	<update id="jen1000DAO.updateJen1000JobInfo" parameterClass="java.util.Map">
-		 
+	<update id="jen1000DAO.updateJen1100JobInfo" parameterClass="java.util.Map">
+		/* jen1000DAO.updateJen1100JobInfo - Job 정보 수정 */ 
 			UPDATE     JEN1100     SET 
-			        JEN_ID = #jenId#            	  	,  
-			        JOB_ID = #jobId# 					, 
-		            JOB_RESTORE_ID = #jobRestoreId# 	, 
-		            JOB_TOK = #jobTok# 					, 
-		            JOB_TYPE_CD = #jobTypeCd#			, 
-		            JOB_PARAMETER = #jobParameter# 		, 
-		            JOB_DESC = #jobDesc# 				, 
-			        USE_CD = #useCd#             		,  
-			        MODIFY_DTM = SYSDATE         	 	,  
-			        MODIFY_USR_ID = #modifyUsrId# 		,  
-			        MODIFY_USR_IP = #modifyUsrIp#   	 
+			        JEN_ID = #jenId#            	  	, /* JENKINS JOB 코드 */ 
+			        JOB_ID = #jobId# 					, /* JOB ID */
+		            JOB_RESTORE_ID = #jobRestoreId# 	, /* 원복 JOB ID */
+		            JOB_TOK = #jobTok# 					, /* JOB TOKEN KEY */
+		            JOB_TYPE_CD = #jobTypeCd#			, /* JOB TYPE */
+		            JOB_PARAMETER = #jobParameter# 		, /* JOB 매개변수 */
+		            JOB_DESC = #jobDesc# 				, /* JOB DESC */
+			        USE_CD = #useCd#             		, /* 사용여부(코드 : CMM00001) */ 
+			        MODIFY_DTM = SYSDATE         	 	, /* 최종수정일시 */ 
+			        MODIFY_USR_ID = #modifyUsrId# 		, /* 최종수정자 ID */ 
+			        MODIFY_USR_IP = #modifyUsrIp#   	/* 최종수정자 IP */ 
 			WHERE 1=1
-				AND	JEN_ID 		= 	#jenId#              
-				AND	JOB_ID		=	#jobId#				
+				AND	JEN_ID 		= 	#jenId#             /* JENKINS JOB 코드 */ 
+				AND	JOB_ID		=	#jobId#				/* JOB ID */
 	</update>
 	
 	
 	<update id="jen1000DAO.deleteJen1000JenkinsInfo" parameterClass="java.util.Map">
 		UPDATE     JEN1000     SET 
-		           DEL_CD = #delCd#              ,  
-		           MODIFY_DTM = SYSDATE          ,  
-		           MODIFY_USR_ID = #modifyUsrId# ,  
-		           MODIFY_USR_IP = #modifyUsrIp#    
+		           DEL_CD = #delCd#              , /* 삭제유무(코드 : CMM00001) */ 
+		           MODIFY_DTM = SYSDATE          , /* 최종수정일시 */ 
+		           MODIFY_USR_ID = #modifyUsrId# , /* 최종수정자 ID */ 
+		           MODIFY_USR_IP = #modifyUsrIp#   /* 최종수정자 IP */ 
 		WHERE
 				   1=1
-		  AND	   JEN_ID 		= 	#jenId#                 
+		  AND	   JEN_ID 		= 	#jenId#                /* JENKINS JOB 코드 */ 
 	</update>
 	
 	
-	<delete id="jen1000DAO.deleteJen1000JobInfo" parameterClass="java.util.Map">
+	<delete id="jen1000DAO.deleteJen1100JobInfo" parameterClass="java.util.Map">
 		DELETE FROM	JEN1100 A
 		WHERE	1=1
-			AND	JEN_ID = #jenId#               
+			AND	JEN_ID = #jenId#               /* JENKINS JOB 코드 */
 			AND	JOB_ID = #jobId# 
 	</delete>
 	
@@ -441,18 +441,29 @@
 		SELECT	COUNT(1) AS CNT
 		FROM 	JEN1000 A
 		WHERE    1=1
-			AND	JEN_ID = #jenId#                
+			AND	JEN_ID = #jenId#               /* JENKINS JOB 코드 */ 
 			AND	ROWNUM = 1
 	</select>
 	
 	
-	<select id="jen1000DAO.selectJen1000JobUseCountInfo" parameterClass="java.util.Map"  resultClass="java.lang.Integer">
+	<select id="jen1000DAO.selectJen1100JobUseCountInfo" parameterClass="java.util.Map"  resultClass="java.lang.Integer">
 		SELECT	COUNT(1) AS CNT
 		FROM 	JEN1100 A
 		WHERE    1=1
-			AND	JEN_ID = #jenId#                
+			AND	JEN_ID = #jenId#               /* JENKINS JOB 코드 */ 
 			AND JOB_ID = #jobId#
 			AND	ROWNUM = 1
 	</select>
     
+	
+	<update id="jen1000DAO.updateJen1100JenkinsJobRestoreInfo" parameterClass="java.util.Map">
+		/* jen1000DAO.updateJen1100JenkinsJobRestoreInfo - Jenkins JOB_RESTORE 삭제   */
+		<![CDATA[
+			UPDATE JEN1100 SET
+				JOB_RESTORE_ID = null
+			WHERE 1=1
+			AND JEN_ID 			= #jenId#
+			AND JOB_RESTORE_ID	= #jobId#
+		]]>	
+	</update>
 </sqlMap>
