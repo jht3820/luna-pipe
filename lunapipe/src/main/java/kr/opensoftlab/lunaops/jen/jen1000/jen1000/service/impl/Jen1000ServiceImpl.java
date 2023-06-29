@@ -1,5 +1,6 @@
 package kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,8 +29,8 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	
 	
 	@SuppressWarnings({"rawtypes" })
-	public List<Map> selectJen1000JobNormalList(Map paramMap) throws Exception {
-		return jen1000DAO.selectJen1000JobNormalList(paramMap);
+	public List<Map> selectJen1100JobNormalList(Map paramMap) throws Exception {
+		return jen1000DAO.selectJen1100JobNormalList(paramMap);
 	}
 	
 	
@@ -38,8 +39,8 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	}
 	
 	
-	public List<Jen1100VO> selectJen1000JobList(Jen1100VO jen1100VO) throws Exception {
-		return jen1000DAO.selectJen1000JobList(jen1100VO);
+	public List<Jen1100VO> selectJen1100JobList(Jen1100VO jen1100VO) throws Exception {
+		return jen1000DAO.selectJen1100JobList(jen1100VO);
 	}
 	
 	
@@ -48,8 +49,8 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	}
 	
 	
-	public int selectJen1000JobListCnt(Jen1100VO jen1100VO) throws Exception {
-		return jen1000DAO.selectJen1000JobListCnt(jen1100VO);
+	public int selectJen1100JobListCnt(Jen1100VO jen1100VO) throws Exception {
+		return jen1000DAO.selectJen1100JobListCnt(jen1100VO);
 	}
 	
 	
@@ -60,8 +61,8 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	
 	
 	@SuppressWarnings("rawtypes")
-	public Map selectJen1000JobInfo(Map<String, String> paramMap) throws Exception {
-		return jen1000DAO.selectJen1000JobInfo(paramMap);
+	public Map selectJen1100JobInfo(Map<String, String> paramMap) throws Exception {
+		return jen1000DAO.selectJen1100JobInfo(paramMap);
 	}
 	
 	
@@ -70,8 +71,8 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	}
 	
 	
-	public String insertJen1000JobInfo(Map<String, String> paramMap) throws Exception {
-		return jen1000DAO.insertJen1000JobInfo(paramMap);
+	public String insertJen1100JobInfo(Map<String, String> paramMap) throws Exception {
+		return jen1000DAO.insertJen1100JobInfo(paramMap);
 	}
 	
 	
@@ -80,8 +81,8 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	}
 	
 	
-	public int updateJen1000JobInfo(Map<String, String> paramMap) throws Exception {
-		return jen1000DAO.updateJen1000JobInfo(paramMap);
+	public int updateJen1100JobInfo(Map<String, String> paramMap) throws Exception {
+		return jen1000DAO.updateJen1100JobInfo(paramMap);
 	}
 
 	
@@ -90,13 +91,35 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	}
 	
 	
-	public void deleteJen1000JobInfo(Map<String, String> paramMap) throws Exception {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void deleteJen1100JobList(Map<String, Object> paramMap) throws Exception {
+		List<Map> paramJenIds = (List<Map>) paramMap.get("list");
 		
 		
-		jen1000DAO.deleteJen1000JobInfo(paramMap);
+		String jenId = (String) paramMap.get("jenId");
+				
+		
+		if(paramJenIds != null) {
+			
+			if(jenId == null) {
+				jenId = (String) paramJenIds.get(0).get("jenId");
+			}
+			
+			for(Map paramJenMap : paramJenIds) {
+				String jobId = (String) paramJenMap.get("jobId");
+				
+				Map newMap = new HashMap<>();
+				newMap.put("jenId", jenId);
+				newMap.put("jobId", jobId);
 
-		
-		
+				
+				jen1000DAO.updateJen1100JenkinsJobRestoreInfo(newMap);
+				
+				
+				jen1000DAO.deleteJen1100JobInfo(newMap);
+			}
+		}
+
 	}
 	
 	
@@ -105,8 +128,8 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	}
 	
 	
-	public int selectJen1000JobUseCountInfo(Map<String, String> paramMap) throws Exception {
-		return jen1000DAO.selectJen1000JobUseCountInfo(paramMap);
+	public int selectJen1100JobUseCountInfo(Map<String, String> paramMap) throws Exception {
+		return jen1000DAO.selectJen1100JobUseCountInfo(paramMap);
 	}
 
 	
@@ -132,23 +155,21 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 		String popupGb = (String)paramMap.get("popupGb");
 		
 		if("insert".equals(popupGb)){
-			insNewJenId = jen1000DAO.insertJen1000JobInfo(paramMap);
+			insNewJenId = jen1000DAO.insertJen1100JobInfo(paramMap);
 			return insNewJenId;
 		}else if("update".equals(popupGb)){
-			
 			String beforeJobTypeCd = (String)paramMap.get("beforeJobTypeCd");
 			String jobTypeCd = (String)paramMap.get("jobTypeCd");
-			
 			
 			if("03".equals(beforeJobTypeCd)){
 				
 				if(!jobTypeCd.equals(beforeJobTypeCd)) {
 					
-				
+				//	stm3100DAO.updateJen1100JenkinsJobRestoreInfo(paramMap);
 				}
 			}
 			
-			result = jen1000DAO.updateJen1000JobInfo(paramMap);
+			result = jen1000DAO.updateJen1100JobInfo(paramMap);
 			return result;
 		}
 		return null;
