@@ -4,7 +4,6 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %> 
 <html lang="ko">
 <title>OpenSoftLab</title>
-<link rel='stylesheet' href='<c:url value='/css/ztree/zTreeStyle/zTreeStyle.css'/>' type='text/css'>
 <script type="text/javascript" src="/js/ztree/jquery.ztree.all.min.js"></script>
 <style>
 .layer_popup_box .popup.jen1002-popup .pop-left,
@@ -71,7 +70,7 @@
 <script>
 
 //zTree, mask
-var zTreeStm3002;
+var zTreeJen1002;
 
 //jenkins 선택 변수
 var jenkinsChk = false;
@@ -169,7 +168,7 @@ $(document).ready(function() {
 		var strCheckObjArr = ["jobTok"];
 		var sCheckObjNmArr = ["JOB TOKEN KEY"];
 		
-		if(gfnIsNull(selJobId)){
+		if(gfnIsNull(zTreeJen1002.getCheckedNodes()[0])){
 			jAlert("JOB ID은(는) 필수 입력 사항입니다.\n\n\r JOB ID 항목을 입력하세요.",'알림창');
 			return;
 		}
@@ -250,7 +249,11 @@ function fnInsertJobInfoAjax(formId){
 		jAlert("JENKINS 연결을 확인해주세요.");
 		return false;
 	}
-	jConfirm("JOB을 저장하시겠습니까?", "알림창", function( result ) {
+	
+	//선택 job
+	var selJobInfo = zTreeJen1002.getCheckedNodes()[0];
+	
+	jConfirm("JOB("+selJobInfo["name"]+")을 저장하시겠습니까?", "알림창", function( result ) {
 		if( result ){
 
 			var fd = new FormData();
@@ -272,8 +275,8 @@ function fnInsertJobInfoAjax(formId){
 
 			fd.append("jenUrl",jenUrl);
 			
-			if(!gfnIsNull(zTreeStm3002)){
-				fd.append("jobUrl",zTreeStm3002.getSelectedNodes()[0].url);
+			if(!gfnIsNull(zTreeJen1002)){
+				fd.append("jobUrl",zTreeJen1002.getSelectedNodes()[0].url);
 			}else{
 				fd.append("jobUrl",jobUrl);
 			}
@@ -414,7 +417,7 @@ function fnJenIdSelecetd(){
 					
 					//원복 job 수 체크
 					var selectStr = "";
-					if(restoreCnt == 0){
+					if(restoreCnt == 0) {
 						selectStr = "selected";
 					}
 					
@@ -435,7 +438,7 @@ function fnJenIdSelecetd(){
 			    		// zTree binding data key 설정
 				        data: {
 				        	key: {
-								name: "name"
+								name: "viewName"
 							},
 				            simpleData: {
 				                enable: true,
@@ -443,6 +446,11 @@ function fnJenIdSelecetd(){
 								pIdKey: "upperJobId",
 				            }
 				        },
+				        check: {
+				    		enable: true,
+				    		chkStyle: "radio",
+				    		radioType: "all"
+				    	},
 				        // 동적 트리 설정
 				        async: {
 							enable: true, // async 사용여부 (true:사용, false:미사용)
@@ -460,6 +468,8 @@ function fnJenIdSelecetd(){
 								if(treeNode["_class"] != "com.cloudbees.hudson.plugins.folder.Folder" && treeNode.useCd == "01"){
 									// job 선택한 경우
 									selJobId = treeNode.name;
+									
+									zTreeJen1002.checkNode(treeNode, true);
 								}else{
 									selJobId = "";
 								}
@@ -467,7 +477,8 @@ function fnJenIdSelecetd(){
 							onAsyncError: fnAsyncError
 						},
 						view : {
-							fontCss: getFontCss
+							fontCss: getFontCss,
+							nameIsHTML : true
 						}
 				    };
 				    
@@ -482,16 +493,18 @@ function fnJenIdSelecetd(){
 							}	
 						}
 						else{
-						//이미 생성된 job인경우 skip
+							//이미 생성된 job인경우 skip
 							if(jobArray.indexOf(map.name) != -1){
 								map.useCd = "02";
+								
+								//radio 선택 불가
+								map.chkDisabled = true;
 								return true;
 							}else{
 								map.useCd = "01";
 							}
 							appendStr += '<option value="'+map.name+'">'+map.name+'</option>';
 						}
-						
 					});
 					//loop end
 					
@@ -502,18 +515,28 @@ function fnJenIdSelecetd(){
 						$("#hideMaskFrame").hide();
 						list = data.list;
 						$.each(list, function(idx, obj){
+							//folder 아닌 경우 job앞에 현재 상태 icon
+							if(obj["_class"] != "com.cloudbees.hudson.plugins.folder.Folder" && obj.hasOwnProperty("color")){
+								obj.viewName = '<i class="fa fa-circle job-color-'+obj.color+'"></i>&nbsp;'+gfnEscapeHtml(obj.name);
+							}else{
+								obj.viewName = obj.name;
+							}
+							
 							if(obj["_class"] == "com.cloudbees.hudson.plugins.folder.Folder"){
 								obj.isParent = true;
+								
+								//radio 선택 불가
+								obj.chkDisabled = true;
 							}else{
 								obj.isParent = false;
 							}
 						});
 					    // zTree 초기화
-					    zTreeStm3002 = $.fn.zTree.init($("#jobTree"), setting, list);
+					    zTreeJen1002 = $.fn.zTree.init($("#jobTree"), setting, list);
 					    
 					    // expandAll(false)를 추가해야 트리의 폴더를 한번 클릭 시 하위 메뉴가 보여진다.
 					    // 추가하지 않을 경우 두번 클릭을 해야 폴더가 펼쳐진다.
-					    zTreeStm3002.expandAll(false);
+					    zTreeJen1002.expandAll(false);
 					}
 					
 					//job갯수가 없는경우
@@ -598,23 +621,35 @@ function fnTreeFilter(treeId, parentNode, result) {
 	// filter에서 모든 자식 노드를 부모형(폴더 아이콛)으로 변경한다.
 	// 해당 옵션 추가해야  트리의  [+] 아이콘 클릭 시 한번에 트리가 펼쳐진다. 
 	$.each(childNodes, function(idx, node){
+		//folder 아닌 경우 job앞에 현재 상태 icon
+		if(node["_class"] != "com.cloudbees.hudson.plugins.folder.Folder" && node.hasOwnProperty("color")){
+			node.viewName = '<i class="fa fa-circle job-color-'+node.color+'"></i>&nbsp;'+gfnEscapeHtml(node.name);
+		}else{
+			node.viewName = node.name;
+		}
 		
 		// 트리 노드가 부모형이 아닐 경우
 		if( node["_class"] == "com.cloudbees.hudson.plugins.folder.Folder"){
+			//radio 선택 불가
+			node.chkDisabled = true;
+			
 			node.isParent = true;
 		}
 
 		if(jobArray.indexOf(node.name) != -1){
 			node.useCd = "02";
+			
+			//radio 선택 불가
+			node.chkDisabled = true;
 		}else{
 			node.useCd = "01";
 		}
 		
-		zTreeStm3002.updateNode(node);
+		zTreeJen1002.updateNode(node);
 		
 	});
 	
-	// 선택한 노드의 자식 노드를 리턴하면 자동으로 트리에 자식 노드가 추가된다. ( zTreeStm3002.addNodes()를 사용할 필요 없음)
+	// 선택한 노드의 자식 노드를 리턴하면 자동으로 트리에 자식 노드가 추가된다. ( zTreeJen1002.addNodes()를 사용할 필요 없음)
 	return childNodes;
 }
   
@@ -717,7 +752,7 @@ function fnTreeFilter(treeId, parentNode, result) {
 		<div class="pop-right display_none">
 			<div class="menu_lists_wrap" id="ztreeDiv">
 				<div class="ztree-title">
-					<label for="jobId">JOB ID(NAME)</label>
+					<label for="jobId">JOB 목록</label>
 					<span class="required_info">&nbsp;*</span>
 				</div>
 				<ul id="jobTree" class="ztree"></ul>
