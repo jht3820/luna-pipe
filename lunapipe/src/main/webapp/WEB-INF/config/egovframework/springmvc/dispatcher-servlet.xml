@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- - DispatcherServlet application context for Application's web tier. -->
+
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:context="http://www.springframework.org/schema/context"
@@ -9,7 +9,7 @@
                 			http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
 	
-	<!-- 패키지 내 Controller, Service, Repository 클래스의 auto detect를 위한 mvc 설정 -->
+	
 	<context:component-scan base-package="egovframework,kr.opensoftlab">
         <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
@@ -17,7 +17,7 @@
     </context:component-scan>
     
     
-	<!-- mvc인터셉터 추가 -->
+	
 	<mvc:interceptors>
 		<mvc:interceptor>
 			<mvc:mapping path="/**/*.do" />
@@ -37,7 +37,7 @@
 		</mvc:interceptor>
 	</mvc:interceptors>
 
-	<!-- 서블릿컨네이너상의 exception에 대한 오류 페이지를 연결하는 mvc 설정-->
+	
     <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
         <property name="defaultErrorView" value="err/error"/>
         <property name="exceptionMappings">
@@ -49,7 +49,7 @@
         </property>
     </bean>
     
-    <!-- 화면처리용 JSP 파일명의  prefix, suffix 처리에 대한 mvc 설정  -->
+    
     <bean class="org.springframework.web.servlet.view.UrlBasedViewResolver" p:order="2"
 	    p:viewClass="org.springframework.web.servlet.view.JstlView"
 	    p:prefix="/WEB-INF/jsp/lunaops" p:suffix=".jsp"/>
@@ -62,14 +62,15 @@
 	
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 
-	<!-- For Pagination Tag -->
+	
     <bean id="imageRenderer" class="kr.opensoftlab.sdf.paging.OslImgPaginationRenderer"/>
     
-	<!-- View 선택을 bean id로 찾아서 사용하기 위한 리절버 -->
+	
 	<bean id="beanNameViewResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver" p:order="0" />
 	
-	<!-- JSON  View 설정 -->
+	
 	<bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
-		<property name="contentType" value="text/plain;charset=UTF-8"/>
+		
+		<property name="contentType" value="application/json;charset=UTF-8"/>
 	</bean>
 </beans>
