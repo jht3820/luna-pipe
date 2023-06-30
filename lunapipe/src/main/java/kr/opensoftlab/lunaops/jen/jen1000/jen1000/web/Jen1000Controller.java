@@ -240,17 +240,13 @@ public class Jen1000Controller {
 	
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1004JobDetailView.do")
 	public String selectJen1004JenkinsDetailView( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-		try{
-			
-			
-			
-			
-			
-			
-		}catch(Exception e){
-			Log.error(e);
-		}
 		return "/jen/jen1000/jen1000/jen1004";
+	}
+	
+	
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1005View.do")
+	public String selectJen1005View( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		return "/jen/jen1000/jen1000/jen1005";
 	}
 	
 	
@@ -427,6 +423,7 @@ public class Jen1000Controller {
 			model.addAttribute("jobInfo", jobMap);
 			
 			
+			model.addAttribute("errorYn", "N");
 			model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
 			
 			return new ModelAndView("jsonView");
@@ -434,7 +431,7 @@ public class Jen1000Controller {
 		catch(Exception ex){
 			Log.error("selectJen1100JobDetailAjax()", ex);
 			
-			
+			model.addAttribute("errorYn", "Y");
 			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
 			return new ModelAndView("jsonView");
 		}
