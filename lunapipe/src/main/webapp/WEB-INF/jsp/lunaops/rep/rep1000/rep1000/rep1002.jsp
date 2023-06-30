@@ -53,7 +53,7 @@
 		
 		
 		ajaxObj.setFnSuccess(function(data){
-			data = JSON.parse(data);
+			
 			if(data.MSG_CD =="REP_OK"){
 				
 				lastRevision = data.lastRevisionNum;
@@ -78,12 +78,6 @@
 				gfnLayerPopupClose();
 				jAlert("소스저장소 연결에 실패했습니다.", "알림창");
 			} 	
-		});
-		
-		
-		ajaxObj.setFnError(function(xhr, status, err){
-			data = JSON.parse(data);
-			jAlert(data.message, "알림창");
 		});
 		
 		
@@ -201,7 +195,7 @@
 				,ajaxParam);
 		
 		ajaxObj.setFnSuccess(function(data){
-			data = JSON.parse(data);
+			
 
 			
 			axdom("#" + svnSearchObj.getItemId("startRevisionVal")).val(data.startRevision);
@@ -400,7 +394,7 @@
 		
 		
 		ajaxObj.setFnSuccess(function(data){
-			data = JSON.parse(data);
+			
 	    
 			
 			if(data.errorYn == "Y"){
@@ -460,11 +454,6 @@
 			}
 		});
 		
-		
-		ajaxObj.setFnError(function(xhr, status, err){
-			data = JSON.parse(data);
-			jAlert(data.message, "알림창");
-	 	});
 		
 		ajaxObj.send();
 	}
