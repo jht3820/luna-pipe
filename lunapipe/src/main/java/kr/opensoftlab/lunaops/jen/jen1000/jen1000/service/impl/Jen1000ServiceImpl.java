@@ -158,14 +158,16 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 			insNewJenId = jen1000DAO.insertJen1100JobInfo(paramMap);
 			return insNewJenId;
 		}else if("update".equals(popupGb)){
+			
 			String beforeJobTypeCd = (String)paramMap.get("beforeJobTypeCd");
 			String jobTypeCd = (String)paramMap.get("jobTypeCd");
+			
 			
 			if("03".equals(beforeJobTypeCd)){
 				
 				if(!jobTypeCd.equals(beforeJobTypeCd)) {
 					
-				//	stm3100DAO.updateJen1100JenkinsJobRestoreInfo(paramMap);
+				
 				}
 			}
 			
@@ -180,4 +182,23 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	public List<Map> selectJen1000JenkinsUserList(Map map) throws Exception{
 		return jen1000DAO.selectJen1000JenkinsUserList(map);
 	}
+	
+	
+	@SuppressWarnings({"rawtypes" })
+	public List selectJen1102JenParameterList(Map paramMap)  throws Exception{
+		return jen1000DAO.selectJen1102JenParameterList(paramMap);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	public String insertJen1102ParameterInfo(Map paramMap) throws Exception{
+		return jen1000DAO.insertJen1102ParameterInfo(paramMap);
+	}
+
+	
+	
+	@SuppressWarnings("rawtypes")
+	public void deleteJen1102ParameterInfo(Map paramMap) throws Exception{
+		jen1000DAO.deleteJen1102ParameterInfo(paramMap);
+    }
 }
