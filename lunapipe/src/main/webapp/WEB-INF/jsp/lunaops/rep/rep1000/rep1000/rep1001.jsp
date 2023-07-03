@@ -191,7 +191,7 @@ $(document).ready(function() {
 				,{ "repId" : repId });
 		
 		ajaxObj.setFnSuccess(function(data){
-			data = JSON.parse(data);
+			
 			
         	
         	gfnSetData2ParentObj(data.repInfo, "rep1000PopupFrm");
@@ -207,12 +207,6 @@ $(document).ready(function() {
 
         	nowSvnPw = data.repInfo.svnUsrPw;
         	nowGitPw = data.repInfo.gitUsrPw;
-		});
-		
-		
-		ajaxObj.setFnError(function(xhr, status, err){
-			data = JSON.parse(data);
-			jAlert(data.message, "알림창");
 		});
 		
 		
@@ -237,7 +231,7 @@ $(document).ready(function() {
 				,fd);
 		
 		ajaxObj.setFnSuccess(function(data){
-			data = JSON.parse(data);
+			
 	    	
 	    	gfnShowLoadingBar(false);
 	    	

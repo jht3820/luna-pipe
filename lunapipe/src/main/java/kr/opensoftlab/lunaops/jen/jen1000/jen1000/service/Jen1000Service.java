@@ -72,4 +72,17 @@ public interface Jen1000Service {
 	@SuppressWarnings({"rawtypes"})
 	List<Map> selectJen1000JenkinsUserList(Map map) throws Exception;
 	
+	
+	@SuppressWarnings({"rawtypes" })
+	List selectJen1102JenParameterList(Map paramMap)  throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	String insertJen1102ParameterInfo(Map paramMap) throws Exception;
+
+	
+	
+	@SuppressWarnings("rawtypes")
+	void deleteJen1102ParameterInfo(Map paramMap) throws Exception;
+	
 }
