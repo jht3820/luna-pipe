@@ -1,24 +1,6 @@
-/**
- * function명 	: gfnCommonSetting [검색 상자 세팅 용]
- * function설명	: 검색 상자에서 사용유무, 승인상태, 중요도 등 선택상자에 공통코드를 적용 할 경우 사용한다.
- * 				  공통코드 테이블을 참조하여 콤보데이터를 가지고 온다.
- * 				  사용 예제 > gfnCommonSetting(mySearch,selectedObject.optionCommonCode,"searchCd","searchTxt");
- * @param searchObj			:	검색 정보를 가지고 있는 객체
- * @param cmmCode			:	공통코드
- * @param showSearchKey		:	SelectBox Key value
- * @param hideSearchKey		:	TextBox Key value
- * showSearchKey와 hideSearchKey가 서로 toggle된다.
- */
+
 function gfnCommonSetting(searchObj,cmmCode,showSearchKey,hideSearchKey){
-	/* 	
-	*	공통코드 가져올때 한번 트랜잭션으로 여러 코드 가져와서 셀렉트박스에 세팅하는 함수(사용 권장)
-	* 	1. 공통 대분류 코드를 순서대로 배열 담기(문자열)
-	*	2. 사용구분 저장(Y: 사용중인 코드만, N: 비사용중인 코드만, 그 외: 전체)
-	*	3. 공통코드 적용할 select 객체 직접 배열로 저장
-	* 	4. 공통코드 가져와 적용할 콤보타입 객체 배열 ( S:선택, A:전체(코드값 A 세팅한 조회조건용), N:전체, E:공백추가,OS:선택 값 selected, 그 외:없음 )
-	*	5. 동기 비동기모드 선택 (true:비동기 통신, false:동기 통신)
-	*	마스터 코드 = REQ00001:요구사항 타입, REQ00002:중요도 
-	*/
+	
 
 	// 팝업 공통코드 select 세팅
 	var commonCodeArr = [
@@ -35,31 +17,7 @@ function gfnCommonSetting(searchObj,cmmCode,showSearchKey,hideSearchKey){
 	axdom("#" + searchObj.getItemId(hideSearchKey)).hide();
 }
 
-/**
- * function명 	: gfnGetMultiCommonCodeDataForm [조회 조건 select Box 용]
- * function설명	: 트랜잭션을 여러번 날리는게 아닌 단일 트랜잭션으로 콤보 코드를 가지고 오는 용도로 사용, 콤보용 공통 코드 및 공통코드명 가져올때 사용
- * 				  공통코드 테이블을 참조하여 콤보데이터를 가지고 온다.
- * 				  사용 예제 > gfnGetMultiCommonCodeDataForm(commonCodeArr , true);
- * 				  Ex> 1. json data 세팅
- *	 						mstCd: 공통코드 마스터 코드
- *	 						useYn: 사용구분 저장(Y: 사용중인 코드만, N: 비사용중인 코드만, 그 외: 전체)
- *	 						comboType: 공통코드 가져와 적용할 콤보타입 객체 배열 ( S:선택, A:전체(코드값 A 세팅한 조회조건용), N:전체, E:공백추가, OS:select 객체에 OS="" 값 설정할경우 값 적용,그 외:없음 )
- *	 						targetObj: 공통코드 적용할 select 객체 ID(*)
- * 					  2. 대분류 코드를 세팅할 selectBox 객체를 배열로 대분류 코드 순서와 일치하게 세팅하여 보낸다.
- * 					  3. 사용여부가 사용인지, 미사용인지 아니면 전체를 다 가지고 올지를 판단. (N: 사용하지 않는 것만, Y: 사용하는 것만, 그외: 전체)
- *            		  4. 콤보타입을 전체, 선택, 일반 바로 선택 가능한 상태에 대한 조건을 순서대로 배열로 보낸다. ["S", "A", "E", "JSON",""] S: 선택, A: 전체, E:공백추가 OS:선택 값 selected , JSON:반환 데이터를 json으로 리턴 , 그 외: 없음  
- *            			OS: 해당 select attr에 OS="01" 등과 같이 입력 -> option elements 생성 후 해당 value의 option을 selected한다.
- *            			JSON: 반환 데이터를 기타 사용 할 수 있도록 JSON OBJECT로 제공 
- *                    5. input box data-osl-value="" 지정 후 값 넣는 경우 해당 option selected
- * @param commonCodeArr		:	공통코드 조회 필요 데이터
- * var commonCodeArr = [
-		{mstCd: "ADM00003",useYn: "Y",targetObj: "#in_usrPositionCd"},
-		{mstCd: "ADM00004",useYn: "Y",targetObj: "#in_usrDutyCd"},
-		{mstCd: "CMM00001",useYn: "Y",targetObj: "#in_asideShowCd"},
-		{mstCd: "CMM00001",useYn: "Y",targetObj: "#in_useCd"}
-	]
-	gfnGetMultiCommonCodeDataForm(commonCodeArr , true);
- */
+
 function gfnGetMultiCommonCodeDataForm(commonCodeArr , isAsyncMode){
 	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
@@ -68,8 +26,6 @@ function gfnGetMultiCommonCodeDataForm(commonCodeArr , isAsyncMode){
 			,{commonCodeArr: JSON.stringify(commonCodeArr)});
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
-		data = JSON.parse(data);
-		
     	if(data.ERROR_CODE == '-1'){
     		toast.push(data.ERROR_MSG);
 			return;
@@ -162,86 +118,7 @@ function gfnGetMultiCommonCodeDataForm(commonCodeArr , isAsyncMode){
 	return ajaxObj.send();
 }
 
-/**
- * AJAX 통신 공통 처리
- * - ajax통신 옵션은 property에서 배열로 처리
- * - 로딩 바 기본(통신 완료 퍼센트)
- * - AJAX통신 중 Background처리가 있는 경우 무조건 async = true(동기) 처리  예) 메일 전송 AJAX
- * property 옵션
- * - url
- * - data
- * - dataType
- * - contentType
- * - async
- * - cache
- * - processData
- * data는 setData로 따로 설정 가능
- * 예제)
- * 1. 객체 선언과 동시에 옵션 세팅
- * var ajaxObj = new gfnAjaxRequestAction({
-		"url":"<c:url value='/req/req2000/req2000/insertReq2000ReqCommentInfoAjax.do'/>"
-		,"contentType":"application/x-www-form-urlencoded; charset=UTF-8"
-		,"datatype":"json"
-		,"async":false
-		,"cache":true
-		,"processData":true
-		});
- * 
- * 2. 객체 선언과 이후 옵션 세팅
- * //setProperty를 여러번 나누어서 설정해도 상관 없음
- * var ajaxObj = new gfnAjaxRequestAction({
-		"url":"<c:url value='/req/req2000/req2000/insertReq2000ReqCommentInfoAjax.do'/>"
-		});
-	ajaxObj.setProperty({
-		"contentType":"application/x-www-form-urlencoded; charset=UTF-8"
-		,"datatype":"json"
-		,"async":false
-		,"cache":true
-		,"processData":true
-	});
- * 
- * 3. data 설정
- * ajaxObj.setData({"prjId" : prjId, "reqId" : reqId, "reqCmnt" : reqCmnt});
- * var ajaxObj = new gfnAjaxRequestAction({
-		"url":"<c:url value='/req/req2000/req2000/insertReq2000ReqCommentInfoAjax.do'/>"
-		,"contentType":"application/x-www-form-urlencoded; charset=UTF-8"
-		,"datatype":"json"
-		,"async":false
-		,"cache":true
-		,"processData":true}
-		,{"prjId" : prjId, "reqId" : reqId, "reqCmnt" : reqCmnt});
- * 3-1. 객체 선언과 동시에 data 설정
- * 
- * 4. AJAX 성공처리 함수 설정
- * //AJAX 전송 성공 함수
-	ajaxObj.setFnSuccess(function(data){
-		data = JSON.parse(data);
-    	//코멘트 등록 실패의 경우 리턴
-    	if(data.saveYN == 'N'){
-    		toast.push(data.message);
-    		return;
-    	}
-    	//코멘트 리스트 세팅
-    	gfnSetData2CommentsArea(data.reqCommentList, "reqCmntListDiv", "BRD");
-    	//코멘트 입력창 클리어
-    	$("#reqCmnt").val("");
-    	toast.push(data.message);
-	});
- * 
- * 5. AJAX 에러처리 함수 설정
- * ajaxObj.fnError(function(xhr, status, err){
- 	
- 	});
- * 
- * 6. AJAX 통신 준비, 통신 완료처리 4번과 동일
- * 
- * 7. AJAX 통신 시작
- * ajaxObj.send();
- * 
- * 		- 그 외 커스텀 추가 시 내용 삽입 - 
- * 2016-09-13			최초 작성			진주영
- * 2016-09-19			수정				진주영
- */
+
 function gfnAjaxRequestAction(property,data){
 	//url, data
 	this.url = "";
@@ -359,9 +236,9 @@ function gfnAjaxRequestAction(property,data){
 	        success: function(data, status, xhr) {
 	        	//응답 시간 계산
 	        	var responeAjaxTime =  new Date().getTime()-startAjaxTime;
-	        	
+	        	obj.fnSuccess(data, status, xhr, responeAjaxTime);
 	        	try{
-	        		obj.fnSuccess(data, status, xhr, responeAjaxTime);
+	        		
 	        	}catch(e){
 	        		console.log("success error: ");
 	        		console.log(e);
@@ -385,31 +262,14 @@ function gfnAjaxRequestAction(property,data){
 }
 
 
-/**
- * function명 	: gfnRequireCheck
- * function설명	: 폼id, 해당 폼에 속한 필수입력 객체 id, 사용자에게 보여줄 이름을 입력받아
- * 				  해당 폼의 공백여부 및 선택여부를 체크하여 true, false로 반환
- * 				  사용 예제 > gfnRequireCheck(formId, checkInputIdArr, checkInputNmArr);
- *            		  1. form ID 를 찾아 해당 form에 속한 객체의 필수 입력 사항을 체크.
- *            		  2. 입력한 객체에 입력값이 없을 경우 true 리턴
- * @param   	: formId			- Form ID
- * @param   	: checkInputIdArr	- 해당 Form에 속한 객체의 ID
- * @param   	: checkInputNmArr	- 해당 객체들의 디스플레이용 이름
- * 
- * 
- *- 수정 - 
- * 2018-08-06			error Class 추가					진주영
- */
+
 function gfnRequireCheck(formId, checkObjArr, checkObjNmArr){
 	var inputCnt = checkObjArr.length;
 	if(inputCnt < 1){
 		return false;
 	}
 	
-	/* 
-	 * 	필수 입력조건을 받아서 true, false 리턴함.
-	 * 	input box가 select인 항목은 S 일경우만 트루 리턴.
-	 */ 
+	 
 	var value = '';
 	for(var i = 0 ; i < inputCnt ; i++){
 		value = eval("document.getElementById('" + formId + "')." + checkObjArr[i] + ".value");
@@ -458,12 +318,7 @@ function gfnRequireCheck(formId, checkObjArr, checkObjNmArr){
 }
 
 
-/**
- * function명 	: gfnSetFormAllObjTabIndex
- * function설명	: form안의 전체 자식 객체에 tabindex 순서대로 처리
- * @param formObj 초기화할 Form ID 문자열
- * @param 
- */
+
 function gfnSetFormAllObjTabIndex(form){
 	var list = document.getElementById(form).elements;
 	var listCnt = document.getElementById(form).elements.length;
@@ -492,14 +347,7 @@ function gfnSetFormAllObjTabIndex(form){
 
 
 
-/**
- * function 명 	: gfnSetData2ParentObj (요구사항 목록 관련 화면에서 사용)
- * function 설명	: json데이터로 온 객체(Json 형식 단건 list 아님)를 키와 동일한 부모 OBJ ID 안의 ID값을 찾아
- * 				  자동으로 데이터를 세팅하는 메서드.
- * 				  부모 obj 안에 포함되어 있는 폼엘레먼트들도 type을 체크하여 라디오 버튼을 제외하고는 밸류를 세팅한다.
- * @param json 	: json info(단건)
- * @param parentObj : parent Obj ID
- */
+
 function gfnSetData2ParentObj(jsonObj, parentObjId){
 
 	var child = null;
@@ -538,18 +386,12 @@ function gfnSetData2ParentObj(jsonObj, parentObjId){
 		            	}
 		                break;
 		            case "radio":
-		                /*for (idx = 0, max = child.length; idx < max; idx++) {
-		                    if (child[idx].value == val) {
-		                        child[idx].checked=true;
-		                        break;
-		                    }
-		                }
-		                break;*/
+		                
 		            case "checkbox":
 		                child.checked = (val == 1);
 		                break;
 		            case "textarea":
-		            	/*$(child).val(val.replace(/<br>/gi,'\n'));*/
+		            	
 		            	$(child).val(val.replace(/(<\/br>|<br>|<br\/>|<br \/>)/gi, '\r\n'));
 		            	break;
 		            default :
@@ -566,12 +408,7 @@ function gfnSetData2ParentObj(jsonObj, parentObjId){
 	});
 }
 
-/**
- * function 명 	: gfnShowLoadingBar
- * function 설명	: Ajax로 트랜잭션시 사용할 loading 바를 show/hide 한다.
- * @param isShow: 로딩바호출 : true, 로딩바숨김 : false
- * @param callbackFn: 로딩바 호출 후 실행 함수
- */
+
 function gfnShowLoadingBar(isShow, callbackFn){
 	if(isShow){
 		$(".top_fixed").show(100, callbackFn);
@@ -582,17 +419,7 @@ function gfnShowLoadingBar(isShow, callbackFn){
 	}
 }
 
-/**
- * 	function 명 	: gfnLayerPopup
- *  function 설명	: 레이어 팝업을 호출한다.
- *  url			: 호출 URL
- *  data		: 1. json 형식 ex> {"key1" : "value1", "key2" : "value2"}
- *  			  2. form serialize 형식 ex> $("#formObj").serialize(); => id=jht&pw=jht
- *  width		: 레이어팝업의 가로사이즈 px	- default 540px
- *  height		: 레이어팝업의 세로사이즈 px	- default 444px
- *  overflowY	: overflow-y속성 기본값 hidden
- *  loadingShow : 로딩바 표현 = true, 미 표현 = false (기본값 true)
- */
+
 function gfnLayerPopupOpen(url, data, width, height, overflowY, loadingShow){
 	//레이어 팝업이 2개 오픈된 경우, 3개 이상부터 경고창 알림
 //	if(!gfnIsNull($('.layer_popup_box')) && $('.layer_popup_box').length >= 1){
@@ -630,12 +457,12 @@ function gfnLayerPopupOpen(url, data, width, height, overflowY, loadingShow){
 	var cssObj = {};
 	
 	if(maxZIndex==0){
-		cssObj = {	/* 로우 추가시 height 수정 */
+		cssObj = {	
 				"width" : width + "px",
 				"height" : height + "px"				
 			};
 	}else{
-		cssObj = {	/* 로우 추가시 height 수정 */
+		cssObj = {	
 			"width" : width + "px",
 			"height" : height + "px",
 			"z-index" : parseInt(maxZIndex)+1
@@ -682,10 +509,7 @@ function gfnLayerPopupOpen(url, data, width, height, overflowY, loadingShow){
 
 
 
-/**
- * 	function 명 	: gfnLayerPopupClose
- *  function 설명	: 레이어 팝업을 닫는다.
- */
+
 function gfnLayerPopupClose(){
 	//팝업 가이드 상자 존재하는경우
 	gfnGuideStack("del");
@@ -714,13 +538,7 @@ function gfnLayerPopupClose(){
 	
 }
 
-/**
- * 	function 명 		: gfnCalRangeSet
- * 	function 설명		: 달력의 시작일과 종료일의 유효성 및 달력 아이콘 등, 달력 컴포넌트를 세팅하는 함수
- * 	@param fromId 	: 시작일 input의 ID 
- * 	@param toId	  	: 종료일 input의 ID
- * 	@param timeUseCd : timePicker 사용-true/미사용-false (default-false)
- */
+
 function gfnCalRangeSet(fromId, toId, grpFromDt, grpEndDt,timeUseCd){
 	
 	//Date type
@@ -818,12 +636,7 @@ function gfnCalRangeSet(fromId, toId, grpFromDt, grpEndDt,timeUseCd){
 	//$.datepicker.setDefaults($.datepicker.regional['ko']);
 }
 
-/**
- * 	function 명 		: gfnCalRangeDel
- * 	function 설명		: 해당 오브젝트에 선언된 datepicker 제거
- * 	@param fromId 	: 시작일 input의 ID 
- * 	@param toId	  	: 종료일 input의 ID
- */
+
 function gfnCalRangeDel(fromId, toId){
 	$( "#" + fromId ).data('daterangepicker').remove();
 	$( "#" + fromId ).next().remove();
@@ -832,12 +645,7 @@ function gfnCalRangeDel(fromId, toId){
 	
 }
 
-/**
- * 	function 명 			: gfnCalSet
- * 	function 설명			: Input box에 달력속성 부여
- * 	@param formatType 	: 출력 일자 타입 (ex. yy-mm-dd) 
- * 	@param ~(동적)  		: 
- */
+
 function gfnCalSet(formatType){
 	
 	//년 범위 구하기 (-10 ~ +10)
@@ -872,12 +680,7 @@ function gfnCalSet(formatType){
 	//$.datepicker.setDefaults($.datepicker.regional['ko']);
 }
 
-/**
- * 
- * @param formatType 	: 출력 일자 타입 (ex. yy-mm-dd) 
- * @param elementIds    : datepicker 가 적용될 elementId
- * @param options		: 추가 적용 옵션 예 minDate , maxDate 등.. datepicker의 모든 옵션 Object Type으로 적용가능
- */
+
 function gfnCalendarSet(formatType,elementIds,options){
 	
 	//Date type
@@ -928,11 +731,7 @@ function gfnCalendarSet(formatType,elementIds,options){
 }
 
 
-/**
- * 널 체크
- * @param sValue
- * @returns {Boolean}
- */
+
 function gfnIsNull(sValue)
 {
 	if( typeof sValue == "undefined") {
@@ -957,13 +756,7 @@ function gfnIsNull(sValue)
     return false;
 }
 
-/**
- * 문자열의 일부분을 다른 문자열로 치환
- * @param sOrg		가운데 부문을 얻어올 원본 문자열
- * @param sRepFrom	치환대상 문자열
- * @param sRepTo	치환될 문자열
- * @returns
- */
+
 function gfnReplace( sOrg, sRepFrom, sRepTo )
 {
 	var pos, nStart=0, sRet="";
@@ -986,11 +779,7 @@ function gfnReplace( sOrg, sRepFrom, sRepTo )
 	}
 	return sRet;
 }
-/**
- * 문자형식으로 변경
- * @param sText
- * @returns
- */
+
 function gfnStr(sText){
 	if(sText == undefined) return "";
 	if(sText == null) return "";
@@ -998,15 +787,7 @@ function gfnStr(sText){
 
 	return ""+sText;
 }
-/**
- * function명 	: String 객체에 특정 문자 배열로 대체. 
- * function설명	: 문자열 객체에 {0},{1} 과 같은 형태로 {n}개를 선언한 다음
- * 				  n개수 만큼의 문자열을 배열에 입력된 값으로 대체 시킨다.
- * @param args	: {0} 과 같은 값을 대체 할 배열
- * ex) "지금 시간은 {0}시 {1}분 {2}초 입니다".format({'11','22','33'}); 
- * 		=> 지금 시간은 11시 22분 33초 입니다. 
- * 
- */
+
 String.prototype.format = function (args) {
 	var str = this;
 	return str.replace(String.prototype.format.regex, function(item) {
@@ -1026,13 +807,7 @@ String.prototype.format = function (args) {
 };
 String.prototype.format.regex = new RegExp("{-?[0-9]+}", "g");
 
-/**
- * 로딩화면 완료 퍼센트 구하기
- * AJAX속성에서 async:true (기본값)
- * AJAX속성에서 xhr: function(){return gfnLoadProgressStr();} 처리
- * AJAX처리 시작 0%에서 완료 시 100%
- * 로딩화면 종료에서 $('.top_str').html('') 처리
- */
+
 function gfnLoadProgressStr(){
 	var xhr = new window.XMLHttpRequest();
     //Upload progress
@@ -1046,13 +821,7 @@ function gfnLoadProgressStr(){
     return xhr;
 }
 
-/**
- * 업로드 게이지 바
- * AJAX속성에서 async:true (기본값)
- * AJAX속성에서 xhr: function(){return gfnLoadProgressBar(pgBarObj);} 처리
- * AJAX처리 시작 width0 ~ 100%
- * @param pgBarObj	: 게이지바 오브젝트 
- */
+
 function gfnLoadProgressBar(pgBarObj){
 	var xhr = new window.XMLHttpRequest();
 	
@@ -1081,11 +850,7 @@ function gfnLoadProgressBar(pgBarObj){
     return xhr;
 }
 
-/**
- * Date Format Function
- * @param f
- * @returns
- */
+
 //getTime to date
 Date.prototype.format = function(f) {
     if (!this.valueOf()) return " ";
@@ -1117,11 +882,7 @@ String.prototype.string = function(len){var s = '', i = 0; while (i++ < len) { s
 String.prototype.zf = function(len){return "0".string(len - this.length) + this;};
 Number.prototype.zf = function(len){return this.toString().zf(len);};
 
-/**
- * 	gfnCheckStrLength
- * 	설정한 글자수 이상은 '···' 처리 하여 리턴하는 스크립트
- * 	길이를 넣지 않거나 0으로 넣은경우는 문자열 그대로 리턴한다.
- */
+
 function gfnCheckStrLength(str,len) {
 	var temp = "";
 	
@@ -1148,12 +909,7 @@ function gfnCheckStrLength(str,len) {
 	return temp;
 }
 
-/**
- * 지정된 Element(Input box)에서 엔터키 입력 시 해당 함수 실행
- * @param	fnc 실행 함수
- * 			매개변수가 있는 경우 전달된 매개변수 타입은 문자열(String)이여야 한다.
- * @param	objName Input box 아이디 값 (동적으로 매개변수 할당)
- */
+
 function gfnEnterAction2(fnc){
 	//동적 매개변수 루프
 	for(var i=1;i<arguments.length;i++){
@@ -1168,11 +924,7 @@ function gfnEnterAction2(fnc){
 	
 }
 
-/**
- * 해당 폼에서 자동으로 폼값을 가져와 FormData()에 세팅
- * @param formName	값을 가져올 폼 이름
- * @param fd		값을 넣을 FormData()
- */
+
 function gfnFormDataAutoValue(formName,fd){
 	var fdInput = $('#'+formName+' input');
 	var fdSelect = $('#'+formName+' select');
@@ -1191,24 +943,7 @@ function gfnFormDataAutoValue(formName,fd){
 	});
 }
 
-/**
- * 해당 폼에서 자동으로 폼값을 가져와 FormData()에 세팅
- * @attr
- * - input box -	title -> 항목 명
- *					value -> 항목 값
- *					id	  -> 항목 필드명
- *					type  -> 항목 타입
- *					modifyset	-> 01- 이력 저장 항목[기본값], 02- 이력 저장 안함
- *					opttarget	-> 01 - 기본 컬럼, 02 - 추가 항목, 03 - 배포계획, 04 - 기본 항목
- *					opttype		-> 01 - 기본값 , 02- 공통코드(cmmcode 속성 값 필요), 03- 사용자, 04- 배포계획
- *					cmmcode		-> 공통코드
- *					optFlowId		-> 작업흐름 Id
- *					(opttype="02" cmmcode="REQ00001")
- *					hiddenset	-> 01 - type이 hidden이어도 jsonData 세팅, 02 - hidden이면 String 형으로[기본값]
- * @param formName	값을 가져올 폼 이름
- * @param fd		값을 넣을 FormData()
 
- */
 function gfnFormDataAutoJsonValue(formName,fd){
 	//input, select, textarea 객체 구하기
 	var fdInput = $('#'+formName+' input');
@@ -1269,7 +1004,7 @@ function gfnFormDataAutoJsonValue(formName,fd){
 			hiddenSet = "02";
 		}
 		
-		/* jsonData 세팅 */
+		
 		//개체 항목 명 (title)
 		var eleTitle = element.title;
 		
@@ -1299,14 +1034,7 @@ function gfnFormDataAutoJsonValue(formName,fd){
 	});
 }
 
-/**
- * 객체 값이 숫자인지 확인하고 숫자가 아니라면 알파벳, 한글 지움
- * @param	숫자 유무 판별 객체 ID값
- * @returns 숫자인경우 true
- * 			숫자가 아닌경우 false
- * @desc	해당 함수 사용 후 같은 분기에 ajax로직이 있는 경우 에러가 발생한다. (숫자 체크 후 return되기 전 ajax이미 비동기 실행중)
- * 			if(gfnIsNumeric("objName")) 으로 ajax를 감싼다.
- */
+
 function gfnIsNumeric(obj){
 	var pattern = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|a-z|A-Z]/g;
 	if($.isNumeric($("#"+obj).val()) == false || pattern.test($("#"+obj).val()) == true){
@@ -1325,12 +1053,7 @@ function gfnIsNumeric(obj){
 }
 
 
-/**
- * Input Box (ID or Class)의 값 길이를 체크한다.
- * @param objName	Input Box 아이디값 혹은 클래스이름
- * @param objDesc	해당 Input box의 이름
- * @param size		최대 글자 수
- */
+
 function gfnIsLength(objName,objDesc,size){
 	var fnObj = null;
 	
@@ -1352,38 +1075,7 @@ function gfnIsLength(objName,objDesc,size){
 	
 }
 
-/**
- * 유효성 값 체크
- * @param arrObj 유효성 체크 하려는 객체와 타입 설정
- * var arrChkObj = {[Object],[SubType]}
- * var arrChkObj = {"email":{"type":"email","msg":"이메일 형식이 아닙니다."}};
- * 
- * [Type]
- * number	: 숫자인지 확인
- * length	: 문자열 최대 길이 체크
- * email	: 이메일 형식 체크
- * english	: 영문인지 확인
- * etc		: 정규 표현식 지정 값 체크
- * 
- * [SubType]
- * type		: [Type]
- * max		: [Type]이 length인 경우 문자열 최대 길이 지정 (한글은 2Byte로 계산)
- * min		: [Type]이 length인 경우 문자열 최소 길이 지정
- * msg		: 값이 형식에 맞지 않는 경우 출력하려는 메시지 내용
- * engOption : 입력값이 영문,숫자인지 체크하기 위한 옵션, 옵션값으로 includeNumber를 사용 
- *             (예){"id":{"type":"english","engOption":"includeNumber"}};
- *             engOption을 사용하지 않으면 입력값이 영문인지만 체크
- * require=true	: 필수 입력 값 체크 (default = false)
- * +[Type]가 etc인 경우 [SubType]
- * pattern		: 매치하려는 정규 표현식
- * rpPattern	: 만약 값 치환이 필요한 경우 지정
- * 				  지정이 안된 경우 inputBox를 빨간 테두리로 변경하는 Class 삽입 동작
- * eventHandler	: 이벤트 발생 지정(key~, click, blur 등)
- * 
- * 		- 그 외 내용 추가 시 내용 삽입 - 
- * 2016-10-10			최초 작성(number,length,email)			진주영
- * 2018-08-06			숫자 parseInt 오류 수정					진주영
- */
+
 function gfnInputValChk(arrObj){
     //오브젝트
     var chkObj;
@@ -1638,30 +1330,7 @@ function gfnInputValChk(arrObj){
 }
 
 
-/**
- * 데이터 저장 전 유효성 값 체크
- * @param arrObj 유효성 체크 하려는 객체와 타입 설정
- * var arrChkObj = {[Object],[SubType]}
- * var arrChkObj = {"email":{"type":"email","msg":"이메일 형식이 아닙니다."}};
- * 
- * [Type]
- * number	: 숫자인지 확인
- * length	: 문자열 최대 길이 체크
- * email	: 이메일 형식 체크
- * etc		: 정규 표현식 지정 값 체크
- * 
- * [SubType]
- * type		: [Type]
- * max		: [Type]이 length인 경우 문자열 최대 길이 지정 (한글은 2Byte로 계산)
- * min		: [Type]이 length인 경우 문자열 최소 길이 지정
- * msg		: 값이 형식에 맞지 않는 경우 출력하려는 메시지 내용
- * require=true	: 필수 입력 값 체크 (default = false)
- * +[Type]가 etc인 경우 [SubType]
- * pattern		: 매치하려는 정규 표현식
- * rpPattern	: 만약 값 치환이 필요한 경우 지정
- * 				  지정이 안된 경우 inputBox를 빨간 테두리로 변경하는 Class 삽입 동작
- * eventHandler	: 이벤트 발생 지정(key~, click, blur 등)
- */
+
 function gfnSaveInputValChk(arrObj){
     //오브젝트
     var chkObj;
@@ -1911,7 +1580,7 @@ function gfnSaveInputValChk(arrObj){
 }
 
 
-/*****************************************************************************************/
+
 
 
 function gfnInputValChk2(arrObj){
@@ -2097,22 +1766,7 @@ function gfnInputValChk2(arrObj){
 		}
 	}
 }
-/**
- * 특정 레이아웃 하이라이트 처리
- * (선택 영역 외에 영역을 마스크 처리 한다)
- * - 마스크 생성 후 선택 객체를 클릭하면 마스크가 제거된다.
- * - 마스크 생성 후 선택 영역이 10x10 이하 일경우 마스크 영역을 클릭하면 마스크가 제거된다.
- * - 마스크 생성 후 컨트롤 + 마우스 좌 클릭으로 마스크를 제거 할 수 있다.
- * @param objId 하이라이트 처리 하려는 객체
- * 예제:
- * gfnLayerHighLight('.button_complete.btn_exit')
- * gfnLayerHighLight('#REQ2016100700008')
- * gfnLayerHighLight('.reqChangeDiv.recentCmnt[reqid=REQ2016090300001]')
- * gfnLayerHighLight('#sprFlowChrtDiv')
- * 
- * 		- 그 외 내용 추가 시 내용 삽입 - 
- * 2016-11-03			최초 작성			진주영
- */
+
 function gfnLayerHighLight(objId){
 	//jQuery 객체 선택
     var obj = $(objId);
@@ -2152,10 +1806,7 @@ function gfnLayerHighLight(objId){
 		//라인 영역의 css
 		var lineStyle;
 		
-		/* 상단 마스크 영역
-		 * (x,y) : (선택 객체 좌측 위치, 0) 
-		 * (w x h) :  (선택 객체 실제 가로 길이 x 선택 객체 Top 위치)
-		 */
+		
 		if(position == 'top'){
 			maskStyle = {
 					top: px(0),
@@ -2166,10 +1817,7 @@ function gfnLayerHighLight(objId){
 		    lineStyle = {width:'100%',
 		    		height:'2px',
 		    		bottom:0};
-	    /* 좌측 마스크 영역
-		 * (x,y) : (0,0) 
-		 * (w x h) :  (선택 객체 좌측 위치 x 페이지 세로 길이)
-		 */
+	    
 		}else if(position == 'left'){
 			maskStyle = {
 					top: px(0),
@@ -2181,10 +1829,7 @@ function gfnLayerHighLight(objId){
 		    		height:px($(obj).outerHeight()),
 		    		right:0,
 		    		top:objIdOffset.top};
-	    /* 우측 마스크 영역
-		 * (x,y) : ((선택 객체 좌측 위치 + 선택 객체의 실제 가로 길이), 0) 
-		 * (w x h) :  (선택 객체 좌측 위치 x 페이지 세로 길이)
-		 */
+	    
 		}else if(position == 'right'){
 			maskStyle = {
 					top: px(0),
@@ -2196,10 +1841,7 @@ function gfnLayerHighLight(objId){
 		    		height:px($(obj).outerHeight()),
 		    		top:objIdOffset.top
 		    		};
-	    /* 하단 마스크 영역
-		 * (x,y) : (선택 객체 좌측 위치, (선택 객체 상단 위치 + 선택 객체의 실제 세로 길이)) 
-		 * (w x h) :  (선택 객체의 실제 가로 길이 x (페이지 세로 길이 - (선택 객체 상단 위치 + 선택 객체의 실제 세로 길이)))
-		 */
+	    
 		}else if(position == 'bottom'){
 			maskStyle = {
 					top: px((objIdOffset.top + $(obj).outerHeight())),
@@ -2286,11 +1928,7 @@ function searchEnterKey(e, obj){
 }
 
 
-/**
- * 첨부파일 확장자 체크 ( 화이트 리스트 )
- * @param fileExt
- * @returns {Boolean}
- */
+
 function gfnFileCheck( fileExt ){
 	// 화이트 리스트가 아니라면 중지 업로드 중지.
 	if( $.inArray(fileExt, ["doc","docx","hwp","pdf","ppt","pptx","xls","xlsx","zip","jpg","jpeg","png","gif","css","css2","csv","htm","htm2","html","js","avi","mp3","mpeg","mpg","psd","rar","spl","swf","tar","text","tga","tgz","tif","tiff","txt","wav","wav2","bmp","jar","zip","eml","cell","show"]) == -1) {
@@ -2300,13 +1938,7 @@ function gfnFileCheck( fileExt ){
 }
 
 
-/**
- * Byte수 구하여 문자열 자른 후 리턴
- *  
- * @param str
- * @param maxByte
- * @returns
- */
+
 function gfnCutStrLen(str, maxByte, type) {
 	//null 체크
 	if(gfnIsNull(str)){
@@ -2329,13 +1961,7 @@ function gfnCutStrLen(str, maxByte, type) {
 	} 
 }
 
-/**
- * 입력한 문자열이 maxByte를 초과할 경우 문자열을 잘라 리턴한다.
- *  
- * @param str 		입력받은 문자열
- * @param maxByte	최대 byte값
- * @returns
- */
+
 function gfnByteLenCutStr(str, maxByte) {
 	//null 체크
 	if(gfnIsNull(str)){
@@ -2353,13 +1979,7 @@ function gfnByteLenCutStr(str, maxByte) {
 	}
 }
 
-/**
- * Byte수 구하여 리턴
- *  
- * @param str
- * @param maxByte
- * @returns
- */
+
 function gfnStrByteLen(str) {
 	var byteLen = 0;
 	for(i=0;i<str.length;i++){
@@ -2369,11 +1989,7 @@ function gfnStrByteLen(str) {
 	return byteLen;
 }
 
-/**
- * 링크값을 받아서 빈값인경우 '#'을 리턴
- * @param str
- * @returns str
- */
+
 function gfnReqLink(reqLink){
 	//링크 내용이 있는지 확인
 	if(gfnIsNull(gfnReplace(reqLink, "http://","").trim()) || gfnIsNull(gfnReplace(reqLink, "https://","").trim())){
@@ -2382,9 +1998,7 @@ function gfnReqLink(reqLink){
 	return reqLink;
 }
 
-/**
- * Date timestamp값으로 몇분전, 몇시간전, 몇일전 표기
- */
+
 function gfnDtmAgoStr(dateTime){
 	var subTime = new Date() - dateTime;
 	
@@ -2414,15 +2028,7 @@ function gfnDtmAgoStr(dateTime){
 	return rtnStr;
 }
 
-/**
- * 
- * 엘리먼트의 byte입력 제한을 지정한다.
- * 엘리먼트의 maxlength 길이를 기준으로 byte수를 제한한다.
- * 예) 500 byte 제한
- *  <input type="text" title="서비스 명" class="input_txt" name="apiNm" id="apiNm" style="width:80%;" maxlength="500"  />
- * 
- * @param eventIdList
- */
+
 function gfnByteCheckEvent(eventIdList){
 	
 	for(var i=0; i<eventIdList.length; i++ ){
@@ -2499,26 +2105,9 @@ function gfnByteCheckEvent(eventIdList){
 }
 
 
-/**
- * 콜백함수
- */
+
 var commonPopFunction ;
-/**
- * 공통 코드를 조회할수 있는 팝업을 생성한다. 
- * 
- * 사용예)
- * gfnCommonPopup("공휴일", $('#holiday').val() ,false,"${sessionScope.loginVO.licGrpId}","CMM00002",function(objs){
-			//objs 는 배열 오브젝트 구조로 ADM4100테이블의 컬럼명과 매칭된다.
-   });
- * 
- * 
- * @param title 팝업의 타이틀명
- * @param param 텍스트박스에 기본셋팅될 정보
- * @param isMulti 멀티 선택가능여부 false 단일선택 , true 멀티선택가능
- * @param licGrpId 라이센스 그룹명
- * @param mstCd 공통코드 그룹명
- * @param pFunc 선택버튼을 눌렀을때 선택된정보를 가져오는 콜백함수
- */
+
 function gfnCommonPopup(title,param,isMulti,licGrpId,mstCd,pFunc){
 	commonPopFunction = pFunc;
 	var data = {
@@ -2529,10 +2118,7 @@ function gfnCommonPopup(title,param,isMulti,licGrpId,mstCd,pFunc){
 	gfnLayerPopupOpen('/cmm/cmm1000/cmm1300/selectCmm1300View.do',data, "480", "453",'scroll');
 }
 
-/**
- * 공통 함수의 선택버튼을 눌렀을때 사용되는 함수
- * @param selGrid
- */
+
 function gfnCheckRow(selGrid,param){
 	var chkList = selGrid.getList('selected');
 	var pList = [];
@@ -2555,14 +2141,7 @@ function gfnCheckRow(selGrid,param){
 	gfnLayerPopupClose();
 }
 
-/**
- * SVN Revision 선택 팝업
- * 
- * @param prjId 프로젝트 ID
- * @param callView 어느 화면에서 호출했는지 구분하기 위한값 (시스템 관리자 메뉴의 SVN배정관리에서 호출시 admin, 그외에서 호출시 ""을 넘긴다.)
- * @param selBtnChk 선택버튼 사용 유무
- * @param pFunc 선택시 CallBack 함수
- */
+
 function gfnSvnRevisionPopup(prjId, callView, selBtnChk, pFunc){
 	commonPopFunction = pFunc;
 	var data = {"prjId": prjId, "callView" : callView, "selBtnChk": selBtnChk  }; 
@@ -2570,31 +2149,19 @@ function gfnSvnRevisionPopup(prjId, callView, selBtnChk, pFunc){
 	gfnLayerPopupOpen("/cmm/cmm1000/cmm1400/selectCmm1400View.do", data, '1300', '850','scroll');	
 }
 
-/**
- * Object를 처리하고 팝업을 닫는다 
- * @param selGrid
- */
+
 function gfnDataRow(selGrid){
 	
 	commonPopFunction(selGrid);
 	
 	gfnLayerPopupClose();
 }
-/**
- * 기준일 이전의 날짜를 조회처리 
- * 
- * @param date
- * @param day 예  7 7일이전 -7 7일 이후
- * @param format
- * @returns {String}
- */
+
 function gfnGetDayAgo(date,day,format){
 	
 	var time;
 	var retdate= new Date( date - (  day * 60 * 60 * 24  * 1000 ) );
-	/**
-	 * 사용되는 포멧을 추가하여 처리
-	 */
+	
 	if("yyyy-mm-dd"==format){
 		time=retdate.getFullYear()+"-"+ (retdate.getMonth() + 1).zf(2) +"-"+retdate.getDate().zf(2);
 	}
@@ -2602,15 +2169,7 @@ function gfnGetDayAgo(date,day,format){
 	return time;
 }
 
-/**
- * 
- * 날짜 기간을 검증한다.
- * 
- * @param fisrtDom
- * @param secondDom
- * @param term
- * @returns {Boolean}
- */
+
 function gfnTermValid(fisrtDom,secondDom,term){
 	var sFirstDay = $(fisrtDom).val();
 	var sSecondDay = $(secondDom).val();
@@ -2630,26 +2189,7 @@ function gfnTermValid(fisrtDom,secondDom,term){
 	return isValid;
 }
 
-/**
- * 
- * 배포 정보를 조회할수 있는 팝업을 생성한다. 
- * 
- * 예)
- * var data = { "dplNm" :  $('#dplNm').val() , "dplSts" : "01" }; 
- * dplSts 배포상태 01 : 대기, 02 : 승인, 03 : 종료 <- 코드는 미정
- * gfnCommonDplPopup(data ,false,function(objs){
-				if(objs.length>0){
-					$('#dplId').val(objs[0].dplId);
-					$('#dplNm').val(objs[0].dplNm);
-				}
-			});
- * 
- * 
- * 
- * @param param 텍스트박스에 기본셋팅될 정보 사용자 명 
- * @param isMulti 멀티 선택가능여부 false 단일선택 , true 멀티선택가능
- * @param pFunc
- */
+
 function gfnCommonDplPopup(param,isMulti,pFunc){
 	commonPopFunction = pFunc;
 	var data={};
@@ -2694,11 +2234,7 @@ function gfnCommonDplPopup(param,isMulti,pFunc){
 	}
 }
 
-/**
- * 배포 조회
- * @param ajaxParam
- * @returns {___anonymous99814_99815} 조회 결과 
- */
+
 function gfnSelectCmm1600CommonDplList(ajaxParam){
 	var retObj = {};
 	var ajaxObj = new gfnAjaxRequestAction(
@@ -2715,14 +2251,7 @@ function gfnSelectCmm1600CommonDplList(ajaxParam){
 	return retObj;
 }
 
-/**
- * 기준일 이전의 날짜를 조회처리 
- * 
- * @param date
- * @param day 예  7 7달이전 -7 7달 이후
- * @param format
- * @returns {String}
- */
+
 function gfnGetMonthAgo(date,day,format){
 	
 	var time;
@@ -2751,9 +2280,7 @@ function gfnGetMonthAgo(date,day,format){
 		}
 	}
 	
-	/**
-	 * 사용되는 포멧을 추가하여 처리
-	 */
+	
 	if("yyyy-mm-dd"==format){
 		var year = ( iDate.getFullYear() - calYear ) ;
 		var month = (calMonth ).zf(2);
@@ -2786,38 +2313,7 @@ function gfnGetMonthAgo(date,day,format){
 	return time;
 }
 
-/**
- * 가이드 상자
- * @param
- * 	type:			true - 가이드 상자 열기, false - 가이드 상자 닫기 (boolean)
- * 	$mainFrame:		가이드 상자가 열리는 부모 객체 (object)
- * 	guideBoxInfo:	가이드 상자 정보 (array)
- * 	@subparam
- * 		id:					가이드 상자 id
- * 		target:				가이드 대상 (div에 guide=target로 대상 설정 필수)
- * 		mainTitle: 			가이드 상자 제목
- * 		top:				가이드 상자 y축 위치
- * 		left:				가이드 상자 x축 위치
- * 		position:			가이드 상자 화살표 도착 위치
- * 		targetPosition:		가이드 대상 화살표 시작 위치
- * 		curve:				화살표 곡선 유무(기본값 true) , true- 곡선 화살표, false- 직선 화살표
- * 		subBox:				가이드 상자 상세정보 내용
- * 			title:			가이드 상자 상세정보 제목
- * 			content:		가이드 상자 상세정보 내용
- * 				
- * 예제)
- * [{id:"flwGuide_leftMenu",target:"leftMenu",mainTitle:"[프로세스 기능]",top:2,left:300,position:"left",targetPosition:"right"
-						,subBox:[
-						         {title:"조회",content:"프로세스 목록 조회"}
-						         ,{title:"추가",content:"프로세스 추가"}
-						         ,{title:"수정",content:"선택 프로세스 수정"}
-						         ,{title:"삭제",content:"선택 프로세스 삭제"}
-						         ,{title:"복사",content:"권한있는 프로젝트의 확정된 프로세스를 복사"}
-						         ,{title:"확정",content:"선택 프로세스 확정</br>(확정 완료시 작업흐름의 명칭과 색상 값만 수정이 가능합니다.)"}
-						         ,{title:"확정 취소",content:"선택 프로세스 확정 취소</br>(배정된 요구사항이 없을경우 확정 취소가 가능합니다.)"}
-						         ]}
-					];
- **/
+
 function gfnGuideBoxDraw(type,$mainFrame,guideBoxInfo){
 	//기본 색상
 	var defaultArrowcolor = '#ff5643';
@@ -2830,11 +2326,7 @@ function gfnGuideBoxDraw(type,$mainFrame,guideBoxInfo){
 	//브라우저 실제 w,h
 	browserWidth = "100%";
 	browserHeight = "100%";
-	/*
-	if (window.screen) { //document.body.clientWidth
-		browserWidth = $(document).outerWidth()+"px";
-		browserHeight = $(document).outerHeight()+"px";
-	}*/
+	
 	
 	//guideBox 생성
 	var $globalGuideMainBox = $('<div class="global_main_guideBox" id="global_main_guideBox"></div>');
@@ -3017,17 +2509,7 @@ function gfnGuideBoxDraw(type,$mainFrame,guideBoxInfo){
 }
 
 
-/**
- * gfnGuideStack
- * F1키로 실행되는 함수 관리
- * @param	functionName : 가이드 상자 실행 함수(function) 
- * 		type
-	 * 		add: function(functionName): 실행 함수 추가(페이지 ready시 선언)
-	 * 		del: function() : 마지막 함수 제거(popup창 close시 사용)
- * 팝업창 가이드 상자의 경우
- * globals_guideChkFn 전역 변수에 가이드 상자 내용 함수 선언하면 사용 가능
- * ex) globals_guideChkFn = fnReq4105GuideShow;
- **/
+
 var gfnGuideOpenCnt = [];
 var globals_guideChkFn = null;
 function gfnGuideStack(type,functionName){
@@ -3038,10 +2520,7 @@ function gfnGuideStack(type,functionName){
 	}
 }
 
-/**
- * gfnGuideKeyAction
- * 브라우저 기본 F1(Help)를 중지하고 해당 솔루션 가이드 상자 open key로 활용
- **/
+
 function gfnGuideKeyAction(){
 	window.onhelp = function() {
 		return false;
@@ -3065,11 +2544,7 @@ function gfnGuideKeyAction(){
 	});
 }
 
-/**
- * function명 	: gfnGetBrowserType
- * function설명	: 사용자의 브라우저 타입을 체크하여 브라우저 종류를 문자열로 리턴한다.
- *                브라우저의 체크는 edge, ie, ms계열을 제외한 브라우저(chrome, safari, firefox)로 구분한다.
- */
+
 function gfnGetBrowserType(){
 	
 	// 브라우저 타입
@@ -3092,12 +2567,7 @@ function gfnGetBrowserType(){
 	return browserType;
 }
 
-/**
- *  function 명 	: gfnEscapeHtml
- *  function 설명	: &<>'" 문자 치환
- * @param sValue
- * @returns {Replace String}
- */
+
 function gfnEscapeHtml(sValue){
 	//숫자인경우 반환
 	if(typeof sValue == "number"){
