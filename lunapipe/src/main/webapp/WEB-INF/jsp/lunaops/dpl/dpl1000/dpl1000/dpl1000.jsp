@@ -95,7 +95,7 @@ function fnJobStatusCheckLoop(){
 		ajaxObj.setFnSuccess(function(data, status, xhr, responeAjaxTime){
 			//응답시간 체크
 			$("#jobAutoCheckTime").html("( 응답시간: "+responeAjaxTime+" ms )");
-			data = JSON.parse(data);
+			
 			var list = data.list;
 			var page = data.page;
 
@@ -222,7 +222,7 @@ function fnJobBuildResultStatus(targetJobId, targetBldNum, targetJobInfo){
 	
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
-		data = JSON.parse(data);
+		
 		
 		if(data.errorYn == "Y"){
 			//모니터링 중단 메시지 출력
@@ -711,7 +711,7 @@ function fnInGridListSet(_pageNo,ajaxParam){
 				,ajaxParam);
 		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
-			data = JSON.parse(data);
+			
 			var list = data.list;
 			var page = data.page;
 			
@@ -921,7 +921,7 @@ function fnDplStsCdUpdate(dplId, selCommonObj){
 	
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
-		data = JSON.parse(data);
+		
 
 		//오류 없는경우
 		if(data.errorYn != "Y"){
@@ -1097,7 +1097,7 @@ function fnSelJobConsoleLogLoad(jobItem){
 				,jobId: jobItem.jobId});
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
-		data = JSON.parse(data);
+		
 		var localJobInfo = data.localJobInfo;
 		
 		//반환 데이터
@@ -1165,7 +1165,7 @@ function fnInJobGridListSet(_pageNo,ajaxParam,dplId){
 				,ajaxParam);
 		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
-			data = JSON.parse(data);
+			
 			var list = data.list;
 			var page = data.page;
 			
@@ -1204,7 +1204,7 @@ function fnDplStart(item){
 			,item);
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
-		data = JSON.parse(data);
+		
 		
 		if(data.errorYn == "Y"){
 			jAlert(data.message, "알림창");
