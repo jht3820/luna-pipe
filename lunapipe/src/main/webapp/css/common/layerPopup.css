@@ -128,7 +128,7 @@
 .pop_menu_info_wrap { overflow-y: auto; float: left; width: 80%; min-height: 600px; padding: 20px 36px; margin-left: 6px; vertical-align: middle; font-size: 0.75em; box-sizing: border-box;}
 .pop_menu_row {float: left;width: 50%;}
 /* .pop_menu_row .pop_menu_col1 → padding-top: 3px 에서 5px 변경 */
-.pop_menu_row .pop_menu_col1 {float: left;clear: both; padding-left:10px; padding-top: 5px; width: 28%; height: 38px; line-height: 30px; background: #f9f9f9;border-width: 0 1px 1px 0;border-style: solid;border-color: #ddd; text-align: left;}
+.pop_menu_row .pop_menu_col1 {float: left;clear: both; padding-left:10px; padding-top: 5px; width: 28%; height: 38px; line-height: 25px; background: #f9f9f9;border-width: 0 1px 1px 0;border-style: solid;border-color: #ddd; text-align: left;}
 .pop_menu_row .pop_menu_col2 {float: left; padding: 5px; width: 72%; height: 38px;line-height: 0px;border-bottom: 1px solid #ddd;}
 .pop_sub input[type="text"] { vertical-align: middle; margin-top: 0; height: 100%; font-size: 1em; width: 100%; min-width: 150px; padding-left: 4px;border: 1px solid #c6c9d0;border-radius: .1875rem;}
 .pop_sub input[type="number"]  { vertical-align: middle; margin-top: 0; height: 100%; font-size: 1em; width: 100%; min-width: 150px; padding-left: 4px;border: 1px solid #c6c9d0;border-radius: .1875rem;}
