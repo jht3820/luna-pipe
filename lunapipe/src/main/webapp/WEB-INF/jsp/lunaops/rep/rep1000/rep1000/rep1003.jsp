@@ -29,13 +29,13 @@ div#contentsFrame > pre > code{    height: 100%;width: 100%;font-size: 10pt;}
 <script>
 	
 	$(document).ready(function() {
-		
+		//var content = "${content}";
 		fnGetFileContent();
-		
+		//
 		$('#sourceTitle').html( '${param.name}');
 		
 		
-		
+		/* 닫기버튼 클릭 시 팝업 창 사라지기*/
 		$('#btn_cancle_rep1003').click(function() {
 			gfnLayerPopupClose();
 		});
@@ -43,27 +43,27 @@ div#contentsFrame > pre > code{    height: 100%;width: 100%;font-size: 10pt;}
 
 
 	function fnGetFileContent(){
-	 	
-	 	
+	 	/* 그리드 데이터 가져오기 */
+	 	//파라미터 세팅
 	 	gfnShowLoadingBar(true);
-	  	
+	  	//AJAX 설정
 		var ajaxObj = new gfnAjaxRequestAction(
 				{"url":"<c:url value='/rep/rep1000/rep1000/selectRep1003FileContentAjax.do'/>","loadingShow": false}
 				, {"revision" : '${param.revision}', "commitId" : '${param.commitId}' ,  "path" : '${param.path}', "repId" : '${param.repId}'});
-		
+		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
 			
-			data = JSON.parse(data);
-
 			
+
+			//소스저장소 접속 실패
 			if(data.MSG_CD =="REP_OK"){
 				$('#fileContent').text(data.content);
 				
-				
+				//코드 뷰어 달기
 				$('#fileContent').each(function(i, block) {hljs.highlightBlock(block);});
-				
+				/*console.time() .promise().done( function(){ gfnShowLoadingBar(false);console.timeEnd() } ); */
 			}else{
-				
+				// 그외 접속 불가인경우 팝업창 닫기
 				$("#btn_cancle_rep1003").click();
 				jAlert("소스저장소 연결에 실패했습니다.", "알림창");
 			}
@@ -71,7 +71,7 @@ div#contentsFrame > pre > code{    height: 100%;width: 100%;font-size: 10pt;}
 			
 		});
 		
-		
+		//AJAX 전송
 		ajaxObj.send();
 	}
 
