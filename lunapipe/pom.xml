@@ -3,10 +3,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>kr.opensoftlab</groupId>
-	<artifactId>luna-pipe</artifactId>
+	<artifactId>lunaops-dpl-module</artifactId>
 	<packaging>war</packaging>
 	<version>1.0.0</version>
-	<name>luna-pipe</name>
+	<name>lunaops</name>
 	<url>http://www.egovframe.go.kr</url>
 
 	<properties>
@@ -18,7 +18,33 @@
 		<slf4j.version>1.7.32</slf4j.version>
 	</properties>
 	
-	<!-- Maven 빌드 설정 -->
+	<!-- <profiles>
+		<profile>
+			<id>real</id>
+			<activation> 
+				<activeByDefault>true</activeByDefault> 
+			</activation>
+			<properties>
+				<profile>real</profile>
+				<config.replace.pattern>*.real</config.replace.pattern>
+			</properties>
+		</profile>
+		<profile>
+			<id>extdev</id>
+			<properties>
+				<profile>extdev</profile>
+				<config.replace.pattern>*.extdev</config.replace.pattern>
+			</properties>
+		</profile>
+		<profile>
+			<id>indev</id>
+			<properties>
+				<profile>indev</profile>
+				<config.replace.pattern>*.indev</config.replace.pattern>
+			</properties>
+		</profile>
+	</profiles> -->
+	
 	<build>
 		<defaultGoal>install</defaultGoal>
 		<directory>${basedir}/target</directory>
@@ -37,12 +63,32 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
-
+		<!-- <plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>resource-replace</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<copy todir="${project.build.outputDirectory}" overwrite="true" preservelastmodified="true" verbose="true">
+									<fileset dir="${project.build.outputDirectory}" includes="**/${config.replace.pattern}" />
+									<mapper type="glob" from="${config.replace.pattern}" to="*" />
+								</copy>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins> -->
 	</build>
 
 	<repositories>
 		
-		<!-- MAVEN 중앙 저장소 -->
 		<repository>
 			<id>mvn2</id>
 			<url>https://repo1.maven.org/maven2/</url>
@@ -296,6 +342,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>ldapsdk</groupId>
+			<artifactId>ldapsdk</artifactId>
+			<version>4.1</version>
+		</dependency>
+
+		<dependency>
 			<groupId>com.artofsolving</groupId>
 			<artifactId>jodconverter</artifactId>
 			<version>2.2.1</version>
@@ -360,9 +412,63 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.180</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.social</groupId>
+			<artifactId>spring-social-security</artifactId>
+			<version>1.1.0.RELEASE</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-security-web</artifactId>
+					<groupId>org.springframework.security</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.websocket</groupId>
+			<artifactId>javax.websocket-api</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+	    
+		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.json</artifactId>
 			<version>1.0.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.ldap</groupId>
+			<artifactId>spring-ldap-core</artifactId>
+			<version>2.0.2.RELEASE</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-beans</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-tx</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jcl-over-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		<dependency>
@@ -445,6 +551,19 @@
 		    <version>1.9.3</version>
 		</dependency>
 		
+		<!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports -->
+		<dependency>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports</artifactId>
+		    <version>6.10.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports-fonts -->
+		<dependency>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports-fonts</artifactId>
+		    <version>6.10.0</version>
+		</dependency>
+						
 		<!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
 		<dependency>
 		    <groupId>org.codehaus.groovy</groupId>
@@ -467,13 +586,6 @@
 		    <version>4.19.0</version>
 		</dependency>
 							
-		<!-- 
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>springloaded</artifactId>
-			<version>1.2.5.RELEASE</version>
-		</dependency>-->
-		
 		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -516,12 +628,7 @@
 	        <artifactId>log4j-over-slf4j</artifactId>
 	        <version>1.7.32</version>
 	    </dependency>
-	    
-        <dependency>
-		  <groupId>com.offbytwo.jenkins</groupId>
-		  <artifactId>jenkins-client</artifactId>
-		  <version>0.3.8</version>
-		</dependency>
+        
 	</dependencies>
 
 </project>
