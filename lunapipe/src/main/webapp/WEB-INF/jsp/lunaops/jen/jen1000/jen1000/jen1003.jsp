@@ -70,7 +70,7 @@ ul#jenkinsDetailJobTree {
 				, param );
 		
 		ajaxObj.setFnSuccess(function(data){
-			data = JSON.parse(data);
+			
 			
 			
         	gfnSetData2ParentObj(data.jenMap, "jen1003PopupFrm");
@@ -180,7 +180,7 @@ ul#jenkinsDetailJobTree {
 
 <div class="popup">
 		
-	<div class="pop_title">[ ${param.jenNm} ] 상세 팝업</div>
+	<div class="pop_title">[ <c:out value="${param.jenNm}" /> ] 상세 팝업</div>
 	<div class="pop_sub">
 		<div class="pop_dpl_div_sub divDetail_sub_left">
 			<form id="jen1003PopupFrm" name="jen1003PopupFrm" method="post">
