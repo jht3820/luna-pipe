@@ -135,7 +135,7 @@ span.text-rep-del {background-color: #af3022;}
 		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
 			
-			data = JSON.parse(data);
+			
 
 			//SVN 접속 실패
 			if(data.MSG_CD =="REP_OK"){
