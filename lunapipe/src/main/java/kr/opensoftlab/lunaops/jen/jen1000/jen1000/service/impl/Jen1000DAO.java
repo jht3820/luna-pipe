@@ -122,11 +122,34 @@ public class Jen1000DAO extends ComOslitsAbstractDAO {
 	public String insertJen1102ParameterInfo(Map paramMap) throws Exception{
 		return (String) insert("jen1000DAO.insertJen1102ParameterInfo", paramMap);
 	}
-
 	
 	
 	@SuppressWarnings("rawtypes")
 	public void deleteJen1102ParameterInfo(Map paramMap) throws Exception{
 		update("jen1000DAO.deleteJen1102ParameterInfo", paramMap);
     }
+	
+	
+	@SuppressWarnings({"rawtypes", "unchecked" })
+	public List<Map> selectJen1101CIJobList(Map paramMap) throws Exception{
+		return (List) list("jen1000DAO.selectJen1101CIJobList", paramMap);
+	}
+	
+	
+	@SuppressWarnings({"rawtypes", "unchecked" })
+	public List<Map> selectJen1102CIJobParamList(Map paramMap) throws Exception{
+		return (List) list("jen1000DAO.selectJen1102CIJobParamList", paramMap);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	public void deleteJen1101CIJobInfo(Map paramMap) throws Exception {
+		delete("jen1000DAO.deleteJen1101CIJobInfo", paramMap);
+	}
+
+	
+	@SuppressWarnings("rawtypes")
+	public String insertJen1101CIJobInfo(Map paramMap) throws Exception{
+		return (String) insert("jen1000DAO.insertJen1101CIJobInfo", paramMap);
+	}
 }
