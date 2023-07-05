@@ -133,7 +133,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 				,ajaxParam);
 		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
-			data = JSON.parse(data);
+			
 			
 			//반환 받은 리비전 번호 세팅
 			axdom("#" + filePathSearchObj.getItemId("startRevisionVal")).val(data.startRevision);
