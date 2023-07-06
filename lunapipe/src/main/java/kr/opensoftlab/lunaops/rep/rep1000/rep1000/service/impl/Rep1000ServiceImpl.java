@@ -182,4 +182,20 @@ public class Rep1000ServiceImpl extends EgovAbstractServiceImpl implements Rep10
 		}
 		return delCount;
 	}
+	
+	
+	@SuppressWarnings({"rawtypes" })
+	public List<Map> selectRep1001CIRepList(Map paramMap) throws Exception{
+		return rep1000DAO.selectRep1001CIRepList(paramMap);
+	}
+	
+	
+	public void deleteRep1001CIRepInfo(Map<String, String> paramMap) throws Exception{
+		rep1000DAO.deleteRep1001CIRepInfo(paramMap);
+	}	
+	
+	
+	public String insertRep1001CIRepInfo(Map<String, String> paramMap) throws Exception{
+		return rep1000DAO.insertRep1001CIRepInfo(paramMap);
+	}
 }
