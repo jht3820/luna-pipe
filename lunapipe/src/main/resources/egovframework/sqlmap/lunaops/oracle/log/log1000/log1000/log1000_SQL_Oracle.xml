@@ -11,7 +11,7 @@
 	<sql id="selectLog1000List">
 				SELECT 
 						T1.LOG_USR_ID
-						, to_char(T1.LOG_TIME,'YYYY-MM-DD HH24:MI:SS') as LOG_TIME /* 로그 일시 */
+						, to_char(T1.LOG_TIME,'YYYY-MM-DD HH24:MI:SS') as LOG_TIME 
 						,T1.LOG_IP
 						,T1.LOG_URL
 						,NVL(T2.USR_NM,'-') USR_NM
@@ -40,7 +40,7 @@
     
     
     <select id="log1000DAO.selectLog1000List" parameterClass="log1000VO"  resultClass="egovMap">
-	    /*log1000DAO.selectLog1000List  시스템 사용 이력 로그 목록을 조회한다.*/
+	    
 		SELECT *
 		FROM
 			(
@@ -56,7 +56,7 @@
     
     
     <select id="log1000DAO.selectLog1000ListCnt" parameterClass="log1000VO"  resultClass="java.lang.Integer">
-	    /*log1000DAO.selectLog1000ListCnt  시스템 사용 이력 로그 목록 총건수를 조회한다.*/
+	    
 	    SELECT
 			COUNT(*)
 		FROM	(
@@ -66,7 +66,7 @@
 	
 	
 	<select id="log1000DAO.selectLog1000ExcelList" parameterClass="log1000VO"  resultClass="egovMap">
-	    /*log1000DAO.selectLog1000ExcelList  시스템 사용 이력 로그 목록엑셀 을 조회한다.*/
+	    
 
 		<include refid="selectLog1000List"/>
 
@@ -75,16 +75,22 @@
 	
 	<insert id="log1000DAO.insertLog1000SystemUseLog" parameterClass="log1000VO">
 		<![CDATA[ 
-			/* log1000DAO.insertLog1000SystemUseLog - 시스템 사용이력 쌓기  쌓기  */
+			
 			INSERT INTO LOG1000
             (	
-            	LOG_SEQ
-            	,LOG_TIME,	LOG_URL,	LOG_USR_ID,		LOG_IP,		LOG_TYPE,	LOG_AJAX_CD
+            		LOG_SEQ
+            	,	LOG_TIME,	LOG_URL,	LOG_USR_ID,		LOG_IP,		LOG_TYPE,	LOG_AJAX_CD
+            	,	LOG_PARAM_DATA1
+            	,	LOG_PARAM_DATA2
+            	,	LOG_PARAM_DATA3
             )
             VALUES
             (
-            	LIC_SEQ.NEXTVAL
-            	,SYSDATE,	#logUrl#,	#logUsrId#,		#logIp#,	#logType#,	#logAjaxCd#
+            		LIC_SEQ.NEXTVAL
+            	,	SYSDATE,	#logUrl#,	#logUsrId#,		#logIp#,	#logType#,	#logAjaxCd#
+            	,	#logParamData1#
+            	,	#logParamData2#
+            	,	#logParamData3#
             )
 		]]>
 	</insert>
