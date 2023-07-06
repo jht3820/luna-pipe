@@ -19,6 +19,7 @@
     
 	
 	<mvc:interceptors>
+		
 		<mvc:interceptor>
 			<mvc:mapping path="/**/*.do" />
 			<bean class="kr.opensoftlab.sdf.interceptor.RequestParamCheckInterceptor" />
@@ -33,6 +34,7 @@
 			<mvc:mapping path="/**/update*.do" />
 			<mvc:mapping path="/**/delete*.do" />
 			<mvc:mapping path="/**/save*.do" />
+			<mvc:mapping path="/api/*" />
 			<bean class="kr.opensoftlab.sdf.interceptor.UserUseControllerLog" />
 		</mvc:interceptor>
 	</mvc:interceptors>
