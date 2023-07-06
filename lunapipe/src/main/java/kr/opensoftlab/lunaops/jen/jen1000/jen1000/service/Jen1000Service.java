@@ -85,4 +85,19 @@ public interface Jen1000Service {
 	@SuppressWarnings("rawtypes")
 	void deleteJen1102ParameterInfo(Map paramMap) throws Exception;
 	
+	
+	@SuppressWarnings({"rawtypes" })
+	List<Map> selectJen1101CIJobList(Map paramMap) throws Exception;
+
+	
+	@SuppressWarnings("rawtypes")
+	List<Map> selectJen1102CIJobParamList(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	void deleteJen1101CIJobInfo(Map paramMap) throws Exception;
+
+	
+	@SuppressWarnings("rawtypes")
+	String insertJen1101CIJobInfo(Map paramMap) throws Exception;
 }
