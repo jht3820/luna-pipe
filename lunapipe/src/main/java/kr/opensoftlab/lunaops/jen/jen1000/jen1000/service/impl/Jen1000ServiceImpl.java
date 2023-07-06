@@ -201,4 +201,27 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	public void deleteJen1102ParameterInfo(Map paramMap) throws Exception{
 		jen1000DAO.deleteJen1102ParameterInfo(paramMap);
     }
+	
+	
+	@SuppressWarnings({"rawtypes"})
+	public List<Map> selectJen1101CIJobList(Map paramMap) throws Exception{
+		return jen1000DAO.selectJen1101CIJobList(paramMap);
+	}
+
+	
+	@SuppressWarnings("rawtypes")
+	public List<Map> selectJen1102CIJobParamList(Map paramMap) throws Exception{
+		return jen1000DAO.selectJen1102CIJobParamList(paramMap);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public void deleteJen1101CIJobInfo(Map paramMap) throws Exception {
+		jen1000DAO.deleteJen1101CIJobInfo(paramMap);
+	}
+
+	
+	@SuppressWarnings("rawtypes")
+	public String insertJen1101CIJobInfo(Map paramMap) throws Exception{
+		return jen1000DAO.insertJen1101CIJobInfo(paramMap);
+	}
 }
