@@ -49,4 +49,20 @@ public class Rep1000DAO extends ComOslitsAbstractDAO {
 	public void deleteRep1000Info(Map<String, String> paramMap) throws Exception{
 		delete("rep1000DAO.deleteRep1000Info", paramMap);
 	}	
+
+	
+	@SuppressWarnings({"rawtypes", "unchecked" })
+	public List<Map> selectRep1001CIRepList(Map paramMap) throws Exception{
+		return (List) list("rep1000DAO.selectRep1001CIRepList", paramMap);
+	}
+	
+	
+	public void deleteRep1001CIRepInfo(Map<String, String> paramMap) throws Exception{
+		delete("rep1000DAO.deleteRep1001CIRepInfo", paramMap);
+	}	
+	
+	
+	public String insertRep1001CIRepInfo(Map<String, String> paramMap) throws Exception{
+		return (String) insert("rep1000DAO.insertRep1001CIRepInfo", paramMap);
+	}
 }
