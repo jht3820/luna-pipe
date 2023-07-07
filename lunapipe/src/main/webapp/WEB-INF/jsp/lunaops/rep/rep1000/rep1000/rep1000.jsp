@@ -36,21 +36,23 @@ $(function(){
 				jAlert("선택한 저장소가 없습니다.", "알림창");
 				return false;
 			}
-
-			
-			$.each(selRepList, function(idx, map){
-				var repInfo = {
-					"repId": map.repId
-					, "repNm": map.repNm
-					, "repTxt": map.repTxt
-					, "svnRepUrl": map.svnRepUrl
-				};
+			jConfirm("선택된 저장소 "+selRepList.length+"개를 연결하시겠습니까?","알림창", function(result){
 				
-				rtnValue.push(repInfo);
+				$.each(selRepList, function(idx, map){
+					var repInfo = {
+						"repId": map.repId
+						, "repNm": map.repNm
+						, "repTxt": map.repTxt
+						, "svnRepUrl": map.svnRepUrl
+					};
+					
+					rtnValue.push(repInfo);
+				});
+				
+				opener.parent.tmp(rtnValue);
+				window.close();
 			});
 			
-			opener.parent.tmp(rtnValue);
-			window.close();
 		}else{
 			jAlert("비정상적인 페이지 호출입니다.</br>데이터를 전달하려는 대상이 없습니다.");
 		}
