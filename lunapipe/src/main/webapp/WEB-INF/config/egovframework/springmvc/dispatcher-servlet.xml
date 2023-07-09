@@ -60,6 +60,12 @@
 		<property name="webBindingInitializer">
 			<bean class="egovframework.com.cmm.web.EgovBindingInitializer" />
 		</property>
+		
+        <property name="messageConverters">
+            <list>
+                <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+            </list>
+        </property>
 	</bean>
 	
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
