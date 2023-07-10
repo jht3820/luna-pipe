@@ -1,5 +1,6 @@
 package kr.opensoftlab.lunaops.com.api.web;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -9,13 +10,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import egovframework.rte.fdl.property.EgovPropertyService;
 import kr.opensoftlab.lunaops.com.api.service.ApiService;
 import kr.opensoftlab.lunaops.com.vo.OslErrorCode;
-import kr.opensoftlab.sdf.util.RequestConvertor;
 
 
 
@@ -34,12 +36,9 @@ public class ApiController {
 	protected EgovPropertyService propertiesService;
 	
 	
-	@RequestMapping(value="/api/insertCIRepJenJob")
-	public ModelAndView insertCIRepJenJob(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+	@RequestMapping(value="/api/insertCIRepJenJob", method=RequestMethod.POST)
+	public ModelAndView insertCIRepJenJob(@RequestBody HashMap<String, Object> paramMap, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try{
-			
-			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
-			
 			
 			String rtnCode = apiService.insertCIRepJenJob(paramMap);
 
@@ -64,19 +63,45 @@ public class ApiController {
 	
 	
 	@SuppressWarnings("rawtypes")
-	@RequestMapping(value="/api/selectCIRepJenJob")
-	public ModelAndView selectCIRepJenJob(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+	@RequestMapping(value="/api/selectCIRepList", method=RequestMethod.POST)
+	public ModelAndView selectCIRepList(@RequestBody HashMap<String, Object> paramMap, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try{
-			
-			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
-			
 			
 			Map ciRepJenJobList = apiService.selectCIRepJenJob(paramMap);
 			
 			
-			if(ciRepJenJobList.containsKey("IS_ERROR") && (boolean) ciRepJenJobList.get("IS_ERROR")) {
+			if(ciRepJenJobList.containsKey("is_Error") && (boolean) ciRepJenJobList.get("is_Error")) {
 				model.addAttribute("result", false);
-				model.addAttribute("errorCode", ciRepJenJobList.get("ERROR_CODE"));
+				model.addAttribute("errorCode", ciRepJenJobList.get("errorCode"));
+				model.addAttribute("message", "오류가 발생했습니다.");
+			}else {
+				model.addAttribute("result", true);
+				model.addAttribute("data", ciRepJenJobList);
+				model.addAttribute("message", "정상적으로 조회되었습니다.");
+			}
+		} 
+		catch(Exception ex){
+			model.addAttribute("result", false);
+			model.addAttribute("errorCode", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("message", "오류가 발생했습니다.");
+			Log.error("selectCIRepList()", ex);
+			ex.printStackTrace();
+		}
+		return new ModelAndView("jsonView");
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value="/api/selectCIRepJenJob", method=RequestMethod.POST)
+	public ModelAndView selectCIRepJenJob(@RequestBody HashMap<String, Object> paramMap, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map ciRepJenJobList = apiService.selectCIRepJenJob(paramMap);
+			
+			
+			if(ciRepJenJobList.containsKey("is_Error") && (boolean) ciRepJenJobList.get("is_Error")) {
+				model.addAttribute("result", false);
+				model.addAttribute("errorCode", ciRepJenJobList.get("errorCode"));
 				model.addAttribute("message", "오류가 발생했습니다.");
 			}else {
 				model.addAttribute("result", true);
