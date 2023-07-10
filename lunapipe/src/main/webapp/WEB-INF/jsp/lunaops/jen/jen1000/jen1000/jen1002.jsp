@@ -19,8 +19,8 @@
 	overflow: scroll;
 }
 
-
-
+/*익스플로러 적용 위해 !important 추가*/
+/* 팝업에 따라 pop_menu_col1, pop_menu_col2 높이 변경 */
 .popup.jen1002-popup .pop_menu_row .pop_menu_col1 { width: 23%; height: 45px; padding-left: 6px; }
 .popup.jen1002-popup .pop_menu_row .pop_menu_col2 { width: 77%; height: 45px; }
 .popup.jen1002-popup .pop_menu_row .pop_menu_col1.menu_col1_subStyle { width: 46%; }
@@ -69,64 +69,72 @@
 </style>
 <script>
 
-
+//zTree, mask
 var zTreeJen1002;
 
-
+//jenkins 선택 변수
 var jenkinsChk = false;
 
-
+//수정인경우 jobId
 var updateJobId = '';
 var jobArray = [];
 
-
+//선택한 JOB ID
 var selJobId = "";
 var jobUrl = "";
 
-
+//현재 값
 var nowJobTok = null;
-
+// JENKINS 유효성
 var arrChkObj = {	
-					
+					//"jobParameter":{"type":"regExp","pattern":/^[0-9a-zA-Z]{0,50}$/ ,"msg":"JOB 매개변수는 영문, 숫자만 입력가능합니다.", "required":false},
 					"jobParameter":{"type":"regExp","pattern":/^(?=.*?[a-zA-Z])(?=.*?[0-9])|[a-zA-Z]{2,50}$/ ,"msg":"JOB 매개변수는 영문,숫자 조합 또는 영문으로 2~50자까지 입력 가능합니다.", "required":false},
 			        "jobDesc":{"type":"length","msg":"JOB 설명은 1000byte까지 입력이 가능합니다.","max":1000} 
 			};
 			
-			
-
+			// 
+//기존 jobType
 var beforeJobTypeCd;
 
-
+//원복Id
 var selJobRestoreId;
 
 globals_guideChkFn = fnJen1002GuideShow;			
 
 $(document).ready(function() {
-	
-	
+	/* 	
+	*	공통코드 가져올때 한번 트랜잭션으로 여러 코드 가져와서 셀렉트박스에 세팅하는 함수(사용 권장)
+	* 	1. 공통 대분류 코드를 순서대로 배열 담기(문자열)
+	*	2. 사용구분 저장(Y: 사용중인 코드만, N: 비사용중인 코드만, 그 외: 전체)
+	*	3. 공통코드 적용할 select 객체 직접 배열로 저장
+	* 	4. 공통코드 가져와 적용할 콤보타입 객체 배열 ( S:선택, A:전체(코드값 A 세팅한 조회조건용), N:전체, E:공백추가, 그 외:없음 )
+	*	5. 동기 비동기모드 선택 (true:비동기 통신, false:동기 통신)
+	*	마스터 코드 = REQ00001:요구사항 타입, REQ00002:중요도 , CMM00001:
+	*/
+	// 팝업 공통코드 select 세팅
 	var commonCodeArr = [
-		{mstCd: "DPL00002", useYn: "Y",targetObj: "#jobTypeCd", comboType:"OS"}, 
-		{mstCd: "CMM00001", useYn: "Y",targetObj: "#useCd", comboType:"OS"} 
+		{mstCd: "DPL00002", useYn: "Y",targetObj: "#jobTypeCd", comboType:"OS"}, // JOB 타입
+		{mstCd: "CMM00001", useYn: "Y",targetObj: "#useCd", comboType:"OS"} // 사용유무
 	];
-	
+	//공통코드 채우기
 	gfnGetMultiCommonCodeDataForm(commonCodeArr , true);
 	
+	//탭인덱스 부여
+	//gfnSetFormAllObjTabIndex(document.getElementById("jen1100PopupFrm"));
 	
-	
-	
-	
+	// 유효성 체크
 	gfnInputValChk(arrChkObj);
 	
-	
+	/* 타이틀 변경 및 버튼명 변경, 수정일경우 값 세팅 */
 	if('${param.popupGb}' == 'insert'){
-		
+		//선택 jenId
 		var selJenId = "${param.selJenId}";
 		
-		
+		//jenId 선택되서 온경우 selected
 		if(!gfnIsNull(selJenId)){
 			$("#jenId").val(selJenId);
 			
-			
+			//jenkins 연결시도 호출
 			fnJenIdSelecetd();
 			
 		}else{
@@ -150,12 +158,13 @@ $(document).ready(function() {
 		$("#jobDiv").removeClass('display_none');
 	}
 	
-	
+	/* 저장버튼 클릭 시 */
 	$('#btn_update_popup').click(function() {
 		
-		
+		/* 필수입력값 체크 공통 호출 */
 		var strFormId = "jen1100PopupFrm";
-		
+		/* var strCheckObjArr = ["jobId","jobTok"];
+		var sCheckObjNmArr = ["JOB ID","JOB TOKEN KEY"]; */
 		var strCheckObjArr = ["jobTok"];
 		var sCheckObjNmArr = ["JOB TOKEN KEY"];
 		
@@ -168,7 +177,7 @@ $(document).ready(function() {
 		}
 
 		
-		
+		// 등록/수정 전 유효성 체크
 		if(!gfnSaveInputValChk(arrChkObj)){
 			return false;	
 		}	
@@ -177,24 +186,26 @@ $(document).ready(function() {
 
 	});
 	
-	
+	/* JOB 파라미터 입력될 경우 이벤트 */
 	$('#jobParameter').keydown(function() {
 		$("#jobParameter").removeClass("inputError");
 	});
 	
-	
+	/* 취소버튼 클릭 시 팝업 창 사라지기*/
 	$('#btn_cancle_popup').click(function() {
 		gfnLayerPopupClose();
 	});
 	
 });
-
+/**
+ * 	젠킨스 job 기본정보 상세 조회
+ */
 function fnSelectJen1001JobInfo(jenId, jobId){
-	
+	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
 			{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1100JobDetailAjax.do'/>",loadingShow:false}
 			,{ "jenId" : jenId, "jobId" : jobId });
-	
+	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
 		
 		if(data.errorYn == "Y"){
@@ -203,57 +214,57 @@ function fnSelectJen1001JobInfo(jenId, jobId){
 			return false;
 		}
 
-		
+		//jenId선택
 		$("#jenId").val(jenId);
 		$("#jenId").attr("disabled","disabled");
 		jobUrl = data.jobInfo.jobUrl;
-		
+		//jenkins 연결시도 호출
 		fnJenIdSelecetd();
 		
-       	
+       	//디테일폼 세팅
        	gfnSetData2ParentObj(data.jobInfo, "jen1100PopupFrm");
 
-       	
+       	//jobType
        	beforeJobTypeCd = data.jobInfo.jobTypeCd;
        	
-       	
+       	//원복 job id
        	selJobRestoreId = data.jobInfo.jobRestoreId; 
        		
 		nowJobTok = data.jobInfo.jobTok;
        	
-		
+		//JOBID
 		updateJobId = data.jobInfo.jobId;
 	});
 	
-	
+	//AJAX 전송
 	ajaxObj.send();
 } 
 
-
+//JOB 등록
 function fnInsertJobInfoAjax(formId){
-	
+	//jenkins 연결 확인
 	if(jenkinsChk == false){
 		jAlert("JENKINS 연결을 확인해주세요.");
 		return false;
 	}
 	
-	
+	//선택 job
 	var selJobInfo = zTreeJen1002.getCheckedNodes()[0];
 	
 	jConfirm("JOB("+selJobInfo["name"]+")을 저장하시겠습니까?", "알림창", function( result ) {
 		if( result ){
 
 			var fd = new FormData();
-			
+			//FormData에 input값 넣기
 			gfnFormDataAutoValue(formId,fd);
 			
-			
+			//jenkins url 체크
 			var jenId = $("#jenId").val();
 			var jenUsrId = $("#jenId > option:selected").attr('jenusrid');
 			var jenUsrTok = $("#jenId > option:selected").attr('jenusrtok');
 			var jenUrl = $("#jenId > option:selected").attr('jenurl');
 				
-			
+			//기본 값과 type 넘기기
 			fd.append("type",'${param.popupGb}');
 			fd.append("nowJobTok",nowJobTok);
 			fd.append("jenUsrId",jenUsrId);
@@ -269,18 +280,18 @@ function fnInsertJobInfoAjax(formId){
 			}
 			fd.set("jobId",selJobId);
 			
-			
+			//AJAX 설정
 			var ajaxObj = new gfnAjaxRequestAction(
 					{"url":"<c:url value='/jen/jen1000/jen1000/saveJen1100JobInfoAjax.do'/>"
 						,"contentType":false
 						,"processData":false
 						,"cache":false}
 					,fd);
-			
+			//AJAX 전송 성공 함수
 			ajaxObj.setFnSuccess(function(data){
 				
 		    	
-		    	
+		    	//jenkins 접속 오류 인경우
 				if(!gfnIsNull(data.MSG_CD)){
 					if(data.MSG_CD=="JENKINS_FAIL"){
 						jAlert("설정 정보가 잘못 입력 되었거나, JENKINS 서버에 문제가 있습니다.<br/><br/>입력한 URL, USER, USER TOKEN KEY 를 확인 하시거나, JENKINS 서버를 확인 해주시기 바랍니다.", "알림창");
@@ -293,13 +304,13 @@ function fnInsertJobInfoAjax(formId){
 					return false;
 				}
 		    	
-		    	
+		    	//오류 발생
 		    	if(data.errorYn == 'Y'){
 		    		jAlert(data.message);
 		    		return;
 		    	}
 		    	
-		    	
+		    	//그리드 새로고침
 				fnInJobGridListSet(0,jobSearchObj.getParam()+"&jenId="+jenId);
 		    	
 		    	
@@ -307,12 +318,12 @@ function fnInsertJobInfoAjax(formId){
 				gfnLayerPopupClose();
 			});
 			
-			
+			//AJAX 전송 오류 함수
 			ajaxObj.setFnError(function(xhr, status, err){
 				toast.push(xhr.status+"("+err+")"+" 에러가 발생했습니다.");
 		    	gfnLayerPopupClose();
 			});
-			
+			//AJAX 전송
 			ajaxObj.send();
 		}
 	});	
@@ -321,27 +332,27 @@ function fnInsertJobInfoAjax(formId){
 function fnJen1002GuideShow(){
 	var mainObj = $(".popup");
 	
-	
+	//mainObj가 없는경우 false return
 	if(mainObj.length == 0){
 		return false;
 	}
-	
+	//guide box setting
 	var guideBoxInfo = globals_guideContents["jen1002"];
 	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
 }
 
-
+//jenkins 선택
 function fnJenIdSelecetd(){
-	
+	//선택 JOB ID 초기화
 	selJobId = "";
 	var jenIdValue = $("#jenId").val();
-	
+	//빈 값인경우 mask처리
 	if(gfnIsNull(jenIdValue)){
 		$("#hideMaskFrame").html("JENKINS를 선택해주세요");
 		jenkinsChk = false;
 		$("#hideMaskFrame").show();
 	}else{
-		
+		//jenkins url 체크
 		var jenUsrId = $("#jenId > option:selected").attr('jenusrid');
 		var jenUsrTok = $("#jenId > option:selected").attr('jenusrtok');
 		var jenUrl = $("#jenId > option:selected").attr('jenurl');
@@ -354,18 +365,18 @@ function fnJenIdSelecetd(){
 				 "jobUrl" : jobUrl
 			   };
 
-		
+		//AJAX 설정
 		var ajaxObj = new gfnAjaxRequestAction(
 				{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000URLConnect.do'/>","loadingShow":true}
 				, param );
-		
+		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
 			
 			if(data.MSG_CD=="JENKINS_OK"){
-				
+				//jobRestoreList 세팅
 				var jobRestoreList = data.jobRestoreList;
 				
-				
+				//jobId, jobRestoreId담을 변수
 				jobArray = [];
 				var jobRestoreArray = [];
 				
@@ -373,23 +384,23 @@ function fnJenIdSelecetd(){
 				if(!gfnIsNull(jobRestoreList)){
 					var appendStr = '';
 					
-					
+					//loop start
 					$.each(jobRestoreList,function(idx, map){
-						
+						//Id담기
 						jobArray.push(map.jobId);
 						jobRestoreArray.push(map.jobRestoreId);
 					});
-					
+					//loop end
 					
 					var restoreCnt = 0;
-					
+					//loop start
 					$.each(jobRestoreList,function(idx, map){
-						
+						//원복 job만 불러오기
 						if(map.jobTypeCd == "03"){
 							var selectStr = "";
-							
+							//현재 선택된 JOB ID를 제외
 							if(selJobRestoreId != map.jobId){
-								
+								//이미 원복 ID로 지정된 JOBID는 제외
 								if(jobRestoreArray.indexOf(map.jobId) != -1){
 									return true;
 								}
@@ -400,29 +411,29 @@ function fnJenIdSelecetd(){
 							restoreCnt++;
 						}
 					});
+					//loop end
 					
-					
-					
+					//원복 job 수 체크
 					var selectStr = "";
 					if(restoreCnt == 0) {
 						selectStr = "selected";
 					}
 					
-					
+					//option 교체
 					$("#jobRestoreId").html('<option value="" '+selectStr+'>선 택</option>'+appendStr);
 				}else{
-					
+					//없을경우
 					$("#jobRestoreId").html('<option value="" '+selectStr+'>선 택</option>'+appendStr);
 				}
 				
-				
+				//jobList 세팅
 				var jobList = data.list;
 				if(!gfnIsNull(jobList)){
 					var appendStr = '';
 
-			    	
+			    	// zTree 설정
 				    var setting = {
-			    		
+			    		// zTree binding data key 설정
 				        data: {
 				        	key: {
 								name: "viewName"
@@ -438,22 +449,22 @@ function fnJenIdSelecetd(){
 				    		chkStyle: "radio",
 				    		radioType: "all"
 				    	},
-				        
+				        // 동적 트리 설정
 				        async: {
-							enable: true, 
+							enable: true, // async 사용여부 (true:사용, false:미사용)
 							contentType: "application/x-www-form-urlencoded; charset=UTF-8",
 							url:"<c:url value='/jen/jen1000/jen1000/selectJen1000SubURLConnect.do'/>",
-							autoParam:["jobId","url"],	
-							otherParam:{"jenId":jenIdValue,"jenUsrTok" : jenUsrTok,"jenUsrId" : jenUsrId},  
+							autoParam:["jobId","url"],	// 노드의 값을 서버로 보낼경우 배열형식으로 autoParam에 세팅
+							otherParam:{"jenId":jenIdValue,"jenUsrTok" : jenUsrTok,"jenUsrId" : jenUsrId},  // 노드의 값을 제외한 다른 값을 서버로 보낼 경우 otherParam에 세팅
 							dataType: "json",
-							dataFilter: fnTreeFilter	
+							dataFilter: fnTreeFilter	// 데이터 조회 후 처리할 필터 function, async 사용시 dataFilter는 반드시 지정해야 한다.
 						},
 						callback: {
 							onClick: function(event, treeId, treeNode){
 								event.preventDefault();
-								
+								// 선택 이벤트
 								if(treeNode["_class"] != "com.cloudbees.hudson.plugins.folder.Folder" && treeNode.useCd == "01"){
-									
+									// job 선택한 경우
 									selJobId = treeNode.name;
 									
 									zTreeJen1002.checkNode(treeNode, true);
@@ -469,9 +480,9 @@ function fnJenIdSelecetd(){
 						}
 				    };
 				    
-					
+					//loop start
 					$.each(jobList,function(idx, map){
-						
+						//수정인경우 자신 JOBID만 출력
 						if('${param.popupGb}' == 'update'){
 							if(map.name == updateJobId){
 								appendStr += '<option value="'+map.name+'">'+map.name+'</option>';
@@ -480,11 +491,11 @@ function fnJenIdSelecetd(){
 							}	
 						}
 						else{
-							
+							//이미 생성된 job인경우 skip
 							if(jobArray.indexOf(map.name) != -1){
 								map.useCd = "02";
 								
-								
+								//radio 선택 불가
 								map.chkDisabled = true;
 								return true;
 							}else{
@@ -493,16 +504,16 @@ function fnJenIdSelecetd(){
 							appendStr += '<option value="'+map.name+'">'+map.name+'</option>';
 						}
 					});
-					
+					//loop end
 					
 					if('${param.popupGb}' == 'update'){
-						
+						//option 교체
 						$("#jobId").html(appendStr);
 					}else{
 						$("#hideMaskFrame").hide();
 						list = data.list;
 						$.each(list, function(idx, obj){
-							
+							//folder 아닌 경우 job앞에 현재 상태 icon
 							if(obj["_class"] != "com.cloudbees.hudson.plugins.folder.Folder" && obj.hasOwnProperty("color")){
 								obj.viewName = '<i class="fa fa-circle job-color-'+obj.color+'"></i>&nbsp;'+gfnEscapeHtml(obj.name);
 							}else{
@@ -512,23 +523,23 @@ function fnJenIdSelecetd(){
 							if(obj["_class"] == "com.cloudbees.hudson.plugins.folder.Folder"){
 								obj.isParent = true;
 								
-								
+								//radio 선택 불가
 								obj.chkDisabled = true;
 							}else{
 								obj.isParent = false;
 							}
 						});
-					    
+					    // zTree 초기화
 					    zTreeJen1002 = $.fn.zTree.init($("#jobTree"), setting, list);
 					    
-					    
-					    
+					    // expandAll(false)를 추가해야 트리의 폴더를 한번 클릭 시 하위 메뉴가 보여진다.
+					    // 추가하지 않을 경우 두번 클릭을 해야 폴더가 펼쳐진다.
 					    zTreeJen1002.expandAll(false);
 					}
 					
-					
+					//job갯수가 없는경우
 					if($("#jobId option").length == 0){
-						
+						//수정일때 자신의 JOB이 없는경우
 						if('${param.popupGb}' == 'update'){
 							$("#hideMaskFrame").html("JENKINS에 일치하는 JOB이 없습니다.");
 							return false;
@@ -553,53 +564,65 @@ function fnJenIdSelecetd(){
 				jAlert("[jenkins 접속 오류]</br>오류 내용 : "+data.MSG_CD);
 			}
 			
-			
+			//팝업 창 닫기
 			gfnLayerPopupClose();
 		});
 		
-		
+		//AJAX 전송
 		ajaxObj.send();
 		
 	}
 }
 
-
+/*
+ * zTree View Font 설정 함수
+ * @param treeId : 트리 노드의 ID
+ * @treeNode : 트리 노드
+ */
 function getFontCss(treeId, treeNode) {
 	
-	
+	// 검색된 결과가 없고, 사용유무가 미사용일 경우	
 	if( !treeNode.highlight && treeNode.useCd == "02"){
 		return {color:"#ddd", "font-weight":"normal"};
-	
+	// 검색된 결과가 없고, 사용유무가 사용일 경우	
 	}else if( !treeNode.highlight && treeNode.useCd == "01" ){
 		return {color:"#333", "font-weight":"normal"};
 	}
 }
 
-
+/*
+ * 동적트리 조회 실패시 처리
+ */
 function fnAsyncError(event, treeId, treeNode, XMLHttpRequest, textStatus, errorThrown){
-	
+	// 조회 실패 메시지 출력
    	toast.push("하위 조직 조회에 실패하였습니다.");
 }
 	
-
+/*
+ * [+] 아이콘 클릭 또는 더블클릭하여 트리 확장시 조회된 결과에 대한 처리를 한다.
+ *
+ * @param treeId : 트리 ID
+ * @param parentNode : 트리에서 [+]아이콘 클릭 또는 더블클릭한 노드
+ * @param result : 동적조회 결과값
+ */
 function fnTreeFilter(treeId, parentNode, result) {
  	
-	
+	// 조회된 하위 조직 목록
  	var childNodes = result.list;
 	
-	
-	
+	// filter에서 모든 자식 노드를 부모형(폴더 아이콛)으로 변경한다.
+	// 해당 옵션 추가해야  트리의  [+] 아이콘 클릭 시 한번에 트리가 펼쳐진다. 
 	$.each(childNodes, function(idx, node){
-		
+		//folder 아닌 경우 job앞에 현재 상태 icon
 		if(node["_class"] != "com.cloudbees.hudson.plugins.folder.Folder" && node.hasOwnProperty("color")){
 			node.viewName = '<i class="fa fa-circle job-color-'+node.color+'"></i>&nbsp;'+gfnEscapeHtml(node.name);
 		}else{
 			node.viewName = node.name;
 		}
 		
-		
+		// 트리 노드가 부모형이 아닐 경우
 		if( node["_class"] == "com.cloudbees.hudson.plugins.folder.Folder"){
-			
+			//radio 선택 불가
 			node.chkDisabled = true;
 			
 			node.isParent = true;
@@ -608,7 +631,7 @@ function fnTreeFilter(treeId, parentNode, result) {
 		if(jobArray.indexOf(node.name) != -1){
 			node.useCd = "02";
 			
-			
+			//radio 선택 불가
 			node.chkDisabled = true;
 		}else{
 			node.useCd = "01";
@@ -618,7 +641,7 @@ function fnTreeFilter(treeId, parentNode, result) {
 		
 	});
 	
-	
+	// 선택한 노드의 자식 노드를 리턴하면 자동으로 트리에 자식 노드가 추가된다. ( zTreeJen1002.addNodes()를 사용할 필요 없음)
 	return childNodes;
 }
   
@@ -669,7 +692,7 @@ function fnTreeFilter(treeId, parentNode, result) {
 				</div>
 			
 				<div class="pop_menu_row pop_menu_oneRow">
-					<div class="pop_menu_col1 pop_oneRow_col1"><label for="jobRestoreId">원복 JOB ID(NAME)</label></div>
+					<div class="pop_menu_col1 pop_oneRow_col1"><label for="jobRestoreId">원복 JOB ID</label></div>
 					<div class="pop_menu_col2 pop_oneRow_col2">
 						<span class="search_select">
 							<select class="select_useCd" name="jobRestoreId" id="jobRestoreId" value="" style="height:100%; width:100%;">

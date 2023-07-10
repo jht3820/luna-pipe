@@ -19,6 +19,7 @@ import kr.opensoftlab.lunaops.com.vo.OslErrorCode;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.lunaops.rep.rep1000.rep1000.service.Rep1000Service;
 import kr.opensoftlab.sdf.util.CommonScrty;
+import kr.opensoftlab.sdf.util.OslUtil;
 
 
 @Service("apiService")
@@ -33,7 +34,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 	protected Jen1000Service jen1000Service;
 	
 	
-	private Object checkParamDataKey(String paramData) throws Exception {
+	public Object checkParamDataKey(String paramData) throws Exception {
 		
 		String data = paramData;
 		
@@ -58,7 +59,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 		JSONObject jsonObj = new JSONObject(da);
 		
 		
-		String dataKey = jsonObj.getString("key");
+		String dataKey = OslUtil.jsonGetString(jsonObj, "key");
 
 		
 		if(!salt.equals(dataKey)) {
@@ -67,6 +68,8 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 		
 		return jsonObj;
 	}
+	
+	
 	
     
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -85,24 +88,20 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			JSONObject jsonObj = (JSONObject) checkParam;
 			
 			
-			if(!jsonObj.has("CI_ID")) {
+			
+			
+			String ciId = OslUtil.jsonGetString(jsonObj, "ci_id");
+			
+			
+			if(ciId == null) {
 				return OslErrorCode.PARAM_CI_ID_NULL;
 			}
 			
 			
-			String ciId = jsonObj.getString("CI_ID");
+			String repIds = OslUtil.jsonGetString(jsonObj, "rep_ids");
 			
 			
-			String repIds = null;
-			if(jsonObj.has("REP_IDS")) {
-				repIds = jsonObj.getString("REP_IDS");
-			}
-			
-			
-			String jenJobIds = null;
-			if(jsonObj.has("JEN_JOB_IDS")) {
-				jenJobIds = jsonObj.getString("JEN_JOB_IDS");
-			}
+			String jenJobIds = OslUtil.jsonGetString(jsonObj, "jen_job_ids");
 			
 			
 			boolean paramIsFlag = false;
@@ -117,7 +116,6 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 				
 				
 				rep1000Service.deleteRep1001CIRepInfo(newMap);
-				
 				try {
 					
 					JSONArray jsonArr = new JSONArray(repIds);
@@ -130,8 +128,12 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 						JSONObject inJsonObj = jsonArr.getJSONObject(i);
 						
 						
-						String repId = inJsonObj.getString("REP_ID");
+						String repId = OslUtil.jsonGetString(inJsonObj, "rep_id");
 						
+						
+						if(repId == null) {
+							return OslErrorCode.CI_REP_PARAM_PARSE_FAIL;
+						}
 						
 						newMap.put("ciId", ciId);
 						newMap.put("repId", repId);
@@ -166,10 +168,15 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 						JSONObject inJsonObj = jsonArr.getJSONObject(i);
 						
 						
-						String jenId = inJsonObj.getString("jenId");
+						String jenId = OslUtil.jsonGetString(inJsonObj, "jenId");
 						
 						
-						String jobId = inJsonObj.getString("jobId");
+						String jobId = OslUtil.jsonGetString(inJsonObj, "jobId");
+						
+						
+						if(jenId == null || jobId == null) {
+							return OslErrorCode.CI_JOB_PARAM_PARSE_FAIL;
+						}
 						
 						
 						newMap.put("ciId", ciId);
@@ -208,14 +215,17 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			JSONObject jsonObj = (JSONObject) checkParam;
 			
 			
-			if(!jsonObj.has("CI_ID")) {
-				rtnValue.put("IS_ERROR", true);
-				rtnValue.put("ERROR_CODE", OslErrorCode.PARAM_CI_ID_NULL);
+			
+			
+			String ciId = OslUtil.jsonGetString(jsonObj, "ci_id");
+			
+			
+			if(ciId == null) {
+				rtnValue.put("is_error", true);
+				rtnValue.put("errorCode", OslErrorCode.PARAM_CI_ID_NULL);
 				return rtnValue;
 			}
 			
-			
-			String ciId = jsonObj.getString("CI_ID");
 			paramMap.put("ciId", ciId);
 			
 			
@@ -265,8 +275,8 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			}
 			
 			
-			rtnValue.put("REP_IDS", ciRepList);
-			rtnValue.put("JEN_JOB_IDS", ciJenJobList);
+			rtnValue.put("rep_ids", ciRepList);
+			rtnValue.put("jen_job_ids", ciJenJobList);
 		}
 		return rtnValue;
 	}
