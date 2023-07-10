@@ -17,9 +17,11 @@ public class Jen1100VO extends PageVO {
 
 	private String    jenId;               
 	private String    jenNm;              
-    private String    jenUsrId;               
-    private String    jenUsrTok;              
+    private String    jenUsrId;            
+    private String    jenUsrTok;          
     private String    jenUrl; 				
+    private String    jenDesc; 				
+    private String    jenUseCd; 				
     private String    jobId;              
     private String    jobRestoreId;               
     private String    jobTok;              
@@ -99,6 +101,20 @@ public class Jen1100VO extends PageVO {
 	}
 	public void setJenUrl(String jenUrl) {
 		this.jenUrl = jenUrl;
+	}
+	
+	public String getJenDesc() {
+		return jenDesc;
+	}
+	public void setJenDesc(String jenDesc) {
+		this.jenDesc = jenDesc;
+	}
+	
+	public String getJenUseCd() {
+		return jenUseCd;
+	}
+	public void setJenUseCd(String jenUseCd) {
+		this.jenUseCd = jenUseCd;
 	}
 	public String getJobId() {
 		return jobId;
