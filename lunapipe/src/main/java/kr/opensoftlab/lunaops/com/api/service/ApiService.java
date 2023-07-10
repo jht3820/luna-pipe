@@ -5,7 +5,9 @@ import java.util.Map;
 
 
 public interface ApiService {
-
+	
+	Object checkParamDataKey(String paramData) throws Exception;
+	
 	
 	@SuppressWarnings("rawtypes")
 	String insertCIRepJenJob(Map paramMap) throws Exception;
