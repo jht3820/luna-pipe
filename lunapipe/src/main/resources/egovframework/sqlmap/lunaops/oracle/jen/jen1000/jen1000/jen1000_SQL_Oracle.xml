@@ -33,10 +33,11 @@
 		<result property="jenUsrId"           column="JEN_USR_ID" />  
 		<result property="jenUsrTok"          column="JEN_USR_TOK" /> 
 		<result property="jenUrl"             column="JEN_URL" />  
+		<result property="jenDesc"             column="JEN_DESC" />  
+		<result property="jenUseCd"             column="JEN_USE_CD" />  
 		<result property="jobId"              column="JOB_ID" />  
 		<result property="jobRestoreId"       column="JOB_RESTORE_ID" />  
 		<result property="jobTok"          	  column="JOB_TOK" /> 
-		<result property="jobParameter"	  	  column="JOB_PARAMETER" />  
 		<result property="jobDesc"            column="JOB_DESC" />  
 		<result property="jobUrl"            column="JOB_URL" />  
 		<result property="jobTypeCd"          column="JOB_TYPE_CD" /> 
@@ -109,12 +110,13 @@
 		            B.JEN_USR_ID ,              /* JENKINS 사용자 ID */ 
 		            B.JEN_USR_TOK ,             /* JENKINS 사용자 TOKEN KEY */ 
 		            B.JEN_URL , 
+		            B.JEN_DESC ,
+		            B.USE_CD AS JEN_USE_CD ,
 		            A.JOB_ID ,
 		            NVL(A.JOB_RESTORE_ID,'-') AS JOB_RESTORE_ID ,
 		            A.JOB_TOK ,
 		            A.JOB_TYPE_CD ,
 		            SF_CMM1001_COM_CD_INFO('DPL00002', A.JOB_TYPE_CD, '1') AS JOB_TYPE_NM ,
-		            A.JOB_PARAMETER,
 		            A.JOB_DESC ,
 		            A.JOB_URL ,
 		            A.USE_CD ,                  /* 사용여부(코드 : CMM00001) */
@@ -372,7 +374,6 @@
 					            JOB_RESTORE_ID 		, /* 원복 JOB ID */
 					            JOB_TOK 			, /* JOB TOKEN KEY */
 					            JOB_TYPE_CD			, /* JOB TYPE */
-					            JOB_PARAMETER 		, /* JOB 매개변수 */
 					            JOB_DESC 			, /* JOB DESC */
 					            JOB_URL 			, /* JOB URL */
 					            USE_CD              , /* 사용여부(코드 : CMM00001) */ 
@@ -390,7 +391,6 @@
 					             #jobRestoreId#,
 					             #jobTok#,
 					             #jobTypeCd#,
-					             #jobParameter#, 
 					             #jobDesc#, 
 					             #jobUrl#, 
 					             #useCd#, 
@@ -434,7 +434,6 @@
 		            JOB_RESTORE_ID = #jobRestoreId# 	, /* 원복 JOB ID */
 		            JOB_TOK = #jobTok# 					, /* JOB TOKEN KEY */
 		            JOB_TYPE_CD = #jobTypeCd#			, /* JOB TYPE */
-		            JOB_PARAMETER = #jobParameter# 		, /* JOB 매개변수 */
 		            JOB_DESC = #jobDesc# 				, /* JOB DESC */
 			        USE_CD = #useCd#             		, /* 사용여부(코드 : CMM00001) */ 
 			        MODIFY_DTM = SYSDATE         	 	, /* 최종수정일시 */ 
@@ -571,14 +570,7 @@
 			, A.JOB_ID
 			, A.JOB_PARAM_KEY
 			, A.JOB_PARAM_VAL
-			<!-- 
-			, A.REG_DTM
-            , A.REG_USR_ID
-            , A.REG_USR_IP
-            , A.MODIFY_DTM
-            , A.MODIFY_USR_ID
-            , A.MODIFY_USR_IP
-             -->
+
 		FROM JEN1102 A
 		WHERE 1=1
 		AND A.CI_ID = #ciId#
@@ -612,4 +604,5 @@
 			,SYSDATE,			#regUsrId#,			#regUsrIp#
 		)
 	</insert>
+
 </sqlMap>
