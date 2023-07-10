@@ -138,18 +138,34 @@ $(function(){
 							if(ADD_JOB_PARAM_LIST.hasOwnProperty(jenId) && ADD_JOB_PARAM_LIST[jenId].hasOwnProperty(jobId)){
 								jobParamData = ADD_JOB_PARAM_LIST[jenId][jobId];
 							}
+						/* 	
+							//반환 값 세팅
+							var jobInfo = {
+								"jen_id": jobInfo.jenId
+								, "jen_name": jobInfo.jenNm
+								, "jen_descr": jobInfo.jenDesc
+								, "jen_url": jobInfo.jenUrl
+								, "jen_used": jobInfo.jenUseCd
+								, "jen_job_id": jobInfo.jobId
+								, "jen_job_type": jobInfo.jobTypeCd
+								, "jen_job_type_name": jobInfo.jobTypeNm
+								, "jen_job_used": jobInfo.useCd
+								, "jen_job_param_list": jobParamData
+							}; 
+						*/
 							
 							//반환 값 세팅
 							var jobInfo = {
 								"jenId": jobInfo.jenId
 								, "jenNm": jobInfo.jenNm
+								, "jenDesc": jobInfo.jenDesc
 								, "jenUrl": jobInfo.jenUrl
+								, "jenUseCd": jobInfo.jenUseCd
 								, "jobId": jobInfo.jobId
-								, "jobUrl": jobInfo.jobUrl
-								, "jobDesc": jobInfo.jobDesc
-								, "jobParamList": jobParamData
 								, "jobTypeCd": jobInfo.jobTypeCd
 								, "jobTypeNm": jobInfo.jobTypeNm
+								, "useCd": jobInfo.useCd
+								, "jobParamData": jobParamData
 								/* , "jenUsrId": jobInfo.jenUsrId
 								, "jenUsrTok": jobInfo.jenUsrTok */
 							};
@@ -158,7 +174,10 @@ $(function(){
 						});
 					}
 					
-					opener.parent.tmp(rtnValue);
+					//function 체크
+					if(typeof opener.parent.setJenItems == "function"){
+						opener.parent.setJenItems(rtnValue);
+					}
 					window.close();
 				}
 			});
