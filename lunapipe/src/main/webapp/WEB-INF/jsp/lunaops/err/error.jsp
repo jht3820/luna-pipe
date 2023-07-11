@@ -32,11 +32,19 @@
   		background-repeat:no-repeat;
   		background-position:50% 50%;
   	}
-  	.contents_text{color:#48532e; position:relative; left:calc(54% - 257.5px); top:426px; font-size:27px;}
+  	.contents_text{color:#48532e; position:relative; left:calc(54% - 257.5px); top:426px; font-size:27px;line-height: 35px;}
   	.contents_btn{position:relative; left:calc(50% - 257.5px); top:176px; font-size:33px; width:135px; height:135px; cursor:pointer; border-radius:50%;}
+  	.addErrorMsg{
+	  	background-color: #9dd53b;
+	    padding: 5px;
+	    font-size: 25px;
+	    border-radius: 5px;
+	    display: inline-block;
+	    margin-top: 10px;
+  	}
 </style>
 <script>
-	//팝업 or 에러페이지 이전페이지 기능
+	
 	function fnErrorhistoryBack(){
 		if("${popupChk}" == 'Y'){
 			gfnLayerPopupClose();
@@ -55,6 +63,7 @@
  			<div class="contents_text">
  				시스템 사용에 이상이 있습니다.</br>
  				시스템 관리자에게 문의주세요.</br>
+ 				<span class="addErrorMsg"><c:out value="${errorMsg}" />${requestScope.exception.message }</span>
  			</div>
  			
  			<!-- 이전페이지로  -->
