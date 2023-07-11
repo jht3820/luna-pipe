@@ -1,11 +1,9 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<html lang="ko">
-<title>OpenSoftLab</title>
-<link rel='stylesheet' href='<c:url value='/css/ztree/zTreeStyle/zTreeStyle.css'/>' type='text/css'>
-<script type="text/javascript" src="/js/ztree/jquery.ztree.all.min.js"></script>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ include file="/WEB-INF/jsp/lunaops/top/header.jsp" %>
 <link rel='stylesheet' href='<c:url value='/css/lunaops/rep.css'/>' type='text/css'>
+<script type="text/javascript" src="/js/ztree/jquery.ztree.all.min.js"></script>
 <style>
 	.groupClear {height: 0;}
 	.layer_popup_box .popup{overflow:hidden !important;}
@@ -40,6 +38,11 @@
 	$(document).ready(function(){
 		
 		svnConnCheck();
+		
+		
+		$("#repDetailCloseBtn").click(function(){
+			window.close();
+		});
 	});
 
 	
@@ -598,19 +601,21 @@
 	}
 </script>
 
-<div class="popup" >
-	<form id="rep1002PopupFrm" name="rep1002PopupFrm" method="post">
-		<input type="hidden" name="repId" id="repId" value="${param.repId}" />
-	</form>
-	<div class="pop_title">소스저장소 상세정보 [ 선택 저장소: <span id="repNm"></span> ]</div>
-	<div class="rep1002Pop_sub">
+<div class="main_contents" style="height: auto;" >
+	<div class="tab_contents menu" style="width:1300px;">
+		<form id="rep1002PopupFrm" name="rep1002PopupFrm" method="post">
+			<input type="hidden" name="repId" id="repId" value="${param.repId}" />
+		</form>
+		<div class="sub_title">
+			소스저장소 상세정보 [ 선택 저장소: <span id="repNm"></span> ]
+		</div>
 		<div class="rep1002SearchFrame rep1002FrameBox" id="repSearchTarget"></div>
 		<div class="rep1002RevisionFrame rep1002FrameBox">
 			<div class="svn_mask_repList" id="repGridList">
 				데이터를 조회중입니다.</br></br>
 				<img class="fixed_loading" src="/images/loading.gif" style="width: 100px;height: 100px;">
 			</div>
-			<div data-ax5grid="rep-grid" data-ax5grid-config="{}" style="height: 240px;"></div>	
+			<div data-ax5grid="rep-grid" data-ax5grid-config="{}" style="height: 250px;"></div>	
 		</div>
 		<div class="rep1002CommitLogFrame rep1002FrameBox">
 			<textarea id="svnCommitLogDetail" class="svnCommitLogDetail" readonly="readonly"></textarea>
@@ -621,14 +626,12 @@
 				<ul id="rep1002FileTree" class="ztree"></ul>
 			</div>
 			<div class="rep1002FileListFrame rep1002FrameBox">
-				<div data-ax5grid="filePath-grid" data-ax5grid-config="{}" style="height: 290px;"></div>
+				<div data-ax5grid="filePath-grid" data-ax5grid-config="{}" style="height: 300px;"></div>
 			</div>
 		</div>
-		<div class="btn_div">
-			<div class="button_normal exit_btn" id="btn_cancle_popup">닫기</div>
+		<div class="btnFrame">
+			<div class="mainPopupBtn" id="repDetailCloseBtn">닫기</div>
 		</div>
 	</div>
-
 </div>
-
-</html>
+<jsp:include page="/WEB-INF/jsp/lunaops/bottom/footer.jsp" />
