@@ -3,6 +3,7 @@
 
 <sqlMap namespace="jen1000DAO">
 	<typeAlias alias="egovMap" 		type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias alias="oslSnakeMap" 		type="kr.opensoftlab.sdf.util.OslSnakeMap"/>
 	<typeAlias alias="Jen1000VO"	type="kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1000VO"/>
 	<typeAlias alias="Jen1100VO"	type="kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1100VO"/>
 
@@ -59,27 +60,37 @@
 	<sql id="selectJen1000JenkinsList">
 		<![CDATA[
 			SELECT
-		            JEN_ID ,                  /* JENKINS JOB 코드 */ 
-		            JEN_NM ,                  /* JENKINS JOB 명 */ 
-		            JEN_USR_ID ,              /* JENKINS 사용자 ID */ 
-		            JEN_USR_TOK ,             /* JENKINS 사용자 TOKEN KEY */ 
-		            JEN_URL ,
-		            REPLACE (JEN_DESC ,'<br>' , '&nbsp;&nbsp;&nbsp;&nbsp;' ) AS JEN_DESC ,                 /* JENKINS JOB Comment */ 
-		            USE_CD ,                  /* 사용여부(코드 : CMM00001) */
-		            SF_CMM1001_COM_CD_INFO('CMM00001', USE_CD, '1') as USE_NM ,
-		            DEL_CD , 
-		            REG_DTM ,                 /* 최초등록 일시 */ 
-		            REG_USR_ID ,              /* 최초등록자 ID */ 
-		            REG_USR_IP ,              /* 최초등록자 IP */ 
-		            MODIFY_DTM ,              /* 최종수정일시 */ 
-		            MODIFY_USR_ID ,           /* 최종수정자 ID */ 
-		            MODIFY_USR_IP             /* 최종수정자 IP */              
+		            A.JEN_ID ,                  /* JENKINS JOB 코드 */ 
+		            A.JEN_NM ,                  /* JENKINS JOB 명 */ 
+		            A.JEN_USR_ID ,              /* JENKINS 사용자 ID */ 
+		            A.JEN_USR_TOK ,             /* JENKINS 사용자 TOKEN KEY */ 
+		            A.JEN_URL ,
+		            REPLACE (A.JEN_DESC ,'<br>' , '&nbsp;&nbsp;&nbsp;&nbsp;' ) AS JEN_DESC ,                 /* JENKINS JOB Comment */ 
+		            A.USE_CD ,                  /* 사용여부(코드 : CMM00001) */
+		            SF_CMM1001_COM_CD_INFO('CMM00001', A.USE_CD, '1') as USE_NM ,
+		            A.DEL_CD , 
+		            A.REG_DTM ,                 /* 최초등록 일시 */ 
+		            A.REG_USR_ID ,              /* 최초등록자 ID */ 
+		            A.REG_USR_IP ,              /* 최초등록자 IP */ 
+		            A.MODIFY_DTM ,              /* 최종수정일시 */ 
+		            A.MODIFY_USR_ID ,           /* 최종수정자 ID */ 
+		            A.MODIFY_USR_IP             /* 최종수정자 IP */              
 				   
 			FROM
-		            JEN1000
+		            JEN1000 A
 			WHERE   1=1
 			AND		DEL_CD ='02'
 		]]>
+		<isNotEmpty property="ciId">
+			AND EXISTS
+			(
+				SELECT *
+				FROM JEN1101 B
+				WHERE 1=1
+				AND B.CI_ID = #ciId#
+				AND B.JEN_ID = A.JEN_ID
+			)		
+		</isNotEmpty>
 		<isNotEmpty property="searchSelect">
 			<isNotEmpty property="searchTxt">
 			<isEqual property="searchSelect" compareValue="jenNm"> 
@@ -132,6 +143,17 @@
 			WHERE   1=1
 			AND		B.DEL_CD = '02'
 		]]>
+		<isNotEmpty property="ciId">
+			AND EXISTS
+			(
+				SELECT *
+				FROM JEN1101 C
+				WHERE 1=1
+				AND C.CI_ID = #ciId#
+				AND C.JEN_ID = A.JEN_ID
+				AND C.JOB_ID = A.JOB_ID
+			)		
+		</isNotEmpty>
 		<isNotEmpty property="projectJenkinsCheck">
 			<isEqual property="projectJenkinsCheck" compareValue="Y">
 				AND	EXISTS (
@@ -238,11 +260,11 @@
 		FROM
 			(
     		SELECT ROWNUM RN,
-    			     A.*
+    			     SUBT1.*
     		FROM
     		(
 					<include refid="selectJen1000JenkinsList"/>
-	    			) A
+	    			) SUBT1
 	    	)
 	    	 WHERE RN BETWEEN (#firstIndex#+1) AND #lastIndex#
     </select>
@@ -254,7 +276,7 @@
 					COUNT(*)
 			FROM	(
 						<include refid="selectJen1000JenkinsList"/>
-					) A
+					) SUBT1
     </select>
     
     
@@ -264,11 +286,11 @@
 		FROM
 			(
     		SELECT ROWNUM RN,
-    			     A.*
+    			     SUBT1.*
     		FROM
     		(
 					<include refid="selectJen1100JobList"/>
-	    			) A
+	    			) SUBT1
 	    	)
 	    	 WHERE RN BETWEEN (#firstIndex#+1) AND #lastIndex#
     </select>
@@ -280,7 +302,7 @@
 					COUNT(*)
 			FROM	(
 						<include refid="selectJen1100JobList"/>
-					) A
+					) SUBT1
     </select>
     
 	 
@@ -496,16 +518,6 @@
 	</update>
 	
 	
-	<select id="jen1000DAO.selectJen1102JenParameterList" parameterClass="java.util.Map" resultClass="egovMap">
-			/* jen1000DAO.selectJen1102JenParameterList - 	빌드 파라미터 조회  */
-			SELECT 
-				T1.*
-			FROM ( 
-			<include refid="jen1000DAO.selectJen1105JobParamList"/>
-			) T1
-	</select>
-	
-	
 	<insert id="jen1000DAO.insertJen1102ParameterInfo" parameterClass="java.util.Map">
 		<![CDATA[ 
 			/* jen1000DAO.insertJen1102ParameterInfo - 빌드 파라미터 등록  */
@@ -535,7 +547,7 @@
 	</update>
 	
 	
-	<select id="jen1000DAO.selectJen1101CIJobList" parameterClass="java.util.Map" resultClass="egovMap">
+	<select id="jen1000DAO.selectJen1101CIJobList" parameterClass="java.util.Map" resultClass="oslSnakeMap">
 		/* jen1000DAO.selectJen1101CIJobList - 	CI, JENKINS JOB 연결 정보 조회  */
 		SELECT 
 			A.CI_ID
@@ -562,7 +574,7 @@
 	</select>
 	
 	
-	<select id="jen1000DAO.selectJen1102CIJobParamList" parameterClass="java.util.Map" resultClass="egovMap">
+	<select id="jen1000DAO.selectJen1102CIJobParamList" parameterClass="java.util.Map" resultClass="oslSnakeMap">
 		/* jen1000DAO.selectJen1102CIJobParamList - 	CI, JENKINS JOB 기본 빌드 파라미터 조회  */
 		SELECT 
 			A.CI_ID
@@ -570,10 +582,24 @@
 			, A.JOB_ID
 			, A.JOB_PARAM_KEY
 			, A.JOB_PARAM_VAL
-
 		FROM JEN1102 A
 		WHERE 1=1
 		AND A.CI_ID = #ciId#
+		<isEmpty property="jenId">
+			<isEmpty property="jobId">
+				<isNotEmpty property="ciId">
+					AND EXISTS
+					(
+						SELECT *
+						FROM JEN1101 B
+						WHERE 1=1
+						AND B.CI_ID = A.CI_ID
+						AND B.JEN_ID = A.JEN_ID
+						AND B.JOB_ID = A.JOB_ID
+					)		
+				</isNotEmpty>
+			</isEmpty>
+		</isEmpty>
 		<isNotEmpty property="jenId">
 			AND A.JEN_ID = #jenId#		
 			<isNotEmpty property="jobId">
