@@ -168,10 +168,10 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 						JSONObject inJsonObj = jsonArr.getJSONObject(i);
 						
 						
-						String jenId = OslUtil.jsonGetString(inJsonObj, "jenId");
+						String jenId = OslUtil.jsonGetString(inJsonObj, "jen_id");
 						
 						
-						String jobId = OslUtil.jsonGetString(inJsonObj, "jobId");
+						String jobId = OslUtil.jsonGetString(inJsonObj, "job_id");
 						
 						
 						if(jenId == null || jobId == null) {
@@ -243,8 +243,8 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			
 			for(Map ciJenJobParamInfo : ciJenJobParamList) {
 				
-				String jenId = (String) ciJenJobParamInfo.get("jenId");
-				String jobId = (String) ciJenJobParamInfo.get("jobId");
+				String jenId = (String) ciJenJobParamInfo.get("jen_id");
+				String jobId = (String) ciJenJobParamInfo.get("job_id");
 				
 				
 				String paramKey = jenId+"_"+jobId;
@@ -262,15 +262,15 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			
 			for(Map ciJenJobInfo : ciJenJobList) {
 				
-				String jenId = (String) ciJenJobInfo.get("jenId");
-				String jobId = (String) ciJenJobInfo.get("jobId");
+				String jenId = (String) ciJenJobInfo.get("jen_id");
+				String jobId = (String) ciJenJobInfo.get("job_id");
 				
 				
 				String paramKey = jenId+"_"+jobId;
 				
 				
 				if(paramKeyMap.containsKey(paramKey)) {
-					ciJenJobInfo.put("jobParamList", paramKeyMap.get(paramKey));
+					ciJenJobInfo.put("job_param_list", paramKeyMap.get(paramKey));
 				}
 			}
 			
