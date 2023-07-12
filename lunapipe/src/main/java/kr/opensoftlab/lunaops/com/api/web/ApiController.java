@@ -48,12 +48,12 @@ public class ApiController {
 				model.addAttribute("message", "정상적으로 등록되었습니다.");
 			}else {
 				model.addAttribute("result", false);
-				model.addAttribute("errorCode", rtnCode);
+				model.addAttribute("error_code", rtnCode);
 				model.addAttribute("message", "오류가 발생했습니다.");
 			}
 		}catch(Exception ex){
 			model.addAttribute("result", false);
-			model.addAttribute("errorCode", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
 			model.addAttribute("message", "오류가 발생했습니다.");
 			Log.error("insertCIRepJenJob()", ex);
 			
@@ -72,7 +72,7 @@ public class ApiController {
 			
 			if(ciRepJenJobList.containsKey("is_Error") && (boolean) ciRepJenJobList.get("is_Error")) {
 				model.addAttribute("result", false);
-				model.addAttribute("errorCode", ciRepJenJobList.get("errorCode"));
+				model.addAttribute("error_code", ciRepJenJobList.get("error_code"));
 				model.addAttribute("message", "오류가 발생했습니다.");
 			}else {
 				model.addAttribute("result", true);
@@ -82,7 +82,7 @@ public class ApiController {
 		} 
 		catch(Exception ex){
 			model.addAttribute("result", false);
-			model.addAttribute("errorCode", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
 			model.addAttribute("message", "오류가 발생했습니다.");
 			Log.error("selectCIRepList()", ex);
 			ex.printStackTrace();
@@ -101,7 +101,7 @@ public class ApiController {
 			
 			if(ciRepJenJobList.containsKey("is_Error") && (boolean) ciRepJenJobList.get("is_Error")) {
 				model.addAttribute("result", false);
-				model.addAttribute("errorCode", ciRepJenJobList.get("errorCode"));
+				model.addAttribute("error_code", ciRepJenJobList.get("error_code"));
 				model.addAttribute("message", "오류가 발생했습니다.");
 			}else {
 				model.addAttribute("result", true);
@@ -110,7 +110,7 @@ public class ApiController {
 		} 
 		catch(Exception ex){
 			model.addAttribute("result", false);
-			model.addAttribute("errorCode", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
 			model.addAttribute("message", "오류가 발생했습니다.");
 			Log.error("insertCIRepJenJob()", ex);
 		}
