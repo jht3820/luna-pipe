@@ -154,7 +154,7 @@ public class Rep1000Controller {
 			rep1000VO.setPageUnit(_pageSize);
 			
 			
-			PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(rep1000VO);  
+			PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(rep1000VO); 
 
 			List<Rep1000VO> rep1000List = null;
 
@@ -270,10 +270,10 @@ public class Rep1000Controller {
 				JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
 				
 				
-				
-				
-				
+				repId = OslUtil.jsonGetString(jsonObj, "repId");
 			}
+			model.put("repId", "repId");
+			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
 			e.printStackTrace();
