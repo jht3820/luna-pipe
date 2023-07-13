@@ -112,12 +112,6 @@ public class Jen1000DAO extends ComOslitsAbstractDAO {
 	}
 	
 	
-	@SuppressWarnings({"rawtypes" })
-	public List selectJen1102JenParameterList(Map paramMap)  throws Exception{
-		return (List) list("jen1000DAO.selectJen1102JenParameterList", paramMap);
-	}
-	
-	
 	@SuppressWarnings("rawtypes")
 	public String insertJen1102ParameterInfo(Map paramMap) throws Exception{
 		return (String) insert("jen1000DAO.insertJen1102ParameterInfo", paramMap);
