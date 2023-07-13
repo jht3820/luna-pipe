@@ -16,7 +16,7 @@ public class Jen1000VO extends PageVO {
 	private String rn;
 	private String loginUsrId;
 	
-
+	private String	  ciId;	
 	private String    jenId;               
     private String    jenNm;              
     private String    jenUsrId;               
@@ -28,6 +28,14 @@ public class Jen1000VO extends PageVO {
     private String    useNm; 
     private String    delCd; 
 	
+    
+    
+	public String getCiId() {
+		return ciId;
+	}
+	public void setCiId(String ciId) {
+		this.ciId = ciId;
+	}
 	public String getUseNm() {
 		return useNm;
 	}

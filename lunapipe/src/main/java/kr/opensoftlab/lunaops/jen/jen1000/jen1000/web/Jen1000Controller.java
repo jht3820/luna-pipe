@@ -8,9 +8,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpStatus;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
+import org.codehaus.jettison.json.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -29,6 +30,7 @@ import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1100VO;
 import kr.opensoftlab.sdf.jenkins.JenkinsClient;
 import kr.opensoftlab.sdf.util.CommonScrty;
 import kr.opensoftlab.sdf.util.OslAgileConstant;
+import kr.opensoftlab.sdf.util.OslUtil;
 import kr.opensoftlab.sdf.util.PagingUtil;
 import kr.opensoftlab.sdf.util.RequestConvertor;
 
@@ -70,6 +72,35 @@ public class Jen1000Controller {
 
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000View.do")
 	public String selectJen1000View( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		return "/jen/jen1000/jen1000/jen1000";
+	}
+	
+
+	
+
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000CIJobView.do")
+	public String selectJen1000CIJobView( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try {
+			JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
+			
+			
+			String ciId = OslUtil.jsonGetString(jsonObj, "ci_id");
+			
+			
+			if(ciId == null) {
+				response.setStatus(HttpStatus.SC_BAD_REQUEST);
+				model.put("errorMsg", "구성항목 ID가 없습니다.");
+				return "/err/error";
+			}
+			
+			model.put("ciId", ciId);
+			
+		}catch(Exception e) {
+			response.setStatus(HttpStatus.SC_BAD_REQUEST);
+			e.printStackTrace();
+			throw new Exception(e.getMessage());
+		}
+		
 		return "/jen/jen1000/jen1000/jen1000";
 	}
 
@@ -274,6 +305,9 @@ public class Jen1000Controller {
 			jen1000VO.setPageIndex(_pageNo);
 			jen1000VO.setPageSize(_pageSize);
 			jen1000VO.setPageUnit(_pageSize);
+			
+			String ciId = (String) paramMap.get("ciId");
+			jen1000VO.setCiId(ciId);
 
 
 			PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(jen1000VO);  
@@ -315,6 +349,7 @@ public class Jen1000Controller {
 	}
 	
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000JobListAjax.do")
 	public ModelAndView selectJen1000JobListAjax(@ModelAttribute("jen1000VO") Jen1100VO jen1100VO, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 
@@ -341,15 +376,21 @@ public class Jen1000Controller {
 			jen1100VO.setPageSize(_pageSize);
 			jen1100VO.setPageUnit(_pageSize);
 
-
+			String ciId = (String) paramMap.get("ciId");
+			jen1100VO.setCiId(ciId);
+			
+			
+			if(ciId != null) {
+				Map newMap = new HashMap<>();
+				newMap.put("ciId", ciId);
+				
+				List<Map> jobParamList = jen1000Service.selectJen1102CIJobParamList(newMap);
+				model.addAttribute("jobParamList", jobParamList);
+			}
+			
 			PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(jen1100VO);  
 
 			List<Jen1100VO> jen1000List = null;
-
-			
-			
-
-			
 
 			
 			int totCnt = 0;
