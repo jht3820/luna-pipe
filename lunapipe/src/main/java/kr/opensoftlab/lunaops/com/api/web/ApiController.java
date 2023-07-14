@@ -58,7 +58,7 @@ public class ApiController {
 			Log.error("insertCIRepJenJob()", ex);
 			
 		}
-		 return new ModelAndView("jsonView");
+		return new ModelAndView("jsonView");
 	}
 	
 	
@@ -113,6 +113,39 @@ public class ApiController {
 			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
 			model.addAttribute("message", "오류가 발생했습니다.");
 			Log.error("insertCIRepJenJob()", ex);
+		}
+		return new ModelAndView("jsonView");
+	}
+	
+	
+	@RequestMapping(value="/api/insertCITicketJobList", method=RequestMethod.POST)
+	public ModelAndView insertCITicketJobList(@RequestBody HashMap<String, Object> paramMap, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map<String, String> rtnMap = apiService.insertCITicketJobList(paramMap);
+
+			String errorYn = (String) rtnMap.get("errorYn");
+			String errorCode = (String) rtnMap.get("errorCode");
+			
+			
+			if("N".equals(errorYn)) {
+				String newDplId = (String) rtnMap.get("newDplId");
+				
+				
+				model.addAttribute("result", true);
+				model.addAttribute("dpl_id", newDplId);
+				model.addAttribute("message", "정상적으로 등록되었습니다.");
+				
+			}else {
+				model.addAttribute("result", false);
+				model.addAttribute("error_code", errorCode);
+				model.addAttribute("message", "오류가 발생했습니다.");
+			}
+		}catch(Exception ex){
+			model.addAttribute("result", false);
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("message", "오류가 발생했습니다.");
+			Log.error("insertCITicketJobList()", ex);
 		}
 		return new ModelAndView("jsonView");
 	}
