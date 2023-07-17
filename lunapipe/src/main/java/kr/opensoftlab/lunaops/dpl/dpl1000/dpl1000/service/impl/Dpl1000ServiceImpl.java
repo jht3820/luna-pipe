@@ -79,80 +79,16 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 	}
 	
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void insertDpl1000DeployVerInfo(Map paramMap) throws Exception{
-		
-		Map rtnMap = new HashMap();
-		for( Object key : paramMap.keySet() ) {
-			String jsonVal = "";
-			try{
-				jsonVal = (String) paramMap.get(key);
-			}catch(ClassCastException cce){	
-				continue;
-			}
-			
-			JSONObject jsonObj = null;
-			
-			
-			try{
-				jsonObj = new JSONObject(jsonVal);
-				rtnMap.put(key, jsonObj.getString("optVal"));
-			}catch(JSONException jsonE){
-				rtnMap.put(key, jsonVal);
-			}catch(NullPointerException npe){
-				rtnMap.put(key, jsonVal);
-			}
-		}
-		paramMap = rtnMap;
-		
-		
-		paramMap.put("dplStsCd", "01");
-		
-		
-		String prjId = (String)paramMap.get("prjId");
-		
-		
-		String dplId = dpl1000DAO.insertDpl1000DeployVerInfo(paramMap);
-		paramMap.put("dplId", dplId);
-		
-    	
-    	JSONArray selJobList = new JSONArray(paramMap.get("selJobList").toString());
-    	
-    	
-    	for(int i=0; i<selJobList.length(); i++){
-    		JSONObject jsonObj = selJobList.getJSONObject(i);
-    		
-    		
-    		HashMap<String, Object> jobInfo = new ObjectMapper().readValue(jsonObj.toString(), HashMap.class) ;
-    		jobInfo.put("prjId", prjId);
-    		jobInfo.put("dplId", dplId);
-    		
-    		dpl1000DAO.insertDpl1100DeployJobInfo(jobInfo);
-    		List jobParamList = (ArrayList<HashMap>) jobInfo.get("paramList");
-    		
-    		if(null != jobParamList && jobParamList.size() != 0) {
-	    		for(int jobIdx=0; jobIdx<jobParamList.size(); jobIdx++){
-	    			HashMap paramInfo = (HashMap) jobParamList.get(jobIdx);
-	    			paramInfo.put("prjId", prjId);
-	    			paramInfo.put("dplId", dplId);
-	    			paramInfo.put("jenId", jobInfo.get("jenId"));
-	    			paramInfo.put("jobId", jobInfo.get("jobId"));
-	    	    	paramMap.put("regUsrId", paramMap.get("regUsrId"));
-	    	    	paramMap.put("regUsrIp", paramMap.get("regUsrIp"));
-	    			
-	    			dpl1000DAO.insertDpl1101ParameterInfo(paramInfo);
-	    		}
-    		}
-    	}
-    	
-    	
-    	paramMap.put("signRegUsrId", paramMap.get("regUsrId"));
-    	paramMap.put("signStsCd", "04");
-    	paramMap.put("signTxt", paramMap.get("dplSignTxt"));
-    	
-    	
-    	
+	@SuppressWarnings({ "rawtypes" })
+	public String insertDpl1000DeployVerInfo(Map paramMap) throws Exception{
+		return dpl1000DAO.insertDpl1000DeployVerInfo(paramMap);
     }
+	
+	
+	@SuppressWarnings({ "rawtypes" })
+	public void  insertDpl1100DeployJobInfo(Map paramMap) throws Exception{
+		dpl1000DAO.insertDpl1100DeployJobInfo(paramMap);
+	}
 
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
