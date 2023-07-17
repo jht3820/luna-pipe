@@ -5,7 +5,9 @@ import kr.opensoftlab.lunaops.com.vo.PageVO;
 public class Dpl1000VO extends PageVO{
 	private String rn;
 	
-	/** 상세 기본 Defind */
+	
+	private String ciId;
+	private String ticketId;
 	private String dplId;		
 	private String dplNm; 		
 	private String dplVer;  		
@@ -23,11 +25,26 @@ public class Dpl1000VO extends PageVO{
 	private String dplStDtm;
 	private String dplRestoreCd;  	
 	private String dplRestoreNm;
-	private String dplRevisionNum;
   	
 	private String bldSts;
 
 	
+	public String getCiId() {
+		return ciId;
+	}
+
+	public void setCiId(String ciId) {
+		this.ciId = ciId;
+	}
+
+	public String getTicketId() {
+		return ticketId;
+	}
+
+	public void setTicketId(String ticketId) {
+		this.ticketId = ticketId;
+	}
+
 	public String getRn() {
 		return rn;
 	}
@@ -178,14 +195,6 @@ public class Dpl1000VO extends PageVO{
 
 	public void setBldSts(String bldSts) {
 		this.bldSts = bldSts;
-	}
-
-	public String getDplRevisionNum() {
-		return dplRevisionNum;
-	}
-
-	public void setDplRevisionNum(String dplRevisionNum) {
-		this.dplRevisionNum = dplRevisionNum;
 	}
 
 }
