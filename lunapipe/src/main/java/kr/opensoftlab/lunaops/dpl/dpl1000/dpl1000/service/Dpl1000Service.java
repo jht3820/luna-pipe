@@ -41,8 +41,11 @@ public interface Dpl1000Service {
 	
 	
 	@SuppressWarnings("rawtypes")
-	void insertDpl1000DeployVerInfo(Map paramMap) throws Exception;
+	String insertDpl1000DeployVerInfo(Map paramMap) throws Exception;
 	
+	
+	@SuppressWarnings({ "rawtypes" })
+	void  insertDpl1100DeployJobInfo(Map paramMap) throws Exception;
 	
 	
 	@SuppressWarnings("rawtypes")
