@@ -63,7 +63,7 @@ public class Dpl1000DAO extends ComOslitsAbstractDAO {
 	@SuppressWarnings("rawtypes")
 	public String insertDpl1000DeployVerInfo(Map paramMap) throws Exception{
 		return (String) insert("dpl1000DAO.insertDpl1000DeployVerInfo", paramMap);
-    }
+	}
 	
 	
 	@SuppressWarnings("rawtypes")
