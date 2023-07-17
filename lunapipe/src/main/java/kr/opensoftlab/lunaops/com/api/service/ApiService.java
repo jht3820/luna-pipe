@@ -15,4 +15,8 @@ public interface ApiService {
 	
 	@SuppressWarnings("rawtypes")
 	Map selectCIRepJenJob(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	Map<String, String> insertCITicketJobList(Map paramMap) throws Exception;
 }
