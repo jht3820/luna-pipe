@@ -9,7 +9,9 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -30,6 +32,7 @@ import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.sdf.jenkins.AutoBuildInit;
 import kr.opensoftlab.sdf.jenkins.JenkinsClient;
 import kr.opensoftlab.sdf.util.OslAgileConstant;
+import kr.opensoftlab.sdf.util.OslUtil;
 import kr.opensoftlab.sdf.util.PagingUtil;
 import kr.opensoftlab.sdf.util.RequestConvertor;
 
@@ -80,6 +83,50 @@ public class Dpl1000Controller {
     
 	@RequestMapping(value="/dpl/dpl1000/dpl1000/selectDpl1000View.do")
     public String selectDpl1000View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		
+		try {
+			JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
+			
+			
+			String ciId = OslUtil.jsonGetString(jsonObj, "ci_id");
+			
+			
+			if(ciId == null) {
+				response.setStatus(HttpStatus.SC_BAD_REQUEST);
+				model.put("errorMsg", "구성항목 ID가 없습니다.");
+				return "/err/error";
+			}
+			
+			
+			String ticketId = OslUtil.jsonGetString(jsonObj, "ticket_id");
+			
+			
+			if(ticketId == null) {
+				response.setStatus(HttpStatus.SC_BAD_REQUEST);
+				model.put("errorMsg", "티켓 ID가 없습니다.");
+				return "/err/error";
+			}
+			
+			
+			String dplId = OslUtil.jsonGetString(jsonObj, "dpl_id");
+			
+			
+			if(dplId == null) {
+				response.setStatus(HttpStatus.SC_BAD_REQUEST);
+				model.put("errorMsg", "배포계획 ID가 없습니다.");
+				return "/err/error";
+			}
+			
+			model.put("ciId", ciId);
+			model.put("ticketId", ticketId);
+			model.put("dplId", dplId);
+			
+		}catch(Exception e) {
+			response.setStatus(HttpStatus.SC_BAD_REQUEST);
+			e.printStackTrace();
+			throw new Exception(e.getMessage());
+		}
+		
     	return "/dpl/dpl1000/dpl1000/dpl1000";
     }
 	
