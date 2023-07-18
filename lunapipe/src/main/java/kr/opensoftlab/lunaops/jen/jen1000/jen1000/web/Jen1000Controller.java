@@ -682,7 +682,6 @@ public class Jen1000Controller {
 					model.addAttribute("MSG_CD", "JOB TOKEN KEY값을 확인해주세요.");
 					return new ModelAndView("jsonView");
 				}
-				
 			}
 			catch(Exception ex){
 				Log.error("selectJen1000URLConnect()", ex);
