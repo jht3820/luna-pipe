@@ -60,6 +60,12 @@ $(function(){
 		var overlapCnt = 0;
 		
 		
+		var addDataRow = [];
+		
+		
+		var addDataIdx = 0;
+		
+		
 		$.each(chkList, function(idx, map){
 			
 			if(overlapJob.hasOwnProperty(map.jenId)){
@@ -73,6 +79,9 @@ $(function(){
 			}
 			map["__selected__"] = false;
 			overlapJob[map.jenId][map.jobId] = true;
+			map["jobStartOrd"] = (selJobGrid.getList().length+1)+addDataIdx;
+			addDataRow.push(map);
+			addDataIdx++;
 		});
 		
 		
@@ -89,7 +98,7 @@ $(function(){
 		jAlert("JOB이 추가되었습니다."+alertAddMsg);
 		
 		
-		selJobGrid.setData(chkList);
+		selJobGrid.addRow(addDataRow);
 		
 	});
 	
@@ -104,9 +113,6 @@ $(function(){
 		
 		$.each(chkList, function(idx, map){
 			
-			selJobGrid.removeRow(map["__original_index"]);
-			
-			
 			delete overlapJob[map.jenId][map.jobId];
 			
 			
@@ -114,13 +120,24 @@ $(function(){
 				delete ADD_JOB_PARAM_LIST[map.jenId][map.jobId];
 			}
 		});
+		
+		
+		selJobGrid.removeRow("selected");
+		
+		
+		$.each(selJobGrid.list, function(idx, map){
+			map["jobStartOrd"] = (idx+1);
+		});
+		
+		
+		selJobGrid.repaint();
+		
 	});
 	
 	
 	$("#jenDataSendBtn").click(function(){
 		
 		if(opener){
-			
 			
 			var rtnValue = [];
 			
@@ -146,7 +163,17 @@ $(function(){
 							
 							
 							if(ADD_JOB_PARAM_LIST.hasOwnProperty(jenId) && ADD_JOB_PARAM_LIST[jenId].hasOwnProperty(jobId)){
-								jobParamData = ADD_JOB_PARAM_LIST[jenId][jobId];
+								
+								var newParamList = [];
+								$.each(ADD_JOB_PARAM_LIST[jenId][jobId], function(idx, map){
+									newParamList.push({
+										"default_val": map["defaultVal"],
+										"job_param_key": map["jobParamKey"],
+										"job_param_val": map["jobParamVal"],
+										"job_param_type": map["jobParamType"]
+									});
+								});
+								jobParamData = newParamList;
 							}
 							
 							
@@ -160,6 +187,7 @@ $(function(){
 								, "jen_job_type": jobInfo.jobTypeCd
 								, "jen_job_type_name": jobInfo.jobTypeNm
 								, "jen_job_used": jobInfo.useCd
+								, "jen_job_start_ord": jobInfo.jobStartOrd
 								, "jen_job_param_list": jobParamData
 							}; 
 							
@@ -462,17 +490,17 @@ function fnInJobGridListSet(_pageNo,ajaxParam,loadingShow){
 	   	if(!gfnIsNull(ciId) && data.hasOwnProperty("jobParamList") && data.jobParamList != null && data.jobParamList.length > 0){
 	   		$.each(data.jobParamList, function(idx, map){
 	   			
-	   			if(!ADD_JOB_PARAM_LIST.hasOwnProperty(map.jenId)){
-	   				ADD_JOB_PARAM_LIST[map.jenId] = {};
+	   			if(!ADD_JOB_PARAM_LIST.hasOwnProperty(map["jen_id"])){
+	   				ADD_JOB_PARAM_LIST[map["jen_id"]] = {};
 	   			}
 	   			
 	   			
-	   			if(!ADD_JOB_PARAM_LIST[map.jenId].hasOwnProperty(map.jobId)){
-	   				ADD_JOB_PARAM_LIST[map.jenId][map.jobId] = [];
+	   			if(!ADD_JOB_PARAM_LIST[map["jen_id"]].hasOwnProperty(map["job_id"])){
+	   				ADD_JOB_PARAM_LIST[map["jen_id"]][map["job_id"]] = [];
 	   			}
-	   			ADD_JOB_PARAM_LIST[map.jenId][map.jobId].push({
-	   				"jobParamKey": map.jobParamKey,
-	   				"jobParamVal": map.jobParamVal
+	   			ADD_JOB_PARAM_LIST[map["jen_id"]][map["job_id"]].push({
+	   				"jobParamKey": map["job_param_key"],
+	   				"jobParamVal": map["job_param_val"]
 	   			});
 	   		});
 	   	}
@@ -877,13 +905,15 @@ function fnJobSearchSetting(){
 function fnSelJobGridSetting(){
 	selJobGrid = new ax5.ui.grid();
 
-  selJobGrid.setConfig({
-      target: $('[data-ax5grid="selJobGrid"]'),
-      showRowSelector: true,
-      sortable:false,
-      header: {align:"center",columnHeight: 30},
-      columns: [
-      	{key: "jenNm", label: "JENKINS NAME", width: 180, align: "center"},
+	selJobGrid.setConfig({
+		target: $('[data-ax5grid="selJobGrid"]'),
+		showRowSelector: true,
+		showLineNumber: false,
+		sortable:false,
+		header: {align:"center",columnHeight: 30},
+		columns: [
+			{key: "jobStartOrd", label: "순서", width: 80, align: "center"},
+			{key: "jenNm", label: "JENKINS NAME", width: 180, align: "center"},
 			{key: "jobTypeNm", label: "JOB TYPE", width: 95, align: "center"},
 			{key: "jobId", label: "JOB ID", width: 170, align: "center"},
 			{key: "jobRestoreId", label: "원복 JOB ID", width: 170, align: "center"},
@@ -898,11 +928,11 @@ function fnSelJobGridSetting(){
 				}
 			},
 			{key: "useNm", label: "사용유무", width: 80, align: "center"}
-      ],
-      body: {
-          align: "center",
-          columnHeight: 30,
-          onClick: function () {
+		],
+		body: {
+			align: "center",
+			columnHeight: 30,
+			onClick: function () {
         		
    				selJobGrid.select(this.doindex, {selected: !this.item.__selected__});	
             },
@@ -910,8 +940,8 @@ function fnSelJobGridSetting(){
   				var data = {"jenId": this.item.jenId, "jobId": this.item.jobId};
   				gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1004JobDetailView.do',data,"1200", "870",'scroll');
             }
-      }
-  });
+		}
+	});
 }
 
 
@@ -952,6 +982,27 @@ function fnSelJobSearchSetting(){
 								
 								gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1005View.do',data,"840","300",'scroll');
 								
+						}},
+						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", addClass: ciFlagCss, key:"btn_update_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-edit' aria-hidden='true'></i>&nbsp;<span>수정</span>",
+							onclick:function(){
+								
+								if(gfnIsNull('<c:out value="${requestScope.ciId}"/>')){
+									return;
+								}
+								var chkList = jobGrid.getList('selected');
+								
+								if (gfnIsNull(chkList)) {
+									jAlert("선택한 JOB이 없습니다.", "알림창");
+									return false;
+								}
+								if(chkList.length > 1){
+									jAlert("1개의 JOB만 선택해주세요.", "알림창");
+									return false;
+								}
+
+								var data = {"popupGb": "update", "jenId": chkList[0].jenId, "jobId": chkList[0].jobId};
+        	                	
+								gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1002JobDetailView.do',data,"650","585",'scroll',false);
 						}}
                   	]
                 		},
