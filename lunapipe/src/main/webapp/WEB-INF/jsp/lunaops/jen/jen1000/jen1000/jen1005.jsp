@@ -40,8 +40,8 @@
 
 .layer_popup_box .pop_left, .layer_popup_box .pop_right { height: 54px; }
 .button_normal { width: 39px; height: 22px; line-height: 22px; text-align: center; font-weight: bold; font-size: 1em; border-radius: 5px; box-shadow: 1px 1px 1px #ccd4eb; margin: 0 auto; border: 1px solid #b8b8b8; cursor: pointer; }
-div.pop_sub .pop_left {width:28%;} /* common.css pop_left width값 오버라이딩 */
-div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이딩 */
+div.pop_sub .pop_left {width:28%;} 
+div.pop_sub .pop_right {width:72%;} 
 .input_txt {padding-left: 5px;}
 
 .popup.jen1005-popup .job-parameter-div{
@@ -72,7 +72,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 		var jenUsrTok = '<c:out value="${param.jenUsrTok}" />';
 		var jobTok = 	'<c:out value="${param.jobTok}" />';
 		
-		//jenId 있는지 체크
+		
 		if(!ADD_JOB_PARAM_LIST.hasOwnProperty(jenId)){
 			ADD_JOB_PARAM_LIST[jenId] = {};
 		}
@@ -88,20 +88,20 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 				"jobTok" : jobTok
 		}
 		
-		//AJAX 설정
+		
 		var ajaxObj = new gfnAjaxRequestAction(
 				{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000JobParameter.do'/>","loadingShow":true}
 				, jobParamMap );
-		//AJAX 전송 성공 함수
+		
 		ajaxObj.setFnSuccess(function(data){
 			if(data.MSG_CD=="JENKINS_OK"){
-				//jobParamList 세팅
+				
 				var jobParamList = data.list;
 				if(!gfnIsNull(jobParamList)){
-					// html
+					
 					var paramHtml = "";
 					
-					//이전 데이터가 있으면 값 채우기
+					
 					$.each(jobParamList,function(idx, map){
 						if(!gfnIsNull(jen1005ParamList)){
 							$.each(jen1005ParamList,function(idx, map2){
@@ -124,7 +124,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 						}
 						
 						if(map.jobParamType == "choice"){
-							// 셀렉트박스
+							
 							var choiceList = map.choiceList;
 							paramHtml += 	 '<div class="pop_menu_row">'
 											+'	<div class="pop_menu_col1" title="'+map.jobParamKey+'"><label for="'+map.jobParamKey+'">'+map.jobParamKey+'</label></div>'
@@ -151,7 +151,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 								chkHtml = "checked";
 							}
 							
-							//체크박스
+							
 							paramHtml += 	 '<div class="pop_menu_row">'
 											+'	<div class="pop_menu_col1" title="'+map.jobParamKey+'" ><label for="'+map.jobParamKey+'">'+map.jobParamKey+'</label></div>'
 											+'	<div class="pop_menu_col2 pop_oneRow_col2 jobChk">'
@@ -160,7 +160,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 											+'	</div>'
 											+'</div>';
 						}else{
-							//문자열
+							
 							paramHtml += 	 '<div class="pop_menu_row">'
 											+'	<div class="pop_menu_col1" title="'+map.jobParamKey+'"><label for="'+map.jobParamKey+'">'+map.jobParamKey+'</label></div>'
 											+'	<div class="pop_menu_col2 pop_oneRow_col2">'
@@ -172,7 +172,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 						
 					})
 					
-					//팝업사이즈 조절
+					
 					var listLength = jobParamList.length;
 					var targetHeight;
 
@@ -198,7 +198,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 					ADD_JOB_PARAM_LIST[jenId][jobId] = jobParamList;
 					
 				}else{
-					//파라미터가 없는 경우 html
+					
 					var paramHtml = "<span class='param-no-data'>빌드 파라미터가 없습니다.</span>";
 					$("#btnPopJen1005Select").hide();
 					$("#jobParameterDiv").html(paramHtml);
@@ -215,11 +215,11 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 
 		});
 		
-		//AJAX 전송
+		
 		ajaxObj.send();
 		
 		
-		//선택 버튼 클릭
+		
 		$('#btnPopJen1005Select').click(function() {
 			if(!gfnIsNull(jen1005ParamList)){
 				$.each(jen1005ParamList,function(idx, map){
@@ -233,14 +233,13 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 						map["jobParamVal"] = $("#"+map.jobParamKey).val();
 					}
 				});
-				
 				ADD_JOB_PARAM_LIST[jenId][jobId] = jen1005ParamList;
 			}
-			//팝업 창 닫기
+			
 			gfnLayerPopupClose();
 		});
 		
-		/* 취소 */
+		
 		$('#btnPopJen1005Cancle').click(function() {
 			gfnLayerPopupClose();
 		});
