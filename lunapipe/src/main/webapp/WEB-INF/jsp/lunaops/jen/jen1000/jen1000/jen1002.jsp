@@ -83,6 +83,8 @@ var jobArray = [];
 var selJobId = "";
 var jobUrl = "";
 
+var selJobInfo;
+
 
 var nowJobTok = null;
 
@@ -159,7 +161,7 @@ $(document).ready(function() {
 		var strCheckObjArr = ["jobTok"];
 		var sCheckObjNmArr = ["JOB TOKEN KEY"];
 		
-		if(gfnIsNull(zTreeJen1002.getCheckedNodes()[0])){
+		if(gfnIsNull(selJobId)){
 			jAlert("JOB ID은(는) 필수 입력 사항입니다.\n\n\r JOB ID 항목을 입력하세요.",'알림창');
 			return;
 		}
@@ -210,6 +212,10 @@ function fnSelectJen1001JobInfo(jenId, jobId){
 		
 		fnJenIdSelecetd();
 		
+		
+		selJobInfo = data.jobInfo;
+		selJonId = data.jobInfo.jobId;
+		
        	
        	gfnSetData2ParentObj(data.jobInfo, "jen1100PopupFrm");
 
@@ -238,9 +244,15 @@ function fnInsertJobInfoAjax(formId){
 	}
 	
 	
-	var selJobInfo = zTreeJen1002.getCheckedNodes()[0];
+	var jobNm = selJobId;
 	
-	jConfirm("JOB("+selJobInfo["name"]+")을 저장하시겠습니까?", "알림창", function( result ) {
+	if('${param.popupGb}' == 'insert'){
+		
+		selJobInfo = zTreeJen1002.getCheckedNodes()[0];
+		jobNm = selJobInfo["name"];
+	}
+
+	jConfirm("JOB("+jobNm+")을 저장하시겠습니까?", "알림창", function( result ) {
 		if( result ){
 
 			var fd = new FormData();
@@ -263,7 +275,7 @@ function fnInsertJobInfoAjax(formId){
 			fd.append("jenUrl",jenUrl);
 			
 			if(!gfnIsNull(zTreeJen1002)){
-				fd.append("jobUrl",zTreeJen1002.getSelectedNodes()[0].url);
+				fd.append("jobUrl",selJobInfo.url);
 			}else{
 				fd.append("jobUrl",jobUrl);
 			}
