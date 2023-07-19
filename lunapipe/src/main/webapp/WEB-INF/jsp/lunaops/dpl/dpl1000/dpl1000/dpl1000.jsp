@@ -36,6 +36,8 @@ var dplJobGrid;
 
 var selDplId;
 
+var dplJobSearchObj;
+
 
 var jobStatusWaitTime = 5000;
 
@@ -56,27 +58,6 @@ var jobConsoleLog = {};
 
 var jobBuildingConsoleLog = '';
 
-var mySearch;
-var Grid = {
-	init : function() {
-		
-		fnAxGrid5View(); 
-		fnSearchBoxControl(); 
-		fnAxJobGrid5View();
-	},
-	columnOption : {
-		dpl1000Search : [ 
-                 {optionValue : "rn",optionText : "전체 보기",optionAll : true}, 
-                 {optionValue : "dplStsCd",optionText : '배포 상태' , optionCommonCode:"DPL00001" }, 
-                 {optionValue : "dplVer",optionText : '배포 버전'}, 
-                 {optionValue : "dplNm",optionText : '배포 명'}, 
-                 {optionValue : "dplTypeCd",optionText : '배포 방법' , optionCommonCode:"DPL00003"},
-                 {optionValue : "dplUsrNm",optionText : "배포자"},
-                 {optionValue : "dplDesc",optionText : "배포 설명"} 
-        		]
-		}
-	}
-
 
 var ciId = '<c:out value="${requestScope.ciId}"/>';
 var ticketId = '<c:out value="${requestScope.ticketId}"/>';
@@ -87,7 +68,8 @@ $(document).ready(function() {
 	 
 	
 	fnAxGrid5View();
-	 
+	fnDplJobSearchSetting();
+	
 	
 	gfnGuideStack("add",fnDpl1000GuideShow);
 	
@@ -543,7 +525,7 @@ function fnAxGrid5View(){
                 nextIcon: '<i class="fa fa-caret-right" aria-hidden="true"></i>',
                 lastIcon: '<i class="fa fa-step-forward" aria-hidden="true"></i>',
                 onChange: function () {
-                   fnInGridListSet(this.page.selectPage,mySearch.getParam());
+                   fnInGridListSet(this.page.selectPage,dplJobSearchObj.getParam());
                 }
             }
         });
@@ -597,68 +579,76 @@ function fnInGridListSet(_pageNo,ajaxParam){
 }
 
 
-function fnSearchBoxControl() {
-	mySearch = new AXSearch();
+function fnDplJobSearchSetting() {
+	dplJobSearchObj = new AXSearch();
 
 	var fnObjSearch = {
 		pageStart : function() {
 			
-			mySearch.setConfig({
-				targetID : "AXSearchTarget",
+			dplJobSearchObj.setConfig({
+				targetID : "dplJobSearch",
 				theme : "AXSearch",
 				rows : [ {
 					display : true,
 					addClass : "",
 					style : "",
 					list : [{label : "<i class='fa fa-search'></i>&nbsp;",labelWidth : "50",type : "selectBox",width : "",key : "searchSelect",addClass : "",valueBoxStyle : "",value : "all",
-						options : Grid.columnOption.dpl1000Search,
+						options : [
+							{optionValue : "rn",optionText : "전체 보기",optionAll : true}, 
+							{optionValue : "dplStsCd",optionText : '배포 상태' , optionCommonCode:"DPL00001" }, 
+							{optionValue : "dplVer",optionText : '배포 버전'}, 
+							{optionValue : "dplNm",optionText : '배포 명'}, 
+							{optionValue : "dplTypeCd",optionText : '배포 방법' , optionCommonCode:"DPL00003"},
+							{optionValue : "dplUsrNm",optionText : "배포자"},
+							{optionValue : "dplDesc",optionText : "배포 설명"} 
+						],
 							onChange : function(selectedObject,value) {
 									
 									if (!gfnIsNull(selectedObject.optionAll) && selectedObject.optionAll == true) {
-										axdom("#"+ mySearch.getItemId("searchTxt")).attr("readonly","readonly");
-										axdom("#"+ mySearch.getItemId("searchTxt")).val('');
+										axdom("#"+ dplJobSearchObj.getItemId("searchTxt")).attr("readonly","readonly");
+										axdom("#"+ dplJobSearchObj.getItemId("searchTxt")).val('');
 									} else {
-										axdom("#"+ mySearch.getItemId("searchTxt")).removeAttr("readonly");
+										axdom("#"+ dplJobSearchObj.getItemId("searchTxt")).removeAttr("readonly");
 									}
 	
 									
 									if (!gfnIsNull(selectedObject.optionCommonCode)) {
-										gfnCommonSetting(mySearch,selectedObject.optionCommonCode,"searchCd","searchTxt");
+										gfnCommonSetting(dplJobSearchObj,selectedObject.optionCommonCode,"searchCd","searchTxt");
 									} else if (value == "flowId") {
 										
-										axdom("#"+ mySearch.getItemId("searchCd")).html('');
+										axdom("#"+ dplJobSearchObj.getItemId("searchCd")).html('');
 										
-										axdom("#"+ mySearch.getItemId("searchCd")).append('<option value="ALL">전체</option>');
+										axdom("#"+ dplJobSearchObj.getItemId("searchCd")).append('<option value="ALL">전체</option>');
 										$.each(JSON.parse(flowList),function() {
-											axdom("#"+ mySearch.getItemId("searchCd")).append('<option value="'+this.flowId+'">'+ this.flowNm+ '</option>');
+											axdom("#"+ dplJobSearchObj.getItemId("searchCd")).append('<option value="'+this.flowId+'">'+ this.flowNm+ '</option>');
 										});
-										axdom("#"+ mySearch.getItemId("searchCd")).append('<option value="FLW">미분류</option>');
-										axdom("#"+ mySearch.getItemId("searchTxt")).hide();
-										axdom("#"+ mySearch.getItemId("searchCd")).show();
+										axdom("#"+ dplJobSearchObj.getItemId("searchCd")).append('<option value="FLW">미분류</option>');
+										axdom("#"+ dplJobSearchObj.getItemId("searchTxt")).hide();
+										axdom("#"+ dplJobSearchObj.getItemId("searchCd")).show();
 									} else if (value == "sprintId") {
-										axdom("#"+ mySearch.getItemId("searchCd")).html('');
+										axdom("#"+ dplJobSearchObj.getItemId("searchCd")).html('');
 									
 									if (gfnIsNull(sprintList)) {
-										axdom("#"+ mySearch.getItemId("searchCd")).append('<option value="">없음</option>');
+										axdom("#"+ dplJobSearchObj.getItemId("searchCd")).append('<option value="">없음</option>');
 									} else {
 										
 										$.each(JSON.parse(sprintList),function() {
-											axdom("#"+ mySearch.getItemId("searchCd")).append('<option value="'+this.sprintId+'">'+ this.sprintNm+ '</option>');
+											axdom("#"+ dplJobSearchObj.getItemId("searchCd")).append('<option value="'+this.sprintId+'">'+ this.sprintNm+ '</option>');
 										});
 									}
-										axdom("#"+ mySearch.getItemId("searchTxt")).hide();
-										axdom("#"+ mySearch.getItemId("searchCd")).show()
+										axdom("#"+ dplJobSearchObj.getItemId("searchTxt")).hide();
+										axdom("#"+ dplJobSearchObj.getItemId("searchCd")).show()
 									} else {
 										
-										axdom("#"+ mySearch.getItemId("searchTxt")).show();
-										axdom("#"+ mySearch.getItemId("searchCd")).hide();
+										axdom("#"+ dplJobSearchObj.getItemId("searchTxt")).show();
+										axdom("#"+ dplJobSearchObj.getItemId("searchCd")).hide();
 									}
 								}
 								},
 								{label : "",labelWidth : "",type : "inputText",width : "225",key : "searchTxt",addClass : "secondItem sendBtn",valueBoxStyle : "padding-left:0px;",value : "",
 									onkeyup:function(e){
 										if(e.keyCode == '13' ){
-											axdom("#" + mySearch.getItemId("btn_search_dlp")).click();
+											axdom("#" + dplJobSearchObj.getItemId("btn_search_dlp")).click();
 										}
 									}
 								},
@@ -677,7 +667,7 @@ function fnSearchBoxControl() {
 												{optionValue:10000, optionText:"10000"}
 				                                
 				                            ],onChange: function(selectedObject, value){
-				                            	fnInGridListSet(0,$('form#searchFrm').serialize()+"&"+mySearch.getParam());
+				                            	fnInGridListSet(0,$('form#searchFrm').serialize()+"&"+dplJobSearchObj.getParam());
 				    						}
 								},
 								{label:"<i class='fas fa-arrows-v'></i>&nbsp;목록 높이&nbsp;", labelWidth:"60", type:"selectBox", width:"", key:"gridHeight", addClass:"", valueBoxStyle:"", value:"600",
@@ -705,59 +695,9 @@ function fnSearchBoxControl() {
 								{label : "",labelWidth : "",type : "button",width : "55",key : "btn_search_dlp",style : "float:right;",valueBoxStyle : "padding:5px;",value : "<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 									onclick : function() {
 										
-							            fnInGridListSet(0,mySearch.getParam());
+							            fnInGridListSet(0,dplJobSearchObj.getParam());
 									}
 								},
-								{label : "",labelWidth : "",type : "button",width : "100",key : "btn_update_dplStsCd",style : "float:right;",valueBoxStyle : "padding:5px;",value : "<i class='fa fa-edit' aria-hidden='true'></i>&nbsp;<span>배포완료 처리</span>",
-									onclick : function() {
-										var item = dplJobGrid.getList('selected')[0];
-										if(gfnIsNull(item)){
-											toast.push('변경하려는 배포 계획을 선택해주세요.');
-											return;
-										}
-										
-										
-										if(item.dplStsCd == "02"){
-											jAlert("배포 상태가 성공일경우 변경이 불가능합니다.", "알림창");
-											return false;
-										}
-
-										
-										if(item.signStsCd != "02"){
-											jAlert("결재 상태가 승인이 아닌 경우 변경이 불가능합니다.", "알림창");
-											return false;
-										}
-										
-										
-										if(item.dplTypeCd == "01"){
-											
-											if(item.dplStsCd == "03" && item.dplAutoAfterCd == "01"){
-												jConfirm("선택 배포 계획을 성공 처리 하시겠습니까?","알림창",
-													function(result) {
-														if (result) {
-															fnDplStsCdUpdate(item.dplId,[{subCd: "02"}]);
-														}
-													});
-											}else{
-												jAlert("자동 배포 계획의 실패 후 처리가 수동인 경우에만 변경이 가능 합니다.", "알림창");
-												return false;
-											}
-										}else{
-											
-											gfnCommonPopup("배포 상태", null ,false,"${sessionScope.loginVO.licGrpId}","DPL00001",function(objs){
-												
-												if(item.dplStsCd == objs[0].subCd){
-													jAlert("현재 값과 동일한 값이 선택되었습니다.", "알림창");
-												}else{
-													
-													fnDplStsCdUpdate(item.dplId,objs);
-												}
-											});
-										}
-										
-									}
-								}
-								
 						]}]
 					});
 		}
@@ -767,10 +707,10 @@ function fnSearchBoxControl() {
 			function() {
 				fnObjSearch.pageStart();
 				
-				axdom("#" + mySearch.getItemId("searchTxt")).attr("readonly", "readonly");
+				axdom("#" + dplJobSearchObj.getItemId("searchTxt")).attr("readonly", "readonly");
 
 				
-				axdom("#" + mySearch.getItemId("searchCd")).hide();
+				axdom("#" + dplJobSearchObj.getItemId("searchCd")).hide();
 
 			});
 	}
@@ -789,10 +729,10 @@ function fnDplStsCdUpdate(dplId, selCommonObj){
 		
 		if(data.errorYn != "Y"){
 			
-			 fnInGridListSet(dplJobGrid.page.currentPage,mySearch.getParam());
+			 fnInGridListSet(dplJobGrid.page.currentPage,dplJobSearchObj.getParam());
 			
    			
-   			fnInJobGridListSet(0,mySearch.getParam(),selDplId);
+   			fnInJobGridListSet(0,dplJobSearchObj.getParam(),selDplId);
 		}
 		jAlert(data.message, "알림창");
 	});
@@ -944,7 +884,7 @@ function fnAxJobGrid5View(){
                 onChange: function () {
                 	
 		    		$(".progress .progress-bar").attr('data-transitiongoal', 0).progressbar2({display_text: 'center', percent_format: function(p) {return '0%';}});
-					fnInJobGridListSet(this.page.selectPage,mySearch.getParam(),selDplId);
+					fnInJobGridListSet(this.page.selectPage,dplJobSearchObj.getParam(),selDplId);
                 }
             }
         });
@@ -1156,7 +1096,7 @@ function fnJobAutoCheckSwitch(onOffValue){
 <div class="main_contents" style="height: auto;">
 	<div class="tab_contents menu" style="max-width: 1500px;position: relative;">
 		<form:form commandName="dpl1000VO" id="searchFrm" name="searchFrm" method="post" onsubmit="return false"></form:form>
-		<div id="AXSearchTarget" style="border-top: 1px solid #ccc;"></div>
+		<div id="dplJobSearch" style="border-top: 1px solid #ccc;"></div>
 		<br />
 		<div data-ax5grid="dplJobGrid" data-ax5grid-config="{}" style="height: 250px;" guide="dpl1000DplList"></div>
 		<div class="main_frame middleJobInfoFrame">
