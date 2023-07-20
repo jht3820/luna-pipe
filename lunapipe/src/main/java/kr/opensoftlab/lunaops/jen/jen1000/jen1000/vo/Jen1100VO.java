@@ -36,9 +36,6 @@ public class Jen1100VO extends PageVO {
     private String    useNm;
     private String	projectJenkinsCheck;
     
-    
-    
-    
 	public String getCiId() {
 		return ciId;
 	}
