@@ -6,9 +6,13 @@
 <title>OpenSoftLab</title>
 <script type="text/javascript" src="/js/ztree/jquery.ztree.all.min.js"></script>
 <style>
-.layer_popup_box .popup.jen1002-popup .pop-left,
-.layer_popup_box .popup.jen1002-popup .pop-right { 
-	width: calc(50% - 10px);
+.layer_popup_box .popup.jen1002-popup .pop-left{
+	width: calc(60% - 10px);
+	overflow: hidden;
+	float: left;
+}
+.layer_popup_box .popup.jen1002-popup .pop-right {
+	width: calc(40% - 10px);
 	overflow: hidden;
 	float: left;
 }
@@ -18,7 +22,9 @@
 .ztree {
 	overflow: scroll;
 }
-
+textarea#jobDesc{height:135px;}
+input#jobTriggerVal{min-width: 100px;}
+.input_txt.readonlyBgNone{background-color:#fff !important;}
 
 
 .popup.jen1002-popup .pop_menu_row .pop_menu_col1 { width: 23%; height: 45px; padding-left: 6px; }
@@ -108,7 +114,8 @@ $(document).ready(function() {
 	
 	var commonCodeArr = [
 		{mstCd: "DPL00002", useYn: "Y",targetObj: "#jobTypeCd", comboType:"OS"}, 
-		{mstCd: "CMM00001", useYn: "Y",targetObj: "#useCd", comboType:"OS"} 
+		{mstCd: "CMM00001", useYn: "Y",targetObj: "#useCd", comboType:"OS"}, 
+		{mstCd: "CMM00001", useYn: "Y",targetObj: "#jobTriggerCd", comboType:"OS"} 
 	];
 	
 	gfnGetMultiCommonCodeDataForm(commonCodeArr , true);
@@ -189,6 +196,26 @@ $(document).ready(function() {
 		gfnLayerPopupClose();
 	});
 	
+	
+	$("#jobTriggerCd").on("change", function(){
+		var chgTriggerCdVal = this.value;
+		
+		
+		if(chgTriggerCdVal == "01"){
+			
+			$("#jobTriggerVal").removeAttr("readonly");
+		}
+		
+		else{
+			
+			$("#jobTriggerVal").val("");
+			
+			
+			$("#jobTriggerVal").attr("readonly","readonly");
+		}
+		
+	});
+	
 });
 
 function fnSelectJen1001JobInfo(jenId, jobId){
@@ -223,12 +250,19 @@ function fnSelectJen1001JobInfo(jenId, jobId){
        	beforeJobTypeCd = data.jobInfo.jobTypeCd;
        	
        	
-       	selJobRestoreId = data.jobInfo.jobRestoreId; 
+       	selJobRestoreId = data.jobInfo.jobRestoreId;
        		
 		nowJobTok = data.jobInfo.jobTok;
        	
 		
 		updateJobId = data.jobInfo.jobId;
+		
+		
+		$("#jobTriggerCd").data("osl-value", data.jobInfo.jobTriggerCd);
+		if(data.jobInfo.jobTriggerCd == "01"){
+			
+			$("#jobTriggerVal").removeAttr("readonly");
+		}
 	});
 	
 	
@@ -275,7 +309,7 @@ function fnInsertJobInfoAjax(formId){
 			fd.append("jenUrl",jenUrl);
 			
 			if(!gfnIsNull(zTreeJen1002)){
-				fd.append("jobUrl",selJobInfo.url);
+				fd.append("jobUrl",selJobInfo.jobUrl);
 			}else{
 				fd.append("jobUrl",jobUrl);
 			}
@@ -298,7 +332,10 @@ function fnInsertJobInfoAjax(formId){
 						jAlert("설정 정보가 잘못 입력 되었거나, JENKINS 서버에 문제가 있습니다.<br/><br/>입력한 URL, USER, USER TOKEN KEY 를 확인 하시거나, JENKINS 서버를 확인 해주시기 바랍니다.", "알림창");
 					}else if(data.MSG_CD=="JENKINS_WORNING_URL"){
 						jAlert("허용되지 않는 URL입니다.<br/><br/>입력한 URL를 확인하십시오", "알림창");
-					}else{
+					}else if(data.MSG_CD == "TRIGGER_CRON_VALUE_ERR"){
+						jAlert("트리거 Cron값에 문제가 있습니다.</br></br>[오류 내용]</br>"+data.MSG_STR, "알림창");
+					}
+					else{
 						jAlert("[jenkins 접속 오류]</br>오류 내용 : "+data.MSG_CD);
 					}
 					fd = new FormData();
@@ -313,7 +350,6 @@ function fnInsertJobInfoAjax(formId){
 		    	
 		    	
 				fnInJobGridListSet(0,jobSearchObj.getParam()+"&jenId="+jenId);
-		    	
 		    	
 				jAlert(data.message, '알림창');
 				gfnLayerPopupClose();
@@ -715,14 +751,39 @@ function fnTreeFilter(treeId, parentNode, result) {
 				</div>
 				
 				<div class="pop_menu_row">
-					<div class="pop_menu_col1 menu_col1_subStyle"><label for="useCd">사용여부</label><span class="required_info">&nbsp;*</span></div>
+					<div class="pop_menu_col1 menu_col1_subStyle"><label for="useCd">사용유무</label><span class="required_info">&nbsp;*</span></div>
 					<div class="pop_menu_col2 menu_col2_subStyle">
 						<span class="search_select">
 							<select class="select_useCd" name="useCd" id="useCd" value="" style="height:100%; width:100%;"></select>
 						</span>
 					</div>
 				</div>
-				
+				<c:choose>
+					<c:when test="${param.popupGb == 'insert'}">
+						<div class="pop_menu_row pop_menu_oneRow insertVisbleJen1002">
+							<div class="pop_menu_col1 pop_oneRow_col1"><label for="jobTriggerCd">트리거</label></div>
+							<div class="pop_menu_col2 pop_oneRow_col2"> 
+								<input type="text" class="input_txt readonlyBgNone" value="트리거는 Job 추가 후 설정이 가능합니다." readonly />
+							</div>
+						</div>
+					</c:when>
+					<c:when test="${param.popupGb == 'update'}">
+						<div class="pop_menu_row">
+							<div class="pop_menu_col1 menu_col1_subStyle"><label for="jobTriggerCd">트리거 사용유무</label></div>
+							<div class="pop_menu_col2 menu_col2_subStyle">
+								<span class="search_select">
+									<select class="select_useCd" name="jobTriggerCd" id="jobTriggerCd" value="" style="height:100%; width:100%;" data-osl-value="02"></select>
+								</span>
+							</div>
+						</div>
+						<div class="pop_menu_row">
+							<div class="pop_menu_col1 menu_col1_subStyle"><label for="jobTriggerVal">Cron 값</label></div>
+							<div class="pop_menu_col2 menu_col2_subStyle">
+								<input type="text" title="Trigger Cron 값" class="input_txt" name="jobTriggerVal" id="jobTriggerVal" value="" maxlength="100" readonly/>
+							</div>
+						</div>
+					</c:when>
+				</c:choose>
 				<div class="pop_note" style="margin-bottom:0px;">
 					<div class="note_title">JOB 설명</div>
 					<textarea class="input_note" title="JOB 설명" name="jobDesc" id="jobDesc" rows="7" value="" maxlength="2000"  ></textarea>
