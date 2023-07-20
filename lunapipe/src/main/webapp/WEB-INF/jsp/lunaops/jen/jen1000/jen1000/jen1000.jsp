@@ -937,8 +937,7 @@ function fnSelJobGridSetting(){
    				selJobGrid.select(this.doindex, {selected: !this.item.__selected__});	
             },
             onDBLClick:function(){
-  				var data = {"jenId": this.item.jenId, "jobId": this.item.jobId};
-  				gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1004JobDetailView.do',data,"1200", "870",'scroll');
+  				
             }
 		}
 	});
