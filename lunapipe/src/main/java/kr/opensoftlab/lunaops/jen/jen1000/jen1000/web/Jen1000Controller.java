@@ -35,6 +35,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
@@ -513,7 +514,17 @@ public class Jen1000Controller {
 			
     		if(triggersNodeList.getLength() > 0) {
     			jobTriggerCd = "01";
-    			jobTriggerVal = triggersNodeList.item(0).getChildNodes().item(0).getTextContent();
+    			
+    			
+    			NodeList tiggerChildNodeList = triggersNodeList.item(0).getChildNodes();
+    			for(int i=0;i<tiggerChildNodeList.getLength();i++) {
+    				Node childNode = tiggerChildNodeList.item(i);
+    				
+    				
+    				if("spec".equals(childNode.getNodeName())) {
+    					jobTriggerVal = childNode.getTextContent();
+    				}
+    			}
     		}
     		
     		
@@ -767,6 +778,7 @@ public class Jen1000Controller {
 					List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
 					nameValuePairs.add(new BasicNameValuePair("value", jobTriggerVal));
 					
+					
 					String rtnCheckStr = jenkinsClient.excuteHttpClientPostJenkins(triggerUrl, nameValuePairs);
 					
 					Document doc = Jsoup.parse(rtnCheckStr);
@@ -787,7 +799,15 @@ public class Jen1000Controller {
 					
 		    		if(triggersNodeList.getLength() > 0) {
 		    			
-		    			triggersNodeList.item(0).getChildNodes().item(0).setTextContent(jobTriggerVal);
+		    			NodeList tiggerChildNodeList = triggersNodeList.item(0).getChildNodes();
+		    			for(int i=0;i<tiggerChildNodeList.getLength();i++) {
+		    				Node childNode = tiggerChildNodeList.item(i);
+		    				
+		    				
+		    				if("spec".equals(childNode.getNodeName())) {
+		    					childNode.setTextContent(jobTriggerVal);
+		    				}
+		    			}
 		    		}else {
 		    			
 		    			org.w3c.dom.Element timeTrigger = document.createElement("hudson.triggers.TimerTrigger");
@@ -798,12 +818,14 @@ public class Jen1000Controller {
 
 		    			document.getElementsByTagName("triggers").item(0).appendChild(timeTrigger);
 		    		}
+		    		
 		    		TransformerFactory tf = TransformerFactory.newInstance();
 		    		Transformer transformer = tf.newTransformer();
 		    		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		    		StringWriter writer = new StringWriter();
 		    		transformer.transform(new DOMSource(document), new StreamResult(writer));
 
+		    		
 		    		jenkins.updateJob(jobId, writer.getBuffer().toString());
 		    		jenkins.close();
 				}else {
@@ -812,12 +834,14 @@ public class Jen1000Controller {
 						
 						document.getElementsByTagName("triggers").item(0).setTextContent("");
 						
+						
 						TransformerFactory tf = TransformerFactory.newInstance();
 			    		Transformer transformer = tf.newTransformer();
 			    		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 			    		StringWriter writer = new StringWriter();
 			    		transformer.transform(new DOMSource(document), new StreamResult(writer));
 
+			    		
 			    		jenkins.updateJob(jobId, writer.getBuffer().toString());
 			    		jenkins.close();
 					}
@@ -1296,4 +1320,152 @@ public class Jen1000Controller {
 		}
 	}
 	
+	
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1002JobCronSpecCheck.do")
+	public ModelAndView selectJen1002JobCronSpecCheck(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		
+		try{
+			
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			
+			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
+			
+			
+			String jenUrl=(String)paramMap.get("jenUrl");
+			String jobId=(String)paramMap.get("jobId");
+			String jenUsrId=(String)paramMap.get("jenUsrId");
+			String jenUsrTok=(String)paramMap.get("jenUsrTok");
+			String jobTriggerVal=(String)paramMap.get("jobTriggerVal");
+			
+			
+			if(jenUsrTok == null || "".equals(jenUsrTok)){
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+				return new ModelAndView("jsonView");
+			}
+			
+			
+			jenUsrTok = CommonScrty.decryptedAria(jenUsrTok, salt);
+			
+			
+			jenkinsClient.setUser(jenUsrId);
+			jenkinsClient.setPassword(jenUsrTok);
+			
+			
+			String triggerUrl = jenUrl+"/job/"+jobId+"/descriptorByName/hudson.triggers.TimerTrigger/checkSpec";
+			
+			
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+			nameValuePairs.add(new BasicNameValuePair("value", jobTriggerVal));
+			
+			
+			String rtnCheckStr = jenkinsClient.excuteHttpClientPostJenkins(triggerUrl, nameValuePairs);
+			
+			model.addAttribute("checkResult", rtnCheckStr);
+			model.addAttribute("MSG_CD", JENKINS_OK);
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("selectJen1000JobParameter()", ex);
+			if( ex instanceof HttpHostConnectException){
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+			}else if( ex instanceof ParseException){
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+			}else if( ex instanceof IllegalArgumentException){
+				model.addAttribute("MSG_CD", JENKINS_WORNING_URL);
+			}else if( ex instanceof UserDefineException){
+				model.addAttribute("MSG_CD", ex.getMessage());
+			}else{
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+			}
+			
+			return new ModelAndView("jsonView");
+		}
+	}
+	
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1002JobCronSpec.do")
+	public ModelAndView selectJen1002JobCronSpec(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		
+		try{
+			
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			
+			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
+			
+			
+			String jenUrl=(String)paramMap.get("jenUrl");
+			String jobId=(String)paramMap.get("jobId");
+			String jenUsrId=(String)paramMap.get("jenUsrId");
+			String jenUsrTok=(String)paramMap.get("jenUsrTok");
+			
+			String jobTriggerCd = "02";
+			String jobTriggerVal = "";
+			
+			
+			if(jenUsrTok == null || "".equals(jenUsrTok)){
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+				return new ModelAndView("jsonView");
+			}
+			
+			
+			jenUsrTok = CommonScrty.decryptedAria(jenUsrTok, salt);
+			
+			
+			jenkinsClient.setUser(jenUsrId);
+			jenkinsClient.setPassword(jenUsrTok);
+			
+			
+			JenkinsServer jenkins = new JenkinsServer(new URI(jenUrl), jenUsrId, jenUsrTok);
+    		
+    		String jobXml = jenkins.getJobXml(jobId);
+    		
+    		jenkins.close();
+    		
+    		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    		DocumentBuilder builder = factory.newDocumentBuilder();
+    		org.w3c.dom.Document document = builder.parse(new InputSource(new StringReader(jobXml)));
+    		
+    		NodeList triggersNodeList = document.getElementsByTagName("hudson.triggers.TimerTrigger");
+			
+			
+    		if(triggersNodeList.getLength() > 0) {
+    			jobTriggerCd = "01";
+    			
+    			
+    			NodeList tiggerChildNodeList = triggersNodeList.item(0).getChildNodes();
+    			for(int i=0;i<tiggerChildNodeList.getLength();i++) {
+    				Node childNode = tiggerChildNodeList.item(i);
+    				
+    				
+    				if("spec".equals(childNode.getNodeName())) {
+    					jobTriggerVal = childNode.getTextContent();
+    				}
+    			}
+    		}
+    		
+			model.addAttribute("jobTriggerCd", jobTriggerCd);
+			model.addAttribute("jobTriggerVal", jobTriggerVal);
+			model.addAttribute("MSG_CD", JENKINS_OK);
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("selectJen1000JobParameter()", ex);
+			if( ex instanceof HttpHostConnectException){
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+			}else if( ex instanceof ParseException){
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+			}else if( ex instanceof IllegalArgumentException){
+				model.addAttribute("MSG_CD", JENKINS_WORNING_URL);
+			}else if( ex instanceof UserDefineException){
+				model.addAttribute("MSG_CD", ex.getMessage());
+			}else{
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+			}
+			
+			return new ModelAndView("jsonView");
+		}
+	}
 }
