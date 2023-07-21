@@ -146,4 +146,66 @@ public class Jen1000DAO extends ComOslitsAbstractDAO {
 	public String insertJen1101CIJobInfo(Map paramMap) throws Exception{
 		return (String) insert("jen1000DAO.insertJen1101CIJobInfo", paramMap);
 	}
+	
+
+	
+	@SuppressWarnings("rawtypes")
+	public int selectJen1200JobBldLogCheck(Map paramMap) throws Exception {
+		return (Integer) select("jen1000DAO.selectJen1200JobBldLogCheck", paramMap);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	public String insertJen1200JobBldLogInfo(Map paramMap) throws Exception{
+		return (String) insert("jen1000DAO.insertJen1200JobBldLogInfo", paramMap);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	public String insertJen1200JobBldChangeLogInfo(Map paramMap) throws Exception{
+		return (String) insert("jen1000DAO.insertJen1200JobBldChangeLogInfo", paramMap);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	public String insertJen1200JobBldChangeFileLogInfo(Map paramMap) throws Exception{
+		return (String) insert("jen1000DAO.insertJen1200JobBldChangeFileLogInfo", paramMap);
+	}
+
+	
+	@SuppressWarnings("rawtypes")
+	public Map selectJen1200JobLastBuildInfo(Map paramMap) throws Exception {
+		return (Map) select("jen1000DAO.selectJen1200JobLastBuildInfo", paramMap);
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes" })
+	public Map selectJen1200JobBuildInfo(Map paramMap) throws Exception {
+		return (Map) select("jen1000DAO.selectJen1200JobBuildInfo", paramMap);
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public List<Map> selectJen1201JobLastBuildChgList(Map paramMap) throws Exception {
+		return (List<Map>) list("jen1000DAO.selectJen1201JobLastBuildChgList", paramMap);
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public List<Map> selectJen1202JobLastBuildFileChgList(Map paramMap) throws Exception {
+		return (List<Map>) list("jen1000DAO.selectJen1202JobLastBuildFileChgList", paramMap);
+	}
+	
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<Map> selectJen1200JobBuildList(Map paramMap) throws Exception {
+		return (List) list("jen1000DAO.selectJen1200JobBuildList", paramMap);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	public int selectJen1200JobBuildListCnt(Map paramMap) throws Exception {
+		return (Integer) select("jen1000DAO.selectJen1200JobBuildListCnt", paramMap);
+	}
+	
 }
