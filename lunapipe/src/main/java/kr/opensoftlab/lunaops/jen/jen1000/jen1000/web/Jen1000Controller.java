@@ -46,6 +46,7 @@ import egovframework.com.cmm.service.EgovProperties;
 import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 import kr.opensoftlab.lunaops.com.exception.UserDefineException;
+import kr.opensoftlab.lunaops.com.vo.PageVO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1000VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1100VO;
@@ -846,8 +847,6 @@ public class Jen1000Controller {
 			    		jenkins.close();
 					}
 				}
-				
-				
 			}
 			catch(Exception ex){
 				Log.error("selectJen1000URLConnect()", ex);
@@ -1384,6 +1383,7 @@ public class Jen1000Controller {
 		}
 	}
 	
+	
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1002JobCronSpec.do")
 	public ModelAndView selectJen1002JobCronSpec(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		
@@ -1466,6 +1466,197 @@ public class Jen1000Controller {
 			}
 			
 			return new ModelAndView("jsonView");
+		}
+	}
+	
+	
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000JobBldLogCheckOut.do")
+	public ModelAndView selectJen1000JobBldLogCheckOut(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			
+			Map<String, Object> paramMap = RequestConvertor.requestParamToMapAddSelInfoList(request, true, "jobId");
+			
+			
+			int insertBldLogCnt = jen1000Service.insertJen1000BldLog(paramMap);
+			
+			model.addAttribute("MSG_CD", JENKINS_OK);
+			model.addAttribute("insertBldLogCnt", insertBldLogCnt);
+			
+			return new ModelAndView("jsonView");
+		}
+		catch(UserDefineException ude) {
+			Log.error("selectJen1000JobBldLogCheckOut()", ude);
+			
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("selectJen1000JobBldLogCheckOut()", ex);
+			if( ex instanceof HttpHostConnectException){
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+			}else if( ex instanceof ParseException){
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+			}else if( ex instanceof IllegalArgumentException){
+				model.addAttribute("MSG_CD", JENKINS_WORNING_URL);
+			}else if( ex instanceof UserDefineException){
+				model.addAttribute("MSG_CD", ex.getMessage());
+			}else{
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+			}
+			
+			return new ModelAndView("jsonView");
+		}
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000JobLastBuildInfo.do")
+	public ModelAndView selectJen1000JobLastBuildInfo(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			
+			Map jobLastBuildInfo = jen1000Service.selectJen1200JobLastBuildInfo(paramMap);
+			
+			List<Map> jobLastBuildChgList = null;
+			
+			List<Map> jobLastBuildFileChgList = null;
+			
+			
+			if(jobLastBuildInfo != null) {
+				
+				String bldNum = String.valueOf(jobLastBuildInfo.get("bldNum"));
+				paramMap.put("bldNum", bldNum);
+				
+				
+				jobLastBuildChgList = jen1000Service.selectJen1201JobLastBuildChgList(paramMap);
+				
+				
+				jobLastBuildFileChgList = jen1000Service.selectJen1202JobLastBuildFileChgList(paramMap);
+			}
+			
+			
+			model.addAttribute("jobLastBuildInfo", jobLastBuildInfo);
+			model.addAttribute("jobLastBuildChgList", jobLastBuildChgList);
+			model.addAttribute("jobLastBuildFileChgList", jobLastBuildFileChgList);
+			model.addAttribute("errorYn", "N");
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("selectJen1000JobLastBuildInfo()", ex);
+			
+			model.addAttribute("errorYn", "Y");
+			return new ModelAndView("jsonView");
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000JobBuildInfo.do")
+	public ModelAndView selectJen1000JobBuildInfo(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			
+			Map jobBuildInfo = jen1000Service.selectJen1200JobBuildInfo(paramMap);
+			
+			List<Map> jobLastBuildChgList = null;
+			
+			List<Map> jobLastBuildFileChgList = null;
+			
+			
+			if(jobBuildInfo != null) {
+				
+				jobLastBuildChgList = jen1000Service.selectJen1201JobLastBuildChgList(paramMap);
+				
+				
+				jobLastBuildFileChgList = jen1000Service.selectJen1202JobLastBuildFileChgList(paramMap);
+			}else {
+				
+				model.addAttribute("errorYn", "Y");
+				model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+				return new ModelAndView("jsonView");
+			}
+			
+			model.addAttribute("jobBuildInfo", jobBuildInfo);
+			model.addAttribute("jobLastBuildChgList", jobLastBuildChgList);
+			model.addAttribute("jobLastBuildFileChgList", jobLastBuildFileChgList);
+			model.addAttribute("errorYn", "N");
+			model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("selectJen1000JobBuildInfo()", ex);
+			
+			model.addAttribute("errorYn", "Y");
+			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+			return new ModelAndView("jsonView");
+		}
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000JobBuildListAjax.do")
+	public ModelAndView selectJen1000JobBuildListAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			String _pageNo_str = paramMap.get("pageNo");
+			String _pageSize_str = paramMap.get("pageSize");
+
+			int _pageNo = 1;
+			int _pageSize = OslAgileConstant.pageSize;
+
+			if(_pageNo_str != null && !"".equals(_pageNo_str)){
+				_pageNo = Integer.parseInt(_pageNo_str)+1;  
+			}
+			if(_pageSize_str != null && !"".equals(_pageSize_str)){
+				_pageSize = Integer.parseInt(_pageSize_str);  
+			}
+
+			PageVO pageVo = new PageVO();
+			
+			
+			pageVo.setPageIndex(_pageNo);
+			pageVo.setPageSize(_pageSize);
+			pageVo.setPageUnit(_pageSize);
+			
+			PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(pageVo);
+
+			
+			paramMap.put("firstIndex", String.valueOf(pageVo.getFirstIndex()));
+			paramMap.put("lastIndex", String.valueOf(pageVo.getLastIndex()));
+			
+			
+			int totCnt = 0;
+			List jen1000List = jen1000Service.selectJen1200JobBuildList(paramMap);
+
+			
+			totCnt =  jen1000Service.selectJen1200JobBuildListCnt(paramMap);
+			paginationInfo.setTotalRecordCount(totCnt);
+
+			model.addAttribute("list", jen1000List);
+
+			
+			Map<String, Integer> pageMap = new HashMap<String, Integer>();
+			pageMap.put("pageNo",pageVo.getPageIndex());
+			pageMap.put("listCount", jen1000List.size());
+			pageMap.put("totalPages", paginationInfo.getTotalPageCount());
+			pageMap.put("totalElements", totCnt);
+			pageMap.put("pageSize", _pageSize);
+
+			model.addAttribute("page", pageMap);
+
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("selectJen1000JobBuildListAjax()", ex);
+			throw new Exception(ex.getMessage());
 		}
 	}
 }
