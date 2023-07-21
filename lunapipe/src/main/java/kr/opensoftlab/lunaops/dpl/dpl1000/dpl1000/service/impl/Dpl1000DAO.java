@@ -187,7 +187,6 @@ public class Dpl1000DAO extends ComOslitsAbstractDAO {
 	public String insertDpl1101ParameterInfo(Map paramMap) throws Exception{
 		return (String) insert("dpl1000DAO.insertDpl1101ParameterInfo", paramMap);
 	}
-
 	
 	
 	@SuppressWarnings("rawtypes")
