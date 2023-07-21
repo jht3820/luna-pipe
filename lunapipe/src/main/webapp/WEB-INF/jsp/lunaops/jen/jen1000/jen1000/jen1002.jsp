@@ -22,9 +22,11 @@
 .ztree {
 	overflow: scroll;
 }
-textarea#jobDesc{height:135px;}
+textarea#jobDesc{height:110px;}
 input#jobTriggerVal{min-width: 100px;}
 .input_txt.readonlyBgNone{background-color:#fff !important;}
+textarea#jobTriggerVal {height: 100px;}
+textarea#jobTriggerVal[readonly] {background-color: #eee;}
 
 
 .popup.jen1002-popup .pop_menu_row .pop_menu_col1 { width: 23%; height: 45px; padding-left: 6px; }
@@ -55,12 +57,12 @@ input#jobTriggerVal{min-width: 100px;}
     float: left;
     width: calc(100% - 10px);
     margin: 5px 5px 0 5px;
-    height: 352px;
+    height: 505px;
 }
 .popup.jen1002-popup .hideMaskFrame {
     position: absolute;
     width: 960px;
-    height: 360px;
+    height: 510px;
     color: #fff;
     font-weight: 700;
     font-size: 13pt;
@@ -72,11 +74,40 @@ input#jobTriggerVal{min-width: 100px;}
     padding: 0;
     display: none;
 }
+div.jenkinsTriggerMsg {
+    height: 30px;
+    display: inline-block;
+    width: 100%;
+    text-align: left;
+}
+
+.jenkinsTriggerMsg .error {
+  color: #c00;
+  font-weight: bold;
+  padding-left: 20px;
+  min-height: 16px;
+  line-height: 16px;
+  background-image: url("/images/svgs/error.svg");
+  background-position: left top;
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+}
+.jenkinsTriggerMsg .warning {
+  color: #c4a000;
+  font-weight: bold;
+  padding-left: 20px;
+  min-height: 16px;
+  line-height: 16px;
+  background-image: url("/images/svgs/warning.svg");
+  background-position: left top;
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+}
 </style>
 <script>
 
 
-var zTreeJen1002;
+var zTreeJen1002 = null;
 
 
 var jenkinsChk = false;
@@ -158,6 +189,49 @@ $(document).ready(function() {
 		$(".popup.jen1002-popup .pop-left").css({width: "100%"});
 		$("#jobDiv").removeClass('display_none');
 	}
+
+	
+	$("#jobTriggerVal").blur(function(){
+		
+		if(gfnIsNull(selJobId)){
+			jAlert("JOB을 선택해주세요.","알림창");
+			return false;
+		}
+		
+		var jobTriggerCd = $("#jobTriggerCd").val();
+		if(jobTriggerCd == "01"){
+			
+			var jobTriggerVal = $("#jobTriggerVal").val();
+			
+			var jenUrl = $("#jenId > option:selected").attr('jenurl');
+			var jenUsrId = $("#jenId > option:selected").attr('jenusrid');
+			var jenUsrTok = $("#jenId > option:selected").attr('jenusrtok');
+			
+			
+			var ajaxObj = new gfnAjaxRequestAction(
+					{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1002JobCronSpecCheck.do'/>",loadingShow:false}
+					,{ "jobId" : selJobId, "jenUrl": jenUrl, "jenUsrId": jenUsrId, "jenUsrTok": jenUsrTok , "jobTriggerVal": jobTriggerVal });
+			
+			ajaxObj.setFnSuccess(function(data){
+				if(data.MSG_CD == "JENKINS_OK"){
+					var checkResult = data.checkResult;
+					checkResult = checkResult.replace("img src='", "img src='"+jenUrl);
+					$("#jenkinsTriggerMsg").html(checkResult);
+				}
+				else if(data.MSG_CD=="JENKINS_FAIL"){
+					jAlert("설정 정보가 잘못 입력 되었거나, JENKINS 서버에 문제가 있습니다.<br/><br/>입력한 URL, USER, USER TOKEN KEY 를 확인 하시거나, JENKINS 서버를 확인 해주시기 바랍니다.", "알림창");
+				}else if(data.MSG_CD=="JENKINS_WORNING_URL"){
+					jAlert("허용되지 않는 URL입니다.<br/><br/>입력한 URL를 확인하십시오", "알림창");
+				}else if(data.MSG_CD == "TRIGGER_CRON_VALUE_ERR"){
+					jAlert("트리거 Cron값에 문제가 있습니다.</br></br>[오류 내용]</br>"+data.MSG_STR, "알림창");
+				}
+			});
+			
+			
+			ajaxObj.send();
+			
+		}
+	});
 	
 	
 	$('#btn_update_popup').click(function() {
@@ -309,7 +383,7 @@ function fnInsertJobInfoAjax(formId){
 			fd.append("jenUrl",jenUrl);
 			
 			if(!gfnIsNull(zTreeJen1002)){
-				fd.append("jobUrl",selJobInfo.jobUrl);
+				fd.append("jobUrl",selJobInfo.url);
 			}else{
 				fd.append("jobUrl",jobUrl);
 			}
@@ -505,6 +579,9 @@ function fnJenIdSelecetd(){
 									selJobId = treeNode.name;
 									
 									zTreeJen1002.checkNode(treeNode, true);
+									
+									
+									fnSelJobCronSpec(treeNode.name);
 								}else{
 									selJobId = "";
 								}
@@ -669,7 +746,48 @@ function fnTreeFilter(treeId, parentNode, result) {
 	
 	return childNodes;
 }
-  
+
+ 
+function fnSelJobCronSpec(paramJobId){
+	
+	var jobTriggerVal = $("#jobTriggerVal").val();
+	
+	var jenUrl = $("#jenId > option:selected").attr('jenurl');
+	var jenUsrId = $("#jenId > option:selected").attr('jenusrid');
+	var jenUsrTok = $("#jenId > option:selected").attr('jenusrtok');
+	
+	
+	var ajaxObj = new gfnAjaxRequestAction(
+			{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1002JobCronSpec.do'/>",loadingShow:false}
+			,{ "jobId" : paramJobId, "jenUrl": jenUrl, "jenUsrId": jenUsrId, "jenUsrTok": jenUsrTok });
+	
+	ajaxObj.setFnSuccess(function(data){
+		if(data.MSG_CD == "JENKINS_OK"){
+			
+			var jobTriggerCd = data.jobTriggerCd;
+			var jobTriggerVal = data.jobTriggerVal;
+			
+			$("#jobTriggerCd").val(jobTriggerCd);
+			$("#jobTriggerCd").change();
+			
+			if(jobTriggerCd == "01"){
+				$("#jobTriggerVal").val(jobTriggerVal);
+			}else{
+				$("#jobTriggerVal").val("");
+			}
+		}
+		else if(data.MSG_CD=="JENKINS_FAIL"){
+			jAlert("설정 정보가 잘못 입력 되었거나, JENKINS 서버에 문제가 있습니다.<br/><br/>입력한 URL, USER, USER TOKEN KEY 를 확인 하시거나, JENKINS 서버를 확인 해주시기 바랍니다.", "알림창");
+		}else if(data.MSG_CD=="JENKINS_WORNING_URL"){
+			jAlert("허용되지 않는 URL입니다.<br/><br/>입력한 URL를 확인하십시오", "알림창");
+		}else if(data.MSG_CD == "TRIGGER_CRON_VALUE_ERR"){
+			jAlert("트리거 Cron값에 문제가 있습니다.</br></br>[오류 내용]</br>"+data.MSG_STR, "알림창");
+		}
+	});
+	
+	
+	ajaxObj.send();
+}
 </script>
 
 <div class="popup jen1002-popup" >
@@ -758,32 +876,26 @@ function fnTreeFilter(treeId, parentNode, result) {
 						</span>
 					</div>
 				</div>
-				<c:choose>
-					<c:when test="${param.popupGb == 'insert'}">
-						<div class="pop_menu_row pop_menu_oneRow insertVisbleJen1002">
-							<div class="pop_menu_col1 pop_oneRow_col1"><label for="jobTriggerCd">트리거</label></div>
-							<div class="pop_menu_col2 pop_oneRow_col2"> 
-								<input type="text" class="input_txt readonlyBgNone" value="트리거는 Job 추가 후 설정이 가능합니다." readonly />
-							</div>
-						</div>
-					</c:when>
-					<c:when test="${param.popupGb == 'update'}">
-						<div class="pop_menu_row">
-							<div class="pop_menu_col1 menu_col1_subStyle"><label for="jobTriggerCd">트리거 사용유무</label></div>
-							<div class="pop_menu_col2 menu_col2_subStyle">
-								<span class="search_select">
-									<select class="select_useCd" name="jobTriggerCd" id="jobTriggerCd" value="" style="height:100%; width:100%;" data-osl-value="02"></select>
-								</span>
-							</div>
-						</div>
-						<div class="pop_menu_row">
-							<div class="pop_menu_col1 menu_col1_subStyle"><label for="jobTriggerVal">Cron 값</label></div>
-							<div class="pop_menu_col2 menu_col2_subStyle">
-								<input type="text" title="Trigger Cron 값" class="input_txt" name="jobTriggerVal" id="jobTriggerVal" value="" maxlength="100" readonly/>
-							</div>
-						</div>
-					</c:when>
-				</c:choose>
+				<div class="pop_menu_row">
+					<div class="pop_menu_col1 menu_col1_subStyle"><label for="jobTriggerCd">트리거 사용유무</label></div>
+					<div class="pop_menu_col2 menu_col2_subStyle">
+						<span class="search_select">
+							<select class="select_useCd" name="jobTriggerCd" id="jobTriggerCd" value="" style="height:100%; width:100%;" data-osl-value="02"></select>
+						</span>
+					</div>
+				</div>
+				<div class="pop_menu_row">
+					<div class="pop_menu_col1 menu_col1_subStyle"></div>
+					<div class="pop_menu_col2 menu_col2_subStyle">
+					</div>
+				</div>
+				<div class="pop_note" style="margin-bottom:0px;">
+					<div class="note_title"><label for="jobTriggerVal">Cron 값</label></div>
+					<textarea class="input_note" title="Cron 값" name="jobTriggerVal" id="jobTriggerVal" rows="7" value="" maxlength="2000" readonly></textarea>
+				</div>
+				<div class="jenkinsTriggerMsg" id="jenkinsTriggerMsg">
+					* 값 체크 메시지가 출력되는 영역입니다. (포커스 해제 시)
+				</div>
 				<div class="pop_note" style="margin-bottom:0px;">
 					<div class="note_title">JOB 설명</div>
 					<textarea class="input_note" title="JOB 설명" name="jobDesc" id="jobDesc" rows="7" value="" maxlength="2000"  ></textarea>
