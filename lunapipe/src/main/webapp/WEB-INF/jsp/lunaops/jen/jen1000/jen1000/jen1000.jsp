@@ -855,7 +855,7 @@ function fnJobSearchSetting(){
 
 								var data = {"popupGb": "update", "jenId": chkList[0].jenId, "jobId": chkList[0].jobId};
         	                	
-								gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1002JobDetailView.do',data,"650","585",'scroll',false);
+								gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1002JobDetailView.do',data,"650","770",'scroll',false);
 						}},
 						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", addClass: ciFlagCss, key:"btn_insert_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-save' aria-hidden='true'></i>&nbsp;<span>등록</span>",
 							onclick:function(){
@@ -868,7 +868,7 @@ function fnJobSearchSetting(){
 									"popupGb": "insert",
 									"selJenId": (!gfnIsNull(item))? item.jenId : null
 								};
-								gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1002JobDetailView.do',data,"1000","540",'scroll',false);
+								gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1002JobDetailView.do',data,"1000","710",'scroll',false);
 						}},
 						{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_jenkins",style:"float:right;",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 							onclick:function(){
@@ -937,8 +937,7 @@ function fnSelJobGridSetting(){
    				selJobGrid.select(this.doindex, {selected: !this.item.__selected__});	
             },
             onDBLClick:function(){
-  				var data = {"jenId": this.item.jenId, "jobId": this.item.jobId};
-  				gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1004JobDetailView.do',data,"1200", "870",'scroll');
+  				
             }
 		}
 	});
