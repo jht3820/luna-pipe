@@ -32,6 +32,7 @@ public class Jen1100VO extends PageVO {
     private String    jobTypeCd;              
     private String	jobTypeNm;
     
+    private String jobTriggerCd;	
     private String    useCd;               
     private String    useNm;
     private String	projectJenkinsCheck;
@@ -158,6 +159,13 @@ public class Jen1100VO extends PageVO {
 	}
 	public void setJobTypeNm(String jobTypeNm) {
 		this.jobTypeNm = jobTypeNm;
+	}
+	
+	public String getJobTriggerCd() {
+		return jobTriggerCd;
+	}
+	public void setJobTriggerCd(String jobTriggerCd) {
+		this.jobTriggerCd = jobTriggerCd;
 	}
 	public String getUseCd() {
 		return useCd;
