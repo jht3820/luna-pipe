@@ -58,6 +58,7 @@ public class Cmm1000Controller {
 			}
 
 		}catch(Exception e){
+			e.printStackTrace();
 			Log.debug(e);
 			rtnMap = new HashMap();
 			rtnMap.put("ERROR_CODE", "-1");

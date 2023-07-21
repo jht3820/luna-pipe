@@ -96,4 +96,34 @@ public interface Jen1000Service {
 	
 	@SuppressWarnings("rawtypes")
 	String insertJen1101CIJobInfo(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	int insertJen1000BldLog(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	Map selectJen1200JobLastBuildInfo(Map paramMap) throws Exception;
+
+
+	
+	@SuppressWarnings({ "rawtypes" })
+	Map selectJen1200JobBuildInfo(Map paramMap) throws Exception;
+
+	
+	@SuppressWarnings("rawtypes")
+	List<Map> selectJen1201JobLastBuildChgList(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	List<Map> selectJen1202JobLastBuildFileChgList(Map paramMap) throws Exception;
+	
+
+	
+	@SuppressWarnings("rawtypes")
+	List<Map> selectJen1200JobBuildList(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	int selectJen1200JobBuildListCnt(Map paramMap) throws Exception;
 }
