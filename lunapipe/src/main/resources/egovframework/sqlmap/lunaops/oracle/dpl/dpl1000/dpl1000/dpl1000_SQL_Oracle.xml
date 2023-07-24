@@ -192,11 +192,14 @@
 		AND A.DPL_ID = #dplId#
        <isNotEmpty property="searchSelect">
 			<isNotEmpty property="searchTxt">
+			<isEqual property="searchSelect" compareValue="jenNm"> 
+				AND		UPPER( C.JEN_NM ) like '%'|| UPPER( #searchTxt#  )  ||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="jenUrl"> 
+				AND		UPPER( C.JEN_URL ) like '%'|| UPPER( #searchTxt#  )  ||'%'
+			</isEqual>
 			<isEqual property="searchSelect" compareValue="jobId"> 
 				AND		UPPER( B.JOB_ID ) like '%'|| UPPER( #searchTxt#  )  ||'%'
-			</isEqual>
-			<isEqual property="searchSelect" compareValue="jobDesc"> 
-				AND		UPPER( D.JOB_DESC )  like '%'|| UPPER( #searchTxt#  )  ||'%'
 			</isEqual>
 			</isNotEmpty>
 		</isNotEmpty>
@@ -537,7 +540,6 @@
         	AND		JEN_ID = #jenId#
         	AND		JOB_ID = #jobId#
 	</update>
-	
 	 
 	
 	
