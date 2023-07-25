@@ -18,33 +18,31 @@
 
 .pop_dpl_div_sub.divDetailJen1004_sub_left{width: 561px;float: left;margin-right: 10px;height: 725px;}
 .pop_dpl_div_sub.divDetailJen1004_sub_right {width: 585px;float: left;height: 725px;}
-.jen1004_middle_row {height: 41px;display: inline-block;float: left;border-bottom: 1px solid #ccc;cursor:pointer;}
-.jen1004_middle_row:first-child {border-top: 1px solid #ccc;}
-.jen1004_middle_cell {display: inline-block;float: left;height: 100%;border-right: 1px solid #ccc;padding: 5px 2px;text-overflow: ellipsis;overflow: hidden;line-height: 30px;}
-.jen1004_middle_job_header {display: inline-block;height: 40px;width: 100%;border: 1px solid #ccc;border-bottom: none;background-color: #f9f9f9;float: left;}
-.jen1004_middle_cell:nth-child(1) {width: 80px;}
-.jen1004_middle_cell:nth-child(2) {width: 80px;}
-.jen1004_middle_cell:nth-child(3) {width: 150px;}
-.jen1004_middle_cell:nth-child(4) {width: 120px;}
-.jen1004_middle_cell:nth-child(5) {width: 100px;border-right:none;}
-.jen1004_bottom_bld_content {display: inline-block;width: 100%;border: 1px solid #ccc;line-height: 25px;height: 635px;overflow-y: scroll;overflow-x: hidden;padding: 2px 0;}
-.jen1004_bld_row {cursor: grab;}
-.jen1004_bld_row:hover {background-color: #414352;color: #fff;}
-.jen1004_middle_row.jobActive {background-color: #414352;color: #fff;}
+
 .jen1004_sub_title {font-weight: bold;background: #f9f9f9;border: 1px solid #ccc;border-left: none;border-right: none;padding: 6px 5px;height: 35px;position: relative;text-align: left;font-size: 11pt;margin-bottom: 2px;line-height: 20px;}
 div#dplPopJobContentsFrame{background: #23241f;color: #f8f8f2;height: 675px;display: inline-block;width: 100%;text-align: left;line-height: 20px;position: relative;}
 div#dplPopJobContentsFrame > pre{width:100%;height:100%}
-div#dplPopJobContentsFrame > pre > code {height: 100%;width: 100%;font-size: 10pt;position: absolute;top: 0;left: 0;padding: 0.5em;}
+div#dplPopJobContentsFrame > pre > code {height: 100%;width: 100%;font-size: 10pt;position: absolute;top: 0;left: 0;padding: 0.5em;    overflow: auto;}
+div#dplPopJobContentsFrame > pre > code > a {color: #67a8e9;}
 div#pop_dpl_job_consoleLogDiv.full_screen{position: absolute;top: 0;left: 0;width: 100%;height: 745px;z-index:2;background-color:#fff;}
 </style>
 <script type="text/javascript">
-	$(document).ready(function() {
-		
-		$('#btnPopJen1004Cancle').click(function() {
-			gfnLayerPopupClose();
-		});
-		
+
+
+var jen1004BldListGrid;
+
+var jen1004BldSearchObj;
+
+$(document).ready(function() {
+	
+	fnJobBldListGridSetting();
+	
+	
+	$('#btnPopJen1004Cancle').click(function() {
+		gfnLayerPopupClose();
 	});
+	
+});
 
 
 function fnPopJobConsoleLogLoad(thisObj){
@@ -126,51 +124,250 @@ $(".dplFullScreanBtn").click(function(){
 		$thisObj.children("i").addClass("fa-compress");
 	}
 });
+
+
+function fnJobBldListGridSetting(){
+	jen1004BldListGrid = new ax5.ui.grid();
+ 
+	jen1004BldListGrid.setConfig({
+		target: $('[data-ax5grid="jobBldListGrid"]'),
+		
+		sortable:false,
+		header: {align:"center",columnHeight: 30},
+		columns: [
+			{key: "bldNum", label: "빌드 번호", width: 60, align: "center"},
+			{key: "bldResult", label: "빌드 결과", width: 100, align: "center"},
+			{key: "bldDurationTm", label: "소요시간", width: 90, align: "center"
+				,formatter:function(){
+					return gfnHourCalc(this.item.bldDurationTm/1000);
+				}
+			},
+			{key: "bldStartDtm", label: "빌드 시작 시간", width: 150, align: "center"
+				,formatter:function(){
+					return new Date(this.item.bldStartDtm).format("yyyy-MM-dd HH:mm:ss");
+				}
+			},
+			{key: "bldCauses", label: "실행 원인", width: 144, align: "center"}
+		],
+		
+		body: {
+			align: "center",
+			columnHeight: 30,
+			onClick:function(){
+				
+   				this.self.select(jen1004BldListGrid.selectedDataIndexs[0]);
+             	
+				
+				this.self.select(this.doindex);
+				
+				
+				fnSelJobBuildInfo(this.item);
+			}
+		},
+		page: {
+			navigationItemCount: 9,
+			height: 30,
+  			display: true,
+			firstIcon: '<i class="fa fa-step-backward" aria-hidden="true"></i>',
+			prevIcon: '<i class="fa fa-caret-left" aria-hidden="true"></i>',
+			nextIcon: '<i class="fa fa-caret-right" aria-hidden="true"></i>',
+			lastIcon: '<i class="fa fa-step-forward" aria-hidden="true"></i>',
+			onChange: function () {
+				fnJobBldListGridDataSet(this.page.selectPage);
+			}
+		} 
+	});
+	
+	fnJobBldListGridDataSet();
+}
+
+
+function fnJobBldListGridDataSet(_pageNo){
+	
+   	
+ 	var ajaxParam = "";
+
+   	
+   	
+   	if(!gfnIsNull(_pageNo)){
+   		ajaxParam += "&pageNo="+_pageNo;
+   	}else if(typeof jen1004BldListGrid.page.currentPage != "undefined"){
+   		ajaxParam += "&pageNo="+jen1004BldListGrid.page.currentPage;
+   	}
+   	
+   	
+   	var jenId = '<c:out value="${param.jenId}"/>';
+   	var jobId = '<c:out value="${param.jobId}"/>';
+   	ajaxParam += "&jenId="+jenId+"&jobId="+jobId;
+   	
+   	
+   	
+	var ajaxObj = new gfnAjaxRequestAction(
+			{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000JobBuildListAjax.do'/>","loadingShow":true}
+			,ajaxParam);
+	
+	ajaxObj.setFnSuccess(function(data){
+		var list = data.list;
+		var page = data.page;
+		
+		jen1004BldListGrid.setData({
+			list:list,
+			page: {
+				currentPage: _pageNo || 0,
+				pageSize: page.pageSize,
+				totalElements: page.totalElements,
+				totalPages: page.totalPages
+			}
+		});
+	});
+	
+	
+	ajaxObj.send();
+}
+
+
+function fnSelJobBuildInfo(paramBldItem){
+
+	
+	var jenId = paramBldItem.jenId;
+	var jobId = paramBldItem.jobId;
+	var bldNum = paramBldItem.bldNum;
+	
+	
+	var ajaxObj = new gfnAjaxRequestAction(
+			{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000JobBuildInfo.do'/>","loadingShow":true}
+			,{"jenId": jenId, "jobId": jobId, "bldNum": bldNum});
+	
+	ajaxObj.setFnSuccess(function(data){
+		var bldConsoleLogStr = "";
+		
+		if(data.errorYn == "Y"){
+			jAlert(data.message,"알림창");
+			return;
+		}else{
+			
+			bldConsoleLogStr = data.jobBuildInfo.bldConsoleLog;
+		}
+		
+	});
+	
+	
+	ajaxObj.send();
+}
 </script>
 
 <div class="popup">
-	<div class="pop_title">[ <c:out value="${param.jobId}"/> ] 상세 팝업</div>
+	<div class="pop_title">[ <c:out value="${param.jobId}"/> ] 빌드 상세 정보</div>
 	<div class="pop_sub">
 		<div class="pop_dpl_div_sub divDetailJen1004_sub_left">
 			<div class="jen1004_sub_title">
-				JOB 빌드 목록 (최근 100건)
+				JOB 빌드 목록
 			</div>
-			<div class="jen1004_middle_job_header">
-				<div class="jen1004_middle_cell">빌드 번호</div>
-				<div class="jen1004_middle_cell">빌드 상태</div>
-				<div class="jen1004_middle_cell">빌드 시작 시간</div>
-				<div class="jen1004_middle_cell">소요 시간</div>
-				<div class="jen1004_middle_cell">배포자</div>
-			</div>
-			<div class="jen1004_bottom_bld_content" id="jen1004_bottom_bld_content">
-				<c:if test="${not empty jobBldNumList}">
-					<c:forEach items="${jobBldNumList}" var="map">
-						<div class="jen1004_middle_row" dplid="${map.dplId}" jenid="${map.jenId}" jobid='<c:out value="${map.jobId}"/>' bldseq='<c:out value="${map.bldSeq}"/>' onclick="fnPopJobConsoleLogLoad(this)">
-							<div class="jen1004_middle_cell"><c:out value="${map.bldNum}"/></div>
-							<div class="jen1004_middle_cell"><c:out value="${map.bldResult}"/></div>
-							<div class="jen1004_middle_cell"><fmt:formatDate value="${map.bldStartDtm}" pattern="yyyy-MM-dd HH:mm:ss"/></div>
-							<div class="jen1004_middle_cell">
-								<fmt:parseNumber var="durationMm" value="${(map.bldDurationTm/(1000))/60}" integerOnly="true" />
-								<fmt:parseNumber var="durationSs" value="${(map.bldDurationTm/(1000))%60}" integerOnly="true" />
-								<c:if test="${durationMm > 0}">${durationMm}분 </c:if>${durationSs}초
-							</div>
-							<div class="jen1004_middle_cell"><c:out value="${map.regUsrNm}"/></div>
-						</div>
-					</c:forEach>
-				</c:if>
+			<div id="AXSearchTarget-jenkins" guide="jen1000JenkinsBtn"></div>
+			<div class="dpl_wrap white">
+				<div data-ax5grid="jobBldListGrid" data-ax5grid-config="{}" style="height: 673px;" guide="jen1000JenkinsList"></div>	
 			</div>
 		</div>
 		<div class="pop_dpl_div_sub divDetailJen1004_sub_right" id="pop_dpl_job_consoleLogDiv" fullmode="2">
+		
 			<div class="jen1004_sub_title">
-				콘솔 로그
-				<div class="sub_title_btn right">
-					<div class="dplFullScreanBtn" fullmode="2"><i class="fas fa-expand"></i></div>
-				</div>
+				JOB 빌드 상세 정보
 			</div>
-			<div id="dplPopJobContentsFrame">
-				<pre>
-					<code id="dplPopBuildJobConsoleLog">좌측 빌드 정보를 선택해주세요.</code>
-				</pre>
+			<div class="jen1004JobDetailInfoFrame">
+				<form name="jen1004JobInfoForm" id="jen1004JobInfoForm" onsubmit="return false;">
+				<div class="descMainFrame">
+					<div class="descSubFrame">
+						<div class="descLabelFrame"><label>CI ID</label></div>
+						<div class="descValueFrame">
+							<span id="ciId"></span>
+						</div>
+					</div>
+					<div class="descSubFrame">
+						<div class="descLabelFrame"><label>TICKET ID</label></div>
+						<div class="descValueFrame">
+							<span id="ticketId"></span>
+						</div>
+					</div>
+				</div>
+				<div class="descMainFrame">
+					<div class="descLabelFrame"><label>JENKINS 명</label></div>
+					<div class="descValueFrame">
+						<span id="jenNm"></span>
+					</div>
+				</div>
+				<div class="descMainFrame">
+					<div class="descLabelFrame"><label>JENKINS URL</label></div>
+					<div class="descValueFrame">
+						<span id="jenUrl"></span>
+					</div>
+				</div>
+				<div class="descMainFrame">
+					<div class="descSubFrame">
+						<div class="descLabelFrame"><label>JOB ID</label></div>
+						<div class="descValueFrame">
+							<span id="jobId"></span>
+						</div>
+					</div>
+					<div class="descSubFrame">
+						<div class="descLabelFrame"><label>JOB 타입</label></div>
+						<div class="descValueFrame">
+							<span id="jobTypeNm"></span>
+						</div>
+					</div>
+				</div>
+				<div class="descMainFrame">
+					<div class="descLabelFrame"><label>JOB _class</label></div>
+					<div class="descValueFrame">
+						<span id="jobClass"></span>
+					</div>
+				</div>
+				<div class="descMainFrame">
+					<div class="descSubFrame">
+						<div class="descLabelFrame"><label>building</label></div>
+						<div class="descValueFrame">
+							<span id="building""></span>
+						</div>
+					</div>
+					<div class="descSubFrame">
+						<div class="descLabelFrame"><label>빌드 일시</label></div>
+						<div class="descValueFrame">
+							<span id="buildDate"></span>
+						</div>
+					</div>
+				</div>
+				<div class="descMainFrame">
+					<div class="descSubFrame">
+						<div class="descLabelFrame"><label>빌드번호</label></div>
+						<div class="descValueFrame">
+							<span id="buildNumber"></span>
+						</div>
+					</div>
+					<div class="descSubFrame">
+						<div class="descLabelFrame"><label>빌드 결과</label></div>
+						<div class="descValueFrame">
+							<span id="buildResult"></span>
+						</div>
+					</div>
+				</div>
+				<div class="descMainFrame">
+					<div class="descSubFrame">
+						<div class="descLabelFrame"><label>예상 소요시간</label></div>
+						<div class="descValueFrame">
+							<span id="buildEstimatedDurationStr"></span>
+						</div>
+					</div>
+					<div class="descSubFrame">
+						<div class="descLabelFrame"><label>소요시간</label></div>
+						<div class="descValueFrame">
+							<span id="buildDurationStr"></span>
+						</div>
+					</div>
+				</div>
+				<div class="descMainFrame">
+					<div class="descHeaderLabelFrame"><label>변경 내용</label></div>
+					<div class="descBodyValueFrame" id="buildChgContent"></div>
+				</div>
+				</form>
 			</div>
 		</div>
 		<div class="btn_div">
