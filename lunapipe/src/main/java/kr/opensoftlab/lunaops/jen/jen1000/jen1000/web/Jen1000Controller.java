@@ -306,6 +306,12 @@ public class Jen1000Controller {
 	}
 	
 	
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1006View.do")
+	public String selectJen1006View( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		return "/jen/jen1000/jen1000/jen1006";
+	}
+	
+	
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000JenkinsListAjax.do")
 	public ModelAndView selectJen1000JenkinsListAjax(@ModelAttribute("jen1000VO") Jen1000VO jen1000VO, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 
@@ -1319,6 +1325,31 @@ public class Jen1000Controller {
 		}
 	}
 	
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1203JobBldParamList.do")
+	public ModelAndView selectJen1203JobBldParamList(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			List jobBldParamList = jen1000Service.selectJen1203JobBuildParamList(paramMap);
+			
+			model.addAttribute("jobBldParamList", jobBldParamList);
+			model.addAttribute("errorYn", "N");
+			model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("selectJen1203JobBldParamList()", ex);
+			
+			model.addAttribute("errorYn", "Y");
+			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+			
+			return new ModelAndView("jsonView");
+		}
+	}
+	
 	
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1002JobCronSpecCheck.do")
 	public ModelAndView selectJen1002JobCronSpecCheck(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
@@ -1563,17 +1594,17 @@ public class Jen1000Controller {
 			
 			Map jobBuildInfo = jen1000Service.selectJen1200JobBuildInfo(paramMap);
 			
-			List<Map> jobLastBuildChgList = null;
+			List<Map> jobBuildChgList = null;
 			
-			List<Map> jobLastBuildFileChgList = null;
+			List<Map> jobBuildFileChgList = null;
 			
 			
 			if(jobBuildInfo != null) {
 				
-				jobLastBuildChgList = jen1000Service.selectJen1201JobLastBuildChgList(paramMap);
+				jobBuildChgList = jen1000Service.selectJen1201JobLastBuildChgList(paramMap);
 				
 				
-				jobLastBuildFileChgList = jen1000Service.selectJen1202JobLastBuildFileChgList(paramMap);
+				jobBuildFileChgList = jen1000Service.selectJen1202JobLastBuildFileChgList(paramMap);
 			}else {
 				
 				model.addAttribute("errorYn", "Y");
@@ -1582,8 +1613,8 @@ public class Jen1000Controller {
 			}
 			
 			model.addAttribute("jobBuildInfo", jobBuildInfo);
-			model.addAttribute("jobLastBuildChgList", jobLastBuildChgList);
-			model.addAttribute("jobLastBuildFileChgList", jobLastBuildFileChgList);
+			model.addAttribute("jobBuildChgList", jobBuildChgList);
+			model.addAttribute("jobBuildFileChgList", jobBuildFileChgList);
 			model.addAttribute("errorYn", "N");
 			model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
 			return new ModelAndView("jsonView");
