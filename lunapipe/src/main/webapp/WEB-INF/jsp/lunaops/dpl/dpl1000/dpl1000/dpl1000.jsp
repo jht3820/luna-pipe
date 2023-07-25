@@ -15,19 +15,16 @@
 	.search_box_wrap {width: calc(100% - 404px);} 
 	.req_right_box {border-radius: 5px;}
 	.req_left_table_wrap {width: 73%;}
-	
-	
-	
-.bg-blue {background: #3498DB !important;color: #fff; }
-.sub_progress {
-    float: right;
-    display: inline-block;
-    position: relative;
-    width: 340px;
-    height: 28px;
-    margin: 0 5px;
-    border: 1px solid #ccc;
-}
+	.bg-blue {background: #3498DB !important;color: #fff; }
+	.sub_progress {
+	    float: right;
+	    display: inline-block;
+	    position: relative;
+	    width: 340px;
+	    height: 28px;
+	    margin: 0 5px;
+	    border: 1px solid #ccc;
+	}
 </style>
 
 <script type="text/javascript">
@@ -86,7 +83,7 @@ $(document).ready(function() {
 			if(jobConsoleLog.hasOwnProperty("bldConsoleLog")){
 				
 				if(gfnIsNull(jobConsoleLog.bldConsoleLog)){
-					$('#buildConsoleLog').text("콘솔 로그가 없습니다.");
+					$('#buildConsoleLog').text("-");
 				}else{
 					
 					$('#buildConsoleLog').html(jobConsoleLog.bldConsoleLog);
@@ -101,7 +98,7 @@ $(document).ready(function() {
 			if(jobConsoleLog.hasOwnProperty("bldConsoleRestoreLog")){
 				
 				if(gfnIsNull(jobConsoleLog.bldConsoleRestoreLog)){
-					$('#buildConsoleLog').text("콘솔 로그가 없습니다.");
+					$('#buildConsoleLog').text("-");
 				}else{
 					
 					$('#buildConsoleLog').html(jobConsoleLog.bldConsoleRestoreLog);
@@ -119,6 +116,7 @@ $(document).ready(function() {
 	
 	
 	$("#btn_update_dplAction").click(function(){
+		return;
 		var item = jobGrid.getList('selected')[0];
 		if(gfnIsNull(item)){
 			toast.push('실행(빌드)하려는 JOB을 선택해주세요.');
@@ -176,7 +174,15 @@ $(document).ready(function() {
 			$targetObj.removeClass("full_screen");
 			$thisObj.children("i").addClass("fa-expand");
 			$thisObj.children("i").removeClass("fa-compress");
+			
+			if($(".frame_contents.full_screen").length == 0){
+				$("#bottomJobInfoFrame").addClass("bottomJobInfoFrame");
+			}
 		}else{
+			
+			if($(".frame_contents.full_screen").length == 0){
+				$("#bottomJobInfoFrame").removeClass("bottomJobInfoFrame");
+			}
 			$targetObj.addClass("full_screen");
 			$thisObj.children("i").removeClass("fa-expand");
 			$thisObj.children("i").addClass("fa-compress");
@@ -494,7 +500,7 @@ function fnAxGrid5View(){
             columns: [
     			{key: "jobStartOrd", label: "순서", width: 80, align: "center"},
               	{key: "jenNm", label: "JENKINS NAME", width: 180, align: "center"},
-              	{key: "jenUrl", label: "JENKINS Url", width: 180, align: "center"},
+              	{key: "jenUrl", label: "JENKINS URL", width: 180, align: "center"},
               	{key: "jenDesc", label: "JENKINS 설명", width: 200, align: "center"},
     			{key: "jobId", label: "JOB ID", width: 170, align: "center"},
     			{key: "jobTypeNm", label: "JOB TYPE", width: 95, align: "center"},
@@ -506,14 +512,59 @@ function fnAxGrid5View(){
                 align: "center",
                 columnHeight: 30,
                 onClick: function () {
-                	this.self.focus(this.dindex);
+                	
+                	$("#jobMaskFrame").hide();
+                	
+                	
+                	fnJobLastBuildDetailSetting(this.item);
                 	
                 },onDBLClick:function(){
                 	
-                	var item = this.item;
-                	var data = {"dplId" : item.dplId, "prjId" : item.prjId};
+					var data = {"jenId": this.item.jenId, "jobId": this.item.jobId};
+					gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1004JobDetailView.do',data,"1200", "870",'scroll');
+                }
+            },
+            contextMenu: {
+                iconWidth: 20,
+                acceleratorWidth: 100,
+                itemClickAndClose: false,
+                icons: {
+                    'arrow': '<i class="fa fa-caret-right"></i>'
+                },
+                items: [
+                    {type: "detailPopup", label: "상세 정보", icon:"<i class='fa fa-info-circle' aria-hidden='true'></i>"},
+                    {type: "detailParamPopup", label: "빌드 파라미터", icon:"<i class='fa fa-info-circle' aria-hidden='true'></i>"},
+                ],
+                popupFilter: function (item, param) {
+                	var selItem = dplJobGrid.list[param.doindex];
                 	
-					gfnLayerPopupOpen('/dpl/dpl1000/dpl1000/selectDpl1003View.do',data, "1200", "907");
+                	if(typeof selItem == "undefined"){
+                		return false;
+                	}
+                	return true;
+                },
+                onClick: function (item, param) {
+                	var selItem = dplJobGrid.list[param.doindex];
+
+                    
+					if(item.type == "detailPopup"){
+						
+						var data = {"jenId": selItem.jenId, "jobId": selItem.jobId};
+						gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1004JobDetailView.do',data,"1200", "870",'scroll');
+					}else if(item.type == "detailParamPopup"){
+						
+
+						var data = {
+								"dplId" : selItem.dplId,
+								"jobId" : selItem.jobId,
+								"jenId" : selItem.jenId
+						};
+						
+						
+						gfnLayerPopupOpen('/dpl/dpl1000/dpl1000/selectDpl1005View.do',data,"840","300",'scroll');
+					}
+					dplJobGrid.contextMenu.close();
+                    
                 }
             },
             page: {
@@ -571,7 +622,7 @@ function fnInGridListSet(_pageNo,ajaxParam){
 		             });
 		   	
 		   	
-            $("#buildConsoleLog").text("좌측에서 JOB을 선택해주세요.");
+            $("#buildConsoleLog").text("-");
 		});
 		
 		
@@ -595,12 +646,10 @@ function fnDplJobSearchSetting() {
 					list : [{label : "<i class='fa fa-search'></i>&nbsp;",labelWidth : "50",type : "selectBox",width : "",key : "searchSelect",addClass : "",valueBoxStyle : "",value : "all",
 						options : [
 							{optionValue : "rn",optionText : "전체 보기",optionAll : true}, 
-							{optionValue : "dplStsCd",optionText : '배포 상태' , optionCommonCode:"DPL00001" }, 
-							{optionValue : "dplVer",optionText : '배포 버전'}, 
-							{optionValue : "dplNm",optionText : '배포 명'}, 
-							{optionValue : "dplTypeCd",optionText : '배포 방법' , optionCommonCode:"DPL00003"},
-							{optionValue : "dplUsrNm",optionText : "배포자"},
-							{optionValue : "dplDesc",optionText : "배포 설명"} 
+							{optionValue : "jenNm",optionText : 'JENKINS 명'}, 
+							{optionValue : "jenUrl",optionText : 'JENKINS URL'}, 
+							{optionValue : "jobId",optionText : 'JOB ID'}, 
+							{optionValue : "jobTypeCd", optionText : 'JOB 타입' , optionCommonCode:"DPL00002"},
 						],
 							onChange : function(selectedObject,value) {
 									
@@ -614,31 +663,7 @@ function fnDplJobSearchSetting() {
 									
 									if (!gfnIsNull(selectedObject.optionCommonCode)) {
 										gfnCommonSetting(dplJobSearchObj,selectedObject.optionCommonCode,"searchCd","searchTxt");
-									} else if (value == "flowId") {
-										
-										axdom("#"+ dplJobSearchObj.getItemId("searchCd")).html('');
-										
-										axdom("#"+ dplJobSearchObj.getItemId("searchCd")).append('<option value="ALL">전체</option>');
-										$.each(JSON.parse(flowList),function() {
-											axdom("#"+ dplJobSearchObj.getItemId("searchCd")).append('<option value="'+this.flowId+'">'+ this.flowNm+ '</option>');
-										});
-										axdom("#"+ dplJobSearchObj.getItemId("searchCd")).append('<option value="FLW">미분류</option>');
-										axdom("#"+ dplJobSearchObj.getItemId("searchTxt")).hide();
-										axdom("#"+ dplJobSearchObj.getItemId("searchCd")).show();
-									} else if (value == "sprintId") {
-										axdom("#"+ dplJobSearchObj.getItemId("searchCd")).html('');
-									
-									if (gfnIsNull(sprintList)) {
-										axdom("#"+ dplJobSearchObj.getItemId("searchCd")).append('<option value="">없음</option>');
-									} else {
-										
-										$.each(JSON.parse(sprintList),function() {
-											axdom("#"+ dplJobSearchObj.getItemId("searchCd")).append('<option value="'+this.sprintId+'">'+ this.sprintNm+ '</option>');
-										});
-									}
-										axdom("#"+ dplJobSearchObj.getItemId("searchTxt")).hide();
-										axdom("#"+ dplJobSearchObj.getItemId("searchCd")).show()
-									} else {
+									}  else {
 										
 										axdom("#"+ dplJobSearchObj.getItemId("searchTxt")).show();
 										axdom("#"+ dplJobSearchObj.getItemId("searchCd")).hide();
@@ -653,35 +678,6 @@ function fnDplJobSearchSetting() {
 									}
 								},
 								{label : "",labelWidth : "",type : "selectBox",width : "100",key : "searchCd",addClass : "selectBox",valueBoxStyle : "padding-left:0px;",value : "01",options : []},
-								{label:"<i class='fas fa-list-ol'></i>&nbsp;목록 수&nbsp;", labelWidth:"60", type:"selectBox", width:"", key:"pageSize", addClass:"", valueBoxStyle:"", value:"30",
-									options:[
-												{optionValue:15, optionText:"15"},
-				                                {optionValue:30, optionText:"30"},
-				                                {optionValue:50, optionText:"50"},
-				                                {optionValue:100, optionText:"100"},
-				                                {optionValue:200, optionText:"200"},
-				                                {optionValue:300, optionText:"300"},
-												{optionValue:600, optionText:"600"},
-												{optionValue:1000, optionText:"1000"},
-												{optionValue:5000, optionText:"5000"},
-												{optionValue:10000, optionText:"10000"}
-				                                
-				                            ],onChange: function(selectedObject, value){
-				                            	fnInGridListSet(0,$('form#searchFrm').serialize()+"&"+dplJobSearchObj.getParam());
-				    						}
-								},
-								{label:"<i class='fas fa-arrows-v'></i>&nbsp;목록 높이&nbsp;", labelWidth:"60", type:"selectBox", width:"", key:"gridHeight", addClass:"", valueBoxStyle:"", value:"600",
-									options:[
-									         	{optionValue:300, optionText:"300px"},
-				                                {optionValue:600, optionText:"600px"},
-				                                {optionValue:1000, optionText:"1000px"},
-				                                {optionValue:1200, optionText:"1200px"},
-				                                {optionValue:2000, optionText:"2000px"},
-				                                
-				                            ],onChange: function(selectedObject, value){
-				                            	dplJobGrid.setHeight(value);
-				    						}
-								},
 								{label : "",labelWidth : "",type : "button",width : "70",key : "btn_print_newReqDemand",style : "float:right;",valueBoxStyle : "padding:5px;",value : "<i class='fa fa-print' aria-hidden='true'></i>&nbsp;<span>프린트</span>",
 									onclick : function() {
 										$(dplJobGrid.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
@@ -715,180 +711,6 @@ function fnDplJobSearchSetting() {
 			});
 	}
 	
-
-function fnDplStsCdUpdate(dplId, selCommonObj){
-	
-	var ajaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/dpl/dpl1000/dpl1000/updateDpl1000DplStsCdView.do'/>","loadingShow":false}
-			,{"dplId": dplId, "dplStsCd": selCommonObj[0].subCd});
-	
-	
-	ajaxObj.setFnSuccess(function(data){
-		
-
-		
-		if(data.errorYn != "Y"){
-			
-			 fnInGridListSet(dplJobGrid.page.currentPage,dplJobSearchObj.getParam());
-			
-   			
-   			fnInJobGridListSet(0,dplJobSearchObj.getParam(),selDplId);
-		}
-		jAlert(data.message, "알림창");
-	});
-	
-	
-	ajaxObj.send();
-}
-
-
-function fnAxJobGrid5View(){
-	jobGrid = new ax5.ui.grid();
- 
-        jobGrid.setConfig({
-            target: $('[data-ax5grid="job-grid"]'),
-            showRowSelector: false,
-            sortable:false,
-
-            header: {align:"center",columnHeight: 30},
-            columns: [
-                {key: "bldResult", label: " ", width: 30, align: "center"
-					,formatter:function(){
-						var result = this.item.bldResult;
-						
-						
-						if(!gfnIsNull(result)){
-							result = result.toLowerCase();
-						}
-						
-						
-						if(!gfnIsNull(this.item.jobRestoreId) && !gfnIsNull(this.item.bldRestoreResult)){
-							if(result != "success"){
-								result = (this.item.bldRestoreResult).toLowerCase();
-							}
-						} 
-						
-						var faIcon = "circle";
-						
-						
-						
-						if(result == "fail" || result == "failure"){
-							faIcon = "times-circle";
-						}
-						else if(result == "success"){
-							faIcon = "check-circle";
-						}else if(result == "progress" || result == "start"){
-							faIcon = "circle-notch fa-spin";
-						}else if(result == "restore"){
-							faIcon = "circle-notch fa-spin";
-						}else if(result == "aborted"){
-							faIcon = "exclamation-circle";
-						}
-						
-						return '<i class="fas fa-'+faIcon+' result-'+result+'"></i>';
-					}},
-                {key: "jobStartOrd", label: "실행 순서", width: 70, align: "center"},
-                {key: "jobTypeNm", label: "JOB TYPE", width: 80, align: "center"},
-                {key: "bldNum", label: "빌드 번호", width: 80, align: "center"},
-				{key: "jobId", label: "JOB ID", width: 120, align: "left"},
-				{key: "jobParameter", label: "JOB 매개변수", width: 100, align: "center"},
-				{key: "bldResultMsg", label: "실행 결과", width: 200, align: "center"},
-				{key: "bldRestoreNum", label: "원복 빌드 번호", width: 120, align: "center"},
-				{key: "jobRestoreId", label: "원복 JOB ID", width: 120, align: "center"},
-				{key: "bldRestoreResultMsg", label: "원복 결과", width: 200, align: "center"},
-            ],
-            body: {
-                align: "center",
-                columnHeight: 30,
-                onClick: function () {
-                	this.self.focus(this.dindex);
-                	
-                	
-    				$("#btn_bldMainLog").show();
-    				$("#btn_bldMainLog").attr("jobid",this.item.jobId);
-    				$("#bldMainConsoleLog").html(this.item.jobId);
-    				
-    				
-    				$("#btn_bldMainLog").addClass("logBtnActive");
-    				
-    				
-    				if(!gfnIsNull(this.item.jobRestoreId)){
-    					$("#btn_bldSubLog").show();
-    					$("#btn_bldSubLog").attr("jobid",this.item.jobRestoreId);
-    					$("#bldSubConsoleLog").html(this.item.jobRestoreId);
-    				}else{
-    					$("#btn_bldSubLog").hide();	
-    				}
-    				
-    				
-    				fnSelJobConsoleLogLoad(this.item);
-    				
-                },onDBLClick:function(){
-                	
-                	var data = {"jenId": this.item.jenId, "jobId": this.item.jobId};
-					gfnLayerPopupOpen('/stm/stm3000/stm3000/selectStm3004JobDetailView.do',data,"1200", "870",'scroll');
-                }
-            },
-            contextMenu: {
-                iconWidth: 20,
-                acceleratorWidth: 100,
-                itemClickAndClose: false,
-                icons: {
-                    'arrow': '<i class="fa fa-caret-right"></i>'
-                },
-                items: [
-                    {type: "detailPopup", label: "상세 정보", icon:"<i class='fa fa-info-circle' aria-hidden='true'></i>"},
-                    {type: "detailParamPopup", label: "빌드 파라미터", icon:"<i class='fa fa-info-circle' aria-hidden='true'></i>"},
-                ],
-                popupFilter: function (item, param) {
-                	var selItem = jobGrid.list[param.doindex];
-                	
-                	if(typeof selItem == "undefined"){
-                		return false;
-                	}
-                	return true;
-                },
-                onClick: function (item, param) {
-                	var selItem = jobGrid.list[param.doindex];
-
-                    
-					if(item.type == "detailPopup"){
-						
-	                	var data = {"jenId": selItem.jenId, "jobId": selItem.jobId};
-						gfnLayerPopupOpen('/stm/stm3000/stm3000/selectStm3004JobDetailView.do',data,"1200", "870",'scroll');
-					}else if(item.type == "detailParamPopup"){
-						
-
-						var data = {
-								"prjId" : selItem.prjId,
-								"dplId" : selItem.dplId,
-								"jobId" : selItem.jobId,
-								"jenId" : selItem.jenId
-						};
-						
-						
-						gfnLayerPopupOpen('/dpl/dpl1000/dpl1000/selectDpl1005View.do',data,"840","300",'scroll');
-					}
-					jobGrid.contextMenu.close();
-                    
-                }
-            },
-            page: {
-                navigationItemCount: 9,
-                height: 30,
-                display: true,
-                firstIcon: '<i class="fa fa-step-backward" aria-hidden="true"></i>',
-                prevIcon: '<i class="fa fa-caret-left" aria-hidden="true"></i>',
-                nextIcon: '<i class="fa fa-caret-right" aria-hidden="true"></i>',
-                lastIcon: '<i class="fa fa-step-forward" aria-hidden="true"></i>',
-                onChange: function () {
-                	
-		    		$(".progress .progress-bar").attr('data-transitiongoal', 0).progressbar2({display_text: 'center', percent_format: function(p) {return '0%';}});
-					fnInJobGridListSet(this.page.selectPage,dplJobSearchObj.getParam(),selDplId);
-                }
-            }
-        });
-}
 
 
 function fnSelJobConsoleLogLoad(jobItem){
@@ -1092,6 +914,147 @@ function fnJobAutoCheckSwitch(onOffValue){
 		
 	}
 }
+
+
+function fnJobLastBuildDetailSetting(paramJobInfo){
+	
+	var ajaxObj = new gfnAjaxRequestAction(
+			{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000JobLastBuildInfo.do'/>","loadingShow":false}
+			,{"jenId": paramJobInfo.jenId, "jobId": paramJobInfo.jobId});
+	
+	ajaxObj.setFnSuccess(function(data){
+		
+		
+		var jobLastBuildInfo = data.jobLastBuildInfo;
+		var jobLastBuildChgList = data.jobLastBuildChgList;
+		var jobLastBuildFileChgList = data.jobLastBuildFileChgList;
+		
+		
+		
+		$("form#dpl1000JobInfoForm #jenNm").text(paramJobInfo.jenNm);
+		$("form#dpl1000JobInfoForm #jenUrl").text(paramJobInfo.jenUrl);
+		$("form#dpl1000JobInfoForm #jobId").text(paramJobInfo.jobId);
+		$("form#dpl1000JobInfoForm #jobTypeNm").text(paramJobInfo.jobTypeNm);
+		
+		
+		var ciId = "-";
+		var ticketId = "-";
+		var dplId = "-";
+		
+		
+		var buildCauses = "-";
+		var building = false;
+		var buildDate = "-";
+		var buildNumber = "-";
+		var buildResult = "-";
+		var buildDurationStr = "-";
+		var buildEstimatedDurationStr = "-";
+		var dpl1000BuildConsoleLog = "-";
+		var buildConsoleLog = "-";
+		var jobClass = "-";
+		
+		if(!gfnIsNull(jobLastBuildInfo)){
+			try{
+				
+				ciId = jobLastBuildInfo["ciId"];
+				ticketId = jobLastBuildInfo["ticketId"];
+				dplId = jobLastBuildInfo["dplId"];
+				
+			}catch(e){
+				console.log(e);
+			}
+			try{
+				
+				jobClass = jobLastBuildInfo["bldClass"];
+				buildCauses = jobLastBuildInfo["bldCauses"];
+				buildDate = new Date(jobLastBuildInfo["bldStartDtm"]).format("yyyy-MM-dd HH:mm:ss");
+				buildNumber = jobLastBuildInfo["bldNum"];
+				buildResult = jobLastBuildInfo["bldResult"];
+				buildDurationStr = gfnHourCalc(jobLastBuildInfo["bldDurationTm"]/1000);
+				buildEstimatedDurationStr = gfnHourCalc(jobLastBuildInfo["bldEtmDurationTm"]/1000);
+				buildConsoleLog = jobLastBuildInfo["bldConsoleLog"];
+				
+			}catch(e){
+				console.log(e);
+			}
+			try{
+				
+				var dpl1000BuildConsoleLogStr = "";
+				
+				
+				if(!gfnIsNull(jobLastBuildChgList)){
+					
+					var jobLastBuildFileChgMap = {};
+					
+					
+					if(!gfnIsNull(jobLastBuildFileChgList)){
+						$.each(jobLastBuildFileChgList, function(idx, map){
+							
+							if(!jobLastBuildFileChgMap.hasOwnProperty(map.bldNum)){
+								jobLastBuildFileChgMap[map.bldNum] = {};
+							}
+							
+							if(!jobLastBuildFileChgMap[map.bldNum].hasOwnProperty(map.chgRevision)){
+								jobLastBuildFileChgMap[map.bldNum][map.chgRevision] = [];
+							}
+							
+							
+							jobLastBuildFileChgMap[map.bldNum][map.chgRevision].push(map);
+						});
+					}
+					
+					
+					$.each(jobLastBuildChgList, function(idx, map){
+						
+						var buildChgFileStr = "";
+						
+						dpl1000BuildConsoleLogStr += 
+							'<div class="buildChgMainFrame">'
+								+'<div class="buildChgHeader"><b>'+map.chgRevision+'</b> - '+map.chgUser+' ('+(new Date(parseInt(map.chgTimestamp)).format("yyyy-MM-dd HH:mm:ss"))+') </div>'
+								+'<div class="buildChgBody">'+(map.chgMsg).replace(/\n/g,"</br>")+'</div>'
+						
+						
+						if(jobLastBuildFileChgMap.hasOwnProperty(map.bldNum) && jobLastBuildFileChgMap[map.bldNum].hasOwnProperty(map.chgRevision)){
+							
+							$.each(jobLastBuildFileChgMap[map.bldNum][map.chgRevision], function(subIdx, subMap){
+								buildChgFileStr += '<span class="buildFileChgLog fa '+subMap.editTypeCd+'">'+subMap.filePath+'</span>';
+							});
+							dpl1000BuildConsoleLogStr += '<div class="buildChgFooter">'+buildChgFileStr+'</div>';
+						}
+						dpl1000BuildConsoleLogStr += '</div>';
+					});
+					dpl1000BuildConsoleLog = dpl1000BuildConsoleLogStr;
+				}
+				
+			}catch(e){
+				console.log(e);
+			}
+		}
+		
+		$("form#dpl1000JobInfoForm #ciId").text(ciId);
+		$("form#dpl1000JobInfoForm #ticketId").text(ticketId);
+		$("form#dpl1000JobInfoForm #dplId").text(dplId);
+		
+		
+		$("form#dpl1000JobInfoForm #buildCauses").text(buildCauses);
+		$("form#dpl1000JobInfoForm #jobClass").text(jobClass);
+		$("form#dpl1000JobInfoForm #building").text(building);
+		$("form#dpl1000JobInfoForm #buildDate").text(buildDate);
+		$("form#dpl1000JobInfoForm #buildNumber").text(buildNumber);
+		$("form#dpl1000JobInfoForm #buildResult").text(buildResult);
+		$("form#dpl1000JobInfoForm #buildDurationStr").text(buildDurationStr);
+		$("form#dpl1000JobInfoForm #buildEstimatedDurationStr").text(buildEstimatedDurationStr);
+		$("form#dpl1000JobInfoForm #dpl1000BuildConsoleLog").html(dpl1000BuildConsoleLog);
+		
+		
+		$("#buildConsoleLog").html(buildConsoleLog);
+		
+	   	
+	});
+	
+	
+	ajaxObj.send();
+}
 </script>
 <div class="main_contents" style="height: auto;">
 	<div class="tab_contents menu" style="max-width: 1500px;position: relative;">
@@ -1108,23 +1071,133 @@ function fnJobAutoCheckSwitch(onOffValue){
 				<button type="button" id="btn_select_jobAutoCheckOff" onclick="fnJobAutoCheckSwitch(false)" title="" placeholder="" style="width:120px;" class="AXButton searchButtonItem "><i class="fa fa-pause-circle" aria-hidden="true"></i>&nbsp;<span>모니터링 중지</span></button>
 			</div>
 		</div>
-		<div class="main_frame bottomJobInfoFrame">
+		<div class="main_frame bottomJobInfoFrame" id="bottomJobInfoFrame">
 			<div class="jobMaskFrame" id="jobMaskFrame">상단의 배포계획을 선택해주세요.</div>
 			<div class="frame_contents left" fullmode="1" guide="dpl1000DplJobList">
 				<div class="sub_title">
-					JOB 배정 목록
+					선택 JOB 정보
 					<div class="sub_title_btn right">
+						<div class="dplFullScreanBtn" fullmode="1"><i class="fas fa-expand"></i></div>
 						<div class="progress progress_sm sub_progress">
 							<div class="progress-bar bg-blue" role="progressbar" data-transitiongoal="100"></div>
 						</div>
 						<button type="button" id="btn_update_dplAction" title="" placeholder="" style="width:90px;" class="AXButton searchButtonItem "><i class="fa fa-play-circle" aria-hidden="true"></i>&nbsp;<span>수동 실행</span></button>
 					</div>
 				</div>
-				<div data-ax5grid="job-grid" data-ax5grid-config="{}" style="height: 300px;"></div>
+				<div class="jobDetailInfoFrame">
+					<form name="dpl1000JobInfoForm" id="dpl1000JobInfoForm" onsubmit="return false;">
+					<div class="descMainFrame">
+						<div class="descSubFrame">
+							<div class="descLabelFrame"><label>CI ID</label></div>
+							<div class="descValueFrame">
+								<span id="ciId"></span>
+							</div>
+						</div>
+						<div class="descSubFrame">
+							<div class="descLabelFrame"><label>TICKET ID</label></div>
+							<div class="descValueFrame">
+								<span id="ticketId"></span>
+							</div>
+						</div>
+					</div>
+					<div class="descMainFrame">
+						<div class="descSubFrame">
+							<div class="descLabelFrame"><label>JENKINS 명</label></div>
+							<div class="descValueFrame">
+								<span id="jenNm"></span>
+							</div>
+						</div>
+						<div class="descSubFrame">
+							<div class="descLabelFrame"><label>DPL ID</label></div>
+							<div class="descValueFrame">
+								<span id="dplId"></span>
+							</div>
+						</div>
+					</div>
+					<div class="descMainFrame">
+						<div class="descLabelFrame"><label>JENKINS URL</label></div>
+						<div class="descValueFrame">
+							<span id="jenUrl"></span>
+						</div>
+					</div>
+					<div class="descMainFrame">
+						<div class="descSubFrame">
+							<div class="descLabelFrame"><label>JOB ID</label></div>
+							<div class="descValueFrame">
+								<span id="jobId"></span>
+							</div>
+						</div>
+						<div class="descSubFrame">
+							<div class="descLabelFrame"><label>JOB 타입</label></div>
+							<div class="descValueFrame">
+								<span id="jobTypeNm"></span>
+							</div>
+						</div>
+					</div>
+					<div class="descMainFrame">
+						<div class="descLabelFrame"><label>JOB _class</label></div>
+						<div class="descValueFrame">
+							<span id="jobClass"></span>
+						</div>
+					</div>
+					<div class="descMainFrame">
+						<div class="descLabelFrame"><label>빌드 실행 원인</label></div>
+						<div class="descValueFrame">
+							<span id="buildCauses"></span>
+						</div>
+					</div>
+					<div class="descMainFrame">
+						<div class="descSubFrame">
+							<div class="descLabelFrame"><label>building</label></div>
+							<div class="descValueFrame">
+								<span id="building""></span>
+							</div>
+						</div>
+						<div class="descSubFrame">
+							<div class="descLabelFrame"><label>빌드 일시</label></div>
+							<div class="descValueFrame">
+								<span id="buildDate"></span>
+							</div>
+						</div>
+					</div>
+					<div class="descMainFrame">
+						<div class="descSubFrame">
+							<div class="descLabelFrame"><label>빌드번호</label></div>
+							<div class="descValueFrame">
+								<span id="buildNumber"></span>
+							</div>
+						</div>
+						<div class="descSubFrame">
+							<div class="descLabelFrame"><label>빌드 결과</label></div>
+							<div class="descValueFrame">
+								<span id="buildResult"></span>
+							</div>
+						</div>
+					</div>
+					<div class="descMainFrame">
+						<div class="descSubFrame">
+							<div class="descLabelFrame"><label>예상 소요시간</label></div>
+							<div class="descValueFrame">
+								<span id="buildEstimatedDurationStr"></span>
+							</div>
+						</div>
+						<div class="descSubFrame">
+							<div class="descLabelFrame"><label>소요시간</label></div>
+							<div class="descValueFrame">
+								<span id="buildDurationStr"></span>
+							</div>
+						</div>
+					</div>
+					<div class="descMainFrame">
+						<div class="descHeaderLabelFrame"><label>변경 내용</label></div>
+						<div class="descBodyValueFrame" id="dpl1000BuildConsoleLog"></div>
+					</div>
+					</form>
+				</div>
 			</div>
 			<div class="frame_contents right" fullmode="2" guide="dpl1000JobConsolLog">
 				<div class="sub_title">
-					선택 JOB 콘솔 로그
+					JOB 콘솔 로그
 					<div class="sub_title_btn right">
 						<button type="button" id="btn_bldMainLog" title="" style="width:150px;" class="AXButton searchButtonItem bldLogBtn" logtype="main"><i class="fa fa-desktop" aria-hidden="true"></i>&nbsp;<span id="bldMainConsoleLog"></span></button>
 						<button type="button" id="btn_bldSubLog" title="" style="width:150px;" class="AXButton searchButtonItem bldLogBtn" logtype="sub"><i class="fa fa-desktop" aria-hidden="true"></i>&nbsp;<span id="bldSubConsoleLog"></span></button>
@@ -1133,7 +1206,7 @@ function fnJobAutoCheckSwitch(onOffValue){
 				</div>
 				<div id="contentsFrame">
 					<pre>
-						<code id="buildConsoleLog">좌측에서 JOB을 선택해주세요.</code>
+						<code id="buildConsoleLog">-</code>
 					</pre>
 				</div>
 			</div>
