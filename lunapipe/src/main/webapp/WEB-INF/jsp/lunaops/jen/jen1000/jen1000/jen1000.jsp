@@ -795,6 +795,25 @@ function fnJobSearchSetting(){
 								});
 								
    								fnSelectJen1000JobConfirmConnect(idxList);
+                		}},
+						{label:"", labelWidth:"", type:"button", width:"100",style:"float:right;", addClass: ciFlagCss, key:"btn_insert_job_log",valueBoxStyle:"padding:5px;", value:"<i class='fas fa-angle-double-right' aria-hidden='true'></i>&nbsp;<span>빌드이력 동기화</span>",
+   							onclick:function(){
+   								var chkList = jobGrid.getList('selected');
+								if (gfnIsNull(chkList)) {
+									jAlert("선택한 JOB이 없습니다.", "알림창");
+									return false;
+								}
+								
+								
+								var jobList = [];
+								
+								
+								$.each(chkList, function(idx, map){
+									jobList.push(map);
+								});
+								
+								
+   								fnSelectJen1000JobBldLog(jobList);
                 		}}
 					]},
 					{display:true, addClass:"", style:"", list:[
@@ -1039,7 +1058,6 @@ function fnSelectJen1000ConfirmConnect(jenId,index){
 			jenkinsGrid.setValue(index, "result", "fail");
 			toast.push(data.MSG_CD);
 		}
-		
 	});
 	
 	
@@ -1150,6 +1168,45 @@ function fnJen1000GuideShow(){
 	
 	var guideBoxInfo = globals_guideContents["jen1000"];
 	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
+}
+
+
+function fnSelectJen1000JobBldLog(jobList){
+	jConfirm("최근 빌드이력 100건을 동기화합니다.</br>빌드 이력 동기화시 오랜 시간이 소요 될 수 있습니다.</br>진행하시겠습니까?","알림", function(result){
+		if(result){
+			var paramData = "jenId=";
+			
+			
+			$.each(jobList, function(idx, map){
+				
+				if(idx == 0){
+					paramData += map.jenId+"&jenUsrId="+map.jenUsrId+"&jenUsrTok="+map.jenUsrTok+"&jenUrl="+map.jenUrl;
+				}
+				paramData += "&jobId="+map.jobId;
+			});
+			
+			
+			var ajaxObj = new gfnAjaxRequestAction(
+					{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000JobBldLogCheckOut.do'/>","loadingShow":true}
+					,paramData);
+			
+			ajaxObj.setFnSuccess(function(data){
+				if(data.MSG_CD=="JENKINS_OK"){
+					
+					if(data.insertBldLogCnt <= 0){
+						jAlert("동기화 대상 빌드 이력이 없습니다.","알림창");
+					}else{
+						jAlert("총 "+data.insertBldLogCnt+"건의 빌드이력을 동기화했습니다.","알림창");
+					}
+				}else{
+					jAlert("빌드 이력 동기화 중 오류가 발생했습니다.","알림창");
+				}
+			});
+			
+			
+			ajaxObj.send();
+		}
+	});
 }
 </script>
 
