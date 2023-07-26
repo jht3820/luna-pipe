@@ -77,14 +77,7 @@
 		<result property="bldStartDtm" column="BLD_START_DTM" />
 		<result property="bldConsoleLog" column="BLD_CONSOLE_LOG" jdbcType="CLOB" javaType="java.lang.String"/>
 		<result property="bldCauses" column="BLD_CAUSES"/>
-		<!-- 
-		<result property="regDtm" column="REG_DTM" />
-		<result property="regUsrId" column="REG_USR_ID" />
-		<result property="regUsrIp" column="REG_USR_IP" />
-		<result property="modifyDtm" column="MODIFY_DTM" />
-		<result property="modifyUsrId" column="MODIFY_USR_ID" />
-		<result property="modifyUsrIp" column="MODIFY_USR_IP" />
-		 -->
+		<result property="bldParamCnt" column="BLD_PARAM_CNT"/>
 	</resultMap>
 	
 	
@@ -702,7 +695,7 @@
 	</insert>
 	
 	
-	<insert id="jen1000DAO.insertJen1200JobBldChangeLogInfo" parameterClass="java.util.Map">
+	<insert id="jen1000DAO.insertJen1201JobBldChangeLogInfo" parameterClass="java.util.Map">
 		<![CDATA[ 
 			
 			INSERT INTO JEN1201
@@ -722,7 +715,7 @@
 	</insert>
 	
 	
-	<insert id="jen1000DAO.insertJen1200JobBldChangeFileLogInfo" parameterClass="java.util.Map">
+	<insert id="jen1000DAO.insertJen1202JobBldChangeFileLogInfo" parameterClass="java.util.Map">
 		<![CDATA[ 
 			
 			INSERT INTO JEN1202
@@ -740,6 +733,42 @@
 			)
 		]]>
 	</insert>
+	
+	
+	<insert id="jen1000DAO.insertJen1203JobBldParameterInfo" parameterClass="java.util.Map">
+		<![CDATA[ 
+			
+			INSERT INTO JEN1203
+			(
+				JEN_ID			,JOB_ID					,BLD_NUM
+				,JOB_PARAM_KEY	,JOB_PARAM_VAL
+				,REG_DTM
+					    
+			)
+			VALUES
+			(
+				#jenId#			,#jobId#				,#bldNum#
+				,#jobParamKey#	,#jobParamVal#
+				,SYSDATE
+			)
+		]]>
+	</insert>
+	
+	
+	<select id="jen1000DAO.selectJen1203JobBuildParamList" parameterClass="java.util.Map" resultClass="egovMap">
+		
+		SELECT
+			A.JEN_ID
+			, A.JOB_ID
+			, A.BLD_NUM
+			, A.JOB_PARAM_KEY
+			, A.JOB_PARAM_VAL
+		FROM JEN1203 A
+		WHERE 1=1
+		AND A.JEN_ID = #jenId#
+		AND A.JOB_ID = #jobId#
+		AND A.BLD_NUM = #bldNum#
+	</select>
 	
 	
 	<select id="jen1000DAO.selectJen1200JobBuildList" parameterClass="java.util.Map" resultClass="egovMap">
@@ -833,6 +862,7 @@
 			, A.BLD_START_DTM
 			, A.BLD_CONSOLE_LOG
 			, A.BLD_CAUSES
+			, (SELECT COUNT(*) FROM JEN1203 WHERE JEN_ID = A.JEN_ID AND JOB_ID = A.JOB_ID AND BLD_NUM = A.BLD_NUM) AS BLD_PARAM_CNT
 		FROM JEN1200 A INNER JOIN (SELECT JEN_ID, JOB_ID, MAX(BLD_NUM) AS BLD_NUM FROM JEN1200 GROUP BY JEN_ID, JOB_ID) B
 			ON ( A.JEN_ID = B.JEN_ID AND A.JOB_ID = B.JOB_ID AND A.BLD_NUM = B.BLD_NUM )
 		INNER JOIN JEN1000 C ON (A.JEN_ID = C.JEN_ID)
@@ -871,6 +901,7 @@
 			, A.BLD_START_DTM
 			, A.BLD_CONSOLE_LOG
 			, A.BLD_CAUSES
+			, (SELECT COUNT(*) FROM JEN1203 WHERE JEN_ID = A.JEN_ID AND JOB_ID = A.JOB_ID AND BLD_NUM = A.BLD_NUM) AS BLD_PARAM_CNT
 		FROM JEN1200 A
 		INNER JOIN JEN1000 C ON (A.JEN_ID = C.JEN_ID)
 		INNER JOIN JEN1100 D ON (A.JEN_ID = D.JEN_ID AND A.JOB_ID = D.JOB_ID)
