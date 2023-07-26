@@ -255,8 +255,8 @@ function fnJenkinsGridSetting(){
 			columnHeight: 30,
 			onClick:function(){
 				
-   				this.self.select(jenkinsGrid.selectedDataIndexs[0]);
-             	
+   				this.self.select(this.self.selectedDataIndexs[0]);
+				
 				
 				this.self.select(this.doindex);
              	
@@ -418,7 +418,7 @@ function fnJobGridSetting(){
             columnHeight: 30,
             onClick: function () {
         		
-   				jobGrid.select(this.doindex, {selected: !this.item.__selected__});	
+   				this.self.select(this.doindex, {selected: !this.item.__selected__});	
             },
             onDBLClick:function(){
 				var data = {"jenId": this.item.jenId, "jobId": this.item.jobId};
@@ -952,6 +952,7 @@ function fnSelJobGridSetting(){
 			align: "center",
 			columnHeight: 30,
 			onClick: function () {
+				
         		
    				selJobGrid.select(this.doindex, {selected: !this.item.__selected__});	
             },

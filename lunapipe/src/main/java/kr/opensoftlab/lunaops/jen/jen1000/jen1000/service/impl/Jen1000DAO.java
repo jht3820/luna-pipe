@@ -162,16 +162,28 @@ public class Jen1000DAO extends ComOslitsAbstractDAO {
 	
 	
 	@SuppressWarnings("rawtypes")
-	public String insertJen1200JobBldChangeLogInfo(Map paramMap) throws Exception{
-		return (String) insert("jen1000DAO.insertJen1200JobBldChangeLogInfo", paramMap);
+	public String insertJen1201JobBldChangeLogInfo(Map paramMap) throws Exception{
+		return (String) insert("jen1000DAO.insertJen1201JobBldChangeLogInfo", paramMap);
 	}
 	
 	
 	@SuppressWarnings("rawtypes")
-	public String insertJen1200JobBldChangeFileLogInfo(Map paramMap) throws Exception{
-		return (String) insert("jen1000DAO.insertJen1200JobBldChangeFileLogInfo", paramMap);
+	public String insertJen1202JobBldChangeFileLogInfo(Map paramMap) throws Exception{
+		return (String) insert("jen1000DAO.insertJen1202JobBldChangeFileLogInfo", paramMap);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	public String insertJen1203JobBldParameterInfo(Map paramMap) throws Exception{
+		return (String) insert("jen1000DAO.insertJen1203JobBldParameterInfo", paramMap);
 	}
 
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public List<Map> selectJen1203JobBuildParamList(Map paramMap) throws Exception {
+		return (List<Map>) list("jen1000DAO.selectJen1203JobBuildParamList", paramMap);
+	}
+	
 	
 	@SuppressWarnings("rawtypes")
 	public Map selectJen1200JobLastBuildInfo(Map paramMap) throws Exception {
@@ -183,6 +195,7 @@ public class Jen1000DAO extends ComOslitsAbstractDAO {
 	public Map selectJen1200JobBuildInfo(Map paramMap) throws Exception {
 		return (Map) select("jen1000DAO.selectJen1200JobBuildInfo", paramMap);
 	}
+	
 	
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
