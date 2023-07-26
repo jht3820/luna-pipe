@@ -188,6 +188,22 @@ $(document).ready(function() {
 			$thisObj.children("i").addClass("fa-compress");
 		}
 	});
+	
+	
+	$("#btn_select_bldParam").click(function(){
+		var jenId = $(this).data("jenId");
+		var jobId = $(this).data("jobId");
+		var bldNum = $(this).data("bldNum");
+		
+		var data = {
+				"jenId" : jenId,
+				"jobId" : jobId,
+				"bldNum" : bldNum
+		};
+		
+		
+		gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1006View.do',data,"840","300",'scroll');
+	});
 });
 
 function fnJobStatusCheckLoop(){
@@ -555,13 +571,13 @@ function fnAxGrid5View(){
 						
 
 						var data = {
-								"dplId" : selItem.dplId,
+								"jenId" : selItem.jenId,
 								"jobId" : selItem.jobId,
-								"jenId" : selItem.jenId
+								"bldNum" : selItem.dplId
 						};
 						
 						
-						gfnLayerPopupOpen('/dpl/dpl1000/dpl1000/selectDpl1005View.do',data,"840","300",'scroll');
+						
 					}
 					dplJobGrid.contextMenu.close();
                     
@@ -937,9 +953,9 @@ function fnJobLastBuildDetailSetting(paramJobInfo){
 		$("form#dpl1000JobInfoForm #jobTypeNm").text(paramJobInfo.jobTypeNm);
 		
 		
-		var ciId = "-";
-		var ticketId = "-";
-		var dplId = "-";
+		var ciIdStr = "-";
+		var ticketIdStr = "-";
+		var dplIdStr = "-";
 		
 		
 		var buildCauses = "-";
@@ -949,17 +965,17 @@ function fnJobLastBuildDetailSetting(paramJobInfo){
 		var buildResult = "-";
 		var buildDurationStr = "-";
 		var buildEstimatedDurationStr = "-";
-		var dpl1000BuildConsoleLog = "-";
+		var buildChgLog = "-";
 		var buildConsoleLog = "-";
 		var jobClass = "-";
+		$("#btn_select_bldParam").hide();
 		
 		if(!gfnIsNull(jobLastBuildInfo)){
 			try{
 				
-				ciId = jobLastBuildInfo["ciId"];
-				ticketId = jobLastBuildInfo["ticketId"];
-				dplId = jobLastBuildInfo["dplId"];
-				
+				ciIdStr = (jobLastBuildInfo.hasOwnProperty("ciId"))?jobLastBuildInfo["ciId"]:"-";
+				ticketIdStr = (jobLastBuildInfo.hasOwnProperty("ticketId"))?jobLastBuildInfo["ticketId"]:"-";
+				dplIdStr = (jobLastBuildInfo.hasOwnProperty("dplId"))?jobLastBuildInfo["dplId"]:"-";
 			}catch(e){
 				console.log(e);
 			}
@@ -974,12 +990,22 @@ function fnJobLastBuildDetailSetting(paramJobInfo){
 				buildEstimatedDurationStr = gfnHourCalc(jobLastBuildInfo["bldEtmDurationTm"]/1000);
 				buildConsoleLog = jobLastBuildInfo["bldConsoleLog"];
 				
+				
+				if(jobLastBuildInfo["bldParamCnt"] > 0){
+					
+					$("#btn_select_bldParam").data("bldNum", buildNumber);
+					$("#btn_select_bldParam").data("jenId",jobLastBuildInfo["jenId"]);
+					$("#btn_select_bldParam").data("jobId",jobLastBuildInfo["jobId"]);
+					
+					
+					$("#btn_select_bldParam").show();
+				}
 			}catch(e){
 				console.log(e);
 			}
 			try{
 				
-				var dpl1000BuildConsoleLogStr = "";
+				var buildChgLogStr = "";
 				
 				
 				if(!gfnIsNull(jobLastBuildChgList)){
@@ -1008,7 +1034,7 @@ function fnJobLastBuildDetailSetting(paramJobInfo){
 						
 						var buildChgFileStr = "";
 						
-						dpl1000BuildConsoleLogStr += 
+						buildChgLogStr += 
 							'<div class="buildChgMainFrame">'
 								+'<div class="buildChgHeader"><b>'+map.chgRevision+'</b> - '+map.chgUser+' ('+(new Date(parseInt(map.chgTimestamp)).format("yyyy-MM-dd HH:mm:ss"))+') </div>'
 								+'<div class="buildChgBody">'+(map.chgMsg).replace(/\n/g,"</br>")+'</div>'
@@ -1019,21 +1045,22 @@ function fnJobLastBuildDetailSetting(paramJobInfo){
 							$.each(jobLastBuildFileChgMap[map.bldNum][map.chgRevision], function(subIdx, subMap){
 								buildChgFileStr += '<span class="buildFileChgLog fa '+subMap.editTypeCd+'">'+subMap.filePath+'</span>';
 							});
-							dpl1000BuildConsoleLogStr += '<div class="buildChgFooter">'+buildChgFileStr+'</div>';
+							buildChgLogStr += '<div class="buildChgFooter">'+buildChgFileStr+'</div>';
 						}
-						dpl1000BuildConsoleLogStr += '</div>';
+						buildChgLogStr += '</div>';
 					});
-					dpl1000BuildConsoleLog = dpl1000BuildConsoleLogStr;
+					buildChgLog = buildChgLogStr;
 				}
 				
 			}catch(e){
 				console.log(e);
 			}
 		}
+
 		
-		$("form#dpl1000JobInfoForm #ciId").text(ciId);
-		$("form#dpl1000JobInfoForm #ticketId").text(ticketId);
-		$("form#dpl1000JobInfoForm #dplId").text(dplId);
+		$("form#dpl1000JobInfoForm #ciId").text(ciIdStr);
+		$("form#dpl1000JobInfoForm #ticketId").text(ticketIdStr);
+		$("form#dpl1000JobInfoForm #dplId").text(dplIdStr);
 		
 		
 		$("form#dpl1000JobInfoForm #buildCauses").text(buildCauses);
@@ -1044,12 +1071,10 @@ function fnJobLastBuildDetailSetting(paramJobInfo){
 		$("form#dpl1000JobInfoForm #buildResult").text(buildResult);
 		$("form#dpl1000JobInfoForm #buildDurationStr").text(buildDurationStr);
 		$("form#dpl1000JobInfoForm #buildEstimatedDurationStr").text(buildEstimatedDurationStr);
-		$("form#dpl1000JobInfoForm #dpl1000BuildConsoleLog").html(dpl1000BuildConsoleLog);
+		$("form#dpl1000JobInfoForm #buildChgLog").html(buildChgLog);
 		
 		
 		$("#buildConsoleLog").html(buildConsoleLog);
-		
-	   	
 	});
 	
 	
@@ -1102,16 +1127,22 @@ function fnJobLastBuildDetailSetting(paramJobInfo){
 					</div>
 					<div class="descMainFrame">
 						<div class="descSubFrame">
-							<div class="descLabelFrame"><label>JENKINS 명</label></div>
-							<div class="descValueFrame">
-								<span id="jenNm"></span>
-							</div>
-						</div>
-						<div class="descSubFrame">
 							<div class="descLabelFrame"><label>DPL ID</label></div>
 							<div class="descValueFrame">
 								<span id="dplId"></span>
 							</div>
+						</div>
+						<div class="descSubFrame">
+							<div class="descLabelFrame"><label>빌드 파라미터 값</label></div>
+							<div class="descValueFrame">
+								<button type="button" id="btn_select_bldParam" style="width:125px;display:none;" class="AXButton searchButtonItem"><i class="fa fa-external-link"></i>&nbsp;<span>보기</span></button>
+							</div>
+						</div>
+					</div>
+					<div class="descMainFrame">
+						<div class="descLabelFrame"><label>JENKINS 명</label></div>
+						<div class="descValueFrame">
+							<span id="jenNm"></span>
 						</div>
 					</div>
 					<div class="descMainFrame">
@@ -1190,7 +1221,7 @@ function fnJobLastBuildDetailSetting(paramJobInfo){
 					</div>
 					<div class="descMainFrame">
 						<div class="descHeaderLabelFrame"><label>변경 내용</label></div>
-						<div class="descBodyValueFrame" id="dpl1000BuildConsoleLog"></div>
+						<div class="descBodyValueFrame" id="buildChgLog"></div>
 					</div>
 					</form>
 				</div>
