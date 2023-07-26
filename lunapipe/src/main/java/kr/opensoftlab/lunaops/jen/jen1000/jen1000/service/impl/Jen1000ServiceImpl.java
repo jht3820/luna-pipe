@@ -184,7 +184,7 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 			if("03".equals(beforeJobTypeCd)){
 				
 				if(!jobTypeCd.equals(beforeJobTypeCd)) {
-					
+//					stm3100DAO.updateJen1100JenkinsJobRestoreInfo(paramMap);
 				
 				}
 			}
