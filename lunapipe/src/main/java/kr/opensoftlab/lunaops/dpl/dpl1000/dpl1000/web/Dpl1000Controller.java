@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.google.gson.GsonBuilder;
-
 import egovframework.com.cmm.EgovMessageSource;
 import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
@@ -80,7 +78,6 @@ public class Dpl1000Controller {
 	private String tempPath;
     
     
-    
 	@RequestMapping(value="/dpl/dpl1000/dpl1000/selectDpl1000View.do")
     public String selectDpl1000View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		
@@ -108,6 +105,7 @@ public class Dpl1000Controller {
 			}
 			
 			
+			
 			String dplId = OslUtil.jsonGetString(jsonObj, "dpl_id");
 			
 			
@@ -129,106 +127,6 @@ public class Dpl1000Controller {
 		
     	return "/dpl/dpl1000/dpl1000/dpl1000";
     }
-	
-    
-     @SuppressWarnings({ "rawtypes", "unchecked" })
- 	@RequestMapping(value="/dpl/dpl1000/dpl1000/selectDpl1001View.do")
-     public String selectDpl1001View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
- 		
-    	 try{
- 			
- 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
- 			
- 			Map dpl1000DplInfo = null;
- 			List<Map> dpl1000DplJobList = null;
- 			String dpl1000DplJobListJson = "{}";
- 			Map dpl1000DplJobParamMap = new HashMap<>();
- 			String dpl1000DplJobParamListJson = "{}";
- 			
- 			
- 			String pageType = paramMap.get("popupGb");
- 			
- 			
- 			if( "update".equals(pageType) || "select".equals(pageType)){
- 				dpl1000DplInfo = dpl1000Service.selectDpl1000DeployVerInfo(paramMap);
- 				dpl1000DplJobList = dpl1000Service.selectDpl1100DeployJobList(paramMap);
- 				
- 				dpl1000DplJobListJson = (new GsonBuilder().serializeNulls().create()).toJsonTree(dpl1000DplJobList).toString();
- 				
- 				for(int i = 0 ; i<dpl1000DplJobList.size();i++) {
- 					Map jobMap = (Map) dpl1000DplJobList.get(i);
- 					paramMap.put("jenId", (String) jobMap.get("jenId"));
- 					paramMap.put("jobId", (String) jobMap.get("jobId"));
- 					
- 					List<Map> dpl1000DplJobParamList = dpl1000Service.selectDpl1101JenParameterList(paramMap);
- 					dpl1000DplJobParamMap.put(jobMap.get("jobId"), dpl1000DplJobParamList);
- 					
- 				}
- 				
- 				dpl1000DplJobParamListJson = (new GsonBuilder().serializeNulls().create()).toJsonTree(dpl1000DplJobParamMap).toString();
- 			}
- 			
- 			model.put("dpl1000DplInfo", dpl1000DplInfo);
- 			model.put("dpl1000DplJobList", dpl1000DplJobList);
- 			model.put("dpl1000DplJobListJson", dpl1000DplJobListJson.replaceAll("<", "&lt"));
- 			model.put("dpl1000DplJobParamMap", dpl1000DplJobParamMap);
- 			model.put("dpl1000DplJobParamListJson", dpl1000DplJobParamListJson.replaceAll("<", "&lt"));
-
- 			return "/dpl/dpl1000/dpl1000/dpl1001";
- 		}
- 		catch(Exception ex){
- 			Log.error("selectReq1001View()", ex);
- 			throw new Exception(ex.getMessage());
- 		}
-     }
-    
-     
-     
-     @RequestMapping(value="/dpl/dpl1000/dpl1000/selectDpl1002View.do")
-     public String selectDpl1002View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-		 return "/dpl/dpl1000/dpl1000/dpl1002";
-     }
-     
-     
-     @SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value="/dpl/dpl1000/dpl1000/selectDpl1003View.do")
-     public String selectDpl1003View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-    	  try{
- 			
- 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
- 			
- 			
- 			Map dpl1000DplInfo = dpl1000Service.selectDpl1000DeployVerInfo(paramMap);
- 			List<Map> dpl1000DplJobList = dpl1000Service.selectDpl1100DeployJobList(paramMap);
-			
- 			model.put("dpl1000DplInfo", dpl1000DplInfo);
- 			model.put("dpl1000DplJobList", dpl1000DplJobList);
- 			
- 			
- 			
- 			
- 			model.put("callView", paramMap.get("callView"));
-
- 			return "/dpl/dpl1000/dpl1000/dpl1003";
- 		}
- 		catch(Exception ex){
- 			Log.error("selectDpl1003View()", ex);
- 			throw new Exception(ex.getMessage());
- 		}
-    	 
-     }
-     
-     
-     @RequestMapping(value="/dpl/dpl1000/dpl1000/selectDpl1004View.do")
-     public String selectDpl1004View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-		 return "/dpl/dpl1000/dpl1000/dpl1004";
-     }
-     
-     
-     @RequestMapping(value="/dpl/dpl1000/dpl1000/selectDpl1005View.do")
-     public String selectDpl1005View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-    	 return "/dpl/dpl1000/dpl1000/dpl1005";
-     }
 
      
      @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -257,34 +155,6 @@ public class Dpl1000Controller {
     		 return new ModelAndView("jsonView", model);
     	 }
      }
-     
-     
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1000DeployNmListAjax.do")
-    public ModelAndView selectDpl1000DeployNmListAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-    	try{
-
-    		
-        	Map paramMap = RequestConvertor.requestParamToMap(request, true);
-
-        	
-        	List<Map> dplDeployNmList = (List) dpl1000Service.selectDpl1000DeployNmList(paramMap);
-        	
-        	model.addAttribute("dplDeployNmList", dplDeployNmList);
-        	
-        	
-        	model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
-        	
-        	return new ModelAndView("jsonView", model);
-    	}
-    	catch(Exception ex){
-    		Log.error("selectDpl1000DeployNmListAjax()", ex);
-    		
-    		
-    		model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
-    		return new ModelAndView("jsonView", model);
-    	}
-    }
     
 	
 	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1000DeployVerInfoListAjax.do")
