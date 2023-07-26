@@ -2,6 +2,7 @@ package kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.impl;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -184,7 +185,7 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 			if("03".equals(beforeJobTypeCd)){
 				
 				if(!jobTypeCd.equals(beforeJobTypeCd)) {
-//					stm3100DAO.updateJen1100JenkinsJobRestoreInfo(paramMap);
+					
 				
 				}
 			}
@@ -316,7 +317,13 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 					continue;
 				}
 				
+				
 				BuildWithDetails bwd = build.details();
+				
+				
+				if(bwd.isBuilding()) {
+					continue;
+				}
 				
 				newMap.put("bldClass", bwd.get_class());
 				newMap.put("bldResult", bwd.getResult().name());
@@ -359,7 +366,7 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 							changeItemMap.put("chgMsg", bcsInfo.getMsg());
 							changeItemMap.put("chgUser", bcsInfo.getAuthor().getFullName());
 							
-							jen1000DAO.insertJen1200JobBldChangeLogInfo(changeItemMap);
+							jen1000DAO.insertJen1201JobBldChangeLogInfo(changeItemMap);
 							
 							
 							List<BuildChangeSetPath> bcspList = bcsInfo.getPaths();
@@ -377,12 +384,31 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 									changePathMap.put("filePath", bcsp.getFile());
 									changePathMap.put("editTypeCd", bcsp.getEditType());
 									
-									jen1000DAO.insertJen1200JobBldChangeFileLogInfo(changePathMap);
+									jen1000DAO.insertJen1202JobBldChangeFileLogInfo(changePathMap);
 								}
 							}
 						}
 					}
 				}
+				
+				
+				Map<String, String> buildParam = bwd.getParameters();
+				if(!buildParam.isEmpty()) {
+					Iterator itr = buildParam.keySet().iterator();
+					while(itr.hasNext()) {
+						String key = (String) itr.next();
+						Map bldParamMap = new HashMap<>();
+						bldParamMap.put("jenId", jenId);
+						bldParamMap.put("jobId", jobId);
+						bldParamMap.put("bldNum", bldNum);
+						bldParamMap.put("jobParamKey", key);
+						bldParamMap.put("jobParamVal", buildParam.get(key));
+						
+						
+						jen1000DAO.insertJen1203JobBldParameterInfo(bldParamMap);
+					}
+				}
+				
 				syncCnt++;
 			}
 			
@@ -403,7 +429,13 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	public Map selectJen1200JobLastBuildInfo(Map paramMap) throws Exception{
 		return jen1000DAO.selectJen1200JobLastBuildInfo(paramMap);
 	}
-
+	
+	
+	@SuppressWarnings({ "rawtypes" })
+	public List<Map> selectJen1203JobBuildParamList(Map paramMap) throws Exception {
+		return jen1000DAO.selectJen1203JobBuildParamList(paramMap);
+	}
+	
 	
 	@SuppressWarnings({ "rawtypes"})
 	public Map selectJen1200JobBuildInfo(Map paramMap) throws Exception {
