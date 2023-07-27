@@ -148,6 +148,7 @@ function fnRepGridSetting(){
              align: "center",
              columnHeight: 30,
              onClick: function () {
+            	
         		
    				repGridObj.select(this.doindex, {selected: !this.item.__selected__});	
              },
