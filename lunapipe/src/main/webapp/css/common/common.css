@@ -337,6 +337,7 @@ div#globalGuideBoxSearchClose {position: fixed;}
     padding-left: 10px;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 32px;
 }
 .descSubFrame {
     display: inline-block;
