@@ -93,12 +93,14 @@ span#jobId {
 }
 .buildChgBody {
 	padding-left: 10px;
+	line-height: 2;
 }
 .buildChgMainFrame{
 	display: inline-block;
     width: 100%;
     border-bottom: 1px solid #ccc;
     padding-left: 10px;
+    text-align: left;
 }
 .buildChgMainFrame:last-child {
     border-bottom: none;
