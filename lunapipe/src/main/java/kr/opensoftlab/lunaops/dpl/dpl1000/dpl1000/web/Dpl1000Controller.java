@@ -127,6 +127,12 @@ public class Dpl1000Controller {
 		
     	return "/dpl/dpl1000/dpl1000/dpl1000";
     }
+	
+	
+	@RequestMapping(value="/dpl/dpl1000/dpl1000/selectDpl1001View.do")
+	public String selectDpl1001View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		return "/dpl/dpl1000/dpl1000/dpl1001";
+	}
 
      
      @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -137,20 +143,20 @@ public class Dpl1000Controller {
     		 
     		 Map paramMap = RequestConvertor.requestParamToMap(request, true);
     		 
-			List<Map> dpl1800JobParamList = dpl1000Service.selectDpl1101JenParameterList(paramMap);
+			List<Map> jobParamList = dpl1000Service.selectDpl1101JenParameterList(paramMap);
     		 
-    		 
-    		 model.addAttribute("jobParamList", dpl1800JobParamList);
+    		 model.addAttribute("jobParamList", jobParamList);
     		 
     		 
     		 model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
-    		 
+    		 model.addAttribute("errorYn", "N");
     		 return new ModelAndView("jsonView", model);
     	 }
     	 catch(Exception ex){
     		 Log.error("selectDpl1000DeployNmListAjax()", ex);
     		 
     		 
+    		 model.addAttribute("errorYn", "Y");
     		 model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
     		 return new ModelAndView("jsonView", model);
     	 }
