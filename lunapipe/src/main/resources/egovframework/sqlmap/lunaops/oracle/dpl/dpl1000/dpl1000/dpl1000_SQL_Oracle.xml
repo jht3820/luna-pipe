@@ -229,32 +229,27 @@
 	</sql>
 	
 	<sql id="dpl1000DAO.selectDpl1101JobParamList">
-		SELECT T1.*, @ROWNUM := @ROWNUM + 1 AS RN
-		FROM
-		(
-				SELECT T1.*
-				FROM
-				(
-					SELECT 
-				             A.DPL_ID
-				            ,A.JEN_ID
-				            ,A.JOB_ID
-				            ,A.JOB_PARAM_KEY
-				            ,A.JOB_PARAM_VAL
-				            ,A.REG_DTM
-				            ,A.REG_USR_ID
-				            ,A.REG_USR_IP
-				            ,A.MODIFY_DTM
-				            ,A.MODIFY_USR_ID
-				            ,A.MODIFY_USR_IP
-				    FROM DPL1101 A
-				    WHERE 1=1
-					    AND A.DPL_ID = #dplId#
-					    AND A.JEN_ID = #jenId#
-					    AND A.JOB_ID = #jobId#
-					
-				) T1 INNER JOIN (SELECT @ROWNUM := 0) R
-		) T1
+		SELECT 
+				A.CI_ID
+				, A.TICKET_ID
+	            , A.DPL_ID
+	            , A.JEN_ID
+	            , A.JOB_ID
+	            , A.JOB_PARAM_KEY
+	            , A.JOB_PARAM_VAL
+	            , A.REG_DTM
+	            , A.REG_USR_ID
+	            , A.REG_USR_IP
+	            , A.MODIFY_DTM
+	            , A.MODIFY_USR_ID
+	            , A.MODIFY_USR_IP
+	    FROM DPL1101 A
+	    WHERE 1=1
+		    AND A.CI_ID = #ciId#
+		    AND A.TICKET_ID = #ticketId#
+		    AND A.DPL_ID = #dplId#
+		    AND A.JEN_ID = #jenId#
+		    AND A.JOB_ID = #jobId#
 	</sql>
 	
 	
