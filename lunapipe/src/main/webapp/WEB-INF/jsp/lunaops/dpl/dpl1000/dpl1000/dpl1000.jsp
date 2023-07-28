@@ -514,6 +514,34 @@ function fnAxGrid5View(){
 
             header: {align:"center",columnHeight: 30},
             columns: [
+            	{key: "bldResult", label: " ", width: 30, align: "center"
+					,formatter:function(){
+						var result = this.item.bldResult;
+						
+						
+						if(!gfnIsNull(result)){
+							result = result.toLowerCase();
+						}
+						
+						var faIcon = "circle";
+						
+						
+						
+						if(result == "fail" || result == "failure"){
+							faIcon = "times-circle";
+						}
+						else if(result == "success"){
+							faIcon = "check-circle";
+						}else if(result == "progress" || result == "start"){
+							faIcon = "circle-notch fa-spin";
+						}else if(result == "restore"){
+							faIcon = "circle-notch fa-spin";
+						}else if(result == "aborted"){
+							faIcon = "exclamation-circle";
+						}
+						
+						return '<i class="fas fa-'+faIcon+' result-'+result+'"></i>';
+				}},
     			{key: "jobStartOrd", label: "순서", width: 80, align: "center"},
               	{key: "jenNm", label: "JENKINS NAME", width: 180, align: "center"},
               	{key: "jenUrl", label: "JENKINS URL", width: 180, align: "center"},
@@ -564,20 +592,24 @@ function fnAxGrid5View(){
 
                     
 					if(item.type == "detailPopup"){
-						
-						var data = {"jenId": selItem.jenId, "jobId": selItem.jobId};
+						var data = {
+							"jenId": selItem.jenId, "jobId": selItem.jobId
+						};
 						gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1004JobDetailView.do',data,"1200", "870",'scroll');
+
+						
 					}else if(item.type == "detailParamPopup"){
 						
-
 						var data = {
+								"ciId": selItem.ciId,
+								"ticketId": selItem.ticketId,
+								"dplId": selItem.dplId,
 								"jenId" : selItem.jenId,
-								"jobId" : selItem.jobId,
-								"bldNum" : selItem.dplId
+								"jobId" : selItem.jobId
 						};
 						
 						
-						
+						gfnLayerPopupOpen('/dpl/dpl1000/dpl1000/selectDpl1001View.do',data,"840","300",'scroll');
 					}
 					dplJobGrid.contextMenu.close();
                     
