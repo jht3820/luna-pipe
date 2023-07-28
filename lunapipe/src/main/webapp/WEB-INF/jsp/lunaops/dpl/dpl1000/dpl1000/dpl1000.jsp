@@ -585,9 +585,6 @@ function fnAxGrid5View(){
                 	if(typeof selItem == "undefined"){
                 		return false;
                 	}
-                	else if(item.type == "detailParamPopup") {
-                		return !gfnIsNull(selItem.bldNum);
-                	}
                 	return true;
                 },
                 onClick: function (item, param) {
@@ -595,19 +592,24 @@ function fnAxGrid5View(){
 
                     
 					if(item.type == "detailPopup"){
-						
-						var data = {"jenId": selItem.jenId, "jobId": selItem.jobId};
+						var data = {
+							"jenId": selItem.jenId, "jobId": selItem.jobId
+						};
 						gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1004JobDetailView.do',data,"1200", "870",'scroll');
+
+						
 					}else if(item.type == "detailParamPopup"){
 						
 						var data = {
+								"ciId": selItem.ciId,
+								"ticketId": selItem.ticketId,
+								"dplId": selItem.dplId,
 								"jenId" : selItem.jenId,
-								"jobId" : selItem.jobId,
-								"bldNum" : selItem.bldNum
+								"jobId" : selItem.jobId
 						};
 						
 						
-						gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1006View.do',data,"840","300",'scroll');
+						gfnLayerPopupOpen('/dpl/dpl1000/dpl1000/selectDpl1001View.do',data,"840","300",'scroll');
 					}
 					dplJobGrid.contextMenu.close();
                     
