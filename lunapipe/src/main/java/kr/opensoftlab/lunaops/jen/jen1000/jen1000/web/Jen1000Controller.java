@@ -1,8 +1,5 @@
 package kr.opensoftlab.lunaops.jen.jen1000.jen1000.web;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,13 +8,6 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -26,20 +16,13 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
-import com.offbytwo.jenkins.JenkinsServer;
+import com.offbytwo.jenkins.client.util.UrlUtils;
 
 import egovframework.com.cmm.EgovMessageSource;
 import egovframework.com.cmm.service.EgovProperties;
@@ -50,7 +33,8 @@ import kr.opensoftlab.lunaops.com.vo.PageVO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1000VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1100VO;
-import kr.opensoftlab.sdf.jenkins.JenkinsClient;
+import kr.opensoftlab.sdf.jenkins.NewJenkinsClient;
+import kr.opensoftlab.sdf.jenkins.vo.JenStatusVO;
 import kr.opensoftlab.sdf.util.CommonScrty;
 import kr.opensoftlab.sdf.util.OslAgileConstant;
 import kr.opensoftlab.sdf.util.OslUtil;
@@ -89,10 +73,10 @@ public class Jen1000Controller {
     
     
    
-
-	@Resource(name = "jenkinsClient")
-	private JenkinsClient jenkinsClient;
 	
+	
+	@Resource(name = "newJenkinsClient")
+	private NewJenkinsClient newJenkinsClient;
 	
 
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000View.do")
@@ -126,7 +110,7 @@ public class Jen1000Controller {
 			throw new Exception(e.getMessage());
 		}
 		
-		return "/jen/jen1000/jen1000/jen1000";
+		return "/jen/jen1000/jen1000/jen1007";
 	}
 
 	
@@ -154,7 +138,7 @@ public class Jen1000Controller {
 	
 	
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes"})
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1003JenkinsDetailView.do")
 	public String selectJen1003JenkinsDetailView( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try{
@@ -174,27 +158,31 @@ public class Jen1000Controller {
 				
 				model.addAttribute("errorYn", "Y");
 				model.addAttribute("message", "JENKINS 연결에 실패했습니다.");
+				return "/jen/jen1000/jen1000/jen1003";
 			}
 			
 			
 			String deTokenId = CommonScrty.decryptedAria(tokenId, salt);
 			
 			
-			jenkinsClient.setUser(userId);
-			jenkinsClient.setPassword(deTokenId);
+			JenStatusVO jenStatusVo = newJenkinsClient.connect(jenUrl, userId, deTokenId);
+			
+			
+			if(jenStatusVo.isErrorFlag()) {
+				model.addAttribute("errorYn", "Y");
+				model.addAttribute("message", jenStatusVo.getErrorMsg());
+				return "/jen/jen1000/jen1000/jen1003";
+			}
 			
 			try{
 				
-				String buildUrl = jenUrl+"/api/json";
-				String buildContent = jenkinsClient.excuteHttpClientJenkins(buildUrl);
-				Map jenMap = jenkinsClient.getJenkinsParser(buildContent);
-				
-				model.addAttribute("jenMap",jenMap);
+				List jobList = newJenkinsClient.getJobList(jenStatusVo);
 				
 				
-				List<JSONObject> jobs = (List)jenMap.get("jobs");
+				Map jenkinsMap = newJenkinsClient.getJenkinsInfo(jenStatusVo);
 				
-				model.addAttribute("jobs",jobs);
+				model.addAttribute("jenMap",jenkinsMap);
+				model.addAttribute("jobs",jobList);
 				
 			}catch(Exception e){
 				System.out.println(e);
@@ -208,7 +196,7 @@ public class Jen1000Controller {
 	}
 	
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes", "unchecked"})
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000JenkinsJobListAjax.do")
 	public ModelAndView selectJen1000JenkinsJobListAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try{
@@ -223,7 +211,6 @@ public class Jen1000Controller {
 			String tokenId= (String)jenMap.get("jenUsrTok");
 			String jenUrl = (String)jenMap.get("jenUrl");
 			String upperJobId = (String)paramMap.get("jobId");
-			String jobUrl = (String)paramMap.get("jobUrl");
 			
 			
 			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
@@ -237,46 +224,37 @@ public class Jen1000Controller {
 			String deTokenId = CommonScrty.decryptedAria(tokenId, salt);
 			
 			
-			jenkinsClient.setUser(userId);
-			jenkinsClient.setPassword(deTokenId);
-			String url ="";
-			if(null != jobUrl && !"".equals(jobUrl)) {
-				String[] urlSplit = jobUrl.split("/job/");
-				String chkUrl = urlSplit[0];
-				for(int i=1; i<(urlSplit.length-1);i++) {
-					chkUrl += "/job/" + urlSplit[i];
-				}
-				url = chkUrl+"/api/json";
-			}else {
-				url = (String)jenUrl + "/api/json";
+			JenStatusVO jenStatusVo = newJenkinsClient.connect(jenUrl, userId, deTokenId);
+			
+			
+			if(jenStatusVo.isErrorFlag()) {
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+				model.addAttribute("message", jenStatusVo.getErrorMsg());
+				return new ModelAndView("jsonView");
 			}
 			
-			String content = "";
-
-			content = jenkinsClient.excuteHttpClientJenkins(url);
-
-			Map jenkinsMap= jenkinsClient.getJenkinsParser(content );
-			List jobList =  (List) jenkinsMap.get("jobs");
-
-			if(null!=jobList) {
-				for (int i = 0 ; i< jobList.size();i++) {
-					Map job = (HashMap) jobList.get(i);
-					job.put("jobId", job.get("name"));
-					job.put("upperJobId", upperJobId);
-					jobList.set(i, job);
-				}
-			}
 			
+			Map addDatas = new HashMap<>();
+			addDatas.put("upperJobId", upperJobId);
+			
+			
+			List jobList = newJenkinsClient.getJobList(jenStatusVo, addDatas);
+			
+			
+			Map jenkinsMap = newJenkinsClient.getJenkinsInfo(jenStatusVo);
 			model.addAttribute("jenMap", jenkinsMap);
 			
 			
 			model.addAttribute("list", jobList);
 			model.addAttribute("MSG_CD", JENKINS_OK);
 			
+			
+			newJenkinsClient.close(jenStatusVo);
+			
 			return new ModelAndView("jsonView");
 		}
 		catch(Exception ex){
-			Log.error("selectJen1000URLConnect()", ex);
+			Log.error("selectJen1000JenkinsJobListAjax()", ex);
 			if( ex instanceof HttpHostConnectException){
 				model.addAttribute("MSG_CD", JENKINS_FAIL);
 			}else if( ex instanceof ParseException){
@@ -288,6 +266,7 @@ public class Jen1000Controller {
 			}else{
 				model.addAttribute("MSG_CD", JENKINS_FAIL);
 			}
+			model.addAttribute("message", ex.getMessage());
 			
 			return new ModelAndView("jsonView");
 		}
@@ -498,6 +477,9 @@ public class Jen1000Controller {
 			String jobId = (String) jobMap.get("jobId");
 			String jobTriggerCd = "02";
 			String jobTriggerVal = "";
+
+			
+			String jobFullPath = UrlUtils.toFullJobPath(jobId);
 			
 			
 			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
@@ -506,33 +488,21 @@ public class Jen1000Controller {
 			String deJenUsrTok = CommonScrty.decryptedAria(jenUsrTok, salt);
 			
 			
-			JenkinsServer jenkins = new JenkinsServer(new URI(jenUrl), jenUsrId, deJenUsrTok);
-    		
-    		String jobXml = jenkins.getJobXml(jobId);
-    		
-    		jenkins.close();
-    		
-    		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    		DocumentBuilder builder = factory.newDocumentBuilder();
-    		org.w3c.dom.Document document = builder.parse(new InputSource(new StringReader(jobXml)));
-    		
-    		NodeList triggersNodeList = document.getElementsByTagName("hudson.triggers.TimerTrigger");
+			JenStatusVO jenStatusVo = newJenkinsClient.connect(jenUrl, jenUsrId, deJenUsrTok);
 			
 			
-    		if(triggersNodeList.getLength() > 0) {
-    			jobTriggerCd = "01";
-    			
-    			
-    			NodeList tiggerChildNodeList = triggersNodeList.item(0).getChildNodes();
-    			for(int i=0;i<tiggerChildNodeList.getLength();i++) {
-    				Node childNode = tiggerChildNodeList.item(i);
-    				
-    				
-    				if("spec".equals(childNode.getNodeName())) {
-    					jobTriggerVal = childNode.getTextContent();
-    				}
-    			}
-    		}
+			if(jenStatusVo.isErrorFlag()) {
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+				model.addAttribute("message", jenStatusVo.getErrorMsg());
+			}
+			
+			
+			jobTriggerVal = newJenkinsClient.getJobTriggerCron(jenStatusVo, jobFullPath);
+			
+			
+			if(jobTriggerVal != null) {
+				jobTriggerCd = "01";
+			}
     		
     		
     		jobMap.put("jobTriggerCd", jobTriggerCd);
@@ -541,8 +511,20 @@ public class Jen1000Controller {
 			model.addAttribute("jobInfo", jobMap);
 			
 			
+			
+			
+			
+			
+			List<Map> jobRestoreList = jen1000Service.selectJen1100JobNormalList(paramMap);
+			model.addAttribute("jobRestoreList", jobRestoreList);
+			
+			
+			model.addAttribute("MSG_CD", JENKINS_OK);
 			model.addAttribute("errorYn", "N");
 			model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
+
+			
+			newJenkinsClient.close(jenStatusVo);
 			
 			return new ModelAndView("jsonView");
 		}
@@ -579,7 +561,10 @@ public class Jen1000Controller {
 			
 			
 			String newJenUsrTok = "";
+			JenStatusVO jenStatusVo = null;
+			
 			try{
+				String jenUrl=(String)paramMap.get("jenUrl");
 				String userId=(String)paramMap.get("jenUsrId");
 				String tokenId=(String)paramMap.get("jenUsrTok");
 				
@@ -601,18 +586,24 @@ public class Jen1000Controller {
 				}
 				
 				
-				jenkinsClient.setUser(userId);
-				jenkinsClient.setPassword(tokenId);
+				jenStatusVo = newJenkinsClient.connect(jenUrl, userId, tokenId);
 				
-				String url =   (String)paramMap.get("jenUrl")+"/api/json";
-				String content = "";
-	
-				content = jenkinsClient.excuteHttpClientJenkins(url);
-	
-				jenkinsClient.getJenkinsParser(content );
+				
+				if(jenStatusVo.isErrorFlag()) {
+					
+					newJenkinsClient.close(jenStatusVo);
+					
+					model.addAttribute("MSG_CD", JENKINS_FAIL);
+					model.addAttribute("message", jenStatusVo.getErrorMsg());
+					return new ModelAndView("jsonView");
+				}
 			}
 			catch(Exception ex){
-				Log.error("selectJen1000URLConnect()", ex);
+				
+				if(jenStatusVo != null) {
+					newJenkinsClient.close(jenStatusVo);
+				}
+				Log.error("saveJen1000JenkinsInfoAjax()", ex);
 				if( ex instanceof HttpHostConnectException){
 					model.addAttribute("MSG_CD", JENKINS_FAIL);
 				}else if( ex instanceof ParseException){
@@ -703,12 +694,16 @@ public class Jen1000Controller {
 			
 			
 			String newJobTok = "";
+			
+			JenStatusVO jenStatusVo = null;
 			try{
 				String jenUrl=(String)paramMap.get("jenUrl");
-				String jobUrl=(String)paramMap.get("jobUrl");
 				String jobId=(String)paramMap.get("jobId");
 				String userId=(String)paramMap.get("jenUsrId");
 				String tokenId=(String)paramMap.get("jenUsrTok");
+				
+				
+				String jobFullPath = UrlUtils.toFullJobPath(jobId);
 				
 				
 				if(tokenId == null || "".equals(tokenId)){
@@ -720,15 +715,18 @@ public class Jen1000Controller {
 				tokenId = CommonScrty.decryptedAria(tokenId, salt);
 				
 				
-				jenkinsClient.setUser(userId);
-				jenkinsClient.setPassword(tokenId);
+				jenStatusVo = newJenkinsClient.connect(jenUrl, userId, tokenId);
 				
-				String url = jenUrl+"/api/json";
-				String content = "";
 				
-				content = jenkinsClient.excuteHttpClientJenkins(url);
+				if(jenStatusVo.isErrorFlag()) {
+					newJenkinsClient.close(jenStatusVo);
+					model.addAttribute("MSG_CD", JENKINS_FAIL);
+					model.addAttribute("message", jenStatusVo.getErrorMsg());
+					return new ModelAndView("jsonView");
+				}
 				
-				jenkinsClient.getJenkinsParser(content );
+				
+				String settingJobTok = newJenkinsClient.getJobTokenValue(jenStatusVo, jobFullPath);
 				
 				
 				String deJobTok = jobTok;
@@ -740,22 +738,14 @@ public class Jen1000Controller {
 				}
 				
 				if(deJobTok == null || "".equals(deJobTok)){
+					newJenkinsClient.close(jenStatusVo);
 					model.addAttribute("MSG_CD", "JOB TOKEN 값이 없습니다.");
 					return new ModelAndView("jsonView");
 				}
 				
-				if(null!=jobUrl && !"".equals(jobUrl)) {
-					url = jobUrl+"/config.xml";
-				}else {
-					url = jenUrl+"/job/"+jobId+"/config.xml";
-				}
-				
-				String settingJobTok = "";
-				
-				settingJobTok = jenkinsClient.excuteHttpClientJobToken(url,deJobTok);
-				
 				
 				if(!deJobTok.equals(settingJobTok)){
+					newJenkinsClient.close(jenStatusVo);
 					model.addAttribute("MSG_CD", "JOB TOKEN KEY값을 확인해주세요.");
 					return new ModelAndView("jsonView");
 				}
@@ -765,97 +755,29 @@ public class Jen1000Controller {
 				String jobTriggerVal = (String) paramMap.get("jobTriggerVal");
 				
 				
-				JenkinsServer jenkins = new JenkinsServer(new URI(jenUrl), userId, tokenId);
-	    		
-	    		String jobXml = jenkins.getJobXml(jobId);
-	    		
-	    		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	    		DocumentBuilder builder = factory.newDocumentBuilder();
-	    		org.w3c.dom.Document document = builder.parse(new InputSource(new StringReader(jobXml)));
-	    		
-	    		
-				NodeList triggersNodeList = document.getElementsByTagName("hudson.triggers.TimerTrigger");
-				
-				
 				if("01".equals(jobTriggerCd)) {
-					
-					String triggerUrl = jenUrl+"/job/"+jobId+"/descriptorByName/hudson.triggers.TimerTrigger/checkSpec";
-					
-					
-					List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-					nameValuePairs.add(new BasicNameValuePair("value", jobTriggerVal));
-					
-					
-					String rtnCheckStr = jenkinsClient.excuteHttpClientPostJenkins(triggerUrl, nameValuePairs);
-					
-					Document doc = Jsoup.parse(rtnCheckStr);
-					Elements divElems = doc.getElementsByTag("div");
-					
-					
-					if(divElems.size() > 0) {
-						Element divElem = divElems.get(0);
-						
-						if(divElem.hasClass("error")) {
-							model.addAttribute("MSG_CD", TRIGGER_CRON_VALUE_ERR);
-							model.addAttribute("MSG_STR", divElem.text());
-							jenkins.close();
-							return new ModelAndView("jsonView");
-						}
-					}
-					
-					
-		    		if(triggersNodeList.getLength() > 0) {
-		    			
-		    			NodeList tiggerChildNodeList = triggersNodeList.item(0).getChildNodes();
-		    			for(int i=0;i<tiggerChildNodeList.getLength();i++) {
-		    				Node childNode = tiggerChildNodeList.item(i);
-		    				
-		    				
-		    				if("spec".equals(childNode.getNodeName())) {
-		    					childNode.setTextContent(jobTriggerVal);
-		    				}
-		    			}
-		    		}else {
-		    			
-		    			org.w3c.dom.Element timeTrigger = document.createElement("hudson.triggers.TimerTrigger");
-		    			org.w3c.dom.Element spec = document.createElement("spec");
-		    			spec.setTextContent(jobTriggerVal);
-		    			
-		    			timeTrigger.appendChild(spec);
-
-		    			document.getElementsByTagName("triggers").item(0).appendChild(timeTrigger);
-		    		}
-		    		
-		    		TransformerFactory tf = TransformerFactory.newInstance();
-		    		Transformer transformer = tf.newTransformer();
-		    		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-		    		StringWriter writer = new StringWriter();
-		    		transformer.transform(new DOMSource(document), new StreamResult(writer));
-
-		    		
-		    		jenkins.updateJob(jobId, writer.getBuffer().toString());
-		    		jenkins.close();
+					jenStatusVo = newJenkinsClient.setJobTriggerCron(jenStatusVo, jobFullPath, jobTriggerVal);
 				}else {
-					
-					if(triggersNodeList.getLength() > 0) {
-						
-						document.getElementsByTagName("triggers").item(0).setTextContent("");
-						
-						
-						TransformerFactory tf = TransformerFactory.newInstance();
-			    		Transformer transformer = tf.newTransformer();
-			    		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-			    		StringWriter writer = new StringWriter();
-			    		transformer.transform(new DOMSource(document), new StreamResult(writer));
+					jenStatusVo = newJenkinsClient.setJobTriggerCron(jenStatusVo, jobFullPath);
+				}
+				
+				
+				newJenkinsClient.close(jenStatusVo);
 
-			    		
-			    		jenkins.updateJob(jobId, writer.getBuffer().toString());
-			    		jenkins.close();
-					}
+				
+				if(jenStatusVo.isErrorFlag()) {
+					newJenkinsClient.close(jenStatusVo);
+					model.addAttribute("MSG_CD", jenStatusVo.getErrorCode());
+					model.addAttribute("message", jenStatusVo.getErrorMsg());
+					return new ModelAndView("jsonView");
 				}
 			}
 			catch(Exception ex){
-				Log.error("selectJen1000URLConnect()", ex);
+				
+				if(jenStatusVo != null) {
+					newJenkinsClient.close(jenStatusVo);
+				}
+				Log.error("saveJen1100JobInfoAjax()", ex);
 				if( ex instanceof HttpHostConnectException){
 					model.addAttribute("MSG_CD", JENKINS_FAIL);
 				}else if( ex instanceof ParseException){
@@ -967,7 +889,6 @@ public class Jen1000Controller {
 	}
 	
 	
-	@SuppressWarnings("rawtypes")
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000ConfirmConnect.do")
 	public ModelAndView selectJen1000ConfirmConnect(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 
@@ -976,9 +897,9 @@ public class Jen1000Controller {
 			
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 
-			Map jenMap = jen1000Service.selectJen1000JenkinsInfo(paramMap);
-			String userId=(String)jenMap.get("jenUsrId");
-			String tokenId=(String)jenMap.get("jenUsrTok");
+			String jenUrl=(String)paramMap.get("jenUrl");
+			String userId=(String)paramMap.get("jenUsrId");
+			String tokenId=(String)paramMap.get("jenUsrTok");
 			
 			
 			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
@@ -993,16 +914,15 @@ public class Jen1000Controller {
 			}
 
 			
-			jenkinsClient.setUser(userId);
-			jenkinsClient.setPassword(newTokenId);
+			JenStatusVO jenStatusVo = newJenkinsClient.connect(jenUrl, userId, newTokenId);
+			newJenkinsClient.close(jenStatusVo);
 			
-			String url =   (String)jenMap.get("jenUrl")+"/api/json";
-			String content = "";
-
-			content = jenkinsClient.excuteHttpClientJenkins(url);
-
-			jenkinsClient.getJenkinsParser(content );
-
+			if(jenStatusVo.isErrorFlag()) {
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+				model.addAttribute("message", jenStatusVo.getErrorMsg());
+				return new ModelAndView("jsonView");
+			}
+			
 			model.addAttribute("MSG_CD", JENKINS_OK);
 
 
@@ -1041,10 +961,12 @@ public class Jen1000Controller {
 			String jenUsrId=(String)jobMap.get("jenUsrId");
 			String jenUsrTok=(String)jobMap.get("jenUsrTok");
 			String jobTok=(String)jobMap.get("jobTok");
-			
-			String jobUrl=(String)jobMap.get("jobUrl");
-			
+			String jenUrl=(String)jobMap.get("jenUrl");
+			String jobId=(String)jobMap.get("jobId");
 
+			
+			String jobFullPath = UrlUtils.toFullJobPath(jobId);
+			
 			
 			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
 			
@@ -1063,13 +985,19 @@ public class Jen1000Controller {
 			}
 			
 			
-			jenkinsClient.setUser(jenUsrId);
-			jenkinsClient.setPassword(deJenUsrTok);
+			JenStatusVO jenStatusVo = newJenkinsClient.connect(jenUrl, jenUsrId, deJenUsrTok);
 			
-			String url = jobUrl+"/config.xml";
-			String settingJobTok = "";
 			
-			settingJobTok = jenkinsClient.excuteHttpClientJobToken(url,deJobTok);
+			if(jenStatusVo.isErrorFlag()) {
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+				model.addAttribute("message", jenStatusVo.getErrorMsg());
+				return new ModelAndView("jsonView");
+			}
+			
+			String settingJobTok = newJenkinsClient.getJobTokenValue(jenStatusVo, jobFullPath);
+			
+			
+			newJenkinsClient.close(jenStatusVo);
 			
 			
 			if(!deJobTok.equals(settingJobTok)){
@@ -1103,16 +1031,17 @@ public class Jen1000Controller {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000URLConnect.do")
 	public ModelAndView selectJen1000URLConnect(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-
+		
+		JenStatusVO jenStatusVo = null;
 		try{
 
 			
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 
+			String jenUrl= (String)paramMap.get("jenUrl");
 			String userId= (String)paramMap.get("jenUsrId");
 			String tokenId= (String)paramMap.get("jenUsrTok");
 			String upperJobId = (String)paramMap.get("jobId");
-			String jobUrl = (String)paramMap.get("jobUrl");
 			
 			
 			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
@@ -1127,50 +1056,43 @@ public class Jen1000Controller {
 			}
 			
 			
-			jenkinsClient.setUser(userId);
-			jenkinsClient.setPassword(tokenId);
-			String url ="";
-			if(null != jobUrl && !"".equals(jobUrl)) {
-				String[] urlSplit = jobUrl.split("/job/");
-				String chkUrl = urlSplit[0];
-				for(int i=1; i<(urlSplit.length-1);i++) {
-					chkUrl += "/job/" + urlSplit[i];
-				}
-				url = chkUrl+"/api/json";
-			}else {
-				url = (String)paramMap.get("jenUrl") + "/api/json";
+			jenStatusVo = newJenkinsClient.connect(jenUrl, userId, tokenId);
+			
+			
+			if(jenStatusVo.isErrorFlag()) {
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+				model.addAttribute("message", jenStatusVo.getErrorMsg());
 			}
 			
 			
-			String content = "";
-
-			content = jenkinsClient.excuteHttpClientJenkins(url);
-
-			Map jenkinsMap= jenkinsClient.getJenkinsParser(content );
-			List jobList =  (List) jenkinsMap.get("jobs");
-
-			if(null!=jobList) {
-				for (int i = 0 ; i< jobList.size();i++) {
-					Map job = (HashMap) jobList.get(i);
-					job.put("jobId", job.get("name"));
-					job.put("upperJobId", upperJobId);
-					jobList.set(i, job);
-				}
-			}
+			Map addDatas = new HashMap<>();
+			addDatas.put("upperJobId", upperJobId);
+			
+			
+			List jobList = newJenkinsClient.getJobList(jenStatusVo, addDatas);
+			
 			
 			model.addAttribute("list", jobList);
 			model.addAttribute("MSG_CD", JENKINS_OK);
 			
 			
-			paramMap.put("restoreSelJobType", "03");
+			
+			
 			
 			
 			List<Map> jobRestoreList = jen1000Service.selectJen1100JobNormalList(paramMap);
 			
+			
+			newJenkinsClient.close(jenStatusVo);
 			model.addAttribute("jobRestoreList", jobRestoreList);
 			return new ModelAndView("jsonView");
 		}
 		catch(Exception ex){
+			
+			if(jenStatusVo != null) {
+				newJenkinsClient.close(jenStatusVo);
+			}
+			
 			Log.error("selectJen1000URLConnect()", ex);
 			if( ex instanceof HttpHostConnectException){
 				model.addAttribute("MSG_CD", JENKINS_FAIL);
@@ -1193,11 +1115,15 @@ public class Jen1000Controller {
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000SubURLConnect.do")
 	public ModelAndView selectJen1000SubURLConnect(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		
+		
+		JenStatusVO jenStatusVo = null;
+		
 		try{
 			
 			
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 			
+			String url= (String)paramMap.get("url");
 			String userId= (String)paramMap.get("jenUsrId");
 			String tokenId= (String)paramMap.get("jenUsrTok");
 			String upperJobId = (String)paramMap.get("jobId");
@@ -1215,26 +1141,21 @@ public class Jen1000Controller {
 			}
 			
 			
-			jenkinsClient.setUser(userId);
-			jenkinsClient.setPassword(tokenId);
+			jenStatusVo = newJenkinsClient.connect(url, userId, tokenId);
 			
-			String url = (String)paramMap.get("url")+"/api/json";
 			
-			String content = "";
-			
-			content = jenkinsClient.excuteHttpClientJenkins(url);
-			
-			Map jenkinsMap= jenkinsClient.getJenkinsParser(content );
-			List jobList =  (List) jenkinsMap.get("jobs");
-
-			if(null!=jobList) {
-				for (int i = 0 ; i< jobList.size();i++) {
-					Map job = (HashMap) jobList.get(i);
-					job.put("jobId", job.get("name"));
-					job.put("upperJobId", upperJobId);
-					jobList.set(i, job);
-				}
+			if(jenStatusVo.isErrorFlag()) {
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+				model.addAttribute("message", jenStatusVo.getErrorMsg());
 			}
+			
+			
+			Map addDatas = new HashMap<>();
+			addDatas.put("upperJobId", upperJobId);
+			
+			
+			List jobList = newJenkinsClient.getJobList(jenStatusVo, addDatas);
+			
 			
 			model.addAttribute("list", jobList);
 			model.addAttribute("MSG_CD", JENKINS_OK);
@@ -1245,10 +1166,16 @@ public class Jen1000Controller {
 			
 			List<Map> jobRestoreList = jen1000Service.selectJen1100JobNormalList(paramMap);
 			
+			
+			newJenkinsClient.close(jenStatusVo);
 			model.addAttribute("jobRestoreList", jobRestoreList);
 			return new ModelAndView("jsonView");
 		}
 		catch(Exception ex){
+			
+			if(jenStatusVo != null) {
+				newJenkinsClient.close(jenStatusVo);
+			}
 			Log.error("selectJen1000SubURLConnect()", ex);
 			if( ex instanceof HttpHostConnectException){
 				model.addAttribute("MSG_CD", JENKINS_FAIL);
@@ -1270,16 +1197,20 @@ public class Jen1000Controller {
 	@SuppressWarnings("rawtypes")
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000JobParameter.do")
 	public ModelAndView selectJen1000JobParameter(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-
+		
+		JenStatusVO jenStatusVo = null;
+		
 		try{
-
 			
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 
+			String jenUrl= (String)paramMap.get("jenUrl");
 			String userId= (String)paramMap.get("jenUsrId");
 			String tokenId= (String)paramMap.get("jenUsrTok");
+			String jobId= (String)paramMap.get("jobId");
 			
-			String jobUrl= (String)paramMap.get("jobUrl");
+			
+			String jobFullPath = UrlUtils.toFullJobPath(jobId);
 			
 			
 			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
@@ -1294,20 +1225,32 @@ public class Jen1000Controller {
 			}
 			
 			
-			jenkinsClient.setUser(userId);
-			jenkinsClient.setPassword(tokenId);
+			jenStatusVo = newJenkinsClient.connect(jenUrl, userId, tokenId);
 			
 			
-			String paramurl = jobUrl+"/config.xml";
-			List<Map> jenJobParamList = jenkinsClient.excuteHttpClientJobParameterList(paramurl,tokenId);
-
+			if(jenStatusVo.isErrorFlag()) {
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+				model.addAttribute("message", jenStatusVo.getErrorMsg());
+				
+				return new ModelAndView("jsonView");
+			}
+			
+			
+			List<Map> jenJobParamList = newJenkinsClient.getJobParamList(jenStatusVo, jobFullPath);
+			
 			
 			model.addAttribute("list", jenJobParamList);
 			model.addAttribute("MSG_CD", JENKINS_OK);
 			
+			newJenkinsClient.close(jenStatusVo);
+			
 			return new ModelAndView("jsonView");
 		}
 		catch(Exception ex){
+			
+			if(jenStatusVo != null) {
+				newJenkinsClient.close(jenStatusVo);
+			}
 			Log.error("selectJen1000JobParameter()", ex);
 			if( ex instanceof HttpHostConnectException){
 				model.addAttribute("MSG_CD", JENKINS_FAIL);
@@ -1354,8 +1297,9 @@ public class Jen1000Controller {
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1002JobCronSpecCheck.do")
 	public ModelAndView selectJen1002JobCronSpecCheck(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		
+		JenStatusVO jenStatusVo = null;
+		
 		try{
-			
 			
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 			
@@ -1370,6 +1314,9 @@ public class Jen1000Controller {
 			String jobTriggerVal=(String)paramMap.get("jobTriggerVal");
 			
 			
+			String jobFullPath = UrlUtils.toFullJobPath(jobId);
+			
+			
 			if(jenUsrTok == null || "".equals(jenUsrTok)){
 				model.addAttribute("MSG_CD", JENKINS_FAIL);
 				return new ModelAndView("jsonView");
@@ -1379,24 +1326,38 @@ public class Jen1000Controller {
 			jenUsrTok = CommonScrty.decryptedAria(jenUsrTok, salt);
 			
 			
-			jenkinsClient.setUser(jenUsrId);
-			jenkinsClient.setPassword(jenUsrTok);
+			jenStatusVo = newJenkinsClient.connect(jenUrl, jenUsrId, jenUsrTok);
 			
 			
-			String triggerUrl = jenUrl+"/job/"+jobId+"/descriptorByName/hudson.triggers.TimerTrigger/checkSpec";
+			if(jenStatusVo.isErrorFlag()) {
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+				model.addAttribute("message", jenStatusVo.getErrorMsg());
+				return new ModelAndView("jsonView");
+			}
 			
+			
+			String triggerUrl = jenUrl+"/job/"+jobFullPath+"/descriptorByName/hudson.triggers.TimerTrigger/checkSpec";
+
 			
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
 			nameValuePairs.add(new BasicNameValuePair("value", jobTriggerVal));
 			
 			
-			String rtnCheckStr = jenkinsClient.excuteHttpClientPostJenkins(triggerUrl, nameValuePairs);
+			String rtnCheckStr = newJenkinsClient.excutePost(jenStatusVo, triggerUrl, nameValuePairs);
 			
 			model.addAttribute("checkResult", rtnCheckStr);
 			model.addAttribute("MSG_CD", JENKINS_OK);
+			
+			
+			newJenkinsClient.close(jenStatusVo);
 			return new ModelAndView("jsonView");
 		}
 		catch(Exception ex){
+			
+			if(jenStatusVo != null) {
+				newJenkinsClient.close(jenStatusVo);
+			}
+			
 			Log.error("selectJen1000JobParameter()", ex);
 			if( ex instanceof HttpHostConnectException){
 				model.addAttribute("MSG_CD", JENKINS_FAIL);
@@ -1418,6 +1379,8 @@ public class Jen1000Controller {
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1002JobCronSpec.do")
 	public ModelAndView selectJen1002JobCronSpec(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		
+		JenStatusVO jenStatusVo = null;
+		
 		try{
 			
 			
@@ -1432,6 +1395,9 @@ public class Jen1000Controller {
 			String jenUsrId=(String)paramMap.get("jenUsrId");
 			String jenUsrTok=(String)paramMap.get("jenUsrTok");
 			
+			
+			String jobFullPath = UrlUtils.toFullJobPath(jobId);
+			
 			String jobTriggerCd = "02";
 			String jobTriggerVal = "";
 			
@@ -1445,44 +1411,37 @@ public class Jen1000Controller {
 			jenUsrTok = CommonScrty.decryptedAria(jenUsrTok, salt);
 			
 			
-			jenkinsClient.setUser(jenUsrId);
-			jenkinsClient.setPassword(jenUsrTok);
+			jenStatusVo = newJenkinsClient.connect(jenUrl, jenUsrId, jenUsrTok);
 			
 			
-			JenkinsServer jenkins = new JenkinsServer(new URI(jenUrl), jenUsrId, jenUsrTok);
-    		
-    		String jobXml = jenkins.getJobXml(jobId);
-    		
-    		jenkins.close();
-    		
-    		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    		DocumentBuilder builder = factory.newDocumentBuilder();
-    		org.w3c.dom.Document document = builder.parse(new InputSource(new StringReader(jobXml)));
-    		
-    		NodeList triggersNodeList = document.getElementsByTagName("hudson.triggers.TimerTrigger");
+			if(jenStatusVo.isErrorFlag()) {
+				model.addAttribute("MSG_CD", JENKINS_FAIL);
+				model.addAttribute("message", jenStatusVo.getErrorMsg());
+				return new ModelAndView("jsonView");
+			}
 			
 			
-    		if(triggersNodeList.getLength() > 0) {
-    			jobTriggerCd = "01";
-    			
-    			
-    			NodeList tiggerChildNodeList = triggersNodeList.item(0).getChildNodes();
-    			for(int i=0;i<tiggerChildNodeList.getLength();i++) {
-    				Node childNode = tiggerChildNodeList.item(i);
-    				
-    				
-    				if("spec".equals(childNode.getNodeName())) {
-    					jobTriggerVal = childNode.getTextContent();
-    				}
-    			}
-    		}
+			jobTriggerVal = newJenkinsClient.getJobTriggerCron(jenStatusVo, jobFullPath);
+			
+			
+			if(jobTriggerVal != null) {
+				jobTriggerCd = "01";
+			}
     		
 			model.addAttribute("jobTriggerCd", jobTriggerCd);
 			model.addAttribute("jobTriggerVal", jobTriggerVal);
 			model.addAttribute("MSG_CD", JENKINS_OK);
+			
+			
+			newJenkinsClient.close(jenStatusVo);
 			return new ModelAndView("jsonView");
 		}
 		catch(Exception ex){
+			
+			if(jenStatusVo != null) {
+				newJenkinsClient.close(jenStatusVo);
+			}
+			
 			Log.error("selectJen1000JobParameter()", ex);
 			if( ex instanceof HttpHostConnectException){
 				model.addAttribute("MSG_CD", JENKINS_FAIL);
