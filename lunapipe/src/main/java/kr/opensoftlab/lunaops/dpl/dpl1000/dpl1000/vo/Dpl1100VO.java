@@ -25,6 +25,11 @@ public class Dpl1100VO extends PageVO{
 	private String jobRestoreId;
 	private String jobRestoreDesc;
 	
+	private String bldNum;
+	private String bldResult;
+	private String bldDurationTm;
+	private String bldStartDtm ;
+	
 	public String getRn() {
 		return rn;
 	}
@@ -132,6 +137,31 @@ public class Dpl1100VO extends PageVO{
 	}
 	public void setJobRestoreDesc(String jobRestoreDesc) {
 		this.jobRestoreDesc = jobRestoreDesc;
+	}
+	
+	public String getBldNum() {
+		return bldNum;
+	}
+	public void setBldNum(String bldNum) {
+		this.bldNum = bldNum;
+	}
+	public String getBldResult() {
+		return bldResult;
+	}
+	public void setBldResult(String bldResult) {
+		this.bldResult = bldResult;
+	}
+	public String getBldDurationTm() {
+		return bldDurationTm;
+	}
+	public void setBldDurationTm(String bldDurationTm) {
+		this.bldDurationTm = bldDurationTm;
+	}
+	public String getBldStartDtm() {
+		return bldStartDtm;
+	}
+	public void setBldStartDtm(String bldStartDtm) {
+		this.bldStartDtm = bldStartDtm;
 	}
 	
 	
