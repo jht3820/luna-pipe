@@ -188,6 +188,27 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 						newMap.put("jenId", jenId);
 						newMap.put("jobId", jobId);
 						jen1000Service.insertJen1101CIJobInfo(newMap);
+						
+						
+						String jobParamListStr = OslUtil.jsonGetString(jsonObj, "job_param_list");
+						if(jobParamListStr != null) {
+							
+							JSONArray jobParamList = new JSONArray(jobParamListStr);
+							
+							for(int j=0;j<jobParamList.length();j++) {
+								
+								String jobParamKey = OslUtil.jsonGetString(jsonObj, "job_param_key");
+								String jobParamVal = OslUtil.jsonGetString(jsonObj, "job_param_val");
+								
+								newMap.put("jobParamKey", jobParamKey);
+								newMap.put("jobParamVal", jobParamVal);
+								
+								
+								jen1000Service.insertJen1102ParameterInfo(newMap);
+							}
+							
+						}
+						
 					}
 				}catch(JSONException je) {
 					return OslErrorCode.CI_JOB_PARAM_PARSE_FAIL;

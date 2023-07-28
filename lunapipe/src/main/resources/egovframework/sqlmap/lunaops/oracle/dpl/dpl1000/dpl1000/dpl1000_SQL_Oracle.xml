@@ -57,8 +57,12 @@
 		<result property="jobTypeCd"			column="JOB_TYPE_CD" /> 
 		<result property="jobTypeNm"			column="JOB_TYPE_NM" /> 
 		<result property="jobUrl"				column="JOB_URL" /> 
-		<result property="jobRestoreId"				column="JOB_RESTORE_ID" />  
-		<result property="jobRestoreDesc"				column="JOB_RESTORE_DESC" /> 
+		<result property="jobRestoreId"			column="JOB_RESTORE_ID" />  
+		<result property="jobRestoreDesc"		column="JOB_RESTORE_DESC" /> 
+		<result property="bldNum"  				column="BLD_NUM" />
+		<result property="bldResult"  			column="BLD_RESULT" />
+		<result property="bldDurationTm"  		column="BLD_DURATION_TM"/>
+		<result property="bldStartDtm"  		column="BLD_START_DTM"/>
 		<result property="regDtm"           	column="REG_DTM" /> 
 		<result property="regUsrId"         	column="REG_USR_ID" /> 
 		<result property="regUsrIp"         	column="REG_USR_IP" /> 
@@ -175,6 +179,10 @@
 			, D.JOB_URL
 			, D.JOB_RESTORE_ID
 			, E.JOB_DESC AS JOB_RESTORE_DESC
+			, F.BLD_NUM
+			, F.BLD_RESULT
+			, F.BLD_DURATION_TM
+			, F.BLD_START_DTM
 			, A.REG_DTM 
             , A.REG_USR_ID 
             , A.REG_USR_IP 
@@ -186,6 +194,12 @@
 		INNER JOIN JEN1000 C ON (B.JEN_ID = C.JEN_ID AND C.USE_CD = '01' AND C.DEL_CD = '02')
 		INNER JOIN JEN1100 D ON (B.JEN_ID = D.JEN_ID AND B.JOB_ID = D.JOB_ID AND D.USE_CD = '01')
 		LEFT JOIN JEN1100 E ON (D.JEN_ID = E.JEN_ID AND D.JOB_RESTORE_ID = E.JOB_ID AND E.USE_CD = '01')
+		LEFT JOIN 
+		(
+			SELECT Z.* FROM JEN1200 Z
+			INNER JOIN (SELECT CI_ID, TICKET_ID, JEN_ID, JOB_ID, DPL_ID, MAX(BLD_NUM) AS BLD_NUM FROM DPL1102 GROUP BY CI_ID, TICKET_ID, JEN_ID, JOB_ID, DPL_ID) Y
+			ON (Z.JEN_ID = Y.JEN_ID AND Z.JOB_ID = Y.JOB_ID AND Z.BLD_NUM = Y.BLD_NUM)
+		) F ON (B.JEN_ID = F.JEN_ID AND B.JOB_ID = F.JOB_ID)
 		WHERE 1=1
 		AND A.CI_ID = #ciId#
 		AND A.TICKET_ID = #ticketId#
