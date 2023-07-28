@@ -28,7 +28,8 @@ import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1000VO;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.sdf.jenkins.AutoBuildInit;
-import kr.opensoftlab.sdf.jenkins.JenkinsClient;
+import kr.opensoftlab.sdf.jenkins.NewJenkinsClient;
+import kr.opensoftlab.sdf.jenkins.vo.JenStatusVO;
 import kr.opensoftlab.sdf.util.OslAgileConstant;
 import kr.opensoftlab.sdf.util.OslUtil;
 import kr.opensoftlab.sdf.util.PagingUtil;
@@ -65,10 +66,10 @@ public class Dpl1000Controller {
 	
     
     
+
 	
-	
-	@Resource(name = "jenkinsClient")
-	private JenkinsClient jenkinsClient;
+	@Resource(name = "newJenkinsClient")
+	private NewJenkinsClient newJenkinsClient;
 	
 	
 	@Resource(name = "autoBuildInit")
@@ -127,6 +128,12 @@ public class Dpl1000Controller {
 		
     	return "/dpl/dpl1000/dpl1000/dpl1000";
     }
+	
+	
+	@RequestMapping(value="/dpl/dpl1000/dpl1000/selectDpl1001View.do")
+	public String selectDpl1001View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		return "/dpl/dpl1000/dpl1000/dpl1001";
+	}
 
      
      @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -137,20 +144,20 @@ public class Dpl1000Controller {
     		 
     		 Map paramMap = RequestConvertor.requestParamToMap(request, true);
     		 
-			List<Map> dpl1800JobParamList = dpl1000Service.selectDpl1101JenParameterList(paramMap);
+			List<Map> jobParamList = dpl1000Service.selectDpl1101JenParameterList(paramMap);
     		 
-    		 
-    		 model.addAttribute("jobParamList", dpl1800JobParamList);
+    		 model.addAttribute("jobParamList", jobParamList);
     		 
     		 
     		 model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
-    		 
+    		 model.addAttribute("errorYn", "N");
     		 return new ModelAndView("jsonView", model);
     	 }
     	 catch(Exception ex){
     		 Log.error("selectDpl1000DeployNmListAjax()", ex);
     		 
     		 
+    		 model.addAttribute("errorYn", "Y");
     		 model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
     		 return new ModelAndView("jsonView", model);
     	 }
@@ -529,6 +536,60 @@ public class Dpl1000Controller {
 			
 			model.addAttribute("errorYn", "Y");
 			model.addAttribute("message", "콘솔 내용 조회 오류");
+			return new ModelAndView("jsonView", model);
+		}
+	}
+	
+	
+	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1000JobBuildAjax.do")
+	public ModelAndView selectDpl1000JobBuildAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			
+			String jenUrl= (String)paramMap.get("jenUrl");
+    		String jenUsrId= (String)paramMap.get("jenUsrId");
+			String jenUsrTok= (String)paramMap.get("jenUsrTok");
+			String jobId= (String)paramMap.get("jobId");
+			
+			
+			JenStatusVO jenStatusVo = newJenkinsClient.connect(jenUrl, jenUsrId, jenUsrTok);
+			
+			
+			if(jenStatusVo.isErrorFlag()) {
+				model.addAttribute("errorYn", "Y");
+				model.addAttribute("message", jenStatusVo.getErrorMsg());
+				return new ModelAndView("jsonView");
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			model.addAttribute("errorYn", "N");
+			model.addAttribute("message", egovMessageSource.getMessage("success.deploy.build"));
+			return new ModelAndView("jsonView", model);
+		}
+		catch(Exception ex){
+			Log.error("selectDpl1000JobBuildAjax()", ex);
+			
+			
+			model.addAttribute("errorYn", "Y");
+			model.addAttribute("message", egovMessageSource.getMessage("fail.deploy.build"));
 			return new ModelAndView("jsonView", model);
 		}
 	}
