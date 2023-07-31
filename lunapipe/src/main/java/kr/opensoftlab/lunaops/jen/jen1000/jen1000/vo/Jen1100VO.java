@@ -24,6 +24,7 @@ public class Jen1100VO extends PageVO {
     private String    jenDesc; 				
     private String    jenUseCd; 				
     private String    jobId;              
+    private String    jobPath;              
     private String    jobRestoreId;               
     private String    jobTok;              
     private String    jobParameter;              
@@ -31,11 +32,16 @@ public class Jen1100VO extends PageVO {
     private String    jobUrl;              
     private String    jobTypeCd;              
     private String	jobTypeNm;
-    
     private String jobTriggerCd;	
     private String    useCd;               
     private String    useNm;
-    private String	projectJenkinsCheck;
+
+    private String lastBldNum;   
+    private String lastBldClass;     
+    private String lastBldResult;
+    private String lastBldDurationTm;
+    private String lastBldStartDtm;
+    
     
 	public String getCiId() {
 		return ciId;
@@ -124,6 +130,13 @@ public class Jen1100VO extends PageVO {
 	public void setJenUseCd(String jenUseCd) {
 		this.jenUseCd = jenUseCd;
 	}
+	
+	public String getJobPath() {
+		return jobPath;
+	}
+	public void setJobPath(String jobPath) {
+		this.jobPath = jobPath;
+	}
 	public String getJobId() {
 		return jobId;
 	}
@@ -179,16 +192,41 @@ public class Jen1100VO extends PageVO {
 	public void setUseNm(String useNm) {
 		this.useNm = useNm;
 	}
-	public String getProjectJenkinsCheck() {
-		return projectJenkinsCheck;
-	}
-	public void setProjectJenkinsCheck(String projectJenkinsCheck) {
-		this.projectJenkinsCheck = projectJenkinsCheck;
-	}
 	public String getJobParameter() {
 		return jobParameter;
 	}
 	public void setJobParameter(String jobParameter) {
 		this.jobParameter = jobParameter;
 	}
+	public String getLastBldNum() {
+		return lastBldNum;
+	}
+	public void setLastBldNum(String lastBldNum) {
+		this.lastBldNum = lastBldNum;
+	}
+	public String getLastBldClass() {
+		return lastBldClass;
+	}
+	public void setLastBldClass(String lastBldClass) {
+		this.lastBldClass = lastBldClass;
+	}
+	public String getLastBldResult() {
+		return lastBldResult;
+	}
+	public void setLastBldResult(String lastBldResult) {
+		this.lastBldResult = lastBldResult;
+	}
+	public String getLastBldDurationTm() {
+		return lastBldDurationTm;
+	}
+	public void setLastBldDurationTm(String lastBldDurationTm) {
+		this.lastBldDurationTm = lastBldDurationTm;
+	}
+	public String getLastBldStartDtm() {
+		return lastBldStartDtm;
+	}
+	public void setLastBldStartDtm(String lastBldStartDtm) {
+		this.lastBldStartDtm = lastBldStartDtm;
+	}
+	
 }
