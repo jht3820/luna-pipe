@@ -75,7 +75,7 @@ $(document).ready(function() {
 		var logType = $(this).attr("logtype");
 		
 		
-		var selJobInfo = jobGrid.getList('selected')[0];
+		var selJobInfo = dplJobGrid.getList('selected')[0];
 		
 		
 		if(logType == "main"){
@@ -116,8 +116,7 @@ $(document).ready(function() {
 	
 	
 	$("#btn_update_dplAction").click(function(){
-		return;
-		var item = jobGrid.getList('selected')[0];
+		var item = dplJobGrid.getList('selected')[0];
 		if(gfnIsNull(item)){
 			toast.push('실행(빌드)하려는 JOB을 선택해주세요.');
 			return;
@@ -127,7 +126,12 @@ $(document).ready(function() {
 			function(result) {
 				if (result) {
 					
-					var list = jobGrid.list;
+					fnDplStart(item);
+					return;
+					
+					
+					
+					var list = dplJobGrid.list;
 					
 					var bldProgressChk = false;
 					
@@ -262,9 +266,9 @@ function fnJobStatusCheckLoop(){
 					var page = data.page;
 					
 					
-					var selJobTmp = jobGrid.getList('selected')[0];
+					var selJobTmp = dplJobGrid.getList('selected')[0];
 					
-				   	jobGrid.setData({
+				   	dplJobGrid.setData({
 				             	list:list,
 				             	page: {
 				                  currentPage: dplJobGrid.page.currentPage,
@@ -275,7 +279,7 @@ function fnJobStatusCheckLoop(){
 				             });
 				   	if(!gfnIsNull(selJobTmp)){
 					   	
-					   	jobGrid.select(selJobTmp.__index);
+					   	dplJobGrid.select(selJobTmp.__index);
 				   	}
 				}
 			}
@@ -307,7 +311,7 @@ function fnJobBuildResultStatus(targetJobId, targetBldNum, targetJobInfo){
 	selJobStatusFlag = false;
 	
 	
-	var selJobItem = jobGrid.getList('selected')[0];
+	var selJobItem = dplJobGrid.getList('selected')[0];
 	
 	
 	var requestConsole = "N";
@@ -368,7 +372,7 @@ function fnJobBuildResultStatus(targetJobId, targetBldNum, targetJobInfo){
 			
 			if(requestConsole == "Y" && !gfnIsNull(data.consoleText)){
 				
-				var selJobItem = jobGrid.getList('selected')[0];
+				var selJobItem = dplJobGrid.getList('selected')[0];
 
 				
 				if(!gfnIsNull(selJobItem)){
@@ -436,7 +440,7 @@ function fnJobBuildResultStatus(targetJobId, targetBldNum, targetJobInfo){
 				
 				if(!gfnIsNull(localBldInfo)){
 					
-					$.each(jobGrid.list,function(idx, map){
+					$.each(dplJobGrid.list,function(idx, map){
 						
 						if(map.jobId == localBldInfo.jobId){
 							
@@ -446,7 +450,7 @@ function fnJobBuildResultStatus(targetJobId, targetBldNum, targetJobInfo){
 							targetJobInfo["bldSeq"] = localBldInfo.bldSeq;
 							targetJobInfo["bldNum"] = localBldInfo.bldNum;
 							
-							jobGrid.updateRow(targetJobInfo, map.__index);
+							dplJobGrid.updateRow(targetJobInfo, map.__index);
 							$(".progress .progress-bar").attr('data-transitiongoal', 100).progressbar2({display_text: 'center', percent_format: function(p) {return buildMap.fullDisplayName+': ' + p+'%';}});
 							return false;
 						}
@@ -459,7 +463,7 @@ function fnJobBuildResultStatus(targetJobId, targetBldNum, targetJobInfo){
 							targetJobInfo["bldRestoreSeq"] = localBldInfo.bldSeq;
 							targetJobInfo["bldRestoreNum"] = localBldInfo.bldNum;
 							
-							jobGrid.updateRow(targetJobInfo, map.__index);
+							dplJobGrid.updateRow(targetJobInfo, map.__index);
 							$(".progress .progress-bar").attr('data-transitiongoal', 100).progressbar2({display_text: 'center', percent_format: function(p) {return buildMap.fullDisplayName+': ' + p+'%';}});
 							return false;
 						}
@@ -556,6 +560,12 @@ function fnAxGrid5View(){
                 align: "center",
                 columnHeight: 30,
                 onClick: function () {
+                	
+       				this.self.select(this.self.selectedDataIndexs[0]);
+    				
+    				
+    				this.self.select(this.doindex);
+                	
                 	
                 	$("#jobMaskFrame").hide();
                 	
@@ -786,7 +796,7 @@ function fnSelJobConsoleLogLoad(jobItem){
 				mainConsoleSetChk = true;
 			}else{
 				
-				$.each(jobGrid.list,function(idx, map){
+				$.each(dplJobGrid.list,function(idx, map){
 					if(map.jobId == localJobInfo.jobId){
 						
 						if(map.bldResult != "PROGRESS"){
@@ -827,8 +837,8 @@ function fnInJobGridListSet(_pageNo,ajaxParam,dplId){
      	
      	if(!gfnIsNull(_pageNo)){
      		ajaxParam += "&pageNo="+_pageNo;
-     	}else if(typeof jobGrid.page.currentPage != "undefined"){
-     		ajaxParam += "&pageNo="+jobGrid.page.currentPage;
+     	}else if(typeof dplJobGrid.page.currentPage != "undefined"){
+     		ajaxParam += "&pageNo="+dplJobGrid.page.currentPage;
      	}
      	
      	ajaxParam += "&dplId="+dplId;
@@ -842,7 +852,7 @@ function fnInJobGridListSet(_pageNo,ajaxParam,dplId){
 			var list = data.list;
 			var page = data.page;
 			
-		   	jobGrid.setData({
+		   	dplJobGrid.setData({
 		             	list:list,
 		             	page: {
 		                  currentPage: _pageNo || 0,
@@ -867,10 +877,10 @@ function fnDplStart(item){
 	$(".progress .progress-bar").attr('data-transitiongoal', 0).progressbar2({display_text: 'center'});
 
 	if(!gfnIsNull(item)){
-		jobGrid.setValue(item.__original_index, "bldResult", "START");
-		jobGrid.setValue(item.__original_index, "bldResultMsg", "빌드 준비 중");
+		dplJobGrid.setValue(item.__original_index, "bldResult", "START");
+		dplJobGrid.setValue(item.__original_index, "bldResultMsg", "빌드 준비 중");
 	}
-	
+	return;
 	
 	var ajaxObj = new gfnAjaxRequestAction(
 			{"url":"<c:url value='/dpl/dpl1000/dpl1000/selectDpl1000JobBuildAjax.do'/>","loadingShow":false}
@@ -882,8 +892,8 @@ function fnDplStart(item){
 		if(data.errorYn == "Y"){
 			jAlert(data.message, "알림창");
 			
-			jobGrid.setValue(item.__original_index, "bldResult", "FAILURE");
-			jobGrid.setValue(item.__original_index, "bldResultMsg", "빌드 오류");
+			dplJobGrid.setValue(item.__original_index, "bldResult", "FAILURE");
+			dplJobGrid.setValue(item.__original_index, "bldResultMsg", "빌드 오류");
 			return false;
 		}else{
 			
@@ -900,8 +910,8 @@ function fnDplStart(item){
     		
 			if(selDplId != item.dplId){
 				
-				jobGrid.setValue(item.__original_index, "bldResult", data.bldResult);
-				jobGrid.setValue(item.__original_index, "bldResultMsg", data.bldResultMsg);
+				dplJobGrid.setValue(item.__original_index, "bldResult", data.bldResult);
+				dplJobGrid.setValue(item.__original_index, "bldResultMsg", data.bldResultMsg);
 			}
 		}
 		
