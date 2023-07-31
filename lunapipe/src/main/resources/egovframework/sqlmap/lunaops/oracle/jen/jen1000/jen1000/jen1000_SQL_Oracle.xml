@@ -37,6 +37,7 @@
 		<result property="jenDesc"             column="JEN_DESC" />  
 		<result property="jenUseCd"             column="JEN_USE_CD" />  
 		<result property="jobId"              column="JOB_ID" />  
+		<result property="jobPath"              column="JOB_PATH" />  
 		<result property="jobRestoreId"       column="JOB_RESTORE_ID" />  
 		<result property="jobTok"          	  column="JOB_TOK" /> 
 		<result property="jobDesc"            column="JOB_DESC" />  
@@ -45,6 +46,11 @@
 		<result property="jobTypeNm"          column="JOB_TYPE_NM" /> 
 		<result property="useCd"              column="USE_CD" />  
 		<result property="useNm"              column="USE_NM" /> 
+		<result property="lastBldNum"              column="LAST_BLD_NUM" />
+		<result property="lastBldClass"              column="LAST_BLD_CLASS" />
+		<result property="lastBldResult"              column="LAST_BLD_RESULT" />
+		<result property="lastBldDurationTm"              column="LAST_BLD_DURATION_TM" />
+		<result property="lastBldStartDtm"              column="LAST_BLD_START_DTM" />
 		<result property="regDtm"             column="REG_DTM" />  
 		<result property="regUsrId"           column="REG_USR_ID" />  
 		<result property="regUsrIp"           column="REG_USR_IP" />  
@@ -149,6 +155,7 @@
 		            B.JEN_DESC ,
 		            B.USE_CD AS JEN_USE_CD ,
 		            A.JOB_ID ,
+		            A.JOB_PATH ,
 		            NVL(A.JOB_RESTORE_ID,'-') AS JOB_RESTORE_ID ,
 		            A.JOB_TOK ,
 		            A.JOB_TYPE_CD ,
@@ -156,7 +163,12 @@
 		            A.JOB_DESC ,
 		            A.JOB_URL ,
 		            A.USE_CD ,                  
-		            SF_CMM1001_COM_CD_INFO('CMM00001', A.USE_CD, '1') AS USE_NM , 
+		            SF_CMM1001_COM_CD_INFO('CMM00001', A.USE_CD, '1') AS USE_NM ,
+		            C.BLD_NUM  AS LAST_BLD_NUM,
+		            C.BLD_CLASS AS LAST_BLD_CLASS ,
+		            C.BLD_RESULT AS LAST_BLD_RESULT ,
+		            C.BLD_DURATION_TM AS LAST_BLD_DURATION_TM ,
+		            C.BLD_START_DTM AS LAST_BLD_START_DTM , 
 		            A.REG_DTM ,                  
 		            A.REG_USR_ID ,               
 		            A.REG_USR_IP ,               
@@ -165,6 +177,12 @@
 		            A.MODIFY_USR_IP                           
 			FROM
 		            JEN1100 A LEFT JOIN JEN1000 B ON(A.JEN_ID = B.JEN_ID)
+		            LEFT JOIN 
+	                (
+						SELECT Z.*
+						FROM JEN1200 Z INNER JOIN (SELECT JEN_ID, JOB_ID, MAX(BLD_NUM) AS BLD_NUM FROM JEN1200 GROUP BY JEN_ID, JOB_ID) Y
+						ON ( Z.JEN_ID = Y.JEN_ID AND Z.JOB_ID = Y.JOB_ID AND Z.BLD_NUM = Y.BLD_NUM )
+	                ) C ON (A.JEN_ID = C.JEN_ID AND A.JOB_ID = C.JOB_ID)
 			WHERE   1=1
 			AND		B.DEL_CD = '02'
 		]]>
@@ -178,17 +196,6 @@
 				AND C.JEN_ID = A.JEN_ID
 				AND C.JOB_ID = A.JOB_ID
 			)		
-		</isNotEmpty>
-		<isNotEmpty property="projectJenkinsCheck">
-			<isEqual property="projectJenkinsCheck" compareValue="Y">
-				AND	EXISTS (
-	            	SELECT Z.*
-	                FROM JEN1200 Z
-	                WHERE 1=1
-	                AND Z.JEN_ID = A.JEN_ID
-	                AND Z.JOB_ID = A.JOB_ID
-	            )
-			</isEqual>
 		</isNotEmpty>
 		<isNotEmpty property="jenId">
 			AND		A.JEN_ID = #jenId#
@@ -212,11 +219,15 @@
 		
 		<isNotEmpty property="searchSelect">
 			<isNotEmpty property="searchCd">
-			<isEqual property="searchSelect" compareValue="useCd">
-				AND		A.USE_CD = #searchCd#
-			</isEqual>
+				<isEqual property="searchSelect" compareValue="useCd">
+					AND		A.USE_CD = #searchCd#
+				</isEqual>
+				<isEqual property="searchSelect" compareValue="jobTypeCd">
+					AND		A.JOB_TYPE_CD = #searchCd#
+				</isEqual>
 			</isNotEmpty>
 		</isNotEmpty>
+		ORDER BY A.JOB_ID, C.BLD_START_DTM DESC
     </sql>
     
     
@@ -424,6 +435,7 @@
 					            JOB_DESC 			, 
 					            JOB_URL 			, 
 					            JOB_TRIGGER_CD		, 
+					            JOB_PATH			, 
 					            USE_CD              ,  
 					            REG_DTM             ,  
 					            REG_USR_ID          ,  
@@ -442,6 +454,7 @@
 					             #jobDesc#, 
 					             #jobUrl#, 
 					             #jobTriggerCd#,
+					             #jobPath#,
 					             #useCd#, 
 					             SYSDATE , 
 					             #regUsrId#, 
