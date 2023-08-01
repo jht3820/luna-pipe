@@ -7,7 +7,7 @@ import kr.opensoftlab.lunaops.com.dao.ComOslitsAbstractDAO;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1000VO;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO;
 import kr.opensoftlab.sdf.excel.ExcelDataListResultHandler;
-import kr.opensoftlab.sdf.jenkins.vo.BuildVO;
+import kr.opensoftlab.sdf.jenkins.vo.OldBuildVO;
 import kr.opensoftlab.sdf.jenkins.vo.ChangePathsVO;
 import kr.opensoftlab.sdf.jenkins.vo.ChangeVO;
 
@@ -127,7 +127,7 @@ public class Dpl1000DAO extends ComOslitsAbstractDAO {
 	}
 	
 	
-	public int insertDpl1200DeployJobBuildLogInfo(BuildVO buildVo) throws Exception{
+	public int insertDpl1200DeployJobBuildLogInfo(OldBuildVO buildVo) throws Exception{
 		return (int) insert("dpl1000DAO.insertDpl1200DeployJobBuildLogInfo", buildVo);
     }
 	
