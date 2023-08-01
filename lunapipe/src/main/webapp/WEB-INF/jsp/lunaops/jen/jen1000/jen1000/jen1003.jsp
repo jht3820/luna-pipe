@@ -40,6 +40,7 @@ ul#jenkinsDetailJobTree {
     width: calc(100% - 10px);
     margin: 5px 5px 0 5px;
     height: 352px;
+    overflow-y:auto;
 }
 </style>
 <script type="text/javascript">
@@ -48,6 +49,17 @@ ul#jenkinsDetailJobTree {
 	var zTreeJen1003;
 
 	$(document).ready(function() {
+		
+		var errorYn = '<c:out value="${requestScope.errorYn}"/>';
+		
+		if(errorYn == "Y"){
+			var errorMessage = '<c:out value="${requestScope.message}"/>';
+			
+			jAlert(errorMessage,"알림창");
+			gfnLayerPopupClose();
+			return;
+		}
+		
 		
 		selectJen1003JobTreeSetting();
 		
@@ -116,12 +128,7 @@ ul#jenkinsDetailJobTree {
 			var list = data.list;
 			
 		    $.each(list, function(idx, obj){
-				
-				if(obj["_class"] != "com.cloudbees.hudson.plugins.folder.Folder" && obj.hasOwnProperty("color")){
-					obj.viewName = '<i class="fa fa-circle job-color-'+obj.color+'"></i>&nbsp;'+gfnEscapeHtml(obj.name);
-				}else{
-					obj.viewName = obj.name;
-				}
+				obj.viewName = obj.name;
 				
 				if(obj["_class"] == "com.cloudbees.hudson.plugins.folder.Folder"){
 					obj.isParent = true;
@@ -157,12 +164,7 @@ ul#jenkinsDetailJobTree {
 		
 		
 		$.each(childNodes, function(idx, node){
-			
-			if(node["_class"] != "com.cloudbees.hudson.plugins.folder.Folder" && node.hasOwnProperty("color")){
-				node.viewName = '<i class="fa fa-circle job-color-'+node.color+'"></i>&nbsp;'+gfnEscapeHtml(node.name);
-			}else{
-				node.viewName = node.name;
-			}
+			node.viewName = node.name;
 			
 			
 			if( node["_class"] == "com.cloudbees.hudson.plugins.folder.Folder"){
