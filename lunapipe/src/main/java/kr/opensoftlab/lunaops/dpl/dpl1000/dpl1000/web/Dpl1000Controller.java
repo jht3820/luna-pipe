@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import egovframework.com.cmm.EgovMessageSource;
+import egovframework.com.cmm.service.EgovProperties;
 import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.service.Dpl1000Service;
@@ -29,7 +29,10 @@ import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.sdf.jenkins.AutoBuildInit;
 import kr.opensoftlab.sdf.jenkins.NewJenkinsClient;
+import kr.opensoftlab.sdf.jenkins.service.BuildService;
+import kr.opensoftlab.sdf.jenkins.vo.BuildVO;
 import kr.opensoftlab.sdf.jenkins.vo.JenStatusVO;
+import kr.opensoftlab.sdf.util.CommonScrty;
 import kr.opensoftlab.sdf.util.OslAgileConstant;
 import kr.opensoftlab.sdf.util.OslUtil;
 import kr.opensoftlab.sdf.util.PagingUtil;
@@ -75,8 +78,9 @@ public class Dpl1000Controller {
 	@Resource(name = "autoBuildInit")
 	private AutoBuildInit autoBuildInit;
 	
-	@Value("${Globals.fileStorePath}")
-	private String tempPath;
+	
+	@Resource(name = "buildService")
+	private BuildService buildService;
     
     
 	@RequestMapping(value="/dpl/dpl1000/dpl1000/selectDpl1000View.do")
@@ -541,10 +545,12 @@ public class Dpl1000Controller {
 	}
 	
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1000JobBuildAjax.do")
 	public ModelAndView selectDpl1000JobBuildAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		
+		JenStatusVO jenStatusVo = null;
 		try{
-			
 			
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 			
@@ -553,9 +559,18 @@ public class Dpl1000Controller {
     		String jenUsrId= (String)paramMap.get("jenUsrId");
 			String jenUsrTok= (String)paramMap.get("jenUsrTok");
 			String jobId= (String)paramMap.get("jobId");
+			String jobTok= (String)paramMap.get("jobTok");
+			String dplTypeCd= (String)paramMap.get("dplTypeCd");
+
+			
+			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
 			
 			
-			JenStatusVO jenStatusVo = newJenkinsClient.connect(jenUrl, jenUsrId, jenUsrTok);
+			String deJenUsrTok = CommonScrty.decryptedAria(jenUsrTok, salt);
+			String deJobToken = CommonScrty.decryptedAria(jobTok, salt);
+			
+			
+			jenStatusVo = newJenkinsClient.connect(jenUrl, jenUsrId, deJenUsrTok);
 			
 			
 			if(jenStatusVo.isErrorFlag()) {
@@ -565,19 +580,37 @@ public class Dpl1000Controller {
 			}
 			
 			
+			Map jobInfo = newJenkinsClient.getJobInfo(jenStatusVo, jobId);
 			
 			
+			boolean isStartBuildable = (boolean) jobInfo.get("isStartBuildable");
 			
 			
+			if(!isStartBuildable) {
+				newJenkinsClient.close(jenStatusVo);
+				model.addAttribute("errorYn", "Y");
+				model.addAttribute("message", egovMessageSource.getMessage("fail.deploy.building"));
+				return new ModelAndView("jsonView", model);
+			}
+			
+			List<Map> jobParamList = dpl1000Service.selectDpl1101JenParameterList(paramMap);
+   		 
+			
+			BuildVO buildVo = new BuildVO();
+			buildVo.setJenUrl(jenUrl);
+			buildVo.setUserId(jenUsrId);
+			buildVo.setDeTokenId(deJenUsrTok);
+			buildVo.setDeJobToken(deJobToken);
+			buildVo.setJobId(jobId);
+			buildVo.setDplTypeCd(dplTypeCd);
+			buildVo.setJenStatusVo(jenStatusVo);
+			buildVo.setJobParamList(jobParamList);
 			
 			
+			buildVo.addBldActionLog(jobId+" JOB 빌드를 준비 중입니다.");
 			
 			
-			
-			
-			
-			
-			
+			buildService.insertJobBuildAction(buildVo);
 			
 			
 			model.addAttribute("errorYn", "N");
@@ -585,6 +618,10 @@ public class Dpl1000Controller {
 			return new ModelAndView("jsonView", model);
 		}
 		catch(Exception ex){
+			
+			if(jenStatusVo != null) {
+				newJenkinsClient.close(jenStatusVo);
+			}
 			Log.error("selectDpl1000JobBuildAjax()", ex);
 			
 			
