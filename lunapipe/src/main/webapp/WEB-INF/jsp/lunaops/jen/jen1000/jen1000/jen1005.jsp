@@ -224,7 +224,7 @@ div.pop_sub .pop_right {width:72%;}
 			if(!gfnIsNull(jen1005ParamList)){
 				$.each(jen1005ParamList,function(idx, map){
 					if(map.jobParamType == "boolean"){
-						if($("#"+map.jobParamKey).prop("checked")){
+						if($("[id='"+map.jobParamKey+"']").prop("checked")){
 							map["jobParamVal"] = "true";
 						}else{
 							map["jobParamVal"] = "false";

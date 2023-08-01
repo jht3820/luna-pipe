@@ -118,6 +118,7 @@ var jobArray = [];
 
 
 var selJobId = "";
+var selJobPath = "";
 var jobUrl = "";
 
 var selJobInfo;
@@ -210,7 +211,7 @@ $(document).ready(function() {
 			
 			var ajaxObj = new gfnAjaxRequestAction(
 					{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1002JobCronSpecCheck.do'/>",loadingShow:false}
-					,{ "jobId" : selJobId, "jenUrl": jenUrl, "jenUsrId": jenUsrId, "jenUsrTok": jenUsrTok , "jobTriggerVal": jobTriggerVal });
+					,{"jobId" : selJobId, "jenUrl": jenUrl, "jenUsrId": jenUsrId, "jenUsrTok": jenUsrTok , "jobTriggerVal": jobTriggerVal });
 			
 			ajaxObj.setFnSuccess(function(data){
 				if(data.MSG_CD == "JENKINS_OK"){
@@ -296,9 +297,13 @@ function fnSelectJen1001JobInfo(jenId, jobId){
 	
 	var ajaxObj = new gfnAjaxRequestAction(
 			{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1100JobDetailAjax.do'/>",loadingShow:false}
-			,{ "jenId" : jenId, "jobId" : jobId });
+			,{ "jenId" : jenId, "jobId" : jobId});
 	
 	ajaxObj.setFnSuccess(function(data){
+		if(data.MSG_CD=="JENKINS_FAIL"){
+			jAlert("설정 정보가 잘못 입력 되었거나, JENKINS 서버에 문제가 있습니다.<br/><br/>입력한 URL, USER, USER TOKEN KEY 를 확인 하시거나, JENKINS 서버를 확인 해주시기 바랍니다.", "알림창");
+			return false;
+		}
 		
 		if(data.errorYn == "Y"){
 			jAlert("JOB 정보 조회 중 오류가 발생했습니다.");
@@ -311,11 +316,14 @@ function fnSelectJen1001JobInfo(jenId, jobId){
 		$("#jenId").attr("disabled","disabled");
 		jobUrl = data.jobInfo.jobUrl;
 		
-		fnJenIdSelecetd();
+		
+		jenkinsChk = true;
 		
 		
 		selJobInfo = data.jobInfo;
-		selJonId = data.jobInfo.jobId;
+		selJobId = data.jobInfo.jobId;
+		
+		$("#jobId").html('<option value="'+selJobId+'">'+selJobId+'</option>');
 		
        	
        	gfnSetData2ParentObj(data.jobInfo, "jen1100PopupFrm");
@@ -336,6 +344,58 @@ function fnSelectJen1001JobInfo(jenId, jobId){
 		if(data.jobInfo.jobTriggerCd == "01"){
 			
 			$("#jobTriggerVal").removeAttr("readonly");
+		}
+		
+		var jobRestoreList = data.jobRestoreList;
+		
+		
+		jobArray = [];
+		var jobRestoreArray = [];
+		
+		
+		if(!gfnIsNull(jobRestoreList)){
+			var appendStr = '';
+			
+			
+			$.each(jobRestoreList,function(idx, map){
+				
+				jobArray.push(map.jobId);
+				jobRestoreArray.push(map.jobRestoreId);
+			});
+			
+			
+			var restoreCnt = 0;
+			
+			$.each(jobRestoreList,function(idx, map){
+				
+				if(map.jobTypeCd == "03"){
+					var selectStr = "";
+					
+					if(selJobRestoreId != map.jobId){
+						
+						if(jobRestoreArray.indexOf(map.jobId) != -1){
+							return true;
+						}
+					}else{
+						selectStr = "selected";
+					}
+					appendStr += '<option value="'+map.jobId+'" '+selectStr+'>'+map.jobId+'</option>';
+					restoreCnt++;
+				}
+			});
+			
+			
+			
+			var selectStr = "";
+			if(restoreCnt == 0) {
+				selectStr = "selected";
+			}
+			
+			
+			$("#jobRestoreId").html('<option value="" '+selectStr+'>선 택</option>'+appendStr);
+		}else{
+			
+			$("#jobRestoreId").html('<option value="" '+selectStr+'>선 택</option>'+appendStr);
 		}
 	});
 	
@@ -382,11 +442,14 @@ function fnInsertJobInfoAjax(formId){
 
 			fd.append("jenUrl",jenUrl);
 			
+			
 			if(!gfnIsNull(zTreeJen1002)){
 				fd.append("jobUrl",selJobInfo.url);
 			}else{
 				fd.append("jobUrl",jobUrl);
 			}
+			
+			
 			fd.set("jobId",selJobId);
 			
 			
@@ -407,7 +470,7 @@ function fnInsertJobInfoAjax(formId){
 					}else if(data.MSG_CD=="JENKINS_WORNING_URL"){
 						jAlert("허용되지 않는 URL입니다.<br/><br/>입력한 URL를 확인하십시오", "알림창");
 					}else if(data.MSG_CD == "TRIGGER_CRON_VALUE_ERR"){
-						jAlert("트리거 Cron값에 문제가 있습니다.</br></br>[오류 내용]</br>"+data.MSG_STR, "알림창");
+						jAlert("트리거 Cron값에 문제가 있습니다.</br></br>[오류 내용]</br>"+data.message, "알림창");
 					}
 					else{
 						jAlert("[jenkins 접속 오류]</br>오류 내용 : "+data.MSG_CD);
@@ -456,6 +519,7 @@ function fnJen1002GuideShow(){
 function fnJenIdSelecetd(){
 	
 	selJobId = "";
+	selJobPath = "";
 	var jenIdValue = $("#jenId").val();
 	
 	if(gfnIsNull(jenIdValue)){
@@ -576,14 +640,15 @@ function fnJenIdSelecetd(){
 								
 								if(treeNode["_class"] != "com.cloudbees.hudson.plugins.folder.Folder" && treeNode.useCd == "01"){
 									
-									selJobId = treeNode.name;
+									selJobId = treeNode.jobId;
 									
 									zTreeJen1002.checkNode(treeNode, true);
 									
 									
-									fnSelJobCronSpec(treeNode.name);
+									fnSelJobCronSpec(treeNode.jobId);
 								}else{
 									selJobId = "";
+									selJobPath = "";
 								}
 							},
 							onAsyncError: fnAsyncError
@@ -597,59 +662,39 @@ function fnJenIdSelecetd(){
 					
 					$.each(jobList,function(idx, map){
 						
-						if('${param.popupGb}' == 'update'){
-							if(map.name == updateJobId){
-								appendStr += '<option value="'+map.name+'">'+map.name+'</option>';
-								selJobId = map.name;
-								return false;
-							}	
-						}
-						else{
+						if(jobArray.indexOf(map.jobId) != -1){
+							map.useCd = "02";
 							
-							if(jobArray.indexOf(map.name) != -1){
-								map.useCd = "02";
-								
-								
-								map.chkDisabled = true;
-								return true;
-							}else{
-								map.useCd = "01";
-							}
-							appendStr += '<option value="'+map.name+'">'+map.name+'</option>';
+							
+							map.chkDisabled = true;
+							return true;
+						}else{
+							map.useCd = "01";
 						}
+						appendStr += '<option value="'+map.name+'">'+map.name+'</option>';
 					});
 					
 					
-					if('${param.popupGb}' == 'update'){
+					$("#hideMaskFrame").hide();
+					list = data.list;
+					$.each(list, function(idx, obj){
+						obj.viewName = obj.name;
 						
-						$("#jobId").html(appendStr);
-					}else{
-						$("#hideMaskFrame").hide();
-						list = data.list;
-						$.each(list, function(idx, obj){
+						if(obj["_class"] == "com.cloudbees.hudson.plugins.folder.Folder"){
+							obj.isParent = true;
 							
-							if(obj["_class"] != "com.cloudbees.hudson.plugins.folder.Folder" && obj.hasOwnProperty("color")){
-								obj.viewName = '<i class="fa fa-circle job-color-'+obj.color+'"></i>&nbsp;'+gfnEscapeHtml(obj.name);
-							}else{
-								obj.viewName = obj.name;
-							}
 							
-							if(obj["_class"] == "com.cloudbees.hudson.plugins.folder.Folder"){
-								obj.isParent = true;
-								
-								
-								obj.chkDisabled = true;
-							}else{
-								obj.isParent = false;
-							}
-						});
-					    
-					    zTreeJen1002 = $.fn.zTree.init($("#jobTree"), setting, list);
-					    
-					    
-					    
-					    zTreeJen1002.expandAll(false);
-					}
+							obj.chkDisabled = true;
+						}else{
+							obj.isParent = false;
+						}
+					});
+				    
+				    zTreeJen1002 = $.fn.zTree.init($("#jobTree"), setting, list);
+				    
+				    
+				    
+				    zTreeJen1002.expandAll(false);
 					
 					
 					if($("#jobId option").length == 0){
@@ -716,11 +761,8 @@ function fnTreeFilter(treeId, parentNode, result) {
 	
 	$.each(childNodes, function(idx, node){
 		
-		if(node["_class"] != "com.cloudbees.hudson.plugins.folder.Folder" && node.hasOwnProperty("color")){
-			node.viewName = '<i class="fa fa-circle job-color-'+node.color+'"></i>&nbsp;'+gfnEscapeHtml(node.name);
-		}else{
-			node.viewName = node.name;
-		}
+		
+		node.viewName = node.name;
 		
 		
 		if( node["_class"] == "com.cloudbees.hudson.plugins.folder.Folder"){
@@ -730,7 +772,7 @@ function fnTreeFilter(treeId, parentNode, result) {
 			node.isParent = true;
 		}
 
-		if(jobArray.indexOf(node.name) != -1){
+		if(jobArray.indexOf(node.jobId) != -1){
 			node.useCd = "02";
 			
 			
@@ -759,7 +801,7 @@ function fnSelJobCronSpec(paramJobId){
 	
 	var ajaxObj = new gfnAjaxRequestAction(
 			{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1002JobCronSpec.do'/>",loadingShow:false}
-			,{ "jobId" : paramJobId, "jenUrl": jenUrl, "jenUsrId": jenUsrId, "jenUsrTok": jenUsrTok });
+			,{"jobId" : paramJobId, "jenUrl": jenUrl, "jenUsrId": jenUsrId, "jenUsrTok": jenUsrTok });
 	
 	ajaxObj.setFnSuccess(function(data){
 		if(data.MSG_CD == "JENKINS_OK"){
