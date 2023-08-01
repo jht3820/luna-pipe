@@ -515,6 +515,9 @@ public class Jen1000Controller {
 			
 			
 			
+			
+			
+			
 			List<Map> jobRestoreList = jen1000Service.selectJen1100JobNormalList(paramMap);
 			model.addAttribute("jobRestoreList", jobRestoreList);
 			
