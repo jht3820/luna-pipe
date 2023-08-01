@@ -23,8 +23,10 @@ var overlapJob = {};
 
 var ADD_JOB_PARAM_LIST = {};
 
+
+var ciId = '<c:out value="${requestScope.ciId}"/>';
+
 $(function(){
-	
 	
 	fnJenkinsGridSetting();
 	fnJenkinsSearchSetting();
@@ -333,6 +335,9 @@ function fnInJenkinsGridDataSet(_pageNo,ajaxParam){
    	}
    	
    	
+   	ajaxParam += "&ciId="+ciId;
+   	
+   	
 	var ajaxObj = new gfnAjaxRequestAction(
 			{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000JenkinsListAjax.do'/>","loadingShow":true}
 			,ajaxParam);
@@ -455,6 +460,9 @@ function fnInJobGridListSet(_pageNo,ajaxParam,loadingShow){
    		ajaxParam += "&pageNo="+jobGrid.page.currentPage;
    	}
    	
+	
+   	ajaxParam += "&ciId="+ciId;
+  
    	
 	var ajaxObj = new gfnAjaxRequestAction(
 			{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000JobListAjax.do'/>","loadingShow":loadingShow}
@@ -473,6 +481,25 @@ function fnInJobGridListSet(_pageNo,ajaxParam,loadingShow){
 	            totalPages: page.totalPages
 			}
 		});
+	   	
+	   	
+	   	if(data.hasOwnProperty("jobParamList") && data.jobParamList != null && data.jobParamList.length > 0){
+	   		$.each(data.jobParamList, function(idx, map){
+	   			
+	   			if(!ADD_JOB_PARAM_LIST.hasOwnProperty(map["jen_id"])){
+	   				ADD_JOB_PARAM_LIST[map["jen_id"]] = {};
+	   			}
+	   			
+	   			
+	   			if(!ADD_JOB_PARAM_LIST[map["jen_id"]].hasOwnProperty(map["job_id"])){
+	   				ADD_JOB_PARAM_LIST[map["jen_id"]][map["job_id"]] = [];
+	   			}
+	   			ADD_JOB_PARAM_LIST[map["jen_id"]][map["job_id"]].push({
+	   				"jobParamKey": map["job_param_key"],
+	   				"jobParamVal": map["job_param_val"]
+	   			});
+	   		});
+	   	}
 	});
 	
 	
@@ -599,39 +626,6 @@ function fnJenkinsSearchSetting(){
 							onclick:function(){
 								jenkinsGrid.exportExcel("JENKINS_LIST.xls");
 						}},
-						{label : "",labelWidth : "",type : "button",width : "55",key : "btn_delete_jenkins",style : "float:right;",valueBoxStyle : "padding:5px;",value : "<i class='fa fa-trash-alt' aria-hidden='true'></i>&nbsp;<span>삭제</span>",
-							onclick : function() {
-								var item = jenkinsGrid.getList('selected')[0];
-								if(gfnIsNull(item)){
-									toast.push('삭제 할 목록을 선택하세요.');
-									return;
-								}
-								jConfirm("JENKINS를 삭제하시겠습니까?</br>연관된 모든 정보가 함께 삭제됩니다.", "알림창", function( result ) {
-									if( result ){
-										fnDeleteJen1000JenkinsInfo(item.jenId);
-									}
-								});
-							}
-						},
-						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_update_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-edit' aria-hidden='true'></i>&nbsp;<span>수정</span>",
-							onclick:function(){
-								var item = jenkinsGrid.getList('selected')[0];
-								if(gfnIsNull(item)){
-									toast.push('수정 할 목록을 선택하세요.');
-									return;
-								}
-								
-								var data = {"popupGb": "update", "jenId": item.jenId};
-        	                	
-								gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1001JenkinsDetailView.do',data,"650","590",'scroll');
-						}},
-						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_insert_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-save' aria-hidden='true'></i>&nbsp;<span>등록</span>",
-							onclick:function(){
-								var data = {
-									"popupGb": "insert"
-								};
-								gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1001JenkinsDetailView.do',data,"650","590",'scroll');
-						}},
 						{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_jenkins",style:"float:right;",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 							onclick:function(){
 								
@@ -752,25 +746,6 @@ function fnJobSearchSetting(){
 								
    								fnSelectJen1000JobConfirmConnect(idxList);
                 		}},
-						{label:"", labelWidth:"", type:"button", width:"100",style:"float:right;", key:"btn_insert_job_log",valueBoxStyle:"padding:5px;", value:"<i class='fas fa-angle-double-right' aria-hidden='true'></i>&nbsp;<span>빌드이력 동기화</span>",
-   							onclick:function(){
-   								var chkList = jobGrid.getList('selected');
-								if (gfnIsNull(chkList)) {
-									jAlert("선택한 JOB이 없습니다.", "알림창");
-									return false;
-								}
-								
-								
-								var jobList = [];
-								
-								
-								$.each(chkList, function(idx, map){
-									jobList.push(map);
-								});
-								
-								
-   								fnSelectJen1000JobBldLog(jobList);
-                		}}
 					]},
 					{display:true, addClass:"", style:"", list:[
                     						
@@ -781,57 +756,6 @@ function fnJobSearchSetting(){
 						{label:"", labelWidth:"", type:"button", width:"55",style:"float:right;", key:"btn_excel_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-file-excel' aria-hidden='true'></i>&nbsp;<span>엑셀</span>",
 							onclick:function(){
 								jobGrid.exportExcel("JENKINS-JOB_LIST.xls");
-						}},
-						{label : "",labelWidth : "",type : "button",width : "55",key : "btn_delete_jenkins",style : "float:right;",valueBoxStyle : "padding:5px;",value : "<i class='fa fa-trash-alt' aria-hidden='true'></i>&nbsp;<span>삭제</span>",
-							onclick : function() {
-								var chkList = jobGrid.getList('selected');
-								
-								if (gfnIsNull(chkList)) {
-									jAlert("선택한 JOB이 없습니다.", "알림창");
-									return false;
-								}
-								
-								jConfirm("JOB "+chkList.length+"개를 삭제하시겠습니까?</br>연관된 모든 정보가 함께 삭제됩니다.", "알림창", function( result ) {
-									if( result ){
-										
-										var jenId = chkList[0].jenId;
-										
-										
-										var jobIdListStr = "jenId="+chkList[0].jenId;
-										$.each(chkList, function(idx, map){
-											jobIdListStr += "&jobId="+map.jobId;
-										});
-										
-										fnDeleteJen1000JobList(jenId, jobIdListStr);
-									}
-								});
-							}
-						},
-						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_update_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-edit' aria-hidden='true'></i>&nbsp;<span>수정</span>",
-							onclick:function(){
-								var chkList = jobGrid.getList('selected');
-								
-								if (gfnIsNull(chkList)) {
-									jAlert("선택한 JOB이 없습니다.", "알림창");
-									return false;
-								}
-								if(chkList.length > 1){
-									jAlert("1개의 JOB만 선택해주세요.", "알림창");
-									return false;
-								}
-
-								var data = {"popupGb": "update", "jenId": chkList[0].jenId, "jobId": chkList[0].jobId, "jobPath": chkList[0].jobPath};
-        	                	
-								gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1002JobDetailView.do',data,"650","770",'scroll',false);
-						}},
-						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_insert_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-save' aria-hidden='true'></i>&nbsp;<span>등록</span>",
-							onclick:function(){
-								var item = jenkinsGrid.getList('selected')[0];
-								var data = {
-									"popupGb": "insert",
-									"selJenId": (!gfnIsNull(item))? item.jenId : null
-								};
-								gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1002JobDetailView.do',data,"1000","710",'scroll',false);
 						}},
 						{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_jenkins",style:"float:right;",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 							onclick:function(){
@@ -875,6 +799,11 @@ function fnSelJobGridSetting(){
 		sortable:false,
 		header: {align:"center",columnHeight: 30},
 		columns: [
+			{key: "jobStartOrd", label: "순서", width: 80, align: "center"
+				,formatter: function(){
+					return (this.item.__index)+1;
+				}	
+			},
 			{key: "jobTypeNm", label: "JOB TYPE", width: 95, align: "center"},
 			{key: "jobId", label: "JOB ID", width: 195, align: "center"},
 			{key: "jenNm", label: "JENKINS NAME", width: 180, align: "center"},
@@ -935,6 +864,67 @@ function fnSelJobSearchSetting(){
 								gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1005View.do',data,"840","300",'scroll');
 								
 						}},
+						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_update_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-arrow-down' aria-hidden='true'></i>&nbsp;<span>아래로</span>",
+							onclick:function(){
+								
+								
+								var selDataIdx = [];
+								$.each(selJobGrid.getList("selected"), function(idx, map){
+									selDataIdx.push(map["__index"]);
+								});
+								
+								
+								for(var idx=selJobGrid.list.length;idx>=0;idx--){
+									
+									if(selDataIdx.indexOf(idx) != -1){
+										
+										if(idx == selJobGrid.list.length || gfnIsNull(selJobGrid.list[idx+1])){
+											continue;
+										}else{
+											
+											selJobGrid.list[idx+1]["jobStartOrd"] -= 1;
+											
+											
+											selJobGrid.list[idx]["jobStartOrd"] += 1;
+											
+											
+											selJobGrid.setColumnSort({"jobStartOrd":{seq:0, orderBy:"asc"}});
+										}
+									}
+									
+								}
+								
+								
+								selJobGrid.setColumnSort({"jobStartOrd":{seq:0, orderBy:"asc"}});
+						}},
+						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_update_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-arrow-up' aria-hidden='true'></i>&nbsp;<span>위로</span>",
+							onclick:function(){
+								
+								var selDataIdx = [];
+								$.each(selJobGrid.getList("selected"), function(idx, map){
+									selDataIdx.push(map["__index"]);
+								});
+								
+								
+								$.each(selJobGrid.list, function(idx, map){
+									
+									if(selDataIdx.indexOf(idx) != -1){
+										
+										if(selJobGrid.list[idx]["jobStartOrd"] == 1){
+											return true;
+										}else{
+											
+											selJobGrid.list[idx-1]["jobStartOrd"] += 1;
+											
+											
+											selJobGrid.list[idx]["jobStartOrd"] -= 1;
+											
+											
+											selJobGrid.setColumnSort({"jobStartOrd":{seq:0, orderBy:"asc"}});
+										}
+									}
+								});
+						}}
                   	]
                 		},
 				]

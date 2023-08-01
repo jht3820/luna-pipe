@@ -9,6 +9,7 @@ public class Dpl1100VO extends PageVO{
 	private String ciId;
 	private String ticketId;
 	private String dplId;
+	private String dplTypeCd;
 	private String jenId;
 	private String jenNm;
 	private String jenUsrId;
@@ -21,6 +22,7 @@ public class Dpl1100VO extends PageVO{
 	private String jobTypeCd;
 	private String jobTypeNm;
 	private String jobUrl;
+	private String jobTok;
 	
 	private String jobRestoreId;
 	private String jobRestoreDesc;
@@ -53,6 +55,13 @@ public class Dpl1100VO extends PageVO{
 	}
 	public void setDplId(String dplId) {
 		this.dplId = dplId;
+	}
+	
+	public String getDplTypeCd() {
+		return dplTypeCd;
+	}
+	public void setDplTypeCd(String dplTypeCd) {
+		this.dplTypeCd = dplTypeCd;
 	}
 	public String getJenId() {
 		return jenId;
@@ -125,6 +134,13 @@ public class Dpl1100VO extends PageVO{
 	}
 	public void setJobUrl(String jobUrl) {
 		this.jobUrl = jobUrl;
+	}
+	
+	public String getJobTok() {
+		return jobTok;
+	}
+	public void setJobTok(String jobTok) {
+		this.jobTok = jobTok;
 	}
 	public String getJobRestoreId() {
 		return jobRestoreId;
