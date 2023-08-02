@@ -6,7 +6,7 @@ import java.util.Map;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1000VO;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO;
 import kr.opensoftlab.sdf.excel.ExcelDataListResultHandler;
-import kr.opensoftlab.sdf.jenkins.vo.OldBuildVO;
+import kr.opensoftlab.sdf.jenkins.vo.BuildVO;
 import kr.opensoftlab.sdf.jenkins.vo.ChangePathsVO;
 import kr.opensoftlab.sdf.jenkins.vo.ChangeVO;
 
@@ -84,10 +84,6 @@ public interface Dpl1000Service {
 	void deleteDpl1100DplJobList(Map paramMap)  throws Exception;
 	
 	
-	
-	int insertDpl1200DeployJobBuildLogInfo(OldBuildVO buildVo) throws Exception;
-	
-	
 	@SuppressWarnings({"rawtypes" })
 	Map selectDpl1100ToJen1000JobInfo(Map map)  throws Exception;
 	
@@ -129,14 +125,17 @@ public interface Dpl1000Service {
 	
 	
 	@SuppressWarnings({"rawtypes" })
-	public List selectDpl1101JenParameterList(Map paramMap)  throws Exception;
+	List selectDpl1101JenParameterList(Map paramMap)  throws Exception;
 	
 	
 	@SuppressWarnings("rawtypes")
-	public String insertDpl1101ParameterInfo(Map paramMap) throws Exception;
+	String insertDpl1101ParameterInfo(Map paramMap) throws Exception;
 
 	
 	
 	@SuppressWarnings("rawtypes")
-	public void deleteDpl1101ParameterInfo(Map paramMap) throws Exception;
+	void deleteDpl1101ParameterInfo(Map paramMap) throws Exception;
+
+	
+	String insertDpl1102DplBuildInfo(BuildVO buildVo) throws Exception;
 }
