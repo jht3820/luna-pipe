@@ -8,10 +8,10 @@ import kr.opensoftlab.sdf.jenkins.service.BuildService;
 public class Dpl1200VO extends PageVO{
 	private String rn;
 	
-	//빌드 대상 (main = JOB_ID, sub = JOB_RESTORE_ID)
+	
 	private String dplTargetType = "main";
 	
-	/** 상세 기본 Defind */
+	
 	private String dplId;
 	private String jenId;
 	private String jobId;
@@ -19,7 +19,6 @@ public class Dpl1200VO extends PageVO{
 	private int bldNum;
 	private int bldMainNum;
 	private String bldResult;
-	private String bldResultMsg;
 	private String bldDurationTm;
 	private String bldStartDtm;
 	private String bldConsoleLog;
@@ -34,6 +33,7 @@ public class Dpl1200VO extends PageVO{
 	private String dplTypeCd;
 	private String dplAutoAfterCd;
 	private String dplRestoreCd;
+	
 	
 	private int buildActionCnt = 1; 
 			
@@ -117,17 +117,6 @@ public class Dpl1200VO extends PageVO{
 	public void setBldResult(String bldResult) {
 		this.bldResult = bldResult;
 	}
-
-
-	public String getBldResultMsg() {
-		return bldResultMsg;
-	}
-
-
-	public void setBldResultMsg(String bldResultMsg) {
-		this.bldResultMsg = bldResultMsg;
-	}
-
 
 	public String getBldDurationTm() {
 		return bldDurationTm;

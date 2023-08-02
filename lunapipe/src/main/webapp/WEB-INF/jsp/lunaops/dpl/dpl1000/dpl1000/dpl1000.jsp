@@ -880,14 +880,14 @@ function fnDplStart(item){
 		dplJobGrid.setValue(item.__original_index, "bldResult", "START");
 		dplJobGrid.setValue(item.__original_index, "bldResultMsg", "빌드 준비 중");
 	}
-	return;
+
 	
 	var ajaxObj = new gfnAjaxRequestAction(
 			{"url":"<c:url value='/dpl/dpl1000/dpl1000/selectDpl1000JobBuildAjax.do'/>","loadingShow":false}
 			,item);
 	
 	ajaxObj.setFnSuccess(function(data){
-		
+		return;
 		
 		if(data.errorYn == "Y"){
 			jAlert(data.message, "알림창");
