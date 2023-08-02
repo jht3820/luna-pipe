@@ -5,6 +5,7 @@ import java.util.Map;
 
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1000VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1100VO;
+import kr.opensoftlab.sdf.jenkins.vo.BuildVO;
 
 
 
@@ -129,4 +130,10 @@ public interface Jen1000Service {
 	
 	@SuppressWarnings("rawtypes")
 	int selectJen1200JobBuildListCnt(Map paramMap) throws Exception;
+
+	
+	String insertJen1200DeployJobBuildLogInfo(BuildVO buildVo) throws Exception;
+
+	
+	int updateJen1200DeployJobBuildLogInfo(BuildVO buildVo)  throws Exception;
 }
