@@ -7,7 +7,7 @@
 	<typeAlias  alias="egovMap" 	type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
 	<typeAlias alias="dpl1000VO"	type="kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1000VO"/>
 	<typeAlias alias="dpl1100VO"	type="kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO"/>
-	<typeAlias alias="BuildVO"		type="kr.opensoftlab.sdf.jenkins.vo.BuildVO"/>
+	<typeAlias alias="OldBuildVO"		type="kr.opensoftlab.sdf.jenkins.vo.OldBuildVO"/>
 	<typeAlias alias="ChangeVO"		type="kr.opensoftlab.sdf.jenkins.vo.ChangeVO"/>
 	<typeAlias alias="ChangePathsVO"	type="kr.opensoftlab.sdf.jenkins.vo.ChangePathsVO"/>
 	
@@ -45,6 +45,7 @@
 		<result property="ciId"  				column="CI_ID"/>
 		<result property="ticketId"  			column="TICKET_ID"/>
 		<result property="dplId"  				column="DPL_ID"/>
+		<result property="dplTypeCd"  			column="DPL_TYPE_CD"/>
 		<result property="jenId"				column="JEN_ID" />  
 		<result property="jenNm"				column="JEN_NM" />  
 		<result property="jenUsrId"				column="JEN_USR_ID" />  
@@ -59,6 +60,7 @@
 		<result property="jobUrl"				column="JOB_URL" /> 
 		<result property="jobRestoreId"			column="JOB_RESTORE_ID" />  
 		<result property="jobRestoreDesc"		column="JOB_RESTORE_DESC" /> 
+		<result property="jobTok"				column="JOB_TOK" /> 
 		<result property="bldNum"  				column="BLD_NUM" />
 		<result property="bldResult"  			column="BLD_RESULT" />
 		<result property="bldDurationTm"  		column="BLD_DURATION_TM"/>
@@ -165,6 +167,7 @@
 			, A.CI_ID
 			, A.TICKET_ID
 			, A.DPL_ID
+			, A.DPL_TYPE_CD
 			, B.JEN_ID
 			, C.JEN_NM
 			, C.JEN_USR_ID
@@ -178,6 +181,7 @@
 			, SF_CMM1001_COM_CD_INFO('DPL00002', D.JOB_TYPE_CD, '1') AS JOB_TYPE_NM
 			, D.JOB_URL
 			, D.JOB_RESTORE_ID
+			, D.JOB_TOK
 			, E.JOB_DESC AS JOB_RESTORE_DESC
 			, F.BLD_NUM
 			, F.BLD_RESULT
@@ -651,7 +655,7 @@
 		]]>
 	</select>
 	
-	<insert id="dpl1000DAO.insertDpl1200DeployJobBuildLogInfo" parameterClass="BuildVO">
+	<insert id="dpl1000DAO.insertDpl1200DeployJobBuildLogInfo" parameterClass="OldBuildVO">
 		<selectKey resultClass="java.lang.Integer" keyProperty="bldSeq">
 		<![CDATA[
 			 

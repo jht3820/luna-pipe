@@ -6,7 +6,7 @@ import java.util.Map;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1000VO;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO;
 import kr.opensoftlab.sdf.excel.ExcelDataListResultHandler;
-import kr.opensoftlab.sdf.jenkins.vo.BuildVO;
+import kr.opensoftlab.sdf.jenkins.vo.OldBuildVO;
 import kr.opensoftlab.sdf.jenkins.vo.ChangePathsVO;
 import kr.opensoftlab.sdf.jenkins.vo.ChangeVO;
 
@@ -85,7 +85,7 @@ public interface Dpl1000Service {
 	
 	
 	
-	int insertDpl1200DeployJobBuildLogInfo(BuildVO buildVo) throws Exception;
+	int insertDpl1200DeployJobBuildLogInfo(OldBuildVO buildVo) throws Exception;
 	
 	
 	@SuppressWarnings({"rawtypes" })
