@@ -7,7 +7,7 @@
 	<typeAlias  alias="egovMap" 	type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
 	<typeAlias alias="dpl1000VO"	type="kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1000VO"/>
 	<typeAlias alias="dpl1100VO"	type="kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO"/>
-	<typeAlias alias="OldBuildVO"		type="kr.opensoftlab.sdf.jenkins.vo.OldBuildVO"/>
+	<typeAlias alias="BuildVO"		type="kr.opensoftlab.sdf.jenkins.vo.BuildVO"/>
 	<typeAlias alias="ChangeVO"		type="kr.opensoftlab.sdf.jenkins.vo.ChangeVO"/>
 	<typeAlias alias="ChangePathsVO"	type="kr.opensoftlab.sdf.jenkins.vo.ChangePathsVO"/>
 	
@@ -85,7 +85,6 @@
 		<result property="bldNum" column="BLD_NUM" />
 		<result property="bldMainNum" column="BLD_MAIN_NUM" />
 		<result property="bldResult" column="BLD_RESULT" />
-		<result property="bldResultMsg" column="BLD_RESULT_MSG" />
 		<result property="bldDurationTm" column="BLD_DURATION_TM" />
 		<result property="bldStartDtm" column="BLD_START_DTM" />
 		<result property="bldConsoleLog" column="BLD_CONSOLE_LOG" jdbcType="CLOB" javaType="java.lang.String"/>
@@ -569,13 +568,11 @@
 				,A.BLD_NUM
 				,C.BLD_MAIN_NUM
 				,A.BLD_RESULT
-				,A.BLD_RESULT_MSG
 				,A.BLD_DURATION_TM
 				,A.BLD_START_DTM
 				,A.BLD_CONSOLE_LOG
 				,C.BLD_NUM AS BLD_RESTORE_NUM
 				,C.BLD_RESULT AS BLD_RESTORE_RESULT
-                ,C.BLD_RESULT_MSG AS BLD_RESTORE_RESULT_MSG
                 ,C.BLD_CONSOLE_LOG AS BLD_CONSOLE_RESTORE_LOG
                 ,A.REG_DTM
 				,A.REG_USR_ID
@@ -632,7 +629,6 @@
 					,A.BLD_NUM
 					,A.BLD_MAIN_NUM
 					,A.BLD_RESULT
-					,A.BLD_RESULT_MSG
 					,A.BLD_DURATION_TM
 					,A.BLD_START_DTM
 					,A.BLD_CONSOLE_LOG
@@ -655,39 +651,6 @@
 		]]>
 	</select>
 	
-	<insert id="dpl1000DAO.insertDpl1200DeployJobBuildLogInfo" parameterClass="OldBuildVO">
-		<selectKey resultClass="java.lang.Integer" keyProperty="bldSeq">
-		<![CDATA[
-			 
-			SELECT NVL(MAX(BLD_SEQ)+1,1) AS NEW_BLD_SEQ
-			FROM DPL1200 A
-			WHERE 1=1
-				AND A.DPL_ID = #dplId# 
-				AND A.JEN_ID = #jenId#
-				AND A.JOB_ID = #jobId#
-		]]>
-		</selectKey>
-		<![CDATA[ 
-			
-			INSERT INTO DPL1200
-			(
-				DPL_ID						,JEN_ID					,JOB_ID
-				,BLD_SEQ				,BLD_NUM					,BLD_MAIN_NUM			,BLD_RESULT
-				,BLD_DURATION_TM		,BLD_START_DTM				,BLD_CONSOLE_LOG		,BLD_RESULT_MSG
-				,REG_DTM				,REG_USR_ID					,REG_USR_IP				,BLD_RESULT_CD
-					    
-			)
-			VALUES
-			(
-				#dplId#					,#jenId#				,#jobId#
-				,#bldSeq#				,#bldNum#					,#bldMainNum#			,#bldResult#
-				,#estimatedDuration#	,#bldStartDtm#				,#bldConsoleLog#		,#bldResultMsg#
-				,SYSDATE				,#regUsrId#					,#regUsrIp#				,#bldResultCd#
-			)
-		]]>
-	</insert>
-	
-	
     <select id="dpl1000DAO.selectDpl1000DplHistoryList" parameterClass="java.util.Map" resultClass="egovMap">
 		<![CDATA[
 			
@@ -703,7 +666,6 @@
 						    , A.BLD_RESULT AS RESULT
 						    ,SF_CMM1001_COM_CD_INFO('DPL00002', Z.JOB_TYPE_CD, '1') AS TYPE_NM
 						    , A.REG_DTM AS START_DTM
-						    , A.BLD_RESULT_MSG AS RESULT_MSG
 						    , A.REG_USR_ID
 						    , SF_ADM2000_USR_INFO(A.REG_USR_ID, 1) AS REG_USR_NM
 						    , SF_ADM2000_USR_INFO(A.REG_USR_ID, 6) AS REG_USR_IMG
@@ -730,7 +692,6 @@
 						,A.BLD_SEQ
 						,A.BLD_NUM
 						,A.BLD_RESULT
-						,A.BLD_RESULT_MSG
 						,A.BLD_DURATION_TM
 						,A.BLD_START_DTM
 		                ,A.REG_DTM
@@ -934,4 +895,23 @@
 		]]>
 	</select>
 	
+	
+	<insert id="dpl1000DAO.insertDpl1102DplBuildInfo" parameterClass="BuildVO">
+		<![CDATA[ 
+			
+			INSERT INTO DPL1102
+			(
+				CI_ID					,TICKET_ID					,JEN_ID					
+				,JOB_ID					,DPL_ID						,BLD_NUM						
+				,REG_DTM				,REG_USR_ID					,REG_USR_IP		
+					    
+			)
+			VALUES
+			(
+				#ciId#					,#ticketId#					,#jenId#
+				,#jobId#				,#dplId#					,#bldNum#
+				,SYSDATE				,#regUsrId#					,#regUsrIp#
+			)
+		]]>
+	</insert>
 </sqlMap>
