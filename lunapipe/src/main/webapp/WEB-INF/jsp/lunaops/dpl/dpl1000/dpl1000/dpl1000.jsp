@@ -116,6 +116,8 @@ $(document).ready(function() {
 	
 	
 	$("#btn_update_dplAction").click(function(){
+		jAlert("빌드 실행 준비중.","알림창");
+		return
 		var item = dplJobGrid.getList('selected')[0];
 		if(gfnIsNull(item)){
 			toast.push('실행(빌드)하려는 JOB을 선택해주세요.');
@@ -1126,9 +1128,9 @@ function fnJobLastBuildDetailSetting(paramJobInfo){
 <div class="main_contents" style="height: auto;">
 	<div class="tab_contents menu" style="max-width: 1500px;position: relative;">
 		<form:form commandName="dpl1000VO" id="searchFrm" name="searchFrm" method="post" onsubmit="return false"></form:form>
-		<div id="dplJobSearch" style="border-top: 1px solid #ccc;"></div>
+		<div id="dplJobSearch" style="border-top: 1px solid #ccc;" guide="dpl1000DplJobBtn"></div>
 		<br />
-		<div data-ax5grid="dplJobGrid" data-ax5grid-config="{}" style="height: 250px;" guide="dpl1000DplList"></div>
+		<div data-ax5grid="dplJobGrid" data-ax5grid-config="{}" style="height: 250px;" guide="dpl1000DplJobList"></div>
 		<div class="main_frame middleJobInfoFrame">
 			<div class="jobBuildAutoCheckDiv sub_title">
 				<div class="jobAutoCheckIcon" id="jobAutoCheckIcon"></div>
@@ -1140,7 +1142,7 @@ function fnJobLastBuildDetailSetting(paramJobInfo){
 		</div>
 		<div class="main_frame bottomJobInfoFrame" id="bottomJobInfoFrame">
 			<div class="jobMaskFrame" id="jobMaskFrame">상단의 배포계획을 선택해주세요.</div>
-			<div class="frame_contents left" fullmode="1" guide="dpl1000DplJobList">
+			<div class="frame_contents left" fullmode="1" guide="dpl1000DplJobBldInfo">
 				<div class="sub_title">
 					선택 JOB 정보
 					<div class="sub_title_btn right">

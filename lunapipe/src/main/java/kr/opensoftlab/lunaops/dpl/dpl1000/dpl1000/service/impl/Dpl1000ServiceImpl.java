@@ -22,7 +22,7 @@ import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.sdf.excel.ExcelDataListResultHandler;
 import kr.opensoftlab.sdf.jenkins.vo.AutoBuildVO;
-import kr.opensoftlab.sdf.jenkins.vo.OldBuildVO;
+import kr.opensoftlab.sdf.jenkins.vo.BuildVO;
 import kr.opensoftlab.sdf.jenkins.vo.ChangePathsVO;
 import kr.opensoftlab.sdf.jenkins.vo.ChangeVO;
 import kr.opensoftlab.sdf.jenkins.vo.GlobalDplListVO;
@@ -275,42 +275,6 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 	}
 	
 	
-	public int insertDpl1200DeployJobBuildLogInfo(OldBuildVO buildVo) throws Exception{
-		int bldSeq = dpl1000DAO.insertDpl1200DeployJobBuildLogInfo(buildVo);
-		
-		
-		List<ChangeVO> changeSetList = buildVo.getChangeSetList();
-		
-		
-		if(changeSetList != null) {
-			for(ChangeVO changeSetInfo : changeSetList) {
-				
-				List<ChangePathsVO> changePathsList = changeSetInfo.getPaths();
-				
-				
-				if(changePathsList != null && changePathsList.size() > 0) {
-					for(ChangePathsVO changePathInfo : changePathsList) {
-						
-						changePathInfo.setBldSeq(bldSeq);
-						
-						changePathInfo.setRevision(changeSetInfo.getRevision());
-						
-						
-						dpl1000DAO.insertDpl1201DeployBuildChgPathLogInfo(changePathInfo);
-					}
-				}
-				
-				changeSetInfo.setBldSeq(bldSeq);
-				
-				
-				dpl1000DAO.insertDpl1201DeployBuildChgLogInfo(changeSetInfo);
-			}
-		}
-		
-		return bldSeq;
-    }
-	
-	
 	@SuppressWarnings({"rawtypes", "unchecked" })
 	public Map selectDpl1100ToJen1000JobInfo(Map map)  throws Exception{
 		return jen1000Service.selectJen1100JobInfo(map);
@@ -387,9 +351,13 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 	}
 
 	
-	
 	@SuppressWarnings("rawtypes")
 	public void deleteDpl1101ParameterInfo(Map paramMap) throws Exception{
 		dpl1000DAO.deleteDpl1101ParameterInfo(paramMap);
     }
+
+	
+	public String insertDpl1102DplBuildInfo(BuildVO buildVo) throws Exception{
+		return dpl1000DAO.insertDpl1102DplBuildInfo(buildVo);
+	}
 }
