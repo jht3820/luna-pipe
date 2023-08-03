@@ -555,13 +555,17 @@ public class Dpl1000Controller {
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 			
 			
+			String jenId= (String)paramMap.get("jenId");
 			String jenUrl= (String)paramMap.get("jenUrl");
     		String jenUsrId= (String)paramMap.get("jenUsrId");
 			String jenUsrTok= (String)paramMap.get("jenUsrTok");
 			String jobId= (String)paramMap.get("jobId");
 			String jobTok= (String)paramMap.get("jobTok");
 			String dplTypeCd= (String)paramMap.get("dplTypeCd");
-
+			String ciId= (String)paramMap.get("ciId");
+			String ticketId= (String)paramMap.get("ticketId");
+			String dplId= (String)paramMap.get("dplId");
+			
 			
 			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
 			
@@ -597,6 +601,7 @@ public class Dpl1000Controller {
    		 
 			
 			BuildVO buildVo = new BuildVO();
+			buildVo.setJenId(jenId);
 			buildVo.setJenUrl(jenUrl);
 			buildVo.setUserId(jenUsrId);
 			buildVo.setDeTokenId(deJenUsrTok);
@@ -605,6 +610,9 @@ public class Dpl1000Controller {
 			buildVo.setDplTypeCd(dplTypeCd);
 			buildVo.setJenStatusVo(jenStatusVo);
 			buildVo.setJobParamList(jobParamList);
+			buildVo.setCiId(ciId);
+			buildVo.setTicketId(ticketId);
+			buildVo.setDplId(dplId);
 			
 			
 			buildVo.addBldActionLog(jobId+" JOB 빌드를 준비 중입니다.");
