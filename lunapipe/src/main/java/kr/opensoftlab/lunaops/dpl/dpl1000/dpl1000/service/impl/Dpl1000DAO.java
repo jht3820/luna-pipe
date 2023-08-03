@@ -3,15 +3,15 @@ package kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.stereotype.Repository;
+
 import kr.opensoftlab.lunaops.com.dao.ComOslitsAbstractDAO;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1000VO;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO;
 import kr.opensoftlab.sdf.excel.ExcelDataListResultHandler;
-import kr.opensoftlab.sdf.jenkins.vo.OldBuildVO;
+import kr.opensoftlab.sdf.jenkins.vo.BuildVO;
 import kr.opensoftlab.sdf.jenkins.vo.ChangePathsVO;
 import kr.opensoftlab.sdf.jenkins.vo.ChangeVO;
-
-import org.springframework.stereotype.Repository;
 
 
 
@@ -127,11 +127,6 @@ public class Dpl1000DAO extends ComOslitsAbstractDAO {
 	}
 	
 	
-	public int insertDpl1200DeployJobBuildLogInfo(OldBuildVO buildVo) throws Exception{
-		return (int) insert("dpl1000DAO.insertDpl1200DeployJobBuildLogInfo", buildVo);
-    }
-	
-	
 	@SuppressWarnings({"rawtypes" })
 	public List selectDpl1000DplHistoryList(Map inputMap)  throws Exception{
 		return (List) list("dpl1000DAO.selectDpl1000DplHistoryList", inputMap);
@@ -193,4 +188,9 @@ public class Dpl1000DAO extends ComOslitsAbstractDAO {
 	public void deleteDpl1101ParameterInfo(Map paramMap) throws Exception{
 		update("dpl1000DAO.deleteDpl1101ParameterInfo", paramMap);
     }
+
+	
+	public String insertDpl1102DplBuildInfo(BuildVO buildVo) throws Exception{
+		return (String) insert("dpl1000DAO.insertDpl1102DplBuildInfo", buildVo);
+	}
 }
