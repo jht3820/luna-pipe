@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import kr.opensoftlab.lunaops.com.dao.ComOslitsAbstractDAO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1000VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1100VO;
+import kr.opensoftlab.sdf.jenkins.vo.BuildVO;
 
 
 
@@ -220,5 +221,14 @@ public class Jen1000DAO extends ComOslitsAbstractDAO {
 	public int selectJen1200JobBuildListCnt(Map paramMap) throws Exception {
 		return (Integer) select("jen1000DAO.selectJen1200JobBuildListCnt", paramMap);
 	}
+
 	
+	public String insertJen1200DeployJobBuildLogInfo(BuildVO buildVo) throws Exception {
+		return (String) insert("jen1000DAO.insertJen1200DeployJobBuildLogInfo", buildVo);
+	}
+
+	
+	public int updateJen1200DeployJobBuildLogInfo(BuildVO buildVo)  throws Exception{
+		return update("jen1000DAO.updateJen1200DeployJobBuildLogInfo", buildVo);
+	}
 }
