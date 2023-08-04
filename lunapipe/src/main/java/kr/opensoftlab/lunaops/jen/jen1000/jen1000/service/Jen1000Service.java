@@ -101,6 +101,11 @@ public interface Jen1000Service {
 	
 	@SuppressWarnings("rawtypes")
 	int insertJen1000BldLog(Map paramMap) throws Exception;
+
+	
+	@SuppressWarnings("rawtypes")
+	String insertJen1203JobBldParameterInfo(Map paramMap) throws Exception;
+	
 	
 	@SuppressWarnings({ "rawtypes" })
 	List<Map> selectJen1203JobBuildParamList(Map paramMap) throws Exception;
