@@ -40,7 +40,7 @@ $(function(){
 	fnSelJobSearchSetting();
 	
 	
-	gfnGuideStack("add",fnJen1000GuideShow);
+	gfnGuideStack("add",fnJen1007GuideShow);
 	
 	
 	$("#selJobAddBtn").click(function(){
@@ -1060,7 +1060,7 @@ function fnSelectJen1000JobConfirmConnect(indexList){
 
 
 
-function fnJen1000GuideShow(){
+function fnJen1007GuideShow(){
 	var mainObj = $(".main_contents");
 	
 	
@@ -1068,7 +1068,7 @@ function fnJen1000GuideShow(){
 		return false;
 	}
 	
-	var guideBoxInfo = globals_guideContents["jen1000"];
+	var guideBoxInfo = globals_guideContents["jen1007"];
 	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
 }
 
@@ -1123,19 +1123,19 @@ function fnSelectJen1000JobBldLog(jobList){
 				<div class="sub_title">
 					JENKINS 관리
 				</div>
-				<div id="AXSearchTarget-jenkins" guide="jen1000JenkinsBtn"></div>
+				<div id="AXSearchTarget-jenkins" guide="jen1007JenkinsBtn"></div>
 				<div class="dpl_wrap white">
 					<input type="hidden" name="strInSql" id="strInSql" />
-					<div data-ax5grid="jenkinsGrid" data-ax5grid-config="{}" style="height: 200px;" guide="jen1000JenkinsList"></div>	
+					<div data-ax5grid="jenkinsGrid" data-ax5grid-config="{}" style="height: 200px;" guide="jen1007JenkinsList"></div>	
 				</div>
 			</div>
 			<div class="frame_contents">
 				<div class="sub_title">
 					JOB 관리 <small>[선택 JENKINS: <span id="selJenkinsNm">-</span>]</small>
 				</div>
-				<div id="AXSearchTarget-job" guide="jen1000JobBtn"></div>
+				<div id="AXSearchTarget-job" guide="jen1007JobBtn"></div>
 				<div class="dpl_wrap white">
-					<div data-ax5grid="jobGrid" data-ax5grid-config="{}" style="height: 300px;" guide="jen1000JobList"></div>	
+					<div data-ax5grid="jobGrid" data-ax5grid-config="{}" style="height: 300px;" guide="jen1007JobList"></div>	
 				</div>
 			</div>
 		</div>
@@ -1148,9 +1148,9 @@ function fnSelectJen1000JobBldLog(jobList){
 				<div class="sub_title">
 					선택 JENKINS&JOB 목록
 				</div>
-				<div id="AXSearchTarget-selJob"></div>
+				<div id="AXSearchTarget-selJob" guide="jen1007SelJobBtn"></div>
 				<div class="dpl_wrap white">
-					<div data-ax5grid="selJobGrid" data-ax5grid-config="{}" style="height: 700px;"></div>	
+					<div data-ax5grid="selJobGrid" data-ax5grid-config="{}" style="height: 700px;" guide="jen1007SelJobList"></div>	
 				</div>
 			</div>
 		</div>
