@@ -33,9 +33,12 @@
 	
 	
 	var globals_repInfo;
-	
+
 	
 	$(document).ready(function(){
+		
+		gfnGuideStack("add",fnRep1002GuideShow);
+		
 		
 		svnConnCheck();
 		
@@ -599,6 +602,18 @@
 		
 		return returnList;
 	}
+	
+	function fnRep1002GuideShow(){
+		var mainObj = $(".main_contents");
+		
+		
+		if(mainObj.length == 0){
+			return false;
+		}
+		
+		var guideBoxInfo = globals_guideContents["rep1002"];
+		gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
+	}
 </script>
 
 <div class="main_contents" style="height: auto;" >
@@ -609,18 +624,18 @@
 		<div class="sub_title">
 			소스저장소 상세정보 [ 선택 저장소: <span id="repNm"></span> ]
 		</div>
-		<div class="rep1002SearchFrame rep1002FrameBox" id="repSearchTarget"></div>
+		<div class="rep1002SearchFrame rep1002FrameBox" id="repSearchTarget" guide="rep1002RepBtn"></div>
 		<div class="rep1002RevisionFrame rep1002FrameBox">
 			<div class="svn_mask_repList" id="repGridList">
 				데이터를 조회중입니다.</br></br>
 				<img class="fixed_loading" src="/images/loading.gif" style="width: 100px;height: 100px;">
 			</div>
-			<div data-ax5grid="rep-grid" data-ax5grid-config="{}" style="height: 250px;"></div>	
+			<div data-ax5grid="rep-grid" data-ax5grid-config="{}" style="height: 250px;" guide="rep1002RepList"></div>	
 		</div>
 		<div class="rep1002CommitLogFrame rep1002FrameBox">
-			<textarea id="svnCommitLogDetail" class="svnCommitLogDetail" readonly="readonly"></textarea>
+			<textarea id="svnCommitLogDetail" class="svnCommitLogDetail" readonly="readonly" guide="rep1002RepCommitLog"></textarea>
 		</div>
-		<div class="rep1002FileMainFrame">
+		<div class="rep1002FileMainFrame" guide="rep1002RepChgLog">
 			<div class="svn_mask_content" id="revisionFileList">리비전을 선택해주세요.</div>
 			<div class="rep1002FileTreeFrame rep1002FrameBox">
 				<ul id="rep1002FileTree" class="ztree"></ul>
