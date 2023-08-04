@@ -839,7 +839,7 @@ function fnSelJobCronSpec(paramJobId){
 	<div class="pop_title">JOB 설정 등록</div>
 	<div class="pop_sub" guide="jobInfo" >
 		<div class="hideMaskFrame" id="hideMaskFrame">JENKINS를 선택해주세요</div>
-		<div class="pop-left">
+		<div class="pop-left" guide="jen1002LeftJobForm">
 			<div class="pop_menu_row pop_menu_oneRow first_menu_row">
 				<div class="pop_menu_col1 pop_oneRow_col1"><label for="jenId">JENKINS</label><span class="required_info">&nbsp;*</span></div>
 				<div class="pop_menu_col2 pop_oneRow_col2">
@@ -945,7 +945,7 @@ function fnSelJobCronSpec(paramJobId){
 			</div>
 		</div>
 		
-		<div class="pop-right display_none">
+		<div class="pop-right display_none" guide="jen1002RightJobList">
 			<div class="menu_lists_wrap" id="ztreeDiv">
 				<div class="ztree-title">
 					<label for="jobId">JOB 목록</label>
