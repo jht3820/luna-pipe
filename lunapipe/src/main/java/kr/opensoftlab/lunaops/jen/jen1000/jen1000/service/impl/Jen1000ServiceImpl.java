@@ -26,6 +26,7 @@ import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1000VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1100VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.web.Jen1000Controller;
 import kr.opensoftlab.sdf.jenkins.NewJenkinsClient;
+import kr.opensoftlab.sdf.jenkins.vo.BuildVO;
 import kr.opensoftlab.sdf.jenkins.vo.JenStatusVO;
 import kr.opensoftlab.sdf.util.CommonScrty;
 
@@ -325,10 +326,28 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 					continue;
 				}
 				
+				@SuppressWarnings("serial")
+				Map<String, String> bldResultMap = new HashMap<String, String>() {{
+				    put("BUILDING", "02");
+				    put("SUCCESS", "03");
+				    put("FAILURE", "04");
+				    put("ABORTED", "05");
+				    put("NOT_BUILT", "06");
+				    put("UNSTABLE", "07");
+				    put("UNKNOWN", "08");
+				    put("CANCELLED", "09");
+				}};
+				
+				
+				String bldResultCd = "08";
+				
+				if(bldResultMap.containsKey(bwd.getResult().name())) {
+					bldResultCd = bldResultMap.get(bwd.getResult().name());
+				}
+				
 				newMap.put("bldClass", bwd.get_class());
 				newMap.put("bldResult", bwd.getResult().name());
-				newMap.put("bldResultCd", bwd.getResult().ordinal());
-				newMap.put("bldResultMsg", bwd.getResult().name());
+				newMap.put("bldResultCd", bldResultCd);
 				newMap.put("bldEtmDurationTm", bwd.getEstimatedDuration());
 				newMap.put("bldDurationTm", bwd.getDuration());
 				newMap.put("bldStartDtm", new Date(bwd.getTimestamp()));
@@ -465,5 +484,15 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	@SuppressWarnings("rawtypes")
 	public int selectJen1200JobBuildListCnt(Map paramMap) throws Exception {
 		return jen1000DAO.selectJen1200JobBuildListCnt(paramMap);
+	}
+
+	
+	public String insertJen1200DeployJobBuildLogInfo(BuildVO buildVo) throws Exception {
+		return jen1000DAO.insertJen1200DeployJobBuildLogInfo(buildVo);
+	}
+
+	
+	public int updateJen1200DeployJobBuildLogInfo(BuildVO buildVo)  throws Exception{
+		return jen1000DAO.updateJen1200DeployJobBuildLogInfo(buildVo);
 	}
 }
