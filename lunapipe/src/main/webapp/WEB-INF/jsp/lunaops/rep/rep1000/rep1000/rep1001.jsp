@@ -555,7 +555,7 @@ $(document).ready(function() {
 				<textarea class="input_note" title="저장소 설명" name="repTxt" id="repTxt" rows="7" value="" maxlength="1000"   ></textarea>
 			</div>
 		</div>
-		<div class="pop_dpl_div_sub divDetail_sub_right">
+		<div class="pop_dpl_div_sub divDetail_sub_right" guide="rep1001SvnTree">
 			<div class="svn_mask_content" id="repTreeListMask">소스저장소 정보(URL, ID, PW)를 입력해주세요.</div>
 			<div class="sub_title">
 					소스저장소 내부 정보
