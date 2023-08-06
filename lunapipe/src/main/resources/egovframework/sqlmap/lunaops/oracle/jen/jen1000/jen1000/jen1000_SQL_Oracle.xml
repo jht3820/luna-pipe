@@ -1020,8 +1020,8 @@
 			<isNotEmpty property="dplId">
 				, DPL_ID = #dplId#
 			</isNotEmpty>
-			<isNotEmpty property="dplActionLog">
-				, BLD_ACTION_LOG = #dplActionLog#
+			<isNotEmpty property="bldActionLog">
+				, BLD_ACTION_LOG = #bldActionLog#
 			</isNotEmpty>
        	WHERE	1=1
        	AND A.JEN_ID = #jenId#
