@@ -73,7 +73,7 @@ form#jen1004JobInfoForm div#buildChgLog {
 var jen1004BldListGrid;
 
 var jen1004BldSearchObj;
-
+globals_guideChkFn = fnJen1004GuideShow;
 $(document).ready(function() {
 	
 	fnJobBldListGridSetting();
@@ -458,6 +458,18 @@ function fnSelJobBuildInfo(paramBldItem){
 	
 	ajaxObj.send();
 }
+
+function fnJen1004GuideShow(){
+	var mainObj = $(".popup");
+	
+	
+	if(mainObj.length == 0){
+		return false;
+	}
+	
+	var guideBoxInfo = globals_guideContents["jen1004"];
+	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
+}
 </script>
 
 <div class="popup">
@@ -468,9 +480,9 @@ function fnSelJobBuildInfo(paramBldItem){
 				JOB 빌드 목록
 			</div>
 			<div class="jen1004_grid_frame">
-				<div data-ax5grid="jobBldListGrid" data-ax5grid-config="{}" style="height: 345px;" guide="jen1000JenkinsList"></div>	
+				<div data-ax5grid="jobBldListGrid" data-ax5grid-config="{}" style="height: 345px;" guide="jen1004JobBldList"></div>	
 			</div>
-			<div class="jen1004BldConsoleMainFrame" id="jen1004BldConsoleMainFrame">
+			<div class="jen1004BldConsoleMainFrame" id="jen1004BldConsoleMainFrame" guide="jen1004JobBldConsoleLog">
 				<div class="jen1004_sub_title">
 					선택 빌드 콘솔 로그
 					<div class="sub_title_btn right">
@@ -484,7 +496,7 @@ function fnSelJobBuildInfo(paramBldItem){
 				</div>
 			</div>
 		</div>
-		<div class="pop_dpl_div_sub divDetailJen1004_sub_right" id="pop_dpl_job_consoleLogDiv" fullmode="2">
+		<div class="pop_dpl_div_sub divDetailJen1004_sub_right" id="pop_dpl_job_consoleLogDiv" fullmode="2" guide="jen1004JobBldDetailInfo">
 		
 			<div class="jen1004_sub_title">
 				선택 빌드 상세 정보
