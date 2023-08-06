@@ -23,4 +23,14 @@
 	
 	<bean id="buildService" class="kr.opensoftlab.sdf.jenkins.service.impl.BuildServiceImpl"></bean>
 	
+	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="5" />
+		<property name="maxPoolSize" value="10" />
+		<property name="queueCapacity" value="25" />
+	</bean>
+	
+	<bean id="taskExecutorClass" class="kr.opensoftlab.sdf.jenkins.task.TaskExecutorClass">
+		<constructor-arg ref="taskExecutor" />
+	</bean>
+	
 </beans>
