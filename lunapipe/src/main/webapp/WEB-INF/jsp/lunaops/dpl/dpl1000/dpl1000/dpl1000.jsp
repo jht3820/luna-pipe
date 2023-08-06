@@ -116,8 +116,6 @@ $(document).ready(function() {
 	
 	
 	$("#btn_update_dplAction").click(function(){
-		jAlert("빌드 실행 준비중.","알림창");
-		return
 		var item = dplJobGrid.getList('selected')[0];
 		if(gfnIsNull(item)){
 			toast.push('실행(빌드)하려는 JOB을 선택해주세요.');
@@ -889,6 +887,7 @@ function fnDplStart(item){
 			,item);
 	
 	ajaxObj.setFnSuccess(function(data){
+		
 		return;
 		
 		if(data.errorYn == "Y"){
