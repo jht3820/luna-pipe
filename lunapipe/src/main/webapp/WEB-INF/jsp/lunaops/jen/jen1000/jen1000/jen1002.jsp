@@ -57,7 +57,7 @@ textarea#jobTriggerVal[readonly] {background-color: #eee;}
     float: left;
     width: calc(100% - 10px);
     margin: 5px 5px 0 5px;
-    height: 505px;
+    height: 460px;
 }
 .popup.jen1002-popup .hideMaskFrame {
     position: absolute;
@@ -392,10 +392,10 @@ function fnSelectJen1001JobInfo(jenId, jobId){
 			}
 			
 			
-			$("#jobRestoreId").html('<option value="" '+selectStr+'>선 택</option>'+appendStr);
+			
 		}else{
 			
-			$("#jobRestoreId").html('<option value="" '+selectStr+'>선 택</option>'+appendStr);
+			
 		}
 	});
 	
@@ -595,10 +595,10 @@ function fnJenIdSelecetd(){
 					}
 					
 					
-					$("#jobRestoreId").html('<option value="" '+selectStr+'>선 택</option>'+appendStr);
+					
 				}else{
 					
-					$("#jobRestoreId").html('<option value="" '+selectStr+'>선 택</option>'+appendStr);
+					
 				}
 				
 				
@@ -875,7 +875,7 @@ function fnSelJobCronSpec(paramJobId){
 						</span>
 					</div>
 				</div>
-			
+			<!-- 
 				<div class="pop_menu_row pop_menu_oneRow">
 					<div class="pop_menu_col1 pop_oneRow_col1"><label for="jobRestoreId">원복 JOB ID</label></div>
 					<div class="pop_menu_col2 pop_oneRow_col2">
@@ -886,7 +886,7 @@ function fnSelJobCronSpec(paramJobId){
 						</span>
 					</div>
 				</div>
-				
+				 -->
 				<div class="pop_menu_row pop_menu_oneRow">
 					<div class="pop_menu_col1 pop_oneRow_col1"><label for="jobTok">TOKEN KEY</label><span class="required_info">&nbsp;*</span></div>
 					<div class="pop_menu_col2 pop_oneRow_col2">
