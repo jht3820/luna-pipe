@@ -1503,49 +1503,6 @@ public class Jen1000Controller {
 	
 	
 	@SuppressWarnings("rawtypes")
-	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000JobLastBuildInfo.do")
-	public ModelAndView selectJen1000JobLastBuildInfo(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-
-		try{
-			
-			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
-			
-			
-			Map jobLastBuildInfo = jen1000Service.selectJen1200JobLastBuildInfo(paramMap);
-			
-			List<Map> jobLastBuildChgList = null;
-			
-			List<Map> jobLastBuildFileChgList = null;
-			
-			
-			if(jobLastBuildInfo != null) {
-				
-				String bldNum = String.valueOf(jobLastBuildInfo.get("bldNum"));
-				paramMap.put("bldNum", bldNum);
-				
-				
-				jobLastBuildChgList = jen1000Service.selectJen1201JobLastBuildChgList(paramMap);
-				
-				
-				jobLastBuildFileChgList = jen1000Service.selectJen1202JobLastBuildFileChgList(paramMap);
-			}
-			
-			
-			model.addAttribute("jobLastBuildInfo", jobLastBuildInfo);
-			model.addAttribute("jobLastBuildChgList", jobLastBuildChgList);
-			model.addAttribute("jobLastBuildFileChgList", jobLastBuildFileChgList);
-			model.addAttribute("errorYn", "N");
-			return new ModelAndView("jsonView");
-		}
-		catch(Exception ex){
-			Log.error("selectJen1000JobLastBuildInfo()", ex);
-			
-			model.addAttribute("errorYn", "Y");
-			return new ModelAndView("jsonView");
-		}
-	}
-	
-	@SuppressWarnings("rawtypes")
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000JobBuildInfo.do")
 	public ModelAndView selectJen1000JobBuildInfo(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		
