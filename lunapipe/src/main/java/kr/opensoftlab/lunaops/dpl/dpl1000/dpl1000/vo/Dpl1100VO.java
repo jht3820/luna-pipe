@@ -29,8 +29,12 @@ public class Dpl1100VO extends PageVO{
 	
 	private String bldNum;
 	private String bldResult;
+	private String bldResultCd;
 	private String bldDurationTm;
-	private String bldStartDtm ;
+	private String bldStartDtm;
+	
+	
+	private String buildingChkFlag;
 	
 	public String getRn() {
 		return rn;
@@ -167,6 +171,13 @@ public class Dpl1100VO extends PageVO{
 	public void setBldResult(String bldResult) {
 		this.bldResult = bldResult;
 	}
+	
+	public String getBldResultCd() {
+		return bldResultCd;
+	}
+	public void setBldResultCd(String bldResultCd) {
+		this.bldResultCd = bldResultCd;
+	}
 	public String getBldDurationTm() {
 		return bldDurationTm;
 	}
@@ -178,6 +189,12 @@ public class Dpl1100VO extends PageVO{
 	}
 	public void setBldStartDtm(String bldStartDtm) {
 		this.bldStartDtm = bldStartDtm;
+	}
+	public String getBuildingChkFlag() {
+		return buildingChkFlag;
+	}
+	public void setBuildingChkFlag(String buildingChkFlag) {
+		this.buildingChkFlag = buildingChkFlag;
 	}
 	
 	
