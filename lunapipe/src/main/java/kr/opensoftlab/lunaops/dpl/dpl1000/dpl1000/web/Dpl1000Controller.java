@@ -24,7 +24,6 @@ import egovframework.com.cmm.service.EgovProperties;
 import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.service.Dpl1000Service;
-import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1000VO;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.sdf.jenkins.AutoBuildInit;
@@ -166,74 +165,41 @@ public class Dpl1000Controller {
     		 return new ModelAndView("jsonView", model);
     	 }
      }
+     
+     
+     @SuppressWarnings({ "unchecked", "rawtypes" })
+     @RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1100BldingJobList.do")
+     public ModelAndView selectDpl1100BldingJobList(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+    	 try{
+    		 
+    		 
+    		 Map paramMap = RequestConvertor.requestParamToMap(request, true);
+    		 
+    		 
+    		 paramMap.put("buildingChkFlag", "Y");
+    		 
+    		 List<Map> bldingJobList = dpl1000Service.selectDpl1100DeployJobList(paramMap);
+    		 
+    		 model.addAttribute("bldingJobList", bldingJobList);
+    		 
+    		 
+    		 model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
+    		 model.addAttribute("errorYn", "N");
+    		 return new ModelAndView("jsonView", model);
+    	 }
+    	 catch(Exception ex){
+    		 Log.error("selectDpl1100BldingJobList()", ex);
+    		 
+    		 
+    		 model.addAttribute("errorYn", "Y");
+    		 model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+    		 return new ModelAndView("jsonView", model);
+    	 }
+     }
     
 	
-	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1000DeployVerInfoListAjax.do")
-    public ModelAndView selectDpl1000DeployVerInfoListAjax(@ModelAttribute("dpl1000VO") Dpl1000VO dpl1000VO, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-    	try{
-
-    		
-        	Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
-        	
-        	
-			String _pageNo_str = paramMap.get("pageNo");
-			String _pageSize_str = paramMap.get("pageSize");
-			
-			int _pageNo = 1;
-			int _pageSize = OslAgileConstant.pageSize;
-			
-			if(_pageNo_str != null && !"".equals(_pageNo_str)){
-				_pageNo = Integer.parseInt(_pageNo_str)+1;  
-			}
-			if(_pageSize_str != null && !"".equals(_pageSize_str)){
-				_pageSize = Integer.parseInt(_pageSize_str);  
-			}
-			
-			
-			dpl1000VO.setPageIndex(_pageNo);
-			dpl1000VO.setPageSize(_pageSize);
-			dpl1000VO.setPageUnit(_pageSize);
-        	
-        	
-        	PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(dpl1000VO); 
-			List<Dpl1000VO> dpl1000List = null;
-			
-        	
-        	dpl1000List = (List<Dpl1000VO>) dpl1000Service.selectDpl1000DeployVerInfoList(dpl1000VO);
-        	
-			int totCnt = dpl1000Service.selectDpl1000ListCnt(dpl1000VO);
-					
-        	paginationInfo.setTotalRecordCount(totCnt);
-        	
-        	model.addAttribute("list", dpl1000List);
-        	
-			
-			Map<String, Integer> pageMap = new HashMap<String, Integer>();
-			pageMap.put("pageNo",dpl1000VO.getPageIndex());
-			pageMap.put("listCount", dpl1000List.size());
-			pageMap.put("totalPages", paginationInfo.getTotalPageCount());
-			pageMap.put("totalElements", totCnt);
-			pageMap.put("pageSize", _pageSize);
-			
-			model.addAttribute("page", pageMap);
-        	
-        	
-        	model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
-        	
-        	return new ModelAndView("jsonView", model);
-    	}
-    	catch(Exception ex){
-    		Log.error("selectDpl1000DeployInfoListAjax()", ex);
-    		
-    		
-    		model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
-    		return new ModelAndView("jsonView", model);
-    	}
-    }
-	
-	
 	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1100DplJobListAjax.do")
-    public ModelAndView selectDpl1100DplJobListAjax(@ModelAttribute("dpl1300VO") Dpl1100VO dpl1300VO, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+    public ModelAndView selectDpl1100DplJobListAjax(@ModelAttribute("dpl1100VO") Dpl1100VO dpl1100VO, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
     	try{
 
     		
@@ -254,18 +220,18 @@ public class Dpl1000Controller {
 			}
 			
 			
-			dpl1300VO.setPageIndex(_pageNo);
-			dpl1300VO.setPageSize(_pageSize);
-			dpl1300VO.setPageUnit(_pageSize);
+			dpl1100VO.setPageIndex(_pageNo);
+			dpl1100VO.setPageSize(_pageSize);
+			dpl1100VO.setPageUnit(_pageSize);
         	
         	
-        	PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(dpl1300VO); 
+        	PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(dpl1100VO); 
 			List<Dpl1100VO> dpl1300List = null;
 			
         	
-        	dpl1300List = (List<Dpl1100VO>) dpl1000Service.selectDpl1100dplJobGridList(dpl1300VO);
+        	dpl1300List = (List<Dpl1100VO>) dpl1000Service.selectDpl1100dplJobGridList(dpl1100VO);
         	
-			int totCnt = dpl1000Service.selectDpl1100dplJobGridListCnt(dpl1300VO);
+			int totCnt = dpl1000Service.selectDpl1100dplJobGridListCnt(dpl1100VO);
 					
         	paginationInfo.setTotalRecordCount(totCnt);
         	
@@ -273,7 +239,7 @@ public class Dpl1000Controller {
         	
 			
 			Map<String, Integer> pageMap = new HashMap<String, Integer>();
-			pageMap.put("pageNo",dpl1300VO.getPageIndex());
+			pageMap.put("pageNo",dpl1100VO.getPageIndex());
 			pageMap.put("listCount", dpl1300List.size());
 			pageMap.put("totalPages", paginationInfo.getTotalPageCount());
 			pageMap.put("totalElements", totCnt);
@@ -288,194 +254,6 @@ public class Dpl1000Controller {
     	}
     	catch(Exception ex){
     		Log.error("selectDpl1100DplJobListAjax()", ex);
-    		
-    		
-    		model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
-    		return new ModelAndView("jsonView", model);
-    	}
-    }
-	
-	
-	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/saveDpl1000DeployVerInfoAjax.do")
-    public ModelAndView saveDpl1000DeployVerInfoAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-    	try{
-
-    		
-    		Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
-			if( paramMap.get("popupGb").toString().equals("insert") ){
-	        	
-	        	dpl1000Service.insertDpl1000DeployVerInfo(paramMap);
-			} else {
-				
-				dpl1000Service.updateDpl1000DeployVerInfo(paramMap);
-			}
-        	
-        	model.addAttribute("message", egovMessageSource.getMessage("success.common.save"));
-        	
-        	return new ModelAndView("jsonView", model);
-    	}
-    	catch(Exception ex){
-    		Log.error("saveDpl1000DeployVerInfoAjax()", ex);
-    		
-    		
-    		model.addAttribute("message", egovMessageSource.getMessage("fail.common.save"));
-    		return new ModelAndView("jsonView", model);
-    	}
-	}
-	
-	
-	
-	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/insertDpl1000DplsignRequestAjax.do")
-    public ModelAndView insertDpl1000DplsignRequestAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-    	try{
-
-    		
-    		Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
-			
-			
-			dpl1000Service.insertDpl1000DplSignRequestList(paramMap);
-			
-        	
-			model.addAttribute("errorYn", "N");
-        	model.addAttribute("message", egovMessageSource.getMessage("success.common.insert"));
-        	
-        	return new ModelAndView("jsonView", model);
-    	}
-    	catch(Exception ex){
-    		Log.error("insertDpl1000DplsignRequestAjax()", ex);
-    		
-    		
-    		model.addAttribute("errorYn", "Y");
-    		model.addAttribute("message", egovMessageSource.getMessage("fail.common.insert"));
-    		return new ModelAndView("jsonView", model);
-    	}
-	}
-	
-	
-	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/deleteDpl1000DeployVerInfoListAjax.do")
-    public ModelAndView deleteDpl1000DeployVerInfoListAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model) throws Exception {
-    	try{
-    		
-			Map<String, Object> paramMap = RequestConvertor.requestParamToMapAddSelInfoList(request, true,"dplId");
-        	
-    		dpl1000Service.deleteDpl1000DeployVerInfo(paramMap);
-    		
-    		
-    		model.addAttribute("successYn", "Y");
-        	model.addAttribute("message", egovMessageSource.getMessage("success.common.delete"));
-        	
-        	return new ModelAndView("jsonView", model);
-    	}
-    	catch(Exception ex){
-    		Log.error("deleteSpr1000SprintInfoListAjax()", ex);
-    		
-    		
-    		model.addAttribute("message", egovMessageSource.getMessage("fail.common.delete"));
-    		return new ModelAndView("jsonView", model);
-    	}
-    }
-	
-	
-	@RequestMapping(value="/dpl/dpl1000/dpl1000/selectDpl1000BuildInfoListAjax.do")
-    public ModelAndView selectDpl1000BuildInfoListAjax(@ModelAttribute("dpl1000VO") Dpl1000VO dpl1000VO, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-    	try{
-
-    		
-        	Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
-        	
-        	
-			String _pageNo_str = paramMap.get("pageNo");
-			String _pageSize_str = paramMap.get("pageSize");
-			
-			int _pageNo = 1;
-			int _pageSize = OslAgileConstant.pageSize;
-			
-			if(_pageNo_str != null && !"".equals(_pageNo_str)){
-				_pageNo = Integer.parseInt(_pageNo_str)+1;  
-			}
-			if(_pageSize_str != null && !"".equals(_pageSize_str)){
-				_pageSize = Integer.parseInt(_pageSize_str);  
-			}
-			
-			
-			dpl1000VO.setPageIndex(_pageNo);
-			dpl1000VO.setPageSize(_pageSize);
-			dpl1000VO.setPageUnit(_pageSize);
-        	
-        	
-        	PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(dpl1000VO); 
-			List<Dpl1000VO> dpl1000List = null;
-						
-        	
-        	dpl1000List = (List<Dpl1000VO>) dpl1000Service.selectDpl1000BuildInfoList(dpl1000VO);
-        	
-			int totCnt = dpl1000Service.selectDpl1000BuildInfoListCnt(dpl1000VO);
-					
-        	paginationInfo.setTotalRecordCount(totCnt);
-        	
-        	model.addAttribute("list", dpl1000List);
-        	
-			
-			Map<String, Integer> pageMap = new HashMap<String, Integer>();
-			pageMap.put("pageNo",dpl1000VO.getPageIndex());
-			pageMap.put("listCount", dpl1000List.size());
-			pageMap.put("totalPages", paginationInfo.getTotalPageCount());
-			pageMap.put("totalElements", totCnt);
-			pageMap.put("pageSize", _pageSize);
-			
-			model.addAttribute("page", pageMap);
-        	
-        	
-        	model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
-        	
-        	return new ModelAndView("jsonView", model);
-    	}
-    	catch(Exception ex){
-    		Log.error("selectDpl1000BuildInfoListAjax()", ex);
-    		
-    		
-    		model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
-    		return new ModelAndView("jsonView", model);
-    	}
-    }
-
-     
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1000DplHistoryListAjax.do")
-    public ModelAndView selectDpl1000DplHistoryListAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-    	try{
-
-    		
-        	Map paramMap = RequestConvertor.requestParamToMap(request, true);
-
-        	
-        	List<Map> dplDplHistoryList = dpl1000Service.selectDpl1000DplHistoryList(paramMap);
-        	
-        	
-			List<Map> jobList = dpl1000Service.selectDpl1100DeployJobList(paramMap);
-			
- 			Map dpl1000DplJobParamMap = new HashMap<>();
-			for(int i = 0 ; i<jobList.size();i++) {
-				Map jobMap = (Map) jobList.get(i);
-				paramMap.put("jenId", (String) jobMap.get("jenId"));
-				paramMap.put("jobId", (String) jobMap.get("jobId"));
-				
-				List<Map> dpl1000DplJobParamList = dpl1000Service.selectDpl1101JenParameterList(paramMap);
-				dpl1000DplJobParamMap.put(jobMap.get("jobId"), dpl1000DplJobParamList);
-				
-			}
-			
-        	model.addAttribute("dplDplHistoryList", dplDplHistoryList);
-        	model.addAttribute("jobList", jobList);
-        	model.addAttribute("jobParamList", dpl1000DplJobParamMap);
-        	
-        	
-        	model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
-        	
-        	return new ModelAndView("jsonView", model);
-    	}
-    	catch(Exception ex){
-    		Log.error("selectDpl1000DplHistoryListAjax()", ex);
     		
     		
     		model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
@@ -618,7 +396,16 @@ public class Dpl1000Controller {
 			buildVo.addBldActionLog(jobId+" JOB 빌드를 준비 중입니다.");
 			
 			
-			buildService.insertJobBuildAction(buildVo);
+			BuildVO rtnBuildVo = buildService.insertJobBuildAction(buildVo);
+			
+			
+			model.addAttribute("bldEtmDurationTm", rtnBuildVo.getBldEtmDurationTm());
+			
+			model.addAttribute("bldResultCd", rtnBuildVo.getBldResultCd());
+			model.addAttribute("bldResult", rtnBuildVo.getBldResult());
+			
+			model.addAttribute("bldActionLog", rtnBuildVo.getBldActionLog());
+			model.addAttribute("bldNum", rtnBuildVo.getBldNum());
 			
 			
 			model.addAttribute("errorYn", "N");
@@ -636,6 +423,126 @@ public class Dpl1000Controller {
 			model.addAttribute("errorYn", "Y");
 			model.addAttribute("message", egovMessageSource.getMessage("fail.deploy.build"));
 			return new ModelAndView("jsonView", model);
+		}
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value="/dpl/dpl1000/dpl1000/selectDpl1000JobConsoleLogAjax.do")
+	public ModelAndView selectDpl1000JobConsoleLogAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			
+			Map jobMap = jen1000Service.selectJen1100JobInfo(paramMap);
+			
+			String jenUrl = (String) jobMap.get("jenUrl");
+			String jenUsrId = (String) jobMap.get("jenUsrId");
+			String jenUsrTok = (String) jobMap.get("jenUsrTok");
+			String jobId = (String) jobMap.get("jobId");
+			String targetBldNum = (String) paramMap.get("targetBldNum");
+			
+			
+			
+			
+			
+			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
+			
+			
+			String deJenUsrTok = CommonScrty.decryptedAria(jenUsrTok, salt);
+			
+			
+			JenStatusVO jenStatusVo = newJenkinsClient.connect(jenUrl, jenUsrId, deJenUsrTok);
+			
+			
+			if(jenStatusVo.isErrorFlag()) {
+				model.addAttribute("errorYn", "Y");
+				model.addAttribute("message", jenStatusVo.getErrorMsg());
+			}
+			
+			
+			Map jobInfo = newJenkinsClient.getJobInfo(jenStatusVo, jobId);
+			
+			
+			boolean isBuilding = (boolean) jobInfo.get("isBuilding");
+			
+			
+			Map bldInfo = null;
+			
+			
+			if(isBuilding) {
+				int bldNum = 0;
+				
+				if(targetBldNum == null) {
+					bldNum = (int)jobInfo.get("lastBuildNum");
+				}else {
+					bldNum = Integer.parseInt(targetBldNum);
+				}
+				
+				
+				bldInfo = newJenkinsClient.getJobBldNumInfo(jenStatusVo, jobId, bldNum);
+				bldInfo.put("bldResultCd", "02");
+				bldInfo.put("bldResult", "BUILDING");
+			}else {
+				
+				
+				bldInfo = jen1000Service.selectJen1200JobLastBuildInfo(paramMap);
+				
+				
+				String bldResultCd = null;
+				if(bldInfo != null) {
+					bldResultCd = (String) bldInfo.get("bldResultCd");
+				}
+				
+				
+				if(bldInfo != null && !"01".equals(bldResultCd) && !"02".equals(bldResultCd)) {
+					
+					String bldNum = String.valueOf(bldInfo.get("bldNum"));
+					paramMap.put("bldNum", bldNum);
+					
+					
+					List<Map> jobLastBuildChgList = jen1000Service.selectJen1201JobLastBuildChgList(paramMap);
+					
+					
+					List<Map> jobLastBuildFileChgList = jen1000Service.selectJen1202JobLastBuildFileChgList(paramMap);
+
+					
+					bldInfo.put("bldChgList", jobLastBuildChgList);
+					bldInfo.put("bldChgFileList", jobLastBuildFileChgList);
+				}else {
+					
+					
+					if(!jobInfo.isEmpty()) {
+						boolean hasLastBuildRun = (boolean)jobInfo.get("hasLastBuildRun"); 
+						
+						
+						if(hasLastBuildRun) {
+							int lastBuildNum = (int)jobInfo.get("lastBuildNum");
+							
+							
+							bldInfo = newJenkinsClient.getJobBldNumInfo(jenStatusVo, jobId, lastBuildNum);
+						}
+					}
+				}
+			}
+			
+			model.addAttribute("bldInfo", bldInfo);
+			
+			
+			model.addAttribute("jobMap", jobMap);
+			
+			model.addAttribute("errorYn", "N");
+			return new ModelAndView("jsonView");
+			
+		}catch(Exception ex){
+			Log.error("selectDpl1000JobConsoleLogAjax()", ex);
+			
+			
+			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+			model.addAttribute("errorYn", "Y");
+			return new ModelAndView("jsonView");
 		}
 	}
 	
