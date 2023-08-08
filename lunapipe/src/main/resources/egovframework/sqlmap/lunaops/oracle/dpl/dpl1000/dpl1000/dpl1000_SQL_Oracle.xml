@@ -63,6 +63,7 @@
 		<result property="jobTok"				column="JOB_TOK" /> 
 		<result property="bldNum"  				column="BLD_NUM" />
 		<result property="bldResult"  			column="BLD_RESULT" />
+		<result property="bldResultCd"  		column="BLD_RESULT_CD" />
 		<result property="bldDurationTm"  		column="BLD_DURATION_TM"/>
 		<result property="bldStartDtm"  		column="BLD_START_DTM"/>
 		<result property="regDtm"           	column="REG_DTM" /> 
@@ -184,6 +185,7 @@
 			, E.JOB_DESC AS JOB_RESTORE_DESC
 			, F.BLD_NUM
 			, F.BLD_RESULT
+			, F.BLD_RESULT_CD
 			, F.BLD_DURATION_TM
 			, F.BLD_START_DTM
 			, A.REG_DTM 
@@ -197,7 +199,12 @@
 		INNER JOIN JEN1000 C ON (B.JEN_ID = C.JEN_ID AND C.USE_CD = '01' AND C.DEL_CD = '02')
 		INNER JOIN JEN1100 D ON (B.JEN_ID = D.JEN_ID AND B.JOB_ID = D.JOB_ID AND D.USE_CD = '01')
 		LEFT JOIN JEN1100 E ON (D.JEN_ID = E.JEN_ID AND D.JOB_RESTORE_ID = E.JOB_ID AND E.USE_CD = '01')
-		LEFT JOIN 
+		<isNotEmpty property="buildingChkFlag">
+			INNER JOIN
+		</isNotEmpty>
+		<isEmpty property="buildingChkFlag">
+			LEFT JOIN
+		</isEmpty>
 		(
 			SELECT Z.* FROM JEN1200 Z
 			INNER JOIN (SELECT CI_ID, TICKET_ID, JEN_ID, JOB_ID, DPL_ID, MAX(BLD_NUM) AS BLD_NUM FROM DPL1102 GROUP BY CI_ID, TICKET_ID, JEN_ID, JOB_ID, DPL_ID) Y
@@ -207,7 +214,7 @@
 		AND A.CI_ID = #ciId#
 		AND A.TICKET_ID = #ticketId#
 		AND A.DPL_ID = #dplId#
-       <isNotEmpty property="searchSelect">
+		<isNotEmpty property="searchSelect">
 			<isNotEmpty property="searchTxt">
 			<isEqual property="searchSelect" compareValue="jenNm"> 
 				AND		UPPER( C.JEN_NM ) like '%'|| UPPER( #searchTxt#  )  ||'%'
