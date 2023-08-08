@@ -336,6 +336,7 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 				    put("UNSTABLE", "07");
 				    put("UNKNOWN", "08");
 				    put("CANCELLED", "09");
+				    put("SYSTEM ERROR", "10");
 				}};
 				
 				
@@ -447,6 +448,12 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	@SuppressWarnings("rawtypes")
 	public Map selectJen1200JobLastBuildInfo(Map paramMap) throws Exception{
 		return jen1000DAO.selectJen1200JobLastBuildInfo(paramMap);
+	}
+
+	
+	@SuppressWarnings("rawtypes")
+	public String insertJen1203JobBldParameterInfo(Map paramMap) throws Exception{
+		return jen1000DAO.insertJen1203JobBldParameterInfo(paramMap);
 	}
 	
 	
