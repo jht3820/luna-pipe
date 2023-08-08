@@ -2029,6 +2029,10 @@ function gfnDtmAgoStr(dateTime){
 
 
 function gfnHourCalc(totalSecond){
+	if(gfnIsNull(totalSecond)){
+		return "0초";
+	}
+	
 	var bldDurationStr = '';
 	
 	
