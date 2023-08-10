@@ -186,11 +186,17 @@ public class Dpl1000DAO extends ComOslitsAbstractDAO {
 	
 	@SuppressWarnings("rawtypes")
 	public void deleteDpl1101ParameterInfo(Map paramMap) throws Exception{
-		update("dpl1000DAO.deleteDpl1101ParameterInfo", paramMap);
+		delete("dpl1000DAO.deleteDpl1101ParameterInfo", paramMap);
     }
 
 	
 	public String insertDpl1102DplBuildInfo(BuildVO buildVo) throws Exception{
 		return (String) insert("dpl1000DAO.insertDpl1102DplBuildInfo", buildVo);
 	}
+
+	
+	@SuppressWarnings("rawtypes")
+	public void deleteDpl1102DplActionInfo(Map paramMap) throws Exception{
+		delete("dpl1000DAO.deleteDpl1102DplActionInfo", paramMap);
+    }
 }
