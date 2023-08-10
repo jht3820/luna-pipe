@@ -23,12 +23,16 @@
 
 
 
-
-
-* { box-sizing:border-box; }					
-
+/* 반응형 속성 제거 */
+/*
+@media screen and (max-width: 1280px) {
+	.main_contents >.tab_title, .main_contents > .spr_title, .req_title, .main_contents > .prj_title, .contents_wrap > .contents_title, .main_contents > .dpl_title, .main_contents > .prs_title{display:none;}
+}
+*/
+* { box-sizing:border-box; }					/* border 등이 요소의 크기를 변화시키지 않기 위해서  */
+/* select { display:none; }							select 박스 커스터 마이징을 위한 숨김 */
 body { position:relative; width:100%;  height:100%; background:#e5e9ec;display: inline-block;  }
-a { text-decoration:none; color:#333; }		
+a { text-decoration:none; color:#333; }		/* a 태그에 걸려있는 기본 디자인을 수정 */
 .AXInput{height:23px;}
 textarea, input {font-family: "Noto Sans KR";}
 .cb { clear: both; }
@@ -36,14 +40,18 @@ textarea, input {font-family: "Noto Sans KR";}
 .fr { float: right; }
 .bold { font-weight: bold; }
 
-
+/* input error */
 .inputError{border:red solid 1px !important; background-color:#fde7eb !important;}
 
-
+/* 그리드 및 검색 상자 */
 div[id^=AXSearchTarget],div[id^=AXGridTarget]{font-size:0.75em;}
 
-
-.contents_title { font-size: 2em; font-weight: bold; margin-bottom: 20px; width: 1500px;}
+/* 
+ * .contents_title
+ *    - 화면 사이즈 변경에 관계없이 타이틀 부분 사이즈 고정
+ *	  - min-width: 1280px; 추가
+ */
+.contents_title { font-size: 2em; font-weight: bold; margin-bottom: 20px; width: 1500px;/* width:100%; min-width: 1280px; */}
 .mainPopupBtn {
     text-align: center;
     font-weight: bold;
@@ -68,13 +76,13 @@ div[id^=AXSearchTarget],div[id^=AXGridTarget]{font-size:0.75em;}
     align-items: flex-end;
 }
 
-.button_complete { width: 101px; height: 40px; line-height: 40px; text-align: center; color: #fff; border-radius: .1875rem; box-shadow: 1px 1px 1px #a7adc0; margin: 0 auto; border: 1px solid #345bd0; cursor: pointer; background-color: #4b73eb; }
+.button_complete { width: 101px; height: 40px; line-height: 40px; text-align: center; color: #fff; /* font-size: 0.85em;  */border-radius: .1875rem; box-shadow: 1px 1px 1px #a7adc0; margin: 0 auto; border: 1px solid #345bd0; cursor: pointer; background-color: #4b73eb; }
 .button_check { width: 63px; height: 28px; line-height: 28px; text-align: center; font-weight: bold; font-size: 0.7em; border-radius: .1875rem; box-shadow: 1px 1px 1px #ccd4eb; margin: 0 auto; border: 1px solid #b8b8b8; cursor: pointer; }
 .button_normal { width: 39px; height: 22px; line-height: 22px; text-align: center; font-weight: bold; font-size: 0.7em; border-radius: .1875rem; box-shadow: 1px 1px 1px #ccd4eb; margin: 0 auto; border: 1px solid #b8b8b8; cursor: pointer; }
 .button_normal2 { display:inline-block; padding:0 6px; height: 28px; line-height: 26px; border: 1px solid #b8b8b8;  text-align: center; color: #333;  border-radius: .1875rem; cursor: pointer;font-size: 10pt;background-color:#fff;}
 .button_normal3 { display: inline-block;padding: 0 6px;height: 40px;line-height: 35px;border: 1px solid #b8b8b8;text-align: center;color: #333;border-radius: .1875rem;cursor: pointer;   }
 
-
+/* 폼 전송 완료, 취소 버튼 */
 .button_submit { display: inline-block; width: 70px; height: 40px; line-height: 40px; background: #4b73eb; border: 1px solid #345bd0; border-radius: 3px; color: white; text-align: center; cursor: pointer; }
 .button_reset { display: inline-block; width: 70px; height: 40px; line-height: 40px; text-align: center; border: 1px solid #bbb; border-radius: 3px; cursor: pointer; }
 
@@ -82,44 +90,44 @@ input[type="text"] { font-size: 0.9em; }
 input[type="checkbox"]{cursor:pointer}
 input[type="checkbox"]+label{cursor:pointer}
 
-
+/* 라디오버튼 커스터마이징 */
 input[type="radio"] {position: absolute;width: 1px;height: 1px;padding: 0;margin: -1px;overflow: hidden;clip: rect(0, 0, 0, 0);border: 0;}
 input[type="radio"]+label {display: inline-block;position: relative;padding-left: 30px;cursor: pointer;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;}
-
+/* input[type="radio"]+label:before {content: '';position: absolute;left: 11px;top: 1px;width: 12px;height: 12px;text-align: center;background: 0;border: 1px solid #e0e0e0;border-radius: 100%;} */
 input[type="radio"]+label:before {content: '';position: absolute;left: 8px;top: -5px;width: 12px;height: 12px;text-align: center;background: 0;border: 1px solid #999999;border-radius: 100%;}
 input[type="radio"]+label:active:before,
 input[type="radio"]:checked+label:active:before { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px 1px 3px rgba(0, 0, 0, 0.1); }
 input[type="radio"]:checked+label:before { background: 0; border-color: #9e9e9e; }
-
+/* input[type="radio"]:checked+label:after {content: '';position: absolute;top: 5px;left: 15px;width: 6px;height: 6px;background: #ccc;border-radius: 100%;box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.3);} */
 input[type="radio"]:checked+label:after {content: '';position: absolute;top: -1px;left: 12px;width: 6px;height: 6px;background: #999999;border-radius: 100%;box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.3);}
+/* 라디오버튼 End */
 
-
-
+/* select_box */
 select{font-size:14px !important; border: 1px solid #c6c9d0;border-radius: .1875rem;background-color: #fff;}
 
-.w100{width:100px !important; max-width:100px !important;}
+.w100{width:100px !important; max-width:100px !important;}/*인풋창, 셀렉트박스 크기 조절 하실떄 class="w100" 넣으시고 , width: 값 조절하시면됩니다. !important 우선순위 가장높습니다.*/
 .w200{width:200px !important; max-width:200px !important;}
 .w300{width:300px !important; max-width:300px !important;}
 .w400{width:400px !important; max-width:400px !important;}
 		
-
+/* read only */
 input.readonly {background-color: #eee;}
 input:read-only {background-color: #eee;}
 input[readonly] {background-color: #eee;}
 input:-moz-read-only {background-color: #eee;}
 
 
-
+/* 레이어 팝업 오픈 시 바디 스크롤 히든 , 포지션 픽스, 커서 */
 .bhpf{ overflow:hidden;}
 .popup_title_box, .pop_title, .header_title{cursor: move;}
 
-
+/* 테이블 클릭시 색 변경 */
 .table_active { background: #4b73eb !important; color: #fff !important; }
 
-
+/* 테이블 호버 */
 tbody tr:hover { background: #f9f9f9; }
 
-
+/* 검색창 */
 .search_box { max-width: 1280px; width: 100%; padding: 37px 30px; margin-bottom: 25px; background: #fff; border: 1px solid #ccc; }
 .search_box span { display: inline-block; vertical-align: top; }
 
@@ -128,15 +136,15 @@ tbody tr:hover { background: #f9f9f9; }
 
 .search_box_wrap .search_txt { width: calc(100% - 55px); height: 28px; vertical-align: top; border: 1px solid #ccc; margin: 0 10px 5px 0; float: left; }
 
-
+/* 달력 */
 .calendar_bar { line-height: 28px; height: 28px; margin: 0 5px; }
 img.ui-datepicker-trigger {width:27px; cursor: pointer; margin-left: 5px; vertical-align: middle; -webkit-margin-after: 2px !important; margin-bottom: 2px; }
 
-
+/*하이라이트 마스크 박스*/
 div#maskBox > div{position:absolute;background:#000}
 div.maskLine{position:absolute;opacity:0.4;background: #ffffff url(../../images/border.gif);}
 
-
+/* daterangepicker */
 .daterangepicker .ranges li {
   color: #73879C; }
   .daterangepicker .ranges li.active, .daterangepicker .ranges li:hover {
@@ -251,7 +259,7 @@ div.maskLine{position:absolute;opacity:0.4;background: #ffffff url(../../images/
 }
 .daterangepicker.dropdown-menu{z-index:999999;}
 
-
+/* 가이드 상자 */
 .globalGuideBox {
     position: absolute;
     background-color: #fff;
@@ -297,7 +305,7 @@ div#globalGuideBoxSearchClose {position: fixed;}
     z-index: 7;
 }
 
-
+/* fontawesome color*/
 .fa-red{color:#ff5643;}
 .fa-blue{color:#4b73eb;}
 
@@ -307,7 +315,7 @@ div#globalGuideBoxSearchClose {position: fixed;}
     border-radius: .1875rem;
 }
 
-
+/* 정보 표시 프레임 */
 
 .descMainFrame {
     display: inline-block;
@@ -318,6 +326,7 @@ div#globalGuideBoxSearchClose {position: fixed;}
     border-bottom: 1px solid #ccc;
     float: left;
 }
+.descMainFrame.descFullFrame{height:auto;}
 .descLabelFrame {
     display: inline-block;
     width: 150px;
@@ -351,15 +360,17 @@ div#globalGuideBoxSearchClose {position: fixed;}
 .descHeaderLabelFrame {
     display: inline-block;
     width: 100%;
-    height: 100%;
+    height: 35px;
     font-weight: bold;
     float: left;
     padding-left: 10px;
     text-align: left;
     background-color: #f9f9f9;
+    border-bottom:1px solid #ccc;
 }
 .descBodyValueFrame {
     display: inline-block;
     width: 100%;
     min-height: 35px;
+    line-height: 2;
 }
