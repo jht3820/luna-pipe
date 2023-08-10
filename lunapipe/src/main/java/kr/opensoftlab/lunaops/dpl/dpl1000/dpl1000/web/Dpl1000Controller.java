@@ -365,6 +365,14 @@ public class Dpl1000Controller {
 			Map jobInfo = newJenkinsClient.getJobInfo(jenStatusVo, jobId);
 			
 			
+			if(jobInfo == null) {
+				newJenkinsClient.close(jenStatusVo);
+				model.addAttribute("errorYn", "Y");
+				model.addAttribute("message", "JOB 정보 조회 중 오류가 발생했습니다.");
+				return new ModelAndView("jsonView", model);
+			}
+			
+			
 			boolean isStartBuildable = (boolean) jobInfo.get("isStartBuildable");
 			
 			
@@ -464,15 +472,24 @@ public class Dpl1000Controller {
 			
 			
 			Map jobInfo = newJenkinsClient.getJobInfo(jenStatusVo, jobId);
+
+			
+			if(jobInfo == null) {
+				newJenkinsClient.close(jenStatusVo);
+				model.addAttribute("errorYn", "Y");
+				model.addAttribute("message", "JENKINS에서 해당 JOB을 찾을 수 없습니다.");
+				return new ModelAndView("jsonView", model);
+			}
 			
 			
 			boolean isBuilding = (boolean) jobInfo.get("isBuilding");
+			boolean isInQueue = (boolean) jobInfo.get("isInQueue");
 			
 			
 			Map bldInfo = null;
 			
 			
-			if(isBuilding) {
+			if(isBuilding || isInQueue) {
 				int bldNum = 0;
 				
 				if(targetBldNum == null) {
@@ -492,8 +509,10 @@ public class Dpl1000Controller {
 				
 				
 				String bldResultCd = null;
+				String bldResult = null;
 				if(bldInfo != null) {
 					bldResultCd = (String) bldInfo.get("bldResultCd");
+					bldResult = (String) bldInfo.get("bldResult");
 				}
 				
 				
@@ -523,6 +542,18 @@ public class Dpl1000Controller {
 							
 							
 							bldInfo = newJenkinsClient.getJobBldNumInfo(jenStatusVo, jobId, lastBuildNum);
+							
+							if(bldInfo != null) {
+								bldResultCd = (String) bldInfo.get("bldResultCd");
+								bldResult = (String) bldInfo.get("bldResult");
+								
+								
+								if("01".equals(bldResultCd) || "02".equals(bldResultCd)) {
+									
+									bldInfo.put("bldResultCd", bldResultCd);
+									bldInfo.put("bldResult", bldResult);
+								}
+							}
 						}
 					}
 				}
