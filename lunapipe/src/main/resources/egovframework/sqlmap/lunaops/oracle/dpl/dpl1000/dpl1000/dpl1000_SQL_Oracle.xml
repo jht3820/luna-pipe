@@ -264,7 +264,7 @@
 	
 	
 	<select id="dpl1000DAO.selectDpl1000DeployVerNormalList" parameterClass="java.util.Map" resultClass="egovMap">
-			
+			/* dpl1000DAO.selectDpl1000DeployVerNormalList - 	배포 계획 정보 일반 목록(No Page) 가져오기  */
 			SELECT 
 				T1.*
 			FROM ( 
@@ -274,7 +274,7 @@
 	
 	
 	<select id="dpl1000DAO.selectDpl1000DeployVerInfoList" parameterClass="dpl1000VO" resultMap="resultMapSelectDpl1000">
-			
+			/* dpl1000DAO.selectDpl1000DeployVerInfoList - 	배포 계획 정보 리스트 조회  */
 			SELECT 
 				T1.*
 			FROM ( 
@@ -285,7 +285,7 @@
 	
 	   
     <select id="dpl1000DAO.selectDpl1000ListCnt" parameterClass="dpl1000VO"  resultClass="java.lang.Integer">
-	    
+	    /*dpl1000DAO.selectDpl1000ListCnt 배포 계획 정보 리스트 총건수를 조회한다.*/
 	    SELECT
 			COUNT(*)
 		FROM	(
@@ -296,7 +296,7 @@
 	
 	<select id="dpl1000DAO.selectDpl1000DeployVerInfo" parameterClass="java.util.Map" resultClass="egovMap">
 		<![CDATA[ 
-			
+			/* dpl1000DAO.selectDpl1000DeployVerInfo - 	배포 계획 단일 정보 가져오기  */
 			SELECT 
 			T1.*
 			FROM (
@@ -311,13 +311,13 @@
 	
 	
 	<select id="dpl1000DAO.selectDpl1100DeployJobList" parameterClass="java.util.Map" resultClass="egovMap">
-			
+			/* dpl1000DAO.selectDpl1100DeployJobList - 	배포 계획 배정 JOB 목록 가져오기  */
 			<include refid="dpl1000DAO.selectDpl1100JobList"/>
 	</select>
 	
 	
 	<select id="dpl1000DAO.selectDpl1100dplJobGridList" parameterClass="dpl1100VO" resultMap="resultMapSelectDpl1100">
-			
+			/* dpl1000DAO.selectDpl1100dplJobGridList - 배포 계획 배정 JOB 목록 가져오기  */
 			SELECT 
 				T1.*
 			FROM ( 
@@ -328,7 +328,7 @@
 	
 	   
     <select id="dpl1000DAO.selectDpl1100dplJobGridListCnt" parameterClass="dpl1100VO"  resultClass="java.lang.Integer">
-	    
+	    /* dpl1000DAO.selectDpl1100dplJobGridListCnt 배포 계획 배정 JOB 목록 리스트 총건수*/
 	    SELECT
 			COUNT(*)
 		FROM	(
@@ -340,7 +340,7 @@
 	<insert id="dpl1000DAO.insertDpl1000DeployVerInfo" parameterClass="java.util.Map">
 		<selectKey resultClass="java.lang.String" keyProperty="newDplId">
 		<![CDATA[
-			 
+			/* dpl1000DAO.insertDpl100DeployVerInfo - 배포 계획 ID 발급 */ 
 			SELECT   NVL(
                 SUBSTR(NEW_DPL_ID, 1, 11) || LPAD( (TO_NUMBER(SUBSTR(NEW_DPL_ID, 12, 5)) + 1) , 5, '0')
             ,   'DPL' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '00001'
@@ -356,7 +356,7 @@
 		]]>
 		</selectKey>
 		<![CDATA[ 
-			
+			/* dpl1000DAO.insertDpl100DeployVerInfo - 배포 계획 생성 정보 등록  */
 			INSERT INTO DPL1000
 			(
 				CI_ID					,TICKET_ID						,DPL_ID
@@ -381,7 +381,7 @@
 	
 	
 	<update id="dpl1000DAO.deleteDpl1000DeployVerInfo" parameterClass="java.util.Map" >
-			
+			/* dpl1000DAO.deleteDpl100DeployVerInfo - 배포 계획 정보 삭제  */
 			UPDATE DPL1000 A
 				SET	A.DPL_DEL_CD = '01'
         	WHERE	1=1
@@ -392,7 +392,7 @@
 
 	
 	<update id="dpl1000DAO.updateDpl1000DeployVerInfo" parameterClass="java.util.Map">
-		
+		/* dpl1000DAO.updateDpl1000DeployVerInfo - 배포 계획 정보 수정 */
 		UPDATE DPL1000
 		SET    DPL_NM 			= #dplNm#		 
 			 , DPL_VER			= #dplVer#
@@ -416,7 +416,7 @@
 
 	
 	<update id="dpl1000DAO.updateDpl1000DplStsCdInfo" parameterClass="java.util.Map">
-		
+		/* dpl1000DAO.updateDpl1000DplStsCdInfo - 배포 계획 배포 상태 수정 */
 		UPDATE DPL1000
 		SET    
 			  DPL_STS_CD		= #dplStsCd#
@@ -430,7 +430,7 @@
 	</update>
 	
 	<select id="dpl1000DAO.selectDpl1000ExcelList" parameterClass="dpl1000VO" resultClass="egovMap">
-		
+		/*dpl1000DAO.selectDpl1000ExcelList 요구사항 엑셀목록을 조회한다.*/
 		<include refid="dpl1000DAO.selectDpl1000BaseList"/>		
 	</select>
 
@@ -468,7 +468,7 @@
 	</sql>
 	
 	<select id="dpl1000DAO.selectDpl1000BuildInfoList" parameterClass="dpl1000VO" resultMap="resultMapSelectDpl1000">
-			
+			/* dpl1000DAO.selectDpl1000BuildLInfoList - 	배포 계획 정보 리스트 조회  */
 			SELECT 
 				A.*
 			FROM ( 
@@ -479,7 +479,7 @@
 	
 	   
     <select id="dpl1000DAO.selectDpl1000BuildInfoListCnt" parameterClass="dpl1000VO"  resultClass="java.lang.Integer">
-	    
+	    /*dpl1000DAO.selectDpl1000BuildLInfoListCnt 배포 계획 정보 리스트 총건수를 조회한다.*/
 	    SELECT
 			COUNT(*)
 		FROM	(
@@ -490,7 +490,7 @@
 	
 	<insert id="dpl1000DAO.insertDpl1100DeployJobInfo" parameterClass="java.util.Map">
 		<![CDATA[ 
-			
+			/* dpl1000DAO.insertDpl1100DeployJobInfo - 배포 JOB 등록  */
 			INSERT INTO DPL1100
 			(
 				CI_ID			,TICKET_ID				,DPL_ID
@@ -511,15 +511,16 @@
 	
 	
 	<delete id="dpl1000DAO.deleteDpl1100DplJobList" parameterClass="java.util.Map">
-		
-		DELETE FROM	DPL1100 A
+		/* dpl1000DAO.deleteDpl1100DplJobList - 배포계획에 등록된 Job 삭제  */
+		DELETE FROM	DPL1100
 		WHERE	1=1
-			AND	DPL_ID = #dplId# 
+			AND JEN_ID = #jenId#
+			AND JOB_ID = #jobId# 
 	</delete>
 	
 	
 	<select id="dpl1000DAO.selectDpl1101JenParameterList" parameterClass="java.util.Map" resultClass="egovMap">
-			
+			/* dpl1000DAO.selectDpl1101JenParameterList - 	빌드 파라미터 조회  */
 			SELECT 
 				T1.*
 			FROM ( 
@@ -530,7 +531,7 @@
 	
 	<insert id="dpl1000DAO.insertDpl1101ParameterInfo" parameterClass="java.util.Map">
 		<![CDATA[ 
-			
+			/* dpl1000DAO.insertDpl1101ParameterInfo - 빌드 파라미터 등록  */
 			INSERT INTO DPL1101
 	        (
 	        	CI_ID					,TICKET_ID
@@ -549,22 +550,28 @@
 	</insert>
 	
 	
-	<update id="dpl1000DAO.deleteDpl1101ParameterInfo" parameterClass="java.util.Map" >
-			
-			DELETE FROM DPL1101
-        	WHERE	1=1
+	<delete id="dpl1000DAO.deleteDpl1101ParameterInfo" parameterClass="java.util.Map" >
+		/* dpl1000DAO.deleteDpl1101ParameterInfo - 빌드 파라미터 정보 삭제  */
+		DELETE FROM DPL1101
+       	WHERE	1=1
+       	<isNotEmpty property="ciId">
         	AND		CI_ID = #ciId#
-        	AND		TICKET_ID = #tocketId#
+       	</isNotEmpty>
+       	<isNotEmpty property="ticketId">
+        	AND		TICKET_ID = #ticketId#
+       	</isNotEmpty>
+       	<isNotEmpty property="dplId">
         	AND		DPL_ID = #dplId#
-        	AND		JEN_ID = #jenId#
-        	AND		JOB_ID = #jobId#
-	</update>
+       	</isNotEmpty>
+       	AND		JEN_ID = #jenId#
+       	AND		JOB_ID = #jobId#
+	</delete>
 	 
 	
 	
 	<select id="dpl1000DAO.selectDpl1200DplJobBuildInfo" parameterClass="java.util.Map" resultMap="resultMapSelectDpl1200">
 		<![CDATA[
-			
+			/* dpl1000DAO.selectDpl1200DplJobBuildInfo - 	배포 계획에 배정된 JOB에 해당하는 배포 실행 이력 조회  */
 			SELECT
 				A.DPL_ID
 				,SF_DPL1000_DPL_INFO(A.DPL_ID,'1') AS DPL_NM
@@ -594,7 +601,7 @@
                    WHERE 1=1
                    AND Y.BLD_SEQ = (
                                SELECT
-                                             BLD_SEQ
+                                           /*+ INDEX_DESC (Z PK_DPL1200 ) */  BLD_SEQ
                                  FROM
                                            DPL1200 Z
                                   WHERE 	1=1
@@ -610,7 +617,7 @@
 				AND A.JOB_ID = #jobId#
 				AND A.BLD_SEQ = (
                			SELECT 
-					            	  BLD_SEQ
+					            	/*+ INDEX_DESC (Z PK_DPL1200 ) */  BLD_SEQ
 					      FROM 
 					      			DPL1200 Z 
 						   WHERE 	1=1
@@ -625,7 +632,7 @@
 	
 	<select id="dpl1000DAO.selectDpl1200DplSelBuildInfoAjax" parameterClass="java.util.Map" resultMap="resultMapSelectDpl1200">
 		<![CDATA[
-			
+			/* dpl1000DAO.selectDpl1200DplSelBuildInfoAjax - 배포 실행 이력 단건 조회  */
 			SELECT
 					A.DPL_ID
 					,SF_DPL1000_DPL_INFO(A.DPL_ID,'1') AS DPL_NM
@@ -660,7 +667,7 @@
 	
     <select id="dpl1000DAO.selectDpl1000DplHistoryList" parameterClass="java.util.Map" resultClass="egovMap">
 		<![CDATA[
-			
+			/* dpl1000DAO.selectDpl1000DplHistoryList - 배포 계획 실행,수정이력  */
 				SELECT *
 				FROM
 				(
@@ -686,7 +693,7 @@
 	
     
     <select id="dpl1000DAO.selectDpl1200DplBldNumList" parameterClass="java.util.Map" resultClass="egovMap">
-		
+		/* dpl1000DAO.selectDpl1200DplBldNumList - Job 빌드 목록 조회 */
 		SELECT *
 		FROM
 		(
@@ -724,14 +731,14 @@
 		) T2
 		WHERE 1=1
 		<![CDATA[
-		AND RN <= 100 
+		AND RN <= 100 /* 100건까지 */
 		]]>
 	</select>
 	
 	
 	<select id="dpl1000DAO.selectDpl1000AllDplList" parameterClass="java.util.Map" resultClass="egovMap">
 		<![CDATA[
-			 
+			/* dpl1000DAO.selectDpl1000AllDplList - 모든 배포계획 자동배포 목록 가져오기 */ 
 			SELECT *
 			FROM (
 				SELECT
@@ -770,7 +777,7 @@
 	
 	<insert id="dpl1000DAO.insertDpl1201DeployBuildChgLogInfo" parameterClass="ChangeVO">
 		<![CDATA[ 
-			
+			/* dpl1000DAO.insertDpl1201DeployBuildChgLogInfo - 배포 실행 변경 정보 등록  */
 			INSERT INTO DPL1201
 			(
 				DPL_ID						,JEN_ID					,JOB_ID
@@ -792,7 +799,7 @@
 	
 	<insert id="dpl1000DAO.insertDpl1201DeployBuildChgPathLogInfo" parameterClass="ChangePathsVO">
 		<![CDATA[ 
-			
+			/* dpl1000DAO.insertDpl1201DeployBuildChgPathLogInfo - 배포 변경 파일 정보 등록  */
 			INSERT INTO DPL1202
 			(
 				DPL_ID						,JEN_ID					,JOB_ID
@@ -812,7 +819,7 @@
 	
 	<select id="dpl1000DAO.selectDpl1201SvnChangeLogsList" parameterClass="java.util.Map" resultClass="egovMap">
 		<![CDATA[
-			
+			/* dpl1000DAO.selectDpl1201SvnChangeLogsList - 배포 실행 변경 정보 목록 조회  */
 			SELECT 
 				A.DPL_ID
 				, A.JEN_ID
@@ -842,7 +849,7 @@
 	
 	<select id="dpl1000DAO.selectDpl1202SvnChangePathList" parameterClass="java.util.Map" resultClass="egovMap">
 		<![CDATA[
-			
+			/* dpl1000DAO.selectDpl1202SvnChangePathList - 배포 변경 파일 목록 조회  */
 			SELECT 
 				A.DPL_ID
 				, A.JEN_ID
@@ -870,7 +877,7 @@
 	
 	<select id="dpl1000DAO.selectDpl1200DplNoneResultList" parameterClass="java.util.Map" resultClass="egovMap">
 		<![CDATA[
-			
+			/* dpl1000DAO.selectDpl1200DplNoneResultList - 완료되지않은 배포 실행 이력 조회  */
 			SELECT
 				Z.DPL_ID
 				,Z.JEN_ID
@@ -887,7 +894,7 @@
 				AND Y.BLD_SEQ =
 				(
 					SELECT
-					  BLD_SEQ
+					/*+ INDEX_DESC (Z PK_DPL1200 ) */  BLD_SEQ
 					FROM DPL1200 Z
 					WHERE 	1=1
 					AND Z.DPL_ID = Y.DPL_ID 
@@ -905,7 +912,7 @@
 	
 	<insert id="dpl1000DAO.insertDpl1102DplBuildInfo" parameterClass="BuildVO">
 		<![CDATA[ 
-			
+			/* dpl1000DAO.insertDpl1102DplBuildInfo - 배포 계획 실행 정보 등록  */
 			INSERT INTO DPL1102
 			(
 				CI_ID					,TICKET_ID					,JEN_ID					
@@ -921,4 +928,22 @@
 			)
 		]]>
 	</insert>
+	
+	
+	<delete id="dpl1000DAO.deleteDpl1102DplActionInfo" parameterClass="java.util.Map" >
+		/* dpl1000DAO.deleteDpl1102DplActionInfo - 배포 계획 실행 정보 삭제  */
+		DELETE FROM DPL1102
+       	WHERE	1=1
+       	<isNotEmpty property="ciId">
+        	AND		CI_ID = #ciId#
+       	</isNotEmpty>
+       	<isNotEmpty property="ticketId">
+        	AND		TICKET_ID = #ticketId#
+       	</isNotEmpty>
+       	<isNotEmpty property="dplId">
+        	AND		DPL_ID = #dplId#
+       	</isNotEmpty>
+       	AND		JEN_ID = #jenId#
+       	AND		JOB_ID = #jobId#
+	</delete>
 </sqlMap>

@@ -1,16 +1,16 @@
 @charset "UTF-8";
 
-
+/* dpl1000*/
 .main_frame { width: 100%; height: auto; margin-top: 10px; float:left; overflow: hidden; }
 .main_frame.bottomJobInfoFrame {position: relative;}
-#bottomJobInfoFrame{height: 360px;}
+#bottomJobInfoFrame{height: 400px;}
 .frame_contents { display: inline-block; width: 1500px; height: auto; padding: 10px; background: #fff; border-radius: 3px; border: 1px solid #ccc; }
 .frame_contents.left { width : 670px;float: left;}
 .frame_contents.right { width : 770px;float: right;}
 .jobDetailInfoFrame {
     display: inline-block;
     width: 100%;
-    height: 300px;
+    height: 340px;
     overflow-y: scroll;
     border: 1px solid #ccc;
 }
@@ -46,9 +46,12 @@
     padding-top: 5%;
 }
 .jobMaskFrame .pop_dpl_sign_frame{margin-top: 0%;font-size: 10pt;color:#000;}
-.result-success {color: #4b73eb;}
-.result-failure,.result-fail {color: #ff5643;}
-.result-aborted {color: #fba450;}
+
+.result-03 {color: #4b73eb;}
+.result-04,.result-10 {color: #ff5643;}
+.result-05 {color: #fba450;}
+.result-etc {color: brown;}
+
 .frame_contents.left.full_screen {
     position: absolute;
     top: 0;
@@ -124,12 +127,12 @@ span.buildFileChgLog {
     font-weight: normal;
 }
 span.buildFileChgLog.fa.edit::before {content: '\f044';margin-right: 5px;}
-span.buildFileChgLog.fa.add::before {content: '\f055';margin-right: 5px;}
-span.buildFileChgLog.fa.remove::before {content: '\f2ed';margin-right: 5px;}
+span.buildFileChgLog.fa.add::before {content: '\f067';margin-right: 5px;font-weight: 900;}
+span.buildFileChgLog.fa.delete::before {content: '\f2ed';margin-right: 5px;}
 
 
 
-
+/* dpl1100 */
 .dpl_title { font-size: 2em; font-weight: bold; margin-bottom: 30px; }
 .version_select{width:100%; margin-bottom:10px; display:inline-block;}
 .version_select select{max-width:1200px;}
@@ -141,15 +144,23 @@ span.buildFileChgLog.fa.remove::before {content: '\f2ed';margin-right: 5px;}
 .dpl_table_dpl1100.white{font-size: 0.75em; }
 .dpl_table_dpl1100.white table td{ height:40px; text-align: center; vertical-align: middle;  }
 .dpl_table_dpl1100.white table tbody tr{ background:#fff; }
-
+/*
+.arrow_wrap{width:100%; max-width:1200px; text-align:center; float:left; margin:20px 0px;}
+.arrow_wrap img.up{margin-right:10px; cursor:pointer;}
+.arrow_wrap img.down{cursor:pointer;}
+*/
 .middle_table { display: inline-flex; width: 100%; height: 10%; padding: 24px; }
 	.up, .down { background: #fff; }
 
-
+/* dpl2000 */
 .mb10 { margin-bottom: 10px; }
 .mb20 { margin-bottom: 20px; }
 
-
+/* 
+ * .dpl_title
+ *    - 화면 사이즈 변경에 관계없이 타이틀 부분 사이즈 고정
+ *	  - min-width: 1280px; 추가
+ */
 .dpl_title { font-size: 2em; font-weight: bold; margin-bottom: 30px; width: 100%; min-width: 1280px;}
 
 .insert_box { max-width: 1280px; width: 100%; padding: 15px 30px; margin-bottom: 25px; background: #fff; border: 1px solid #ccc; height: 100px; }
@@ -177,7 +188,7 @@ span.buildFileChgLog.fa.remove::before {content: '\f2ed';margin-right: 5px;}
 	.dpl_left_table_wrap { width: 73.5%; float: left; margin-right: 2%; }
 	.dpl_right_table_wrap { width: 24.5%; float: left; background-color: #fff; border: 1px solid #4badeb; border-radius: 5px; }
 	
-	
+	/* dpl_table */
 	.dpl_table { float: left; width: 100%; table-layout: fixed; word-break: break-all; border: 1px solid #ccc; }
 	.dpl_table table { width: 100%; float: left; overflow: hidden; }
 		.dpl_thead { font-size: 0.75em; height: 45px; color: #fff; background: #4b73eb; vertical-align: middle; border-bottom: 1px solid #6f8fef; }
@@ -195,9 +206,9 @@ span.buildFileChgLog.fa.remove::before {content: '\f2ed';margin-right: 5px;}
 			.next_box { display: inline-block; }
 			.page_num { display: inline-block; }
 			.direction_num.active { border: 1px solid #cccccc; color: #fd0303; font-weight: bold; }
+	/*dpl_table*/
 	
-	
-	
+	/* dpl_right_box */
 	.dpl_right_box { width: 100%; }
 		.dpl_right_topheader { width: 100%; padding: 27px 22px; border-bottom: 1px solid #ddd; }
 			.dpl_right_header_title { line-height: 1.5; font-size: 0.75em;}
@@ -220,15 +231,51 @@ span.buildFileChgLog.fa.remove::before {content: '\f2ed';margin-right: 5px;}
 			.comment_date { font-size: 0.8em; color: #999; }
 			.comment_contents { font-size: 0.95em; color: #666; margin-top: 5px; line-height: 16px; white-space:normal; word-break: break-word; }
 		
-		
-	
-	
+	/*dpl_right_box*/	
+	/* 반응형 속성 제거 */
+	/*
+	@media screen and (max-width:1100px){
+		.search_box {}
+		.dpl_left_table_wrap { width: 100%; margin-bottom: 20px; }
+		.dpl_right_table_wrap {width: 100%; border: 1px solid #4badeb; }
+		.dpl_right_box { margin-top: 0px; background-color: #fff; }
+		.r_r_c_left { width: 21%; }
+		.r_r_c_right { width: 79%; }	
+	}
+	*/
 	.search_popup { display: none; position: absolute; top: 50px; height: 100%; }
-	
-	
+	/* 반응형 속성 제거 */
+	/*
+	.main_mobile { display: none; }					// 모바일화면
+	@media screen and (max-width:640px){	
+		.main_pc { display: none; }						// pc, 태블릿 화면 
+		.main_mobile { display: block; }				// 모바일화면 
+		.main_contents { padding: 0; }
+		.search_btn { display: inline-block; position: absolute; right: 16px; top: 0; height: 50px; line-height: 50px; cursor: pointer; }
+		.search_wrap { height: 40px; line-height: 40px; border-bottom: 1px solid #ccc; }
+		.search_wrap select { width: calc(100% - 50px); border: none; height: 100%; float: left; }
+		.search_wrap .button_normal2 {float: left; width: 50px; height: 100%; vertical-align: top; line-height: 40px; border: none; border-left: 1px solid #ccc; box-sizing: border-box; font-size: 12px; }
+		.search_wrap .sod_select:after { bottom: 15px; }
+		.m_dpl_list { border-bottom: 1px solid #ccc; background: #f9f9f9; box-sizing: border-box; padding: 15px; font-size: 11px; }
+		.grouping { font-size: 16px; }
+		.m_dpl_left { display: table-cell; width: 80%; line-height: 20px; }
+		.m_dpl_right { display: table-cell; height: 100%; font-size: 11px; font-weight: bold; vertical-align: middle; text-align: right; }
+		.table_between { margin: 0 5px; }
+		.m_dpl_right[data="1"] { color: #4DBAC0; }
+		.m_dpl_right[data="2"] { color: #FDBA00; }
+		.main_mobile .dpl_right_table_wrap { display:none; position: absolute; top: 50px; border: none; }
+		.x_btn { float: right; cursor: pointer; }
+		
+		.search_popup { text-align: center; width: 100%; background: #fff; }
+		.search_popup_title { height: 50px; font-size: 16px; border-bottom: 1px solid #ccc; width: 100%; padding: 16px; }
+		.search_dpluire { background: #f9f9f9; padding: 16px; border-bottom: 1px solid #ccc; }
+		.require_list { margin-bottom: 8px; border: 1px solid #ccc; width: 100%; height: 28px; }
+		.require_input { width: calc(100% - 50px);margin-right: 6px; height: 28px; border: 1px solid #ccc; }
+	}
+	*/
+/*dp2000 버전 별 요구사항 확인*/
 
-
-
+/* dpl1001 배포 계획 생성 */
 .pop_dpl_div_sub.div_sub_left{width:400px;width:35%;display:inline-block;float:left;margin-right: 10px;height: 733px;}
 .pop_dpl_div_sub.div_sub_right{width:750px;width:64%;display:inline-block;float:left;height: 733px;}
 .pop_dpl_div_sub {
@@ -238,11 +285,11 @@ span.buildFileChgLog.fa.remove::before {content: '\f2ed';margin-right: 5px;}
     padding: 5px;
     border-radius: 1px;
 }
-
+/* 배포 리비전 번호 */
 input[type=text].dpl1001_revision{width: 230px !important;}
 
-
-
+/* 배포 리비전 번호 초기화 버튼 */
+/* 배포계획 생성 팝업의 배포자, 결재자 부분 - IE에서 input 사이즈 유지하기 위해 important로 처리 */
 input[type=text].dpl1001_charger{width:230px !important;}
 span.dpl1001_revision, span.dpl1001_charger {
     height: 34px;
@@ -263,7 +310,11 @@ span.dpl1001_revision, span.dpl1001_charger {
     float: left;
     border-bottom: 1px solid #ccc;
 }
-
+/* 
+.dpl_middle_row:first-child {
+    border-top: 1px solid #ccc;
+}
+ */
 .dpl_middle_cell {
     display: inline-block;
     float: left;
@@ -301,7 +352,7 @@ span.dpl1001_revision, span.dpl1001_charger {
     height: 629px;
     overflow-y: scroll;
     overflow-x: hidden;
-    
+    /* padding: 2px 0; */
 }
 .dpl_job_row {
     cursor: grab;
@@ -357,11 +408,11 @@ span.dpl1001_revision, span.dpl1001_charger {
 }
 .usrImgClass{width:60px;height:60px;}
 
-
-
+/* dpl1100 */
+/* 배포 계획 요구사항 배정 - 배정,제외 버튼 영역 */
 .dpl_middle_wrap{ display: inline-flex; width: 100%; height: 15%; padding: 0 0 15px 0;}
 
-
+/* dpl3000 */
 
 .sub_title_btn {
     position: absolute;
@@ -382,7 +433,7 @@ span.dpl1001_revision, span.dpl1001_charger {
 div#contentsFrame {
     background: #23241f;
     color: #f8f8f2;
-    height: 300px;
+    height: 340px;
     display: inline-block;
     width: 100%;
     text-align: left;
@@ -416,7 +467,7 @@ button.logBtnActive, .AXButton:focus {
     line-height: 20px;
 }
 
-
+/* dpl4000 배포계획 통합 정보 */
 .top_contents{width:100%;}
 .bottom_contents{width:100%; margin-top: 20px; position:relative; overflow: hidden;}
 .bottom_contents > div {width: 49%; display: inline-block;}
