@@ -231,4 +231,28 @@ public class Jen1000DAO extends ComOslitsAbstractDAO {
 	public int updateJen1200DeployJobBuildLogInfo(BuildVO buildVo)  throws Exception{
 		return update("jen1000DAO.updateJen1200DeployJobBuildLogInfo", buildVo);
 	}
+
+	
+	@SuppressWarnings("rawtypes")
+	public void deleteJen1200DeployJobBuildLogList(Map paramMap) throws Exception {
+		delete("jen1000DAO.deleteJen1200DeployJobBuildLogList", paramMap);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	public void deleteJen1201DeployJobBuildChgLogList(Map paramMap) throws Exception {
+		delete("jen1000DAO.deleteJen1201DeployJobBuildChgLogList", paramMap);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	public void deleteJen1202DeployJobBuildFileChgLogList(Map paramMap) throws Exception {
+		delete("jen1000DAO.deleteJen1202DeployJobBuildFileChgLogList", paramMap);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	public void deleteJen1203DeployJobBuildParamList(Map paramMap) throws Exception {
+		delete("jen1000DAO.deleteJen1203DeployJobBuildParamList", paramMap);
+	}
 }
