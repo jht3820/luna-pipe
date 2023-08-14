@@ -536,6 +536,11 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	}
 
 	
+	@SuppressWarnings("rawtypes")
+	public int selectJen1200DeployJobBuildLogCnt(BuildVO buildVo) throws Exception {
+		return jen1000DAO.selectJen1200DeployJobBuildLogCnt(buildVo);
+	}
+	
 	public String insertJen1200DeployJobBuildLogInfo(BuildVO buildVo) throws Exception {
 		return jen1000DAO.insertJen1200DeployJobBuildLogInfo(buildVo);
 	}
