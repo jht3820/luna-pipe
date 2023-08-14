@@ -34,6 +34,8 @@ import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1000VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1100VO;
 import kr.opensoftlab.sdf.jenkins.NewJenkinsClient;
+import kr.opensoftlab.sdf.jenkins.task.JobBuildTask;
+import kr.opensoftlab.sdf.jenkins.vo.BldTaskListVO;
 import kr.opensoftlab.sdf.jenkins.vo.JenStatusVO;
 import kr.opensoftlab.sdf.util.CommonScrty;
 import kr.opensoftlab.sdf.util.OslAgileConstant;
@@ -275,6 +277,24 @@ public class Jen1000Controller {
 	
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1004JobDetailView.do")
 	public String selectJen1004JenkinsDetailView( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try {
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			String jenId = (String) paramMap.get("jenId");
+			String jobId = (String) paramMap.get("jobId");
+			
+			System.out.println("#######################");
+			System.out.println(BldTaskListVO.getTaskMap(jenId, jobId));
+			if(BldTaskListVO.getTaskMap(jenId, jobId) != null) {
+				
+			}
+			
+			
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
 		return "/jen/jen1000/jen1000/jen1004";
 	}
 	
@@ -689,15 +709,6 @@ public class Jen1000Controller {
 			
 			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
 			
-			
-			String nowJobTok = (String)paramMap.get("nowJobTok");
-			
-			
-			String jobTok = (String)paramMap.get("jobTok");
-			
-			
-			String newJobTok = "";
-			
 			JenStatusVO jenStatusVo = null;
 			try{
 				String jenUrl=(String)paramMap.get("jenUrl");
@@ -725,31 +736,6 @@ public class Jen1000Controller {
 					newJenkinsClient.close(jenStatusVo);
 					model.addAttribute("MSG_CD", JENKINS_FAIL);
 					model.addAttribute("message", jenStatusVo.getErrorMsg());
-					return new ModelAndView("jsonView");
-				}
-				
-				
-				String settingJobTok = newJenkinsClient.getJobTokenValue(jenStatusVo, jobFullPath);
-				
-				
-				String deJobTok = jobTok;
-				
-				
-				if(nowJobTok.equals(jobTok)){
-					
-					deJobTok = CommonScrty.decryptedAria(jobTok, salt);
-				}
-				
-				if(deJobTok == null || "".equals(deJobTok)){
-					newJenkinsClient.close(jenStatusVo);
-					model.addAttribute("MSG_CD", "JOB TOKEN 값이 없습니다.");
-					return new ModelAndView("jsonView");
-				}
-				
-				
-				if(!deJobTok.equals(settingJobTok)){
-					newJenkinsClient.close(jenStatusVo);
-					model.addAttribute("MSG_CD", "JOB TOKEN KEY값을 확인해주세요.");
 					return new ModelAndView("jsonView");
 				}
 				
@@ -795,27 +781,6 @@ public class Jen1000Controller {
 				
 				return new ModelAndView("jsonView");
 			}
-			
-			
-			if("update".equals(type)){
-				
-				if(!nowJobTok.equals(jobTok)){
-					
-					newJobTok = CommonScrty.encryptedAria(jobTok, salt);
-				}else{
-					newJobTok = jobTok;
-				}
-			}
-			
-			else{
-				newJobTok = CommonScrty.encryptedAria(jobTok, salt);
-			}
-			
-			
-			paramMap.remove("jobTok");
-			
-			
-			paramMap.put("jobTok", newJobTok);
 			
 			
 			jen1000Service.saveJen1000JobInfo(paramMap);
@@ -963,27 +928,18 @@ public class Jen1000Controller {
 			
 			String jenUsrId=(String)jobMap.get("jenUsrId");
 			String jenUsrTok=(String)jobMap.get("jenUsrTok");
-			String jobTok=(String)jobMap.get("jobTok");
 			String jenUrl=(String)jobMap.get("jenUrl");
 			String jobId=(String)jobMap.get("jobId");
-
-			
-			String jobFullPath = UrlUtils.toFullJobPath(jobId);
 			
 			
 			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
 			
 			
 			String deJenUsrTok = CommonScrty.decryptedAria(jenUsrTok, salt);
-			String deJobTok = CommonScrty.decryptedAria(jobTok, salt);
 			
 			
 			if(deJenUsrTok == null || "".equals(deJenUsrTok)){
 				model.addAttribute("MSG_CD", JENKINS_SETTING_WORNING);
-				return new ModelAndView("jsonView");
-			}
-			if(deJobTok == null || "".equals(deJobTok)){
-				model.addAttribute("MSG_CD", "JOB TOKEN 값이 없습니다.");
 				return new ModelAndView("jsonView");
 			}
 			
@@ -996,18 +952,17 @@ public class Jen1000Controller {
 				model.addAttribute("message", jenStatusVo.getErrorMsg());
 				return new ModelAndView("jsonView");
 			}
+
 			
-			String settingJobTok = newJenkinsClient.getJobTokenValue(jenStatusVo, jobFullPath);
+			Map jobInfo = newJenkinsClient.getJobInfo(jenStatusVo, jobId);
+			
+			if(jobInfo == null) {
+				model.addAttribute("MSG_CD", "JOB 정보를 찾을 수 없습니다.");
+				return new ModelAndView("jsonView");
+			}
 			
 			
 			newJenkinsClient.close(jenStatusVo);
-			
-			
-			if(!deJobTok.equals(settingJobTok)){
-				model.addAttribute("MSG_CD", "JOB TOKEN KEY값을 확인해주세요.");
-				
-				return new ModelAndView("jsonView");
-			}
 			
 			model.addAttribute("MSG_CD", JENKINS_OK);
 			
