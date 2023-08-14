@@ -223,6 +223,11 @@ public class Jen1000DAO extends ComOslitsAbstractDAO {
 	}
 
 	
+	public int selectJen1200DeployJobBuildLogCnt(BuildVO buildVo) throws Exception {
+		return (Integer) select("jen1000DAO.selectJen1200DeployJobBuildLogCnt", buildVo);
+	}
+	
+	
 	public String insertJen1200DeployJobBuildLogInfo(BuildVO buildVo) throws Exception {
 		return (String) insert("jen1000DAO.insertJen1200DeployJobBuildLogInfo", buildVo);
 	}

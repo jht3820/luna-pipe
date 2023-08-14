@@ -377,6 +377,8 @@ function fnSelJobBuildInfo(paramBldItem){
 					//actionlog 줄바꿈
 					if(!gfnIsNull(bldActionLog)){
 						bldActionLog = bldActionLog.replace(/\n/g,"</br>");
+					}else{
+						bldActionLog = "";
 					}
 					
 				}catch(e){
@@ -410,13 +412,23 @@ function fnSelJobBuildInfo(paramBldItem){
 						
 						//변경 내용 세팅
 						$.each(jobBuildChgList, function(idx, map){
+							//변경 내용
+							var chgMsg = map.chgMsg;
+							
+							//변경 내용 있는 경우 줄바꿈처리
+							if(!gfnIsNull(chgMsg)){
+								chgMsg = chgMsg.replace(/\n/g,"</br>")
+							}else{
+								chgMsg = "";
+							}
+							
 							//빌드 변경 파일 내용
 							var buildChgFileStr = "";
 							//빌드 내용 세팅
 							buildChgLogStr += 
 								'<div class="buildChgMainFrame">'
 									+'<div class="buildChgHeader"><b>'+map.chgRevision+'</b> - '+map.chgUser+' ('+(new Date(parseInt(map.chgTimestamp)).format("yyyy-MM-dd HH:mm:ss"))+') </div>'
-									+'<div class="buildChgBody">'+(map.chgMsg).replace(/\n/g,"</br>")+'</div>'
+									+'<div class="buildChgBody">'+chgMsg+'</div>'
 							
 							//변경된 파일 내용 있는지 체크
 							if(jobLastBuildFileChgMap.hasOwnProperty(map.bldNum) && jobLastBuildFileChgMap[map.bldNum].hasOwnProperty(map.chgRevision)){
@@ -457,7 +469,7 @@ function fnSelJobBuildInfo(paramBldItem){
 		$("form#jen1004JobInfoForm #buildDurationStr").text(buildDurationStr);
 		$("form#jen1004JobInfoForm #buildEstimatedDurationStr").text(buildEstimatedDurationStr);
 		$("form#jen1004JobInfoForm #buildChgLog").html(buildChgLog);
-		$("form#jen1004JobInfoForm #bldActionLog").html(bldActionLog);
+		//$("form#jen1004JobInfoForm #bldActionLog").html(bldActionLog);
 		
 		//console 세팅
 		$("#jen1004BuildJobConsoleLog").html(buildConsoleLog);
@@ -623,10 +635,12 @@ function fnJen1004GuideShow(){
 					<div class="descHeaderLabelFrame"><label>변경 내용</label></div>
 					<div class="descBodyValueFrame" id="buildChgLog"><div class="buildChgMainFrame">-</div></div>
 				</div>
+				<!-- 
 				<div class="descMainFrame descFullFrame">
 					<div class="descHeaderLabelFrame"><label>빌드 로그</label></div>
 					<div class="descBodyValueFrame" id="bldActionLog"></div>
 				</div>
+				 -->
 				</form>
 			</div>
 		</div>
