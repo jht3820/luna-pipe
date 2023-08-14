@@ -21,6 +21,8 @@ import com.offbytwo.jenkins.model.BuildWithDetails;
 import egovframework.com.cmm.service.EgovProperties;
 import egovframework.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import kr.opensoftlab.lunaops.com.exception.UserDefineException;
+import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.service.Dpl1000Service;
+import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.service.impl.Dpl1000DAO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1000VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1100VO;
@@ -37,6 +39,10 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	
     @Resource(name="jen1000DAO")
     private Jen1000DAO jen1000DAO;
+    
+    
+    @Resource(name="dpl1000DAO")
+    private Dpl1000DAO dpl1000DAO;
 
 	
 	@Resource(name = "newJenkinsClient")
@@ -133,7 +139,31 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 				newMap.put("jobId", jobId);
 
 				
-				jen1000DAO.updateJen1100JenkinsJobRestoreInfo(newMap);
+				dpl1000DAO.deleteDpl1100DplJobList(newMap);
+				
+				
+				dpl1000DAO.deleteDpl1101ParameterInfo(newMap);
+				
+				
+				dpl1000DAO.deleteDpl1102DplActionInfo(newMap);
+				
+				
+				jen1000DAO.deleteJen1101CIJobInfo(newMap);
+				
+				
+				jen1000DAO.deleteJen1102ParameterInfo(newMap);
+				
+				
+				jen1000DAO.deleteJen1200DeployJobBuildLogList(newMap);
+				
+				
+				jen1000DAO.deleteJen1201DeployJobBuildChgLogList(newMap);
+				
+				
+				jen1000DAO.deleteJen1202DeployJobBuildFileChgLogList(newMap);
+				
+				
+				jen1000DAO.deleteJen1203DeployJobBuildParamList(newMap);
 				
 				
 				jen1000DAO.deleteJen1100JobInfo(newMap);
@@ -452,6 +482,18 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 
 	
 	@SuppressWarnings("rawtypes")
+	public String insertJen1201JobBldChangeLogInfo(Map paramMap) throws Exception{
+		return jen1000DAO.insertJen1201JobBldChangeLogInfo(paramMap);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	public String insertJen1202JobBldChangeFileLogInfo(Map paramMap) throws Exception{
+		return jen1000DAO.insertJen1202JobBldChangeFileLogInfo(paramMap);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
 	public String insertJen1203JobBldParameterInfo(Map paramMap) throws Exception{
 		return jen1000DAO.insertJen1203JobBldParameterInfo(paramMap);
 	}
@@ -493,6 +535,11 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 		return jen1000DAO.selectJen1200JobBuildListCnt(paramMap);
 	}
 
+	
+	@SuppressWarnings("rawtypes")
+	public int selectJen1200DeployJobBuildLogCnt(BuildVO buildVo) throws Exception {
+		return jen1000DAO.selectJen1200DeployJobBuildLogCnt(buildVo);
+	}
 	
 	public String insertJen1200DeployJobBuildLogInfo(BuildVO buildVo) throws Exception {
 		return jen1000DAO.insertJen1200DeployJobBuildLogInfo(buildVo);
