@@ -145,6 +145,9 @@ public interface Jen1000Service {
 	int selectJen1200JobBuildListCnt(Map paramMap) throws Exception;
 
 	
+	int selectJen1200DeployJobBuildLogCnt(BuildVO buildVo) throws Exception;
+	
+	
 	String insertJen1200DeployJobBuildLogInfo(BuildVO buildVo) throws Exception;
 
 	
