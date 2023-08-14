@@ -322,6 +322,89 @@ public class Dpl1000Controller {
 		}
 	}
 	
+	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1000JobBuildStopAjax.do")
+	public ModelAndView selectDpl1000JobBuildStopAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		
+		JenStatusVO jenStatusVo = null;
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			
+			String jenUrl= (String)paramMap.get("jenUrl");
+    		String jenUsrId= (String)paramMap.get("jenUsrId");
+			String jenUsrTok= (String)paramMap.get("jenUsrTok");
+			String jobId= (String)paramMap.get("jobId");
+
+			
+			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
+			
+			
+			String deJenUsrTok = CommonScrty.decryptedAria(jenUsrTok, salt);
+			
+			
+			jenStatusVo = newJenkinsClient.connect(jenUrl, jenUsrId, deJenUsrTok);
+			
+			
+			if(jenStatusVo.isErrorFlag()) {
+				model.addAttribute("errorYn", "Y");
+				model.addAttribute("message", jenStatusVo.getErrorMsg());
+				return new ModelAndView("jsonView");
+			}
+			
+			jenStatusVo = newJenkinsClient.executeJobBldStop(jenStatusVo, jobId);
+			
+			
+			int statusCode = jenStatusVo.getStatusCode();
+			
+			
+			if(jenStatusVo.isErrorFlag()) {
+				
+				model.addAttribute("errorYn", "Y");
+				model.addAttribute("message", jenStatusVo.getErrorMsg());
+				return new ModelAndView("jsonView", model);
+			}
+			
+			else if(statusCode == 204){
+				
+				model.addAttribute("bldResultCd", "09");
+				model.addAttribute("bldResult", "CANCELLED");
+				
+				model.addAttribute("errorYn", "N");
+				model.addAttribute("message", jenStatusVo.getResultMsg());
+				return new ModelAndView("jsonView", model);
+			}
+			else if(statusCode == 200){
+				
+				model.addAttribute("bldResultCd", "05");
+				model.addAttribute("bldResult", "ABORTED");
+				
+				model.addAttribute("errorYn", "N");
+				model.addAttribute("message", jenStatusVo.getResultMsg());
+				return new ModelAndView("jsonView", model);
+			}
+			else {
+				
+				model.addAttribute("errorYn", "Y");
+				model.addAttribute("message", "[CODE="+statusCode+"] 빌드 중지 중 오류가 발생했습니다.");
+				return new ModelAndView("jsonView", model);
+			}
+		}
+		catch(Exception ex){
+			Log.error("selectDpl1000JobBuildStopAjax()", ex);
+			
+			
+			model.addAttribute("errorYn", "Y");
+			model.addAttribute("message", "빌드 중지 실패");
+			return new ModelAndView("jsonView", model);
+		}finally {
+			
+			if(jenStatusVo != null) {
+				newJenkinsClient.close(jenStatusVo);
+			}
+		}
+	}
+	
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1000JobBuildAjax.do")
@@ -421,10 +504,6 @@ public class Dpl1000Controller {
 			return new ModelAndView("jsonView", model);
 		}
 		catch(Exception ex){
-			
-			if(jenStatusVo != null) {
-				newJenkinsClient.close(jenStatusVo);
-			}
 			Log.error("selectDpl1000JobBuildAjax()", ex);
 			
 			
