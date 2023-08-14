@@ -374,3 +374,6 @@ div#globalGuideBoxSearchClose {position: fixed;}
     min-height: 35px;
     line-height: 2;
 }
+div#bldActionLog {
+    padding-left: 10px;
+}
