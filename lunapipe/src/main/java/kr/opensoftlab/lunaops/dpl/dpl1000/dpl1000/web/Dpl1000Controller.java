@@ -334,6 +334,7 @@ public class Dpl1000Controller {
 			String jenUrl= (String)paramMap.get("jenUrl");
     		String jenUsrId= (String)paramMap.get("jenUsrId");
 			String jenUsrTok= (String)paramMap.get("jenUsrTok");
+			String jenId= (String)paramMap.get("jenId");
 			String jobId= (String)paramMap.get("jobId");
 
 			
@@ -344,6 +345,7 @@ public class Dpl1000Controller {
 			
 			
 			jenStatusVo = newJenkinsClient.connect(jenUrl, jenUsrId, deJenUsrTok);
+			jenStatusVo.setJenId(jenId);
 			
 			
 			if(jenStatusVo.isErrorFlag()) {
@@ -421,7 +423,6 @@ public class Dpl1000Controller {
     		String jenUsrId= (String)paramMap.get("jenUsrId");
 			String jenUsrTok= (String)paramMap.get("jenUsrTok");
 			String jobId= (String)paramMap.get("jobId");
-			String jobTok= (String)paramMap.get("jobTok");
 			String dplTypeCd= (String)paramMap.get("dplTypeCd");
 			String ciId= (String)paramMap.get("ciId");
 			String ticketId= (String)paramMap.get("ticketId");
@@ -432,7 +433,6 @@ public class Dpl1000Controller {
 			
 			
 			String deJenUsrTok = CommonScrty.decryptedAria(jenUsrTok, salt);
-			String deJobToken = CommonScrty.decryptedAria(jobTok, salt);
 			
 			
 			jenStatusVo = newJenkinsClient.connect(jenUrl, jenUsrId, deJenUsrTok);
@@ -474,7 +474,6 @@ public class Dpl1000Controller {
 			buildVo.setJenUrl(jenUrl);
 			buildVo.setUserId(jenUsrId);
 			buildVo.setDeTokenId(deJenUsrTok);
-			buildVo.setDeJobToken(deJobToken);
 			buildVo.setJobId(jobId);
 			buildVo.setDplTypeCd(dplTypeCd);
 			buildVo.setJenStatusVo(jenStatusVo);
