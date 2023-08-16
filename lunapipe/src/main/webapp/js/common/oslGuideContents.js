@@ -157,7 +157,7 @@ var globals_guideContents =
 		"jen1001":   
 			[  {id:"jenGuide_jenkinsInfo",target:"jenkinsInfo",mainTitle:"[JENKINS 설정]",top:304,left:146,position:"top",targetPosition:"top", curve: false
 				,subBox:[
-				         {title:"<i></i>",content:"URL : JEKINS 시스템의 접속 URL(http://URL:PORT/jenkins/)에<br/>jenkins/을 제거(http://URL:PORT/)하고 입력합니다 ."}
+				         {title:"<i></i>",content:"URL : JEKINS 시스템의 접속 URL(http:
 				         ,{title:"<i></i>",content:"USER : JEKINS 시스템의 접속가능한 사용자 ID를 입력합니다."}
 				         ,{title:"<i></i>",content:"USER TOKEN KEY : JEKINS 시스템의 접속가능한 사용자의 API TOKEN을 가져와 입력합니다."}
 				         ]
@@ -169,7 +169,6 @@ var globals_guideContents =
 			[	{id:"jen1002Guide_jobInfo",target:"jen1002LeftJobForm",mainTitle:"[JOB 정보 입력]",top:304,left:46,position:"top",targetPosition:"top", curve: false
 					,subBox:[
 				         {title:"<i></i>",content:"- JOB ID(NAME) : JENKINS에 생성한 JOB을 선택합니다."}
-				         ,{title:"<i></i>",content:"- TOKEN KEY : JEKINS 시스템에서 해당 JOB에서 설정한 Authentication Token을 입력합니다."}
 				         ,{title:"<i></i>",content:"- CRON : JOB에 등록되있는 `Build periodically` 값 입니다. </br> 등록, 수정 중 값이 변경되는 경우 실제 JENNKINS에서 값이 변경됩니다."}
 				    ]
 				},
@@ -199,7 +198,6 @@ var globals_guideContents =
 	        		 ]} 
 			
 			]
-		
 		,"dpl1000":
 			[{id:"dpl1000_dplJobList",target:"dpl1000DplJobList",mainTitle:"[배포 계획 배정 JOB 목록]",top:155,left:500,position:"bottom",targetPosition:"top",curve:false	
 			,subBox:[
