@@ -23,6 +23,7 @@ public class Dpl1100VO extends PageVO{
 	private String jobTypeNm;
 	private String jobUrl;
 	private String jobTok;
+	private String jobBldActionCd;
 	
 	private String jobRestoreId;
 	private String jobRestoreDesc;
@@ -145,6 +146,13 @@ public class Dpl1100VO extends PageVO{
 	}
 	public void setJobTok(String jobTok) {
 		this.jobTok = jobTok;
+	}
+	
+	public String getJobBldActionCd() {
+		return jobBldActionCd;
+	}
+	public void setJobBldActionCd(String jobBldActionCd) {
+		this.jobBldActionCd = jobBldActionCd;
 	}
 	public String getJobRestoreId() {
 		return jobRestoreId;
