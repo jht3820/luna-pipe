@@ -123,7 +123,7 @@ function fnInsertReqInfoAjax(formId){
 			
 			//기본 값과 type 넘기기
 			fd.append("type",'${param.popupGb}');
-			fd.append("nowJenUsrTok",nowJenUsrTok);
+			fd.append("nowJenUsrTok", nowJenUsrTok);
 			
 			//AJAX 설정
 			var ajaxObj = new gfnAjaxRequestAction(
