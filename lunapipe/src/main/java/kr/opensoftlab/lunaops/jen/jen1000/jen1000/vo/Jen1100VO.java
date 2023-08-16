@@ -24,7 +24,6 @@ public class Jen1100VO extends PageVO {
     private String    jenDesc; 				
     private String    jenUseCd; 				
     private String    jobId;              
-    private String    jobPath;              
     private String    jobRestoreId;               
     private String    jobTok;              
     private String    jobParameter;              
@@ -33,6 +32,7 @@ public class Jen1100VO extends PageVO {
     private String    jobTypeCd;              
     private String	jobTypeNm;
     private String jobTriggerCd;	
+    private String jobBldActionCd;
     private String    useCd;               
     private String    useNm;
 
@@ -130,13 +130,6 @@ public class Jen1100VO extends PageVO {
 	public void setJenUseCd(String jenUseCd) {
 		this.jenUseCd = jenUseCd;
 	}
-	
-	public String getJobPath() {
-		return jobPath;
-	}
-	public void setJobPath(String jobPath) {
-		this.jobPath = jobPath;
-	}
 	public String getJobId() {
 		return jobId;
 	}
@@ -179,6 +172,12 @@ public class Jen1100VO extends PageVO {
 	}
 	public void setJobTriggerCd(String jobTriggerCd) {
 		this.jobTriggerCd = jobTriggerCd;
+	}
+	public String getJobBldActionCd() {
+		return jobBldActionCd;
+	}
+	public void setJobBldActionCd(String jobBldActionCd) {
+		this.jobBldActionCd = jobBldActionCd;
 	}
 	public String getUseCd() {
 		return useCd;
