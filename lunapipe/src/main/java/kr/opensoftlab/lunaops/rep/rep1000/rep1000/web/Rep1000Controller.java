@@ -154,7 +154,7 @@ public class Rep1000Controller {
 			rep1000VO.setPageUnit(_pageSize);
 			
 			
-			PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(rep1000VO); 
+			PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(rep1000VO);  
 
 			List<Rep1000VO> rep1000List = null;
 
@@ -272,6 +272,11 @@ public class Rep1000Controller {
 				
 				repId = OslUtil.jsonGetString(jsonObj, "repId");
 			}
+			
+			
+			RepVO repInfo = rep1000Service.selectRep1000Info(paramMap);
+			
+			model.put("repInfo", repInfo);
 			model.put("repId", "repId");
 			
 		}catch(Exception e) {
@@ -286,6 +291,12 @@ public class Rep1000Controller {
 	@RequestMapping(value="/rep/rep1000/rep1000/selectRep1003View.do")
 	public String selectRep1003View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		return "/rep/rep1000/rep1000/rep1003";
+	}
+	
+	
+	@RequestMapping(value="/rep/rep1000/rep1000/selectRep1004View.do")
+	public String selectRep1004View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		return "/rep/rep1000/rep1000/rep1004";
 	}
 	
 	
@@ -669,13 +680,17 @@ public class Rep1000Controller {
 				searchMap.put("searchEdDate", searchEdDate);
 			}
 			
-			String[] filePath = new String[] {};
+			
+			
+			String selRepPath = (String) paramMap.get("selRepPath");
+			
+			
+			String[] filePath = new String[] {selRepPath};
 			
 			
 			if(searchFilePath != null && !"".equals(searchFilePath)) {
-				filePath = new String[] {searchFilePath};
+				filePath = new String[] {selRepPath+searchFilePath};
 			}
-			
 			Map repDataMap = repModule.selectRepLogPageList(repResultVO, filePath, startRevision, lastRevision, _pageNo, _pageSize, searchMap);
 			
 			
@@ -907,8 +922,8 @@ public class Rep1000Controller {
 	
 	
 	@SuppressWarnings({ "rawtypes" })
-	@RequestMapping(value="/rep/rep1000/rep1000/saveRep1001RepTreeListAjax.do")
-	public ModelAndView saveRep1001RepTreeListAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+	@RequestMapping(value="/rep/rep1000/rep1000/selectRep1001RepTreeListAjax.do")
+	public ModelAndView selectRep1001RepTreeListAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 
 		try{
 			
