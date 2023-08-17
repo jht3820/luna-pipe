@@ -430,7 +430,7 @@ function fnJobGridSetting(){
    				this.self.select(this.doindex, {selected: !this.item.__selected__});	
             },
             onDBLClick:function(){
-				var data = {"jenId": this.item.jenId, "jobId": this.item.jobId, "jobPath": this.item.jobPath};
+				var data = {"jenId": this.item.jenId, "jobId": this.item.jobId};
 				gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1004JobDetailView.do',data,"1200", "870",'scroll');
             }
         },
@@ -848,7 +848,7 @@ function fnJobSearchSetting(){
 									return false;
 								}
 
-								var data = {"popupGb": "update", "jenId": chkList[0].jenId, "jobId": chkList[0].jobId, "jobPath": chkList[0].jobPath};
+								var data = {"popupGb": "update", "jenId": chkList[0].jenId, "jobId": chkList[0].jobId};
         	                	
 								gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1002JobDetailView.do',data,"650","650",'scroll',false);
 						}},

@@ -447,6 +447,14 @@ function fnJobBuildResultStatus(targetJobInfo){
 					$("#btn_update_dplActionStop").hide();
 				}
 			}
+			//빌드 실행 가능 유무인경우 버튼 제어
+			if(gfnIsNull(selJobItem["jobBldActionCd"]) || selJobItem["jobBldActionCd"] == "02"){
+				//수동배포 버튼 보이기
+				$("#btn_update_dplAction").hide();
+				
+				//빌드중지 버튼 감추기
+				$("#btn_update_dplActionStop").hide();
+			}
 			
 			//콘솔 로그 재 조회
 			if(consoleRefreshFlag){
@@ -551,7 +559,7 @@ function fnAxGrid5View(){
                 	
                 	//mask 해제
                 	$("#jobMaskFrame").hide();
-                		
+                	
                 	//선택 JOB 콘솔로그 불러오기
                		fnJobBuildResultStatus(this.item);
                 },onDBLClick:function(){
