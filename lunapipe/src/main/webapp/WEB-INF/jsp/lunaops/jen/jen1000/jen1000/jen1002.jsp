@@ -153,9 +153,10 @@ $(document).ready(function() {
 	*/
 	// 팝업 공통코드 select 세팅
 	var commonCodeArr = [
-		{mstCd: "DPL00002", useYn: "Y",targetObj: "#jobTypeCd", comboType:"OS"}, // JOB 타입
-		{mstCd: "CMM00001", useYn: "Y",targetObj: "#useCd", comboType:"OS"}, // 사용유무
-		{mstCd: "CMM00001", useYn: "Y",targetObj: "#jobTriggerCd", comboType:"OS"} // 사용유무
+		{mstCd: "DPL00002", useYn: "Y",targetObj: "#jobTypeCd", comboType:"OS"},
+		{mstCd: "CMM00001", useYn: "Y",targetObj: "#useCd", comboType:"OS"}, 
+		{mstCd: "CMM00001", useYn: "Y",targetObj: "#jobTriggerCd", comboType:"OS"},
+		{mstCd: "CMM00001", useYn: "Y",targetObj: "#jobBldActionCd", comboType:"OS"} 
 	];
 	//공통코드 채우기
 	gfnGetMultiCommonCodeDataForm(commonCodeArr , true);
@@ -965,8 +966,11 @@ function fnSelJobCronSpec(paramJobId){
 					</div>
 				</div>
 				<div class="pop_menu_row">
-					<div class="pop_menu_col1 menu_col1_subStyle"></div>
+					<div class="pop_menu_col1 menu_col1_subStyle"><label for="jobBldActionCd">빌드 실행 가능 유무</label></div>
 					<div class="pop_menu_col2 menu_col2_subStyle">
+						<span class="search_select">
+							<select class="select_useCd" name="jobBldActionCd" id="jobBldActionCd" value="" style="height:100%; width:100%;" data-osl-value="01"></select>
+						</span>
 					</div>
 				</div>
 				<div class="pop_note" style="margin-bottom:0px;">
