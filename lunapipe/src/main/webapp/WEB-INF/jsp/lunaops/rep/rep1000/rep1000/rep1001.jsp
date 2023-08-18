@@ -9,20 +9,20 @@
 .layer_popup_box .pop_left, .layer_popup_box .pop_right { height: 54px; }
 .required_info { color: red; }
 
-
-
+/*익스플로러 적용 위해 !important 추가*/
+/* 팝업에 따라 pop_menu_col1, pop_menu_col2 높이 변경 */
 .pop_menu_row .pop_menu_col1 { width: 20% !important; height: 45px !important; padding-left: 6px !important; }
 .pop_menu_row .pop_menu_col2 { width: 80% !important; height: 45px !important; }
 .pop_menu_row .menu_col1_subStyle { width: 40% !important; }
 .pop_menu_row .menu_col2_subStyle { width: 60% !important; }
 .pop_sub input[type="password"].input_txt { width:100% !important; height:100%!important; }
-
+/* SVN 수정시 알림 메시지 영역 */
 .warning_message{display:none; text-align: left; font-size: 13px;}
 
 .pop_dpl_div_sub.divDetail_sub_left{width: 530px;float: left;margin-right: 10px;height: 405px;}
 .pop_dpl_div_sub.divDetail_sub_right {width: 460px;float: left;height: 402px;position: relative;}
 
-
+/* 소스저장소 종류에따른 show/hide */
 .rep1001GitFrame{display:none;}
 .rep1001GitUsrAuthIdFrame{display:none;}
 .button_normal.button_col {
@@ -55,24 +55,24 @@ globals_guideChkFn = fnRep1001GuideShow;
 
 var fd = new FormData();
 
-
+//현재 비밀번호 저장
 var nowSvnPw = null;
 var nowGitPw = null;
 
-
+//zTree
 var zTreeRep1001;
 
-
+//접속 체크 플래그
 var svnConnCheckFlag = false;
 
-
+//url, id, pw 변경 데이터 확인값
 var chgDataFlag = {
 		svnRepUrl: "",
 		svnUsrId: "",
 		svnUsrId: ""
 };
 
-
+// input 유효성
 var arrChkObj = {	"repNm":{"type":"length","msg":"저장소 명은 500byte까지 입력이 가능합니다.","max":500},
 			        "svnRepUrl":{"type":"length","msg":"URL은 500byte까지 입력이 가능합니다.","max":500},
 			        "svnUsrId":{"type":"length","msg":"User ID는 30byte까지 입력이 가능합니다.", "max":30},
@@ -85,24 +85,32 @@ var arrChkObj = {	"repNm":{"type":"length","msg":"저장소 명은 500byte까지
 
 $(document).ready(function() {
 
-	
-	
+	/* 	
+	*	공통코드 가져올때 한번 트랜잭션으로 여러 코드 가져와서 셀렉트박스에 세팅하는 함수(사용 권장)
+	* 	1. 공통 대분류 코드를 순서대로 배열 담기(문자열)
+	*	2. 사용구분 저장(Y: 사용중인 코드만, N: 비사용중인 코드만, 그 외: 전체)
+	*	3. 공통코드 적용할 select 객체 직접 배열로 저장
+	* 	4. 공통코드 가져와 적용할 콤보타입 객체 배열 ( S:선택, A:전체(코드값 A 세팅한 조회조건용), N:전체, E:공백추가, 그 외:없음 )
+	*	5. 동기 비동기모드 선택 (true:비동기 통신, false:동기 통신)
+	*	마스터 코드 = REQ00001:요구사항 타입, REQ00002:중요도 , CMM00001:
+	*/
+	// 팝업 공통코드 select 세팅
 	var commonCodeArr = [
-		{mstCd: "REP00002", useYn: "Y",targetObj: "#gitUsrAuthTypeCd", comboType:"OS"}, 
-		{mstCd: "CMM00001", useYn: "Y",targetObj: "#useCd", comboType:"OS"} 
+		{mstCd: "REP00002", useYn: "Y",targetObj: "#gitUsrAuthTypeCd", comboType:"OS"}, // git 인증 타입
+		{mstCd: "CMM00001", useYn: "Y",targetObj: "#useCd", comboType:"OS"} // 사용유무
 	];
-	
+	//공통코드 채우기
 	gfnGetMultiCommonCodeDataForm(commonCodeArr , true);
 	
 	$("#repNm").focus();
 	
-	
+	// 유효성 체크
 	gfnInputValChk(arrChkObj);
 	
+	//탭인덱스 부여
+	//gfnSetFormAllObjTabIndex(document.getElementById("rep1000PopupFrm"));
 	
-	
-	
-	
+	/* 타이틀 변경 및 버튼명 변경, 수정일경우 값 세팅 */
 	if('${param.popupGb}' == 'insert'){
 		$(".pop_title").text("저장소 등록");
 		$("#btn_update_popup").text('등록');
@@ -114,49 +122,49 @@ $(document).ready(function() {
 		var repId = '${param.repId}';
 		fnSelectSvn1001RepInfo(repId);
 		
-		
+		// 해당 소스저장소의 리비전이 요구사항에 배정된 건수
 		var assignCnt = '${param.assignCnt}';
 		if(assignCnt > 0){
-			
+			// 요구사항에 리비전 배정되어있을 경우 URL 수정불가처리
 			$("#svnRepUrl").attr("readonly", true);
-			
+			// 알림 메시지 show
 			$("#svnRepoUpdateMsg").show();
 			$(".pop_menu_row").last().css("margin-bottom", "14px");
-			
+			// 팝업 높이 변경
 			$(".layer_popup_box").height(578);
 		}
 	}
 	
-	
+	/* 저장버튼 클릭 시 */
 	$('#btn_update_popup').click(function() {
 		
-		
+		/* 필수입력값 체크 공통 호출 */
 		var strFormId = "rep1000PopupFrm";
 		var strCheckObjArr = ["repNm"];
 		var sCheckObjNmArr = ["저장소 명"];
 		
-		
+		//소스저장소 종류에 따라 필수 값 분기
 		var repTypeCd = $("#repTypeCd").val();
 		
-		
+		//git
 		if(repTypeCd == "01" || repTypeCd == "03"){
 			strCheckObjArr = strCheckObjArr.concat(["gitRepUrl"]);
 			sCheckObjNmArr = sCheckObjNmArr.concat(["Repository URL"]);
 			
-			
+			//사용자 인증 방식
 			var gitUsrAuthTypeCd = $("#gitUsrAuthTypeCd").val();
-			
+			//토큰
 			if(gitUsrAuthTypeCd == "01"){
 				strCheckObjArr = strCheckObjArr.concat(["gitUsrTk"]);
 				sCheckObjNmArr = sCheckObjNmArr.concat(["사용자 토큰"]);
 			}
-			
+			//id/pw
 			else if(gitUsrAuthTypeCd == "02"){
 				strCheckObjArr = strCheckObjArr.concat(["gitUsrId","gitUsrPw"]);
 				sCheckObjNmArr = sCheckObjNmArr.concat(["사용자 ID" , "PASSWORD"]);
 			}
 		}
-		
+		//svn
 		else if(repTypeCd == "02"){
 			strCheckObjArr = strCheckObjArr.concat(["svnRepUrl","svnUsrId","svnUsrPw"]);
 			sCheckObjNmArr = sCheckObjNmArr.concat(["URL" ,"USER" , "PASSWORD"]);
@@ -167,7 +175,7 @@ $(document).ready(function() {
 		
 		var formObj = document.getElementById("rep1000PopupFrm");
 		
-		
+		// 등록/수정 전 유효성 체크
 		if(!gfnSaveInputValChk(arrChkObj)){
 			return false;	
 		}
@@ -176,40 +184,44 @@ $(document).ready(function() {
 
 	});
 	
-	
+	/* 취소버튼 클릭 시 팝업 창 사라지기*/
 	$('#btn_cancle_popup').click(function() {
 		gfnLayerPopupClose();
 	});
-
+/* 
+	//소스저장소 종류 변경
+	$("#repTypeCd").on("change", function(){
+		fnRepTypeCdChg(this.value);
+	}); */
 	
-	
+	//git 인증 방식 변경
 	$("#gitUsrAuthTypeCd").on("change", function(){
 		fnGitUsrAuthTypeCdChg(this.value);
 	});
 	
-	
+	//url, user, pw 입력하는 경우 mask 생성
 	$("#svnRepUrl, #svnUsrId, #svnUsrPw").blur(function(){
-		
+		//접속 중인경우
 		if(svnConnCheckFlag){
-			
+			//key값
 			var key = $(this).attr("id");
 			var value = this.value;
 		
-			
+			//이전 데이터와 변경점 있는지 체크
 			if(chgDataFlag[key] != value){
-				
+				//mask 보이기
 			    $("#repTreeListMask").show();
-				
+				//트리 제거
 				zTreeRep1001.destroy();
-				
+				//경로내용 제거
 				$("#selTreeNodeUrl").val("");
 			}
 		}
 	});
 	
-	
+	//접속 체크
 	$("#btnSvnConnCheck").click(function(){
-		
+		//현재 값 넣기
 		chgDataFlag["svnRepUrl"] = $("#svnRepUrl").val();
 		chgDataFlag["svnUsrId"] = $("#svnUsrId").val();
 		chgDataFlag["svnUsrPw"] = $("#svnUsrPw").val();
@@ -218,14 +230,14 @@ $(document).ready(function() {
 	})
 });
 
-	
+	//소스저장소 종류 변경 함수
 	function fnRepTypeCdChg(chgValue){
-		
+		//git
 		if(chgValue == "01"){
 			$(".rep1001GitFrame").show();
 			$(".rep1001SvnFrame").hide();
 		}
-		
+		//svn
 		else if(chgValue == "02"){
 			$(".rep1001SvnFrame").show();
 			$(".rep1001GitFrame").hide();
@@ -234,36 +246,38 @@ $(document).ready(function() {
 			$(".rep1001SvnFrame").hide();
 		}
 	}
-	
+	//git 인증 방식 변경 함수
 	function fnGitUsrAuthTypeCdChg(chgValue){
-		
+		//사용자 토큰
 		if(chgValue == "01"){
 			$(".rep1001GitUsrAuthTkFrame").show();
 			$(".rep1001GitUsrAuthIdFrame").hide();
 		}
-		
+		//사용자 id/pw
 		else if(chgValue == "02"){
 			$(".rep1001GitUsrAuthIdFrame").show();
 			$(".rep1001GitUsrAuthTkFrame").hide();
 		}
 	}
-	
+	/**
+	 * 	소스저장소 디테일 정보 조회
+	 */
  	function fnSelectSvn1001RepInfo(repId){
-		
+		//AJAX 설정
 		var ajaxObj = new gfnAjaxRequestAction(
 				{"url":"<c:url value='/rep/rep1000/rep1000/selectRep1000InfoAjax.do'/>"}
 				,{ "repId" : repId });
-		
+		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
-        	
+        	//디테일폼 세팅
         	gfnSetData2ParentObj(data.repInfo, "rep1000PopupFrm");
         	
         	var repTypeCd = data.repInfo.repTypeCd;
         	
-        	
+        	//소스저장소 종류
         	fnRepTypeCdChg(repTypeCd);
         	if(repTypeCd == "01" || repTypeCd == "03"){
-	        	
+	        	//git 인증 방식
 	        	fnGitUsrAuthTypeCdChg(data.repInfo.gitUsrAuthTypeCd);
         	}
 
@@ -271,79 +285,79 @@ $(document).ready(function() {
         	nowGitPw = data.repInfo.gitUsrPw;
 		});
 		
-		
+		//AJAX 전송
 		ajaxObj.send();
 	} 
 	
-	
+	//소스저장소 등록 함수
 	function fnInsertReqInfoAjax(formId){
-		
+		//FormData에 input값 넣기
 		gfnFormDataAutoValue('rep1000PopupFrm',fd);
 		
-		
+		//기존 비밀번호 넘기기
 		fd.append("nowSvnPw",nowSvnPw);
 		fd.append("nowGitPw",nowGitPw);
 		
-		
+		//AJAX 설정
 		var ajaxObj = new gfnAjaxRequestAction(
 				{"url":"<c:url value='/rep/rep1000/rep1000/saveRep1000InfoAjax.do'/>"
 					,"contentType":false
 					,"processData":false
 					,"cache":false}
 				,fd);
-		
+		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
 			
-	    	
+	    	//로딩바 숨김
 	    	gfnShowLoadingBar(false);
 	    	
-	    	
+	    	//코멘트 등록 실패의 경우 리턴
 	    	if(data.saveYN == 'N'){
 	    		jAlert(data.message, '알림창');
 	    		fd = new FormData();
 	    		return;
 	    	}
 	    	
-	    	
+	    	//그리드 새로고침
 			fnInGridListSet(repGridObj.page.currentPage,$('form#searchFrm').serialize()+"&"+repSearchObj.getParam());
 	    	
 			jAlert(data.message, '알림창');
 			gfnLayerPopupClose();
 		});
 		
-		
+		//AJAX 전송 오류 함수
 		ajaxObj.setFnError(function(xhr, status, err) {
 			jAlert("소스저장소 등록에 실패하였습니다.", "알림창");
     		fd = new FormData();
     		return;
 		});
 
-		
+		//AJAX 전송
 		ajaxObj.send();
 	}
 	
 	function fnRep1001GuideShow(){
 		var mainObj = $(".popup");
 		
-		
+		//mainObj가 없는경우 false return
 		if(mainObj.length == 0){
 			return false;
 		}
-		
+		//guide box setting
 		var guideBoxInfo = globals_guideContents["rep1001"];
 		gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
 	}
 	
 	
-	
+	//svn 목록 트리 세팅하기
 	function selectRep1001SvnTreeSetting(){
-		
+		//svn url, id, password
 		var svnRepUrl = $("#svnRepUrl").val();
 		var svnUsrId = $("#svnUsrId").val();
 		var svnUsrPw = $("#svnUsrPw").val();
 		var repTypeCd = $("#repTypeCd").val();
 		
-		
+		//값이 없는 경우 중지
 		if(gfnIsNull(svnRepUrl)){
 			jAlert("SVN URL값을 입력해주세요.","알림");
 			return false;
@@ -357,7 +371,7 @@ $(document).ready(function() {
 			return false;
 		}
 		
-		
+		//파라미터
 		var param = {
 				"svnRepUrl": svnRepUrl,
 				"svnUsrId": svnUsrId,
@@ -365,11 +379,11 @@ $(document).ready(function() {
 				"repTypeCd": repTypeCd
 			   };
 	
-		
+		//AJAX 설정
 		var ajaxObj = new gfnAjaxRequestAction(
-				{"url":"<c:url value='/rep/rep1000/rep1000/saveRep1001RepTreeListAjax.do'/>","loadingShow":true}
+				{"url":"<c:url value='/rep/rep1000/rep1000/selectRep1001RepTreeListAjax.do'/>","loadingShow":true}
 				, param );
-		
+		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
 			if(data.MSG_CD =="SVN_EXCEPTION"){
 				jAlert("소스저장소 접근 중 오류가 발생했습니다.","알림");
@@ -379,9 +393,9 @@ $(document).ready(function() {
 				return false;
 			}
 			
-			
+			//job tree setting
 		    var setting = {
-	    		
+	    		// zTree binding data key 설정
 		        data: {
 		        	key: {
 						name: "name"
@@ -392,15 +406,15 @@ $(document).ready(function() {
 						pIdKey: "pId",
 		            }
 		        },
-		        
+		        // 동적 트리 설정
 		        async: {
-					enable: true, 
+					enable: true, // async 사용여부 (true:사용, false:미사용)
 					contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-					url:"<c:url value='/rep/rep1000/rep1000/saveRep1001RepTreeListAjax.do'/>",
-					autoParam:["id", "path"],	
-					otherParam: param,  
+					url:"<c:url value='/rep/rep1000/rep1000/selectRep1001RepTreeListAjax.do'/>",
+					autoParam:["id", "path"],	// 노드의 값을 서버로 보낼경우 배열형식으로 autoParam에 세팅
+					otherParam: param,  // 노드의 값을 제외한 다른 값을 서버로 보낼 경우 otherParam에 세팅
 					dataType: "json",
-					dataFilter: fnTreeFilter	
+					dataFilter: fnTreeFilter	// 데이터 조회 후 처리할 필터 function, async 사용시 dataFilter는 반드시 지정해야 한다.
 				},
 				
 				callback: {
@@ -411,7 +425,7 @@ $(document).ready(function() {
 				}
 		    };
 			
-			
+			//job list
 			var list = data.list;
 			
 		    $.each(list, function(idx, obj){
@@ -422,40 +436,48 @@ $(document).ready(function() {
 				}
 			});
 		    
-		    
+		    // zTree 초기화
 		    zTreeRep1001 = $.fn.zTree.init($("#repDetailTree"), setting, list);
 		    
-		    
-		    
+		    // expandAll(false)를 추가해야 트리의 폴더를 한번 클릭 시 하위 메뉴가 보여진다.
+		    // 추가하지 않을 경우 두번 클릭을 해야 폴더가 펼쳐진다.
 		    zTreeRep1001.expandAll(false);
 		    
-		    
+		    //mask 감추기
 		    $("#repTreeListMask").hide();
 		    
-		    
+		    //접속 중 값 변경
 		    svnConnCheckFlag = true;
 		});
 	
-		
+		//AJAX 전송
 		ajaxObj.send();
 	}
 	
-	
+	/*
+	 * 동적트리 조회 실패시 처리
+	 */
 	function fnAsyncError(event, treeId, treeNode, XMLHttpRequest, textStatus, errorThrown){
-		
+		// 조회 실패 메시지 출력
 	   	toast.push("하위 디렉토리 조회에 실패하였습니다.");
 	}
 	
-	
+	/*
+	 * [+] 아이콘 클릭 또는 더블클릭하여 트리 확장시 조회된 결과에 대한 처리를 한다.
+	 *
+	 * @param treeId : 트리 ID
+	 * @param parentNode : 트리에서 [+]아이콘 클릭 또는 더블클릭한 노드
+	 * @param result : 동적조회 결과값
+	 */
 	function fnTreeFilter(treeId, parentNode, result) {
 	 	
-		
+		// 조회된 하위 조직 목록
 	 	var childNodes = result.list;
-		
-		
+		// filter에서 모든 자식 노드를 부모형(폴더 아이콛)으로 변경한다.
+		// 해당 옵션 추가해야  트리의  [+] 아이콘 클릭 시 한번에 트리가 펼쳐진다. 
 		$.each(childNodes, function(idx, node){
 			
-			
+			// 트리 노드가 부모형이 아닐 경우
 			if(node["type"] == 0){
 				node.isParent = true;
 			}
@@ -463,7 +485,7 @@ $(document).ready(function() {
 			zTreeRep1001.updateNode(node);
 			
 		});
-		
+		// 선택한 노드의 자식 노드를 리턴하면 자동으로 트리에 자식 노드가 추가된다.
 		return childNodes;
 	}
 </script>
