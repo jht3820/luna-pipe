@@ -11,7 +11,7 @@
 div.pop_sub .pop_left {width:28%;} /* common.css pop_left width값 오버라이딩 */
 div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이딩 */
 .input_txt {padding-left: 5px;}
-.rep1005GridFrame {position: relative;}
+.rep1005GridFrame {position: relative;margin-bottom: 2px;}
 </style>
 <script type="text/javascript">
 
@@ -257,9 +257,12 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 		<input type="hidden" name="repId" id="repId" value="${param.repId}" />
 		<input type="hidden" name="filePath" id="filePath" value="${param.filePath}" />
 	</form>
-	<div class="pop_title">[ <c:out value="${param.fileName}"/> ] 비교 대상 파일 리비전 선택</div>
+	<div class="pop_title">비교 대상 파일 리비전 목록</div>
 	<div class="rep1005Pop_sub">
-		<div class="rep1002SearchFrame rep1002FrameBox" id="filePathSearchTarget"></div>
+		<div class="sub_title">
+			[ <c:out value="${param.fileName}"/> ] 비교 대상 파일 리비전 선택
+		</div>
+		<div class="rep1005SearchFrame rep1005FrameBox" id="filePathSearchTarget"></div>
 		<div class="rep1005GridFrame">
 			<div class="svn_mask_repList" id="repPathGridList">
 				데이터를 조회중입니다.<br><br>
@@ -267,7 +270,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 			</div>
 			<div data-ax5grid="rep1005-grid" data-ax5grid-config="{}" style="height: 380px;"></div>
 		</div>		
-		<div class="rep1002CommitLogFrame rep1002FrameBox">
+		<div class="rep1005CommitLogFrame rep1005FrameBox">
 			<textarea id="svnCommitLogDetailRep1005" class="svnCommitLogDetail" readonly="readonly"></textarea>
 		</div>
 		<div class="btn_div">
