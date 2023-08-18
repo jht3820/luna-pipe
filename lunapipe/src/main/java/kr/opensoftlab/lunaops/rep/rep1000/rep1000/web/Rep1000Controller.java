@@ -29,6 +29,7 @@ import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 import kr.opensoftlab.lunaops.com.api.service.ApiService;
 import kr.opensoftlab.lunaops.com.exception.UserDefineException;
+import kr.opensoftlab.lunaops.com.vo.OslErrorCode;
 import kr.opensoftlab.lunaops.rep.rep1000.rep1000.service.Rep1000Service;
 import kr.opensoftlab.lunaops.rep.rep1000.rep1000.vo.Rep1000VO;
 import kr.opensoftlab.sdf.rep.com.RepModule;
@@ -98,6 +99,23 @@ public class Rep1000Controller {
 			JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
 			
 			
+			String ciId = OslUtil.jsonGetString(jsonObj, "luna/ci_id");
+			String apiId = OslUtil.jsonGetString(jsonObj, "luna/api_id");
+			String svcId = OslUtil.jsonGetString(jsonObj, "luna/svc_id");
+			String fId = OslUtil.jsonGetString(jsonObj, "luna/f_id");
+			String empId = OslUtil.jsonGetString(jsonObj, "luna/emp_id");
+
+			
+			String eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
+			
+			model.addAttribute("ciId", ciId);
+			model.addAttribute("apiId", apiId);
+			model.addAttribute("svcId", svcId);
+			model.addAttribute("fId", fId);
+			model.addAttribute("empId", empId);
+			model.addAttribute("eGeneUrl", eGeneUrl);
+			
+			
 			jsonObj.put("current_date", new Date().getTime());
 			
 			
@@ -118,7 +136,7 @@ public class Rep1000Controller {
 			
 			String rtnData = CommonScrty.encryptedAria(jsonObj.toString(), salt);
 			
-			model.put("rtnData", rtnData);
+			model.addAttribute("rtnData", rtnData);
 		}catch(Exception e) {
 			Log.error(e);
 			e.printStackTrace();
@@ -232,40 +250,7 @@ public class Rep1000Controller {
 				String lunaCheckCode = (String) request.getSession().getAttribute("lunaCheckCode");
 				
 				
-				if(lunaCheckCode == null) {
-					response.setStatus(HttpStatus.SC_BAD_REQUEST);
-					model.put("errorMsg", "인증 코드를 읽는 중 오류가 발생했습니다.");
-					return "/err/error";
-				}
 				
-				String data = (String) paramMap.get("data");
-				
-				
-				Object checkParam = apiService.checkParamDataKey(data);
-				
-				
-				if(checkParam instanceof String) {
-					model.put("errorMsg", "오류 코드: "+ checkParam.toString());
-					return "/err/error";
-				}else {
-					
-					JSONObject jsonObj = (JSONObject) checkParam;
-					
-					
-					if(!jsonObj.has("lunaCheckCode")) {
-						response.setStatus(HttpStatus.SC_METHOD_NOT_ALLOWED);
-						model.put("errorMsg", "인증 코드를 읽는 중 오류가 발생했습니다.");
-						return "/err/error";
-					}
-					
-					String jsonLunaCheckCode = OslUtil.jsonGetString(jsonObj, "lunaCheckCode");
-					
-					if(jsonLunaCheckCode == null || !jsonLunaCheckCode.equals(lunaCheckCode)) {
-						response.setStatus(HttpStatus.SC_METHOD_NOT_ALLOWED);
-						model.put("errorMsg", "인증 코드를 읽는 중 오류가 발생했습니다.");
-						return "/err/error";
-					}
-				}
 			}else {
 				JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
 				
@@ -492,7 +477,7 @@ public class Rep1000Controller {
 				}
 				
 				
-				model.addAttribute("message", "선택된 데이터 "+paramRepIdCnt+"건 중 "+succCnt+"건이 삭제되었습니다."+addMsg);
+				model.addAttribute("message", "선택된 데이터 "+succCnt+"건이 삭제되었습니다."+addMsg);
 			}else {
 				model.addAttribute("errorYn", "Y");
 				
@@ -938,6 +923,17 @@ public class Rep1000Controller {
 			String svnUsrId = (String) paramMap.get("svnUsrId");
 			String svnUsrPw = (String) paramMap.get("svnUsrPw");
 			String repTypeCd = (String) paramMap.get("repTypeCd");
+			
+			
+			String type = (String) paramMap.get("type");
+			
+			if(type != null && "insert".equals(type)) {
+				
+				String salt = EgovProperties.getProperty("Globals.lunaops.salt");
+				
+				
+				svnUsrPw = CommonScrty.encryptedAria(svnUsrPw, salt);
+			}
 			
 			repVo.setSvnRepUrl(svnRepUrl);
 			repVo.setSvnUsrId(svnUsrId);
