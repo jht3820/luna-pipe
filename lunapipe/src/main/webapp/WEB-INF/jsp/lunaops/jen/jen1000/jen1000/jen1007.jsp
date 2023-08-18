@@ -130,94 +130,123 @@ $(function(){
 	
 	//전송 버튼
 	$("#jenDataSendBtn").click(function(){
-		//팝업이 아닌 경우 동작 안함
-		if(opener){
-			//callback function 값
-			var rtnValue = [];
-			
-			//선택한 JOB
-			var selJenList = selJobGrid.getList();
-			
-			if (gfnIsNull(selJenList)) {
-				jAlert("선택한  JOB이 없습니다.</br>추가하려는 JOB을 우측 목록에 추가해주세요.", "알림창");
-				return false;
-			}
-			
-			jConfirm("선택된 JOB "+selJenList.length+"개를 연결하시겠습니까?","알림창", function(result){
-				if(result){
-					//선택 JOB에 빌드파라미터 넣기
-					if(!gfnIsNull(ADD_JOB_PARAM_LIST)){
-						$.each(selJenList, function(idx, jobInfo){
-							//jenId, jobId
-							var jenId = jobInfo["jenId"];
-							var jobId = jobInfo["jobId"];
-							
-							//파라미터
-							var jobParamData = [];
-							
-							//해당 job에 빌드 파라미터 있는지 체크
-							if(ADD_JOB_PARAM_LIST.hasOwnProperty(jenId) && ADD_JOB_PARAM_LIST[jenId].hasOwnProperty(jobId)){
-								//카멜케이스 -> 스네이크케이스
-								var newParamList = [];
-								$.each(ADD_JOB_PARAM_LIST[jenId][jobId], function(idx, map){
-									newParamList.push({
-										"default_val": map["defaultVal"],
-										"job_param_key": map["jobParamKey"],
-										"job_param_val": map["jobParamVal"],
-										"job_param_type": map["jobParamType"]
-									});
-								});
-								jobParamData = newParamList;
-							}
-							
-							//반환 값 세팅
-							var jobInfo = {
-								"jen_id": jobInfo.jenId
-								, "jen_name": jobInfo.jenNm
-								, "jen_descr": jobInfo.jenDesc
-								, "jen_url": jobInfo.jenUrl
-								, "jen_used": jobInfo.jenUseCd
-								, "jen_job_id": jobInfo.jobId
-								, "jen_job_type": jobInfo.jobTypeCd
-								, "jen_job_type_name": jobInfo.jobTypeNm
-								, "jen_job_used": jobInfo.useCd
-								, "jen_job_start_ord": jobInfo.jobStartOrd
-								, "jen_job_param_list": jobParamData
-							}; 
-							
-							/* 
-							//반환 값 세팅
-							var jobInfo = {
-								"jenId": jobInfo.jenId
-								, "jenNm": jobInfo.jenNm
-								, "jenDesc": jobInfo.jenDesc
-								, "jenUrl": jobInfo.jenUrl
-								, "jenUseCd": jobInfo.jenUseCd
-								, "jobId": jobInfo.jobId
-								, "jobTypeCd": jobInfo.jobTypeCd
-								, "jobTypeNm": jobInfo.jobTypeNm
-								, "useCd": jobInfo.useCd
-								, "jobParamData": jobParamData
-								//, "jenUsrId": jobInfo.jenUsrId
-								//, "jenUsrTok": jobInfo.jenUsrTok 
-							};
-							 */
-							rtnValue.push(jobInfo);
-						});
-					}
-					
-					//function 체크
-					if(typeof opener.parent.setJenItems == "function"){
-						opener.parent.setJenItems(rtnValue);
-					}
-					window.close();
-				}
-			});
-			
-		}else{
-			jAlert("비정상적인 페이지 호출입니다.</br>데이터를 전달하려는 대상이 없습니다.");
-			window.close();
+		//callback function 값
+		var rtnValue = [];
+		
+		//선택한 JOB
+		var selJenList = selJobGrid.getList();
+		
+		if (gfnIsNull(selJenList)) {
+			jAlert("선택한  JOB이 없습니다.</br>추가하려는 JOB을 우측 목록에 추가해주세요.", "알림창");
+			return false;
 		}
+		
+		jConfirm("선택된 JOB "+selJenList.length+"개를 연결하시겠습니까?","알림창", function(result){
+			if(result){
+				//선택 JOB에 빌드파라미터 넣기
+				if(!gfnIsNull(ADD_JOB_PARAM_LIST)){
+					//필요 값
+					var apiId = $("form#jen1007Form > #apiId").val();
+					var srcId = $("form#jen1007Form > #ciId").val();
+					var svcId = $("form#jen1007Form > #svcId").val();
+					var fId = $("form#jen1007Form > #fId").val();
+					var eGeneUrl = $("form#jen1007Form > #eGeneUrl").val();
+					
+					var urows = [];
+					
+					$.each(selJenList, function(idx, jobInfo){
+						//jenId, jobId
+						var jenId = jobInfo["jenId"];
+						var jobId = jobInfo["jobId"];
+						
+						//파라미터
+						var jobParamData = [];
+						
+						//해당 job에 빌드 파라미터 있는지 체크
+						if(ADD_JOB_PARAM_LIST.hasOwnProperty(jenId) && ADD_JOB_PARAM_LIST[jenId].hasOwnProperty(jobId)){
+							//카멜케이스 -> 스네이크케이스
+							var newParamList = [];
+							$.each(ADD_JOB_PARAM_LIST[jenId][jobId], function(idx, map){
+								newParamList.push({
+									"default_val": map["defaultVal"],
+									"job_param_key": map["jobParamKey"],
+									"job_param_val": map["jobParamVal"],
+									"job_param_type": map["jobParamType"]
+								});
+							});
+							jobParamData = newParamList;
+						}
+						
+						//반환 값 세팅
+						var jobInfo = {
+							"key": jobInfo.jenId
+							, "jks_name": jobInfo.jenNm
+							, "jks_src_id": srcId
+							, "jks_descr": jobInfo.jenDesc
+							, "jks_order": jobInfo.jobStartOrd
+							, "jks_used": (jobInfo.useCd == "01")?1:2
+							, "jks_job_id": jobInfo.jobId
+							, "jks_job_type": jobInfo.jobTypeNm
+							, "jks_var": jobParamData
+						}; 
+						
+						urows.push(jobInfo);
+					});
+					
+					//리시브 전달 데이터
+					var returnMap = {
+						"svcid": svcId
+						, "urows": urows
+					};
+					
+					//컨트롤러 전달 데이터
+					var ctrlMap = {
+						"f_id": fId
+						, "src_id": srcId
+						, "api_id": apiId
+					};
+					
+					//data값 receiver에 전달
+					var ajaxObj = new gfnAjaxRequestAction(
+						{"url":"<c:url value='/api/selectSendDataReceiver'/>","loadingShow":true}
+						,{
+							//리시브 반환 데이터
+							data: JSON.stringify(returnMap),
+							//컨트롤러 전달 데이터
+							ctlData: JSON.stringify(ctrlMap)
+						}
+					);
+					
+					//AJAX 전송 성공 함수
+					ajaxObj.setFnSuccess(function(data){
+						//결과 값
+						var result = data.result;
+						
+						//결과 처리 성공
+						if(result == "SUCCESS"){
+							//컨트롤러 데이터
+							var enCtlData = data.enCtlData;
+							
+							//eController 호출
+							var egene_controller = eGeneUrl+'/plugins/jsp/lunaController.jsp?data='+encodeURIComponent(enCtlData);
+							window.location.href = egene_controller;
+							
+						}else{
+							jAlert(data.msg, "알림창");
+							return false;
+						}
+					});
+					
+					//AJAX 전송
+					ajaxObj.send();
+				}else{
+					jAlert("선택한  JOB이 없습니다.</br>추가하려는 JOB을 우측 목록에 추가해주세요.", "알림창");
+					return false;
+				}
+				
+			}
+		});
+			
 	});
 	
 	//닫기 버튼
@@ -1150,9 +1179,13 @@ function fnSelectJen1000JobBldLog(jobList){
 
 
 <div class="main_contents" style="height: auto;">
-	<form:form commandName="jen1000VO" id="searchFrm" name="searchFrm" method="post" onsubmit="return false;">
-		
-	</form:form>
+	<form name="jen1007Form" id="jen1000Form">
+		<input type="hidden" name="ciId" id="ciId" value="${requestScope.ciId }"/>
+		<input type="hidden" name="apiId" id="apiId" value="${requestScope.apiId }"/>
+		<input type="hidden" name="svcId" id="svcId" value="${requestScope.svcId }"/>
+		<input type="hidden" name="fId" id="fId" value="${requestScope.fId }"/>
+		<input type="hidden" name="eGeneUrl" id="eGeneUrl" value="${requestScope.eGeneUrl }"/>
+	</form>
 	<div class = "tab_contents menu" >
 		<div class="main_frame left">
 			<div class="frame_contents">
