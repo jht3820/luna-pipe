@@ -32,6 +32,10 @@ public interface Dpl1000Service {
 	
 	@SuppressWarnings({"rawtypes" })
 	List selectDpl1100DeployJobList(Map inputMap)  throws Exception;
+
+	
+	@SuppressWarnings({"rawtypes" })
+	List selectExternalDpl1100DeployJobList(Map inputMap)  throws Exception;
 	
 	
 	List<Dpl1100VO> selectDpl1100dplJobGridList(Dpl1100VO dpl1300VO)  throws Exception;
