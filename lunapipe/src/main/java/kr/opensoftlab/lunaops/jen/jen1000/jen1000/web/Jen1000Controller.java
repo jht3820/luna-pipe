@@ -34,7 +34,6 @@ import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1000VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1100VO;
 import kr.opensoftlab.sdf.jenkins.NewJenkinsClient;
-import kr.opensoftlab.sdf.jenkins.task.JobBuildTask;
 import kr.opensoftlab.sdf.jenkins.vo.BldTaskListVO;
 import kr.opensoftlab.sdf.jenkins.vo.JenStatusVO;
 import kr.opensoftlab.sdf.util.CommonScrty;
@@ -83,6 +82,33 @@ public class Jen1000Controller {
 
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000View.do")
 	public String selectJen1000View( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try {
+			JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
+			
+			
+			String ciId = OslUtil.jsonGetString(jsonObj, "luna/ci_id");
+			String apiId = OslUtil.jsonGetString(jsonObj, "luna/api_id");
+			String svcId = OslUtil.jsonGetString(jsonObj, "luna/svc_id");
+			String fId = OslUtil.jsonGetString(jsonObj, "luna/f_id");
+			String empId = OslUtil.jsonGetString(jsonObj, "luna/emp_id");
+
+			
+			String eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
+			
+			model.addAttribute("ciId", ciId);
+			model.addAttribute("apiId", apiId);
+			model.addAttribute("svcId", svcId);
+			model.addAttribute("fId", fId);
+			model.addAttribute("empId", empId);
+			model.addAttribute("eGeneUrl", eGeneUrl);
+			
+		}catch(Exception e) {
+			response.setStatus(HttpStatus.SC_BAD_REQUEST);
+			e.printStackTrace();
+			throw new Exception(e.getMessage());
+		}
+		
+		
 		return "/jen/jen1000/jen1000/jen1000";
 	}
 	
@@ -95,16 +121,19 @@ public class Jen1000Controller {
 			JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
 			
 			
-			String ciId = OslUtil.jsonGetString(jsonObj, "ci_id");
+			String ciId = OslUtil.jsonGetString(jsonObj, "luna/ci_id");
+			String apiId = OslUtil.jsonGetString(jsonObj, "luna/api_id");
+			String svcId = OslUtil.jsonGetString(jsonObj, "luna/svc_id");
+			String fId = OslUtil.jsonGetString(jsonObj, "luna/f_id");
+
 			
+			String eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
 			
-			if(ciId == null) {
-				response.setStatus(HttpStatus.SC_BAD_REQUEST);
-				model.put("errorMsg", "구성항목 ID가 없습니다.");
-				return "/err/error";
-			}
-			
-			model.put("ciId", ciId);
+			model.addAttribute("ciId", ciId);
+			model.addAttribute("apiId", apiId);
+			model.addAttribute("svcId", svcId);
+			model.addAttribute("fId", fId);
+			model.addAttribute("eGeneUrl", eGeneUrl);
 			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -116,14 +145,14 @@ public class Jen1000Controller {
 	}
 
 	
-	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1001JenkinsDetailView.do")
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1001View.do")
 	public String selectJen1001JenkinsDetailView( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		return "/jen/jen1000/jen1000/jen1001";
 	}
 	
 	
 	@SuppressWarnings("rawtypes")
-	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1002JobDetailView.do")
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1002View.do")
 	public String selectJen1002JobDetailView( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try{
 			
@@ -1562,6 +1591,45 @@ public class Jen1000Controller {
 		catch(Exception ex){
 			Log.error("selectJen1000JobBuildListAjax()", ex);
 			throw new Exception(ex.getMessage());
+		}
+	}
+	
+	
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000JobApiKeyAjax.do")
+	public ModelAndView selectJen1000JobApiKeyAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+
+			
+			String jenId = (String) paramMap.get("jenId");
+			String jobId = (String) paramMap.get("jobId");
+
+			
+			String salt = EgovProperties.getProperty("Globals.data.salt");
+			
+			String addSalt = EgovProperties.getProperty("Globals.data.addSalt");
+			
+			
+			String enJenId = CommonScrty.encryptedAria(jenId, salt);
+			String enJobId = CommonScrty.encryptedAria(jobId, salt);
+			
+			
+			String key = enJenId+addSalt+enJobId;
+			
+			
+			String rtnValue = CommonScrty.encryptedAria(key, salt);
+			model.addAttribute("errorYn", "N");
+			model.addAttribute("rtnValue", rtnValue);
+			
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("selectJen1000JobApiKeyAjax()", ex);
+
+			model.addAttribute("errorYn", "Y");
+			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+			return new ModelAndView("jsonView");
 		}
 	}
 }
