@@ -49,6 +49,12 @@ public class Dpl1000DAO extends ComOslitsAbstractDAO {
 	}
 	
 	
+	@SuppressWarnings({"rawtypes" })
+	public List selectExternalDpl1100DeployJobList(Map inputMap)  throws Exception{
+		return (List) list("dpl1000DAO.selectExternalDpl1100DeployJobList", inputMap);
+	}
+	
+	
 	@SuppressWarnings({ "rawtypes" })
 	public List selectDpl1100dplJobGridList(Dpl1100VO dpl1300VO)  throws Exception{
 		return (List) list("dpl1000DAO.selectDpl1100dplJobGridList", dpl1300VO);
