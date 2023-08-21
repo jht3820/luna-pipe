@@ -11,7 +11,7 @@
   		</File>
 	 	-->
  		 
-  		<RollingFile name="debug-appender" fileName="/home/khispms/app/lunalogs/debug.log" filePattern="/home/khispms/app/lunalogs/debug.log.%d{yyyy-MM-dd-HH-mm-ss}" append="true">
+  		<RollingFile name="debug-appender" fileName="/home/app/lunalogs/debug.log" filePattern="/home/app/lunalogs/debug.log.%d{yyyy-MM-dd-HH-mm-ss}" append="true">
   		 	<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c{1.} - %msg%n"/>
   		 	<Policies>
 	  		 	<TimeBasedTriggeringPolicy interval="21600" modulate="true"/>
