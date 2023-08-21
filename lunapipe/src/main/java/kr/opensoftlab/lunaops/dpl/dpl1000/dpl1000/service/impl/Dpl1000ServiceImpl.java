@@ -66,7 +66,12 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 	public List selectDpl1100DeployJobList(Map inputMap)  throws Exception{
 		return dpl1000DAO.selectDpl1100DeployJobList(inputMap);
 	}
+
 	
+	@SuppressWarnings({"rawtypes" })
+	public List selectExternalDpl1100DeployJobList(Map inputMap)  throws Exception{
+		return dpl1000DAO.selectExternalDpl1100DeployJobList(inputMap);
+	}
 	
 	@SuppressWarnings("unchecked")
 	public List<Dpl1100VO> selectDpl1100dplJobGridList(Dpl1100VO dpl1300VO)  throws Exception{
