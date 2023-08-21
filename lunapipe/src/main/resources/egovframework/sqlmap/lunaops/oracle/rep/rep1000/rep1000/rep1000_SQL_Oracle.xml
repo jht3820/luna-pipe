@@ -305,6 +305,14 @@
 	</delete>
 	
 	
+	<delete id="rep1000DAO.deleteRep1001RepInfo" parameterClass="java.util.Map">
+		 
+		DELETE FROM	REP1001
+		WHERE 1=1
+		AND REP_ID = #repId#
+	</delete>
+	
+	
 	<insert id="rep1000DAO.insertRep1001CIRepInfo" parameterClass="java.util.Map">
 		 
 		INSERT INTO REP1001 (
