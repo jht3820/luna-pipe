@@ -20,7 +20,10 @@
 .main_contents {
     margin: 10px;
 }
-
+.alert > #popup_message {
+    line-height: 15px;
+    word-break: break-all;
+}
 
 
 /* 반응형 속성 제거 */
