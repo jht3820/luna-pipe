@@ -376,7 +376,8 @@ $(document).ready(function() {
 				"svnRepUrl": svnRepUrl,
 				"svnUsrId": svnUsrId,
 				"svnUsrPw": svnUsrPw,
-				"repTypeCd": repTypeCd
+				"repTypeCd": repTypeCd,
+				"type": '${param.popupGb}'
 			   };
 	
 		//AJAX 설정
@@ -552,7 +553,7 @@ $(document).ready(function() {
 						<div class="pop_menu_col2 menu_col2_subStyle" guide="gitUser" ><input type="text" title="사용자 ID" class="input_txt" name="gitUsrId" id="gitUsrId" value="" maxlength="30" /></div>
 					</div>
 					<div class="pop_menu_row">
-						<div class="pop_menu_col1 menu_col1_subStyle pop_menu_col1_right"><label for="svnUsrPw">PASSWORD</label><span class="required_info">&nbsp;*</span></div>
+						<div class="pop_menu_col1 menu_col1_subStyle pop_menu_col1_right"><label for="gitUsrPw">PASSWORD</label><span class="required_info">&nbsp;*</span></div>
 						<div class="pop_menu_col2 menu_col2_subStyle" guide="gitPassword" ><input type="password" title="PASSWORD" class="input_txt" name="gitUsrPw" id="gitUsrPw" value="" maxlength="50" /></div>
 					</div>
 				</div>
