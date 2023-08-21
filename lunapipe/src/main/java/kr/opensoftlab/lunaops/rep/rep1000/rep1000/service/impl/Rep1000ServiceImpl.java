@@ -151,7 +151,11 @@ public class Rep1000ServiceImpl extends EgovAbstractServiceImpl implements Rep10
 	
 	@Override
 	public void deleteRep1000Info(Map<String, String> paramMap) throws Exception{
+		
 		rep1000DAO.deleteRep1000Info(paramMap);
+		
+		
+		rep1000DAO.deleteRep1001RepInfo(paramMap);
 	}
 	
 	
@@ -171,13 +175,11 @@ public class Rep1000ServiceImpl extends EgovAbstractServiceImpl implements Rep10
 				Map newMap = new HashMap<>();
 				newMap.put("repId", repId);
 				
+				rep1000DAO.deleteRep1000Info(newMap);
 				
-				int useCount = rep1000DAO.selectRep1000UseCountInfo(newMap);
 				
-				if(useCount == 0){
-					rep1000DAO.deleteRep1000Info(newMap);
-					delCount++;
-				}
+				rep1000DAO.deleteRep1001RepInfo(newMap);
+				delCount++;
 			}
 		}
 		return delCount;
