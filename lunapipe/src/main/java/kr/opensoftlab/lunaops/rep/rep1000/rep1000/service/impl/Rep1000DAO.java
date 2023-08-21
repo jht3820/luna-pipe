@@ -62,6 +62,11 @@ public class Rep1000DAO extends ComOslitsAbstractDAO {
 	}	
 	
 	
+	public void deleteRep1001RepInfo(Map<String, String> paramMap) throws Exception{
+		delete("rep1000DAO.deleteRep1001RepInfo", paramMap);
+	}	
+	
+	
 	public String insertRep1001CIRepInfo(Map<String, String> paramMap) throws Exception{
 		return (String) insert("rep1000DAO.insertRep1001CIRepInfo", paramMap);
 	}
