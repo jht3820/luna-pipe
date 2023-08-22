@@ -102,6 +102,24 @@
 		<result property="modifyUsrIp" column="MODIFY_USR_IP" />
 	</resultMap>
 	
+    
+    <resultMap id="resultDplJobListExt" class="HashMap">
+		<result property="ci_id" 			column="CI_ID" />
+		<result property="ticket_id"		column="TICKET_ID" />
+		<result property="dpl_id" 			column="DPL_ID" />
+		<result property="jen_id" 			column="JEN_ID" />
+		<result property="jen_nm" 			column="JEN_NM" />
+		<result property="jen_url" 			column="JEN_URL" />
+		<result property="jen_desc" 		column="JEN_DESC" />
+		<result property="job_id" 			column="JOB_ID" />
+		<result property="job_ord" 			column="JOB_START_ORD" />
+		<result property="job_type_nm" 		column="JOB_TYPE_NM" />
+		<result property="bld_num" 			column="BLD_NUM" />
+		<result property="bld_result" 		column="BLD_RESULT" />
+		<result property="bld_duration_tm" 	column="BLD_DURATION_TM" />
+		<result property="bld_start_dtm" 	column="BLD_START_DTM" />
+	</resultMap>
+	
    	<sql id="dpl1000DAO.selectDpl1000BaseList">
 		<![CDATA[
 		SELECT *
@@ -317,6 +335,12 @@
 	
 	
 	<select id="dpl1000DAO.selectDpl1100DeployJobList" parameterClass="java.util.Map" resultClass="egovMap">
+			
+			<include refid="dpl1000DAO.selectDpl1100JobList"/>
+	</select>
+	
+	
+	<select id="dpl1000DAO.selectExternalDpl1100DeployJobList" parameterClass="java.util.Map" resultMap="resultDplJobListExt">
 			
 			<include refid="dpl1000DAO.selectDpl1100JobList"/>
 	</select>
