@@ -25,50 +25,88 @@ $(function(){
 	//전송 버튼
 	$("#repDataSendBtn").click(function(){
 		
-		//팝업이 아닌 경우 동작 안함
-		if(opener){
-			var rtnValue = [];	
+		var rtnValue = [];
+		
+		//선택한 저장소
+		var selRepList = repGridObj.getList('selected');
+		
+		if (gfnIsNull(selRepList)) {
+			jAlert("선택한 저장소가 없습니다.", "알림창");
+			return false;
+		}
+		jConfirm("선택된 저장소 "+selRepList.length+"개를 연결하시겠습니까?","알림창", function(result){
+			//필요 값
+			var apiId = $("form#rep1000Form > #apiId").val();
+			var srcId = $("form#rep1000Form > #ciId").val();
+			var svcId = $("form#rep1000Form > #svcId").val();
+			var fId = $("form#rep1000Form > #fId").val();
+			var eGeneUrl = $("form#rep1000Form > #eGeneUrl").val();
 			
-			//선택한 저장소
-			var selRepList = repGridObj.getList('selected');
+			//저장소 param
+			var urows = [];
 			
-			if (gfnIsNull(selRepList)) {
-				jAlert("선택한 저장소가 없습니다.", "알림창");
-				return false;
-			}
-			jConfirm("선택된 저장소 "+selRepList.length+"개를 연결하시겠습니까?","알림창", function(result){
-				//선택 저장소 값 loop
-				$.each(selRepList, function(idx, map){
-					var repInfo = {
-						"rep_id": map.repId
-						, "svn_name": map.repNm
-						, "svn_descr": map.repTxt
-						//, "svn_src_id": map.repTxt
-						, "svn_url": map.svnRepUrl
-					};
-					
-					 /* 
-					var repInfo = {
-						"repId": map.repId
-						, "repNm": map.repNm
-						, "repTxt": map.repTxt
-						, "svnRepUrl": map.svnRepUrl
-					};
-					 */
-					
-					rtnValue.push(repInfo);
-				});
+			//선택 저장소 값 loop
+			$.each(selRepList, function(idx, map){
+				var repInfo = {
+					"key": map.repId
+					, "svn_name": map.repNm
+					, "svn_src_id": srcId
+					, "svn_mod": ""
+					, "svn_url": map.svnRepUrl
+					, "svn_descr": map.repTxt
+					, "svn_used": (map.useCd == "01")?1:2
+				};
 				
-				//function 체크
-				if(typeof opener.parent.setSvnItems == "function"){
-					opener.parent.setSvnItems(rtnValue);
-				}
-				window.close();
+				urows.push(repInfo);
 			});
 			
-		}else{
-			jAlert("비정상적인 페이지 호출입니다.</br>데이터를 전달하려는 대상이 없습니다.");
-		}
+			//리시브 전달 데이터
+			var returnMap = {
+				"svc_id": svcId
+				, "urows": urows
+			};
+			
+			//컨트롤러 전달 데이터
+			var ctrlMap = {
+				"f_id": fId
+				, "src_id": srcId
+				, "api_id": apiId
+			};
+			
+			//data값 receiver에 전달
+			var ajaxObj = new gfnAjaxRequestAction(
+				{"url":"<c:url value='/api/selectSendDataReceiver'/>","loadingShow":true}
+				,{
+					//리시브 반환 데이터
+					data: JSON.stringify(returnMap),
+					//컨트롤러 전달 데이터
+					ctlData: JSON.stringify(ctrlMap)
+				}
+			);
+			
+			//AJAX 전송 성공 함수
+			ajaxObj.setFnSuccess(function(data){
+				//결과 값
+				var result = data.result;
+				
+				//결과 처리 성공
+				if(result == "SUCCESS"){
+					//컨트롤러 데이터
+					var enCtlData = data.enCtlData;
+					
+					//eController 호출
+					var egene_controller = eGeneUrl+'/plugins/jsp/lunaController.jsp?data='+encodeURIComponent(enCtlData);
+					window.location.href = egene_controller;
+					
+				}else{
+					jAlert(data.msg, "알림창");
+					return false;
+				}
+			});
+			
+			//AJAX 전송
+			ajaxObj.send();
+		});
 	});
 	
 	//닫기 버튼
@@ -201,12 +239,14 @@ function fnRepGridSetting(){
              	}
              	//수정
              	else if(item.type == "repUpdate"){
-             		var data = {"popupGb": "update", "repId": selItem.repId};
+             		var empId = $("form#rep1000Form > #empId").val();
+             		
+             		var data = {"popupGb": "update", "repId": selItem.repId, "empId": empId};
 					gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1040","590",'scroll');
              	}
              	//삭제
              	else if(item.type == "repDelete"){
-             		jConfirm("저장소를 삭제 하시겠습니까?</br>배정된 구성항목이 있는 경우 삭제 대상에서 제외됩니다.","알림", function(result){
+             		jConfirm("저장소를 삭제 하시겠습니까?</br>배정된 구성항목이 있는 경우 연결 정보가 함께 삭제됩니다.","알림", function(result){
 						if(result){
 							var repIdListStr = "&repId="+selItem.repId;
 							
@@ -290,7 +330,7 @@ function fnDeleteRep1000Info(repIds){
 		jAlert(data.message, "알림창");
 		
 		//삭제된 데이터 1건 이상인경우
-		if(errorYn == "N"){
+		if(data.errorYn == "N"){
 			axdom("#" + repSearchObj.getItemId("btn_search_rep")).click();
 		}
 	});
@@ -368,7 +408,7 @@ function fnSearchBoxControl(){
 									return false;
 								}
 								
-								jConfirm("저장소 "+chkList.length+"개를 삭제 하시겠습니까?</br>배정된 구성항목이 있는 경우 삭제 대상에서 제외됩니다.","알림", function(result){
+								jConfirm("저장소 "+chkList.length+"개를 삭제 하시겠습니까?</br>배정된 구성항목이 있는 경우 연결 정보가 함께 삭제됩니다.","알림", function(result){
 									if(result){
 										var repIdListStr = "";
 										$.each(chkList, function(idx, map){
@@ -393,17 +433,20 @@ function fnSearchBoxControl(){
 									jAlert("1개의 저장소만 선택해주세요.", "알림창");
 									return false;
 								}
-								
-								var data = {"popupGb": "update", "repId": chkList[0].repId};
+								var empId = $("form#rep1000Form > #empId").val();
+								var data = {"popupGb": "update", "repId": chkList[0].repId, "empId": empId};
         	                	
 								gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1040","590",'scroll');
 						}},
 						
 						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_insert_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-save' aria-hidden='true'></i>&nbsp;<span>등록</span>",
 							onclick:function(){
+								var empId = $("form#rep1000Form > #empId").val();
 								var data = {
 									"popupGb": "insert"
+									, "empId": empId
 								};
+								
 								gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1040","590",'scroll');
 						}},
 						{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_rep",style:"float:right;", valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
@@ -610,8 +653,14 @@ function fnRep1000GuideShow(){
 
 
 <div class="main_contents" style="height: auto;" >
-	<form:form commandName="rep1000VO" id="searchFrm" name="searchFrm" method="post" onsubmit="return false;">
-	</form:form>
+	<form name="rep1000Form" id="rep1000Form">
+		<input type="hidden" name="ciId" id="ciId" value="${requestScope.ciId }"/>
+		<input type="hidden" name="apiId" id="apiId" value="${requestScope.apiId }"/>
+		<input type="hidden" name="svcId" id="svcId" value="${requestScope.svcId }"/>
+		<input type="hidden" name="fId" id="fId" value="${requestScope.fId }"/>
+		<input type="hidden" name="empId" id="empId" value="${requestScope.empId }"/>
+		<input type="hidden" name="eGeneUrl" id="eGeneUrl" value="${requestScope.eGeneUrl }"/>
+	</form>
 	<div class="tab_contents menu">
 		<div class="sub_title">
 			소스저장소 관리
