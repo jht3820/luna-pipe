@@ -7,6 +7,7 @@ public class OslErrorCode {
 	
 	@SuppressWarnings("serial")
 	private static Map<String, String> errorMsg = new HashMap<String, String>() {{
+		
 		put("001", "파라미터 DATA값 없음");
 		put("002", "인증 KEY 오류 (잘못된 KEY)");
 		put("003", "파라미터 'CI_ID'값 없음");
@@ -14,11 +15,27 @@ public class OslErrorCode {
 		put("005", "파라미터 'TICKET_ID'값 없음");
 		put("006", "파라미터 'REP_ID'값 없음");
 		put("007", "파라미터 'DPL_ID'값 없음");
+		put("008", "JOB_ID 정보 찾을 수 없음");
+		put("009", "REP_ID에 해당하는 소스저장소 정보가 없음");
+		put("010", "JEN_ID, JOB_ID에 해당하는 JENKINS&JOB 정보가 없음");
+		put("011", "등록된 데이터 없음");
+		
+		
 		put("100", "구성항목 저장 중 오류");
 		put("101", "구성항목 저장 데이터 없음(소스저장소, JENKINS)");
 		put("102", "구성항목 `소스저장소` 파라미터 추출 중 오류");
 		put("103", "구성항목 `JENKINS&JOB` 파라미터 추출 중 오류");
+		
+		
 		put("200", "Brache 명 중복");
+		put("201", "소스저장소 고유 식별 ID 'UUID' 값 없음");
+		put("202", "소스저장소 리비전 'rv' 값 없음");
+		
+		
+		put("300", "JENKINS 연결 실패");
+		put("301", "해당 JOB이 이미 실행 중입니다.");
+		
+		
 		put("999", "서버 내 처리 중 오류");
 	}};
 
@@ -54,6 +71,18 @@ public class OslErrorCode {
 	public final static String PARAM_DPL_ID_NULL = "007";
 	
 	
+	public final static String JOB_ID_INFO_NULL = "008";
+	
+	
+	public final static String REP_ID_INFO_NULL = "009";
+	
+	
+	public final static String JEN_JOB_ID_INFO_NULL = "010";
+	
+	
+	public final static String DATA_INSERT_COUNT_NULL = "011";
+	
+	
 	public final static String CI_INSERT_FAIL = "100";
 	
 	
@@ -67,6 +96,18 @@ public class OslErrorCode {
 	
 	
 	public final static String BRANCHE_CREATE_DUPLE = "200";
+	
+	
+	public final static String REP_UUID_PARAM_NULL = "201";
+	
+	
+	public final static String REP_REVISION_PARAM_NULL = "202";
+	
+	
+	public final static String JENKINS_CONN_FAIL = "300";
+	
+	
+	public final static String JOB_DUPLE_ACTION = "301";
 	
 	
 	public final static String SERVER_ERROR = "999";
