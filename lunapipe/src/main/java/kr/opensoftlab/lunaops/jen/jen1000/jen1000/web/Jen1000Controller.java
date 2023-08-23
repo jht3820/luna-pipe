@@ -86,11 +86,12 @@ public class Jen1000Controller {
 			JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
 			
 			
-			String ciId = OslUtil.jsonGetString(jsonObj, "luna/ci_id");
-			String apiId = OslUtil.jsonGetString(jsonObj, "luna/api_id");
-			String svcId = OslUtil.jsonGetString(jsonObj, "luna/svc_id");
-			String fId = OslUtil.jsonGetString(jsonObj, "luna/f_id");
-			String empId = OslUtil.jsonGetString(jsonObj, "luna/emp_id");
+			String ciId = OslUtil.jsonGetString(jsonObj, "src_id");
+			String apiId = OslUtil.jsonGetString(jsonObj, "api_id");
+			String svcId = OslUtil.jsonGetString(jsonObj, "svc_id");
+			String fId = OslUtil.jsonGetString(jsonObj, "f_id");
+			String empId = OslUtil.jsonGetString(jsonObj, "emp_id");
+			String callbakApiId = OslUtil.jsonGetString(jsonObj, "callbak_api_id");
 
 			
 			String eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
@@ -101,6 +102,7 @@ public class Jen1000Controller {
 			model.addAttribute("fId", fId);
 			model.addAttribute("empId", empId);
 			model.addAttribute("eGeneUrl", eGeneUrl);
+			model.addAttribute("callbakApiId", callbakApiId);
 			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -121,10 +123,12 @@ public class Jen1000Controller {
 			JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
 			
 			
-			String ciId = OslUtil.jsonGetString(jsonObj, "luna/ci_id");
-			String apiId = OslUtil.jsonGetString(jsonObj, "luna/api_id");
-			String svcId = OslUtil.jsonGetString(jsonObj, "luna/svc_id");
-			String fId = OslUtil.jsonGetString(jsonObj, "luna/f_id");
+			String ciId = OslUtil.jsonGetString(jsonObj, "src_id");
+			String apiId = OslUtil.jsonGetString(jsonObj, "api_id");
+			String svcId = OslUtil.jsonGetString(jsonObj, "svc_id");
+			String ticketId = OslUtil.jsonGetString(jsonObj, "ticket_id");
+			String fId = OslUtil.jsonGetString(jsonObj, "f_id");
+			String callbakApiId = OslUtil.jsonGetString(jsonObj, "callbak_api_id");
 
 			
 			String eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
@@ -133,7 +137,9 @@ public class Jen1000Controller {
 			model.addAttribute("apiId", apiId);
 			model.addAttribute("svcId", svcId);
 			model.addAttribute("fId", fId);
+			model.addAttribute("ticketId", ticketId);
 			model.addAttribute("eGeneUrl", eGeneUrl);
+			model.addAttribute("callbakApiId", callbakApiId);
 			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -372,11 +378,6 @@ public class Jen1000Controller {
 			PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(jen1000VO);  
 
 			List<Jen1000VO> jen1000List = null;
-
-			
-			
-
-			
 
 			
 			int totCnt = 0;
@@ -675,6 +676,7 @@ public class Jen1000Controller {
 			if("update".equals(type)){
 				
 				if(!nowJenUsrTok.equals(jenUsrTok)){
+					
 					
 					newJenUsrTok = CommonScrty.encryptedAria(jenUsrTok, salt);
 				}else{
