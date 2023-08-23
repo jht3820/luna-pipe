@@ -1,10 +1,8 @@
 package kr.opensoftlab.lunaops.rep.rep1000.rep1000.web;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +27,6 @@ import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 import kr.opensoftlab.lunaops.com.api.service.ApiService;
 import kr.opensoftlab.lunaops.com.exception.UserDefineException;
-import kr.opensoftlab.lunaops.com.vo.OslErrorCode;
 import kr.opensoftlab.lunaops.rep.rep1000.rep1000.service.Rep1000Service;
 import kr.opensoftlab.lunaops.rep.rep1000.rep1000.vo.Rep1000VO;
 import kr.opensoftlab.sdf.rep.com.RepModule;
@@ -93,17 +90,15 @@ public class Rep1000Controller {
 		
 		try {
 			
-			String salt = EgovProperties.getProperty("Globals.data.salt");
-			
-			
 			JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
 			
 			
-			String ciId = OslUtil.jsonGetString(jsonObj, "luna/ci_id");
-			String apiId = OslUtil.jsonGetString(jsonObj, "luna/api_id");
-			String svcId = OslUtil.jsonGetString(jsonObj, "luna/svc_id");
-			String fId = OslUtil.jsonGetString(jsonObj, "luna/f_id");
-			String empId = OslUtil.jsonGetString(jsonObj, "luna/emp_id");
+			String ciId = OslUtil.jsonGetString(jsonObj, "src_id"); 
+			String apiId = OslUtil.jsonGetString(jsonObj, "api_id");
+			String svcId = OslUtil.jsonGetString(jsonObj, "svc_id");
+			String fId = OslUtil.jsonGetString(jsonObj, "f_id");
+			String empId = OslUtil.jsonGetString(jsonObj, "emp_id");
+			String callbakApiId = OslUtil.jsonGetString(jsonObj, "callbak_api_id");
 
 			
 			String eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
@@ -114,29 +109,7 @@ public class Rep1000Controller {
 			model.addAttribute("fId", fId);
 			model.addAttribute("empId", empId);
 			model.addAttribute("eGeneUrl", eGeneUrl);
-			
-			
-			jsonObj.put("current_date", new Date().getTime());
-			
-			
-			byte[] arr = new byte[8];
-	        new Random().nextBytes(arr);
-	        
-	        StringBuilder result = new StringBuilder();
-	        for (byte temp : arr) {
-	            result.append(String.format("%02x", temp));
-	        }
-
-			
-			jsonObj.put("lunaCheckCode", result.toString());
-			
-			
-			request.getSession().setAttribute("lunaCheckCode", result.toString());
-			
-			
-			String rtnData = CommonScrty.encryptedAria(jsonObj.toString(), salt);
-			
-			model.addAttribute("rtnData", rtnData);
+			model.addAttribute("callbakApiId", callbakApiId);
 		}catch(Exception e) {
 			Log.error(e);
 			e.printStackTrace();
@@ -179,7 +152,18 @@ public class Rep1000Controller {
 			
 			int totCnt = 0;
 			rep1000List =  rep1000Service.selectRep1000RepositoryList(rep1000VO);
-
+			
+			
+			String salt = EgovProperties.getProperty("Globals.data.salt");
+			
+			
+			for(Rep1000VO rep1000Info : rep1000List) {
+				String jsonParam = "{key: '"+salt+"', type: 'local', rep_id: '"+rep1000Info.getRepId()+"'}";
+				String enParam = CommonScrty.encryptedAria(jsonParam, salt);
+				
+				rep1000Info.setEnRepIdData(enParam);
+			}
+			
 			
 			
 			totCnt =rep1000Service.selectRep1000RepositoryListCnt(rep1000VO);
@@ -241,28 +225,44 @@ public class Rep1000Controller {
 		try {
 			
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
-						
 			
-			String repId = paramMap.get("repId");
 			
-			if(repId != null) {
-				
-				String lunaCheckCode = (String) request.getSession().getAttribute("lunaCheckCode");
-				
-				
-				
-			}else {
-				JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
-				
-				
-				repId = OslUtil.jsonGetString(jsonObj, "repId");
-			}
+			JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
+
 			
+			String type = OslUtil.jsonGetString(jsonObj, "type");
+			
+			
+			String ciId = OslUtil.jsonGetString(jsonObj, "src_id"); 
+			String ticketId = OslUtil.jsonGetString(jsonObj, "ticket_id");
+			String apiId = OslUtil.jsonGetString(jsonObj, "api_id");
+			String svcId = OslUtil.jsonGetString(jsonObj, "svc_id");
+			String fId = OslUtil.jsonGetString(jsonObj, "f_id");
+			String empId = OslUtil.jsonGetString(jsonObj, "emp_id");
+			String callbakApiId = OslUtil.jsonGetString(jsonObj, "callbak_api_id");
+
+			
+			String eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
+			
+			model.addAttribute("ciId", ciId);
+			model.addAttribute("ticketId", ticketId);
+			model.addAttribute("apiId", apiId);
+			model.addAttribute("svcId", svcId);
+			model.addAttribute("fId", fId);
+			model.addAttribute("empId", empId);
+			model.addAttribute("eGeneUrl", eGeneUrl);
+			model.addAttribute("callbakApiId", callbakApiId);
+			
+			
+			String repId = OslUtil.jsonGetString(jsonObj, "rep_id");
+			
+			paramMap.put("repId", repId);
 			
 			RepVO repInfo = rep1000Service.selectRep1000Info(paramMap);
 			
-			model.put("repInfo", repInfo);
-			model.put("repId", "repId");
+			model.addAttribute("repInfo", repInfo);
+			model.addAttribute("repId", repId);
+			model.addAttribute("type", type);
 			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -429,6 +429,9 @@ public class Rep1000Controller {
 				
 				return new ModelAndView("jsonView");
 			}
+			
+			
+			paramMap.put("repUuid", repResultVO.getUuid());
 			
 			
 			Object insertKey = rep1000Service.saveRep1000Info(paramMap);
@@ -670,11 +673,16 @@ public class Rep1000Controller {
 			String selRepPath = (String) paramMap.get("selRepPath");
 			
 			
+			if(selRepPath == null || "".equals(selRepPath)) {
+				selRepPath = "/";
+			}
+			
+			
 			String[] filePath = new String[] {selRepPath};
 			
 			
 			if(searchFilePath != null && !"".equals(searchFilePath)) {
-				filePath = new String[] {selRepPath+searchFilePath};
+				filePath = new String[] {searchFilePath};
 			}
 			Map repDataMap = repModule.selectRepLogPageList(repResultVO, filePath, startRevision, lastRevision, _pageNo, _pageSize, searchMap);
 			
@@ -759,7 +767,18 @@ public class Rep1000Controller {
 			RepVO repVo = rep1000Service.selectRep1000Info(paramMap);
 			
 			
-			RepDirVO repDirVO = repModule.setDirectoryList(repVo, revision, commitId);
+			String selRepPath = (String) paramMap.get("selRepPath");
+			
+			
+			if(selRepPath == null || "".equals(selRepPath)) {
+				selRepPath = "/";
+			}
+			
+			
+			String[] filePath = new String[] {selRepPath};
+			
+			
+			RepDirVO repDirVO = repModule.setDirectoryList(repVo, revision, commitId, filePath);
 			
 			model.addAttribute("revisionDirList", repDirVO.getRevisionDirList());
 			model.addAttribute("revisionFileList", repDirVO.getRevisionFileList());
