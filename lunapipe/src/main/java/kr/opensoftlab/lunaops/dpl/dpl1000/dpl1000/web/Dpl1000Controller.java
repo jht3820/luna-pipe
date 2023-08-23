@@ -26,7 +26,6 @@ import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.service.Dpl1000Service;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
-import kr.opensoftlab.sdf.jenkins.AutoBuildInit;
 import kr.opensoftlab.sdf.jenkins.NewJenkinsClient;
 import kr.opensoftlab.sdf.jenkins.service.BuildService;
 import kr.opensoftlab.sdf.jenkins.vo.BuildVO;
@@ -57,25 +56,13 @@ public class Dpl1000Controller {
     @Resource(name = "dpl1000Service")
     private Dpl1000Service dpl1000Service;
     
-	
-    
-    
-    
     
 	@Resource(name = "jen1000Service")
 	private Jen1000Service jen1000Service;
-	
-	
-    
-    
 
 	
 	@Resource(name = "newJenkinsClient")
 	private NewJenkinsClient newJenkinsClient;
-	
-	
-	@Resource(name = "autoBuildInit")
-	private AutoBuildInit autoBuildInit;
 	
 	
 	@Resource(name = "buildService")
@@ -89,7 +76,7 @@ public class Dpl1000Controller {
 			JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
 			
 			
-			String ciId = OslUtil.jsonGetString(jsonObj, "ci_id");
+			String ciId = OslUtil.jsonGetString(jsonObj, "src_id");
 			
 			
 			if(ciId == null) {
@@ -119,9 +106,13 @@ public class Dpl1000Controller {
 				return "/err/error";
 			}
 			
+			
+			String empId = OslUtil.jsonGetString(jsonObj, "emp_id");
+			
 			model.put("ciId", ciId);
 			model.put("ticketId", ticketId);
 			model.put("dplId", dplId);
+			model.put("empId", empId);
 			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -427,6 +418,7 @@ public class Dpl1000Controller {
 			String ciId= (String)paramMap.get("ciId");
 			String ticketId= (String)paramMap.get("ticketId");
 			String dplId= (String)paramMap.get("dplId");
+			String empId= (String)paramMap.get("empId");
 			
 			
 			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
@@ -481,6 +473,8 @@ public class Dpl1000Controller {
 			buildVo.setCiId(ciId);
 			buildVo.setTicketId(ticketId);
 			buildVo.setDplId(dplId);
+			buildVo.setBldStartUsrId(empId);
+			buildVo.setBldStartUsrIp(request.getRemoteAddr());
 			
 			
 			buildVo.addBldActionLog(jobId+" JOB 빌드를 준비 중입니다.");
