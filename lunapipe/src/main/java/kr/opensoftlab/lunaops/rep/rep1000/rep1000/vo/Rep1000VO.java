@@ -27,7 +27,8 @@ public class Rep1000VO extends PageVO {
 	private String prjNm;
 	private String gitUsrAuthTypeCd;
 	
-
+	
+	private String enRepIdData;
 	
 	public String getGitUsrAuthTypeCd() {
 		return gitUsrAuthTypeCd;
@@ -124,6 +125,12 @@ public class Rep1000VO extends PageVO {
 	}
 	public void setRn(String rn) {
 		this.rn = rn;
+	}
+	public String getEnRepIdData() {
+		return enRepIdData;
+	}
+	public void setEnRepIdData(String enRepIdData) {
+		this.enRepIdData = enRepIdData;
 	}
 
 }
