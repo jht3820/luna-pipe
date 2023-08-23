@@ -17,7 +17,7 @@ public interface ApiService {
 	Map selectCIRepJenJob(Map paramMap) throws Exception;
 	
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes"})
 	Map selectTicketJobInfo(Map paramMap) throws Exception;
 	
 	
@@ -28,6 +28,19 @@ public interface ApiService {
 	@SuppressWarnings({ "rawtypes" })
 	void insertJobBldLogInfo(Map paramMap) throws Exception;
 	
+	
+	@SuppressWarnings({ "rawtypes" })
+	Map insertJobBldAction(Map paramMap) throws Exception;
+	
+	
 	@SuppressWarnings({ "rawtypes"})
 	Map insertRepTicketBranchInfo(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings({ "rawtypes"})
+	Map insertRepRevisionInfo(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings({ "rawtypes" })
+	Map selectTicketRvDataList(Map paramMap) throws Exception;
 }
