@@ -60,9 +60,6 @@ public interface Dpl1000Service {
 	void updateDpl1000DplStsCdInfo(Map paramMap) throws Exception;
 	
 	
-	@SuppressWarnings("rawtypes")
-	void deleteDpl1000DeployVerInfo(Map paramMap) throws Exception;
-	
 	
 	int selectDpl1000ListCnt(Dpl1000VO dpl1000VO) throws Exception;
 	
