@@ -25,9 +25,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
-import javax.sql.rowset.serial.SerialBlob;
-
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,15 +45,15 @@ public class EgovFileMngUtil {
 	
 	
 	public List<FileVO> fileUploadInsert(MultipartHttpServletRequest request,String inputAtchFileId, int inputFileSn, String addStrPath) throws Exception{
-		//파일 정보 담을 변수
+		
    		List<FileVO> _result = null;
    		
 		inputFileSn = (inputFileSn<0)?0:inputFileSn;
-		//첨부된 파일 정보 불러오기
+		
 		final Map<String, MultipartFile> files = request.getFileMap();
-			//첨부된 파일이 존재할 경우
+			
 			if(!files.isEmpty()){
-				//실제 저장소에 파일을 등록하고 FileVO 리턴
+				
 					_result = parseFileInf(files, "OSL_", inputFileSn, inputAtchFileId,"",addStrPath);
 			}
 		return _result;
@@ -73,7 +70,7 @@ public class EgovFileMngUtil {
 		} else {
 			storePathString = EgovProperties.getProperty(storePath);
 		}
-		//storePath 폴더 분류
+		
 		if(!"".equals(addStrPath) && addStrPath != null){
 			storePathString += addStrPath+"/";
 		}
@@ -96,7 +93,7 @@ public class EgovFileMngUtil {
 		List<FileVO> result = new ArrayList<FileVO>();
 		FileVO fvo;
 
-		//파일 업로드 사이즈 구하기
+		
 		long fileInfoMaxSize = Long.parseLong(EgovProperties.getProperty("Globals.lunaops.fileInfoMaxSize"));
 		long fileSumMaxSize = Long.parseLong(EgovProperties.getProperty("Globals.lunaops.fileSumMaxSize"));
 		
@@ -108,35 +105,35 @@ public class EgovFileMngUtil {
 			file = entry.getValue();
 
 			String orginFileName = file.getOriginalFilename();
-			//--------------------------------------
-			// 원 파일명이 없는 경우 처리
-			// (첨부가 되지 않은 input file type)
-			//--------------------------------------
+			
+			
+			
+			
 			
 			if ("".equals(orginFileName)) {
-				//클립보드판 ie 데이터 파일명이 ""이여서 제거 (2017-06-15)
-				//continue;
+				
+				
 				orginFileName = "image.png";
 			}
-			////------------------------------------
+			
 
 			int index = orginFileName.lastIndexOf(".");
-			//String fileName = orginFileName.substring(0, index);
+			
 			String fileExt = orginFileName.substring(index + 1);
 			
-			//확장자가 없는 경우
+			
 			if(index == -1){
 				continue;
 			}
 			
 			
 			if("UsrImg".equals(addStrPath)){
-				//확장자 이미지인지 체크
+				
 				String imgPattern = "(jpg|jpeg|png|gif)$";
 				Pattern p = Pattern.compile(imgPattern);
 				Matcher m = p.matcher(fileExt.toLowerCase());
 				
-				//확장자 체크, 이미지 확장자가 아닐 경우
+				
 				if(m.find() == false){
 					continue;
 				}
@@ -146,7 +143,7 @@ public class EgovFileMngUtil {
 			String newName = KeyStr + getTimeStamp() + fileKey;
 			long size = file.getSize();
 
-			//파일 사이즈 체크하기
+			
 			if(size > fileInfoMaxSize || fileSumSize > fileSumMaxSize){
 				continue;
 			}
@@ -233,7 +230,7 @@ public class EgovFileMngUtil {
 			throw new FileNotFoundException(downFileName);
 		}
 
-		byte[] buffer = new byte[BUFF_SIZE]; //buffer size 2K.
+		byte[] buffer = new byte[BUFF_SIZE]; 
 
 		response.setContentType("application/x-msdownload");
 		response.setHeader("Content-Disposition:", "attachment; filename*=UTF-8''" + new String(orgFileName.getBytes(), "UTF-8").replaceAll(",","%2C"));
@@ -261,20 +258,20 @@ public class EgovFileMngUtil {
 	public static HashMap<String, String> uploadFile(MultipartFile file) throws Exception {
 
 		HashMap<String, String> map = new HashMap<String, String>();
-		//Write File 이후 Move File????
+		
 		String newName = "";
 		String stordFilePath = EgovProperties.getProperty("Globals.fileStorePath");
 		String orginFileName = file.getOriginalFilename();
 
 		int index = orginFileName.lastIndexOf(".");
-		//String fileName = orginFileName.substring(0, _index);
+		
 		String fileExt = orginFileName.substring(index + 1);
 		long size = file.getSize();
 
-		//newName 은 Naming Convention에 의해서 생성
-		newName = getTimeStamp(); // 2012.11 KISA 보안조치
+		
+		newName = getTimeStamp(); 
 		writeFile(file, newName, stordFilePath);
-		//storedFilePath는 지정
+		
 		map.put(Globals.ORIGIN_FILE_NM, orginFileName);
 		map.put(Globals.UPLOAD_FILE_NM, newName);
 		map.put(Globals.FILE_EXT, fileExt);
@@ -333,13 +330,13 @@ public class EgovFileMngUtil {
 
 				String mimetype = "application/x-msdownload";
 
-				//response.setBufferSize(fSize);
+				
 				response.setContentType(mimetype);
 				response.setHeader("Content-Disposition:", "attachment; filename*=UTF-8''" + orgFileName.replaceAll(",","%2C"));
 				response.setContentLength(fSize);
-				//response.setHeader("Content-Transfer-Encoding","binary");
-				//response.setHeader("Pragma","no-cache");
-				//response.setHeader("Expires","0");
+				
+				
+				
 				FileCopyUtils.copy(in, response.getOutputStream());
 			} finally {
 				EgovResourceCloseHelper.close(in);
@@ -358,7 +355,7 @@ public class EgovFileMngUtil {
 
 		String rtnStr = null;
 
-		// 문자열로 변환하기 위한 패턴 설정(년도-월-일 시:분:초:초(자정이후 초))
+		
 		String pattern = "yyyyMMddhhmmssSSS";
 
 		SimpleDateFormat sdfCurrent = new SimpleDateFormat(pattern, Locale.KOREA);
@@ -372,7 +369,7 @@ public class EgovFileMngUtil {
 
 	public static String deleteFile(String fileDeletePath) {
 
-		// 인자값 유효하지 않은 경우 블랭크 리턴
+		
 		if (fileDeletePath == null || fileDeletePath.equals("")) {
 			return "";
 		}
