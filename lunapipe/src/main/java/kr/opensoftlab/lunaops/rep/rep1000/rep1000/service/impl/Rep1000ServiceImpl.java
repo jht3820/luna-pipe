@@ -57,7 +57,6 @@ public class Rep1000ServiceImpl extends EgovAbstractServiceImpl implements Rep10
 		
 		String salt = EgovProperties.getProperty("Globals.lunaops.salt");
 		
-
 		
 		String newEnPw = "";
 		
