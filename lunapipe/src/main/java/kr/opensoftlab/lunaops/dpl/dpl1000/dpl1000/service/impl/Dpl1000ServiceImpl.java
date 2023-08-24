@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
 
 import javax.annotation.Resource;
 
@@ -21,11 +20,9 @@ import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1000VO;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.sdf.excel.ExcelDataListResultHandler;
-import kr.opensoftlab.sdf.jenkins.vo.AutoBuildVO;
 import kr.opensoftlab.sdf.jenkins.vo.BuildVO;
 import kr.opensoftlab.sdf.jenkins.vo.ChangePathsVO;
 import kr.opensoftlab.sdf.jenkins.vo.ChangeVO;
-import kr.opensoftlab.sdf.jenkins.vo.GlobalDplListVO;
 
 
 @Service("dpl1000Service")
@@ -192,49 +189,6 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 		dpl1000DAO.updateDpl1000DplStsCdInfo(paramMap);
 	}
 	
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void deleteDpl1000DeployVerInfo(Map paramMap) throws Exception{
-		
-		List<Map<String,String>> list = (List<Map<String,String>>) paramMap.get("list");
-		
-		
-		String prjId = (String)paramMap.get("prjId");
-		
-		int listSize = list.size();
-		List<AutoBuildVO> autoList = GlobalDplListVO.getDplList();
-		
-		for (int i = 0; i < listSize; i++) {
-			Map<String,String> dplMap = list.get(i);
-			dplMap.put("prjId", prjId);
-			
-			
-			String dplId = dplMap.get("dplId");
-			
-			
-			dpl1000DAO.deleteDpl1000DeployVerInfo(dplMap);
-			
-			
-			for(int j=0;j<autoList.size();j++){
-				AutoBuildVO autoInfo = autoList.get(j);
-				
-				
-				String targetPrjId = autoInfo.getPrjId();
-				String targetDplId = autoInfo.getDplAutoAfterCd();
-
-				
-				if(prjId.equals(targetPrjId) && dplId.equals(targetDplId)){
-					
-					Timer timer = autoInfo.getAutoDplTimer();
-					timer.cancel();
-					
-					
-					autoList.remove(j);
-					break;
-				}
-			}
-		}
-    }
 	
 	
 	@Override
