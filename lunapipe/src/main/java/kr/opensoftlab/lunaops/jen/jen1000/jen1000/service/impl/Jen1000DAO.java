@@ -138,6 +138,12 @@ public class Jen1000DAO extends ComOslitsAbstractDAO {
 	
 	
 	@SuppressWarnings("rawtypes")
+	public void deleteJen1101CIList(Map paramMap) throws Exception {
+		delete("jen1000DAO.deleteJen1101CIList", paramMap);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
 	public void deleteJen1101CIJobInfo(Map paramMap) throws Exception {
 		delete("jen1000DAO.deleteJen1101CIJobInfo", paramMap);
 	}
