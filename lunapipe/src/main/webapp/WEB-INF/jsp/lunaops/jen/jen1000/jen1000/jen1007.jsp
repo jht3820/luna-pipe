@@ -151,6 +151,8 @@ $(function(){
 					var svcId = $("form#jen1007Form > #svcId").val();
 					var fId = $("form#jen1007Form > #fId").val();
 					var eGeneUrl = $("form#jen1007Form > #eGeneUrl").val();
+					var ticketId = $("form#jen1007Form > #ticketId").val();
+					var callbakApiId = $("form#jen1007Form > #callbakApiId").val();
 					
 					var urows = [];
 					
@@ -168,6 +170,9 @@ $(function(){
 							var newParamList = [];
 							$.each(ADD_JOB_PARAM_LIST[jenId][jobId], function(idx, map){
 								newParamList.push({
+									"ci_id": srcId,
+									"jen_id": jenId,
+									"job_id": jobId,
 									"default_val": map["defaultVal"],
 									"job_param_key": map["jobParamKey"],
 									"job_param_val": map["jobParamVal"],
@@ -179,15 +184,16 @@ $(function(){
 						
 						//반환 값 세팅
 						var jobInfo = {
-							"key": jobInfo.jenId
-							, "jks_name": jobInfo.jenNm
-							, "jks_src_id": srcId
-							, "jks_descr": jobInfo.jenDesc
-							, "jks_order": jobInfo.jobStartOrd
-							, "jks_used": (jobInfo.useCd == "01")?1:2
-							, "jks_job_id": jobInfo.jobId
-							, "jks_job_type": jobInfo.jobTypeNm
-							, "jks_var": jobParamData
+							"key": jobInfo.jobId
+							, "tkt_jen_id": jobInfo.jenId
+							, "tkt_name": jobInfo.jenNm
+							, "tkt_src_id": srcId
+							, "tkt_descr": jobInfo.jenDesc
+							, "tkt_order": jobInfo.jobStartOrd
+							, "tkt_used": (jobInfo.useCd == "01")?1:2
+							, "tkt_job_type": jobInfo.jobTypeNm
+							, "tkt_var": jobParamData
+							, "tkt_tgt_id": ticketId
 						}; 
 						
 						urows.push(jobInfo);
@@ -195,7 +201,7 @@ $(function(){
 					
 					//리시브 전달 데이터
 					var returnMap = {
-						"svcid": svcId
+						"svc_id": svcId
 						, "urows": urows
 					};
 					
@@ -204,6 +210,8 @@ $(function(){
 						"f_id": fId
 						, "src_id": srcId
 						, "api_id": apiId
+						, "ticket_id": ticketId
+						, "callbak_api_id": callbakApiId
 					};
 					
 					//data값 receiver에 전달
@@ -228,7 +236,7 @@ $(function(){
 							var enCtlData = data.enCtlData;
 							
 							//eController 호출
-							var egene_controller = eGeneUrl+'/plugins/jsp/lunaController.jsp?data='+encodeURIComponent(enCtlData);
+							var egene_controller = eGeneUrl+'plugins/jsp/lunaController.jsp?data='+encodeURIComponent(enCtlData);
 							window.location.href = egene_controller;
 							
 						}else{
@@ -1179,12 +1187,14 @@ function fnSelectJen1000JobBldLog(jobList){
 
 
 <div class="main_contents" style="height: auto;">
-	<form name="jen1007Form" id="jen1000Form">
+	<form name="jen1007Form" id="jen1007Form">
 		<input type="hidden" name="ciId" id="ciId" value="${requestScope.ciId }"/>
 		<input type="hidden" name="apiId" id="apiId" value="${requestScope.apiId }"/>
 		<input type="hidden" name="svcId" id="svcId" value="${requestScope.svcId }"/>
 		<input type="hidden" name="fId" id="fId" value="${requestScope.fId }"/>
+		<input type="hidden" name="ticketId" id="ticketId" value="${requestScope.ticketId }"/>
 		<input type="hidden" name="eGeneUrl" id="eGeneUrl" value="${requestScope.eGeneUrl }"/>
+		<input type="hidden" name="callbakApiId" id="callbakApiId" value="${requestScope.callbakApiId }"/>
 	</form>
 	<div class = "tab_contents menu" >
 		<div class="main_frame left">
