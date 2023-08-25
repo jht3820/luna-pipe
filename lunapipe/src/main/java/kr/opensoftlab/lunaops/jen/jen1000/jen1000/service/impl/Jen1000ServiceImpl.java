@@ -21,7 +21,6 @@ import com.offbytwo.jenkins.model.BuildWithDetails;
 import egovframework.com.cmm.service.EgovProperties;
 import egovframework.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import kr.opensoftlab.lunaops.com.exception.UserDefineException;
-import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.service.Dpl1000Service;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.service.impl.Dpl1000DAO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1000VO;
@@ -257,6 +256,12 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	public List<Map> selectJen1102CIJobParamList(Map paramMap) throws Exception{
 		return jen1000DAO.selectJen1102CIJobParamList(paramMap);
 	}
+	
+	@SuppressWarnings("rawtypes")
+	public void deleteJen1101CIList(Map paramMap) throws Exception {
+		jen1000DAO.deleteJen1101CIList(paramMap);
+	}
+	
 	
 	@SuppressWarnings("rawtypes")
 	public void deleteJen1101CIJobInfo(Map paramMap) throws Exception {
@@ -536,7 +541,6 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	}
 
 	
-	@SuppressWarnings("rawtypes")
 	public int selectJen1200DeployJobBuildLogCnt(BuildVO buildVo) throws Exception {
 		return jen1000DAO.selectJen1200DeployJobBuildLogCnt(buildVo);
 	}

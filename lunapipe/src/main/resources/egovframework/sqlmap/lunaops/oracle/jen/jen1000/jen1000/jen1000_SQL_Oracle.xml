@@ -420,10 +420,10 @@
 					             #useCd#, 
 					             '02',
 					             SYSDATE , 
-					             #regUsrId#, 
+					             #empId#, 
 					             #regUsrIp#, 
 					             SYSDATE , 
-					             #modifyUsrId#, 
+					             #empId#, 
 					             #modifyUsrIp#
 					)
 			
@@ -466,10 +466,10 @@
 					             #jobBldActionCd#,
 					             #useCd#, 
 					             SYSDATE , 
-					             #regUsrId#, 
+					             #empId#, 
 					             #regUsrIp#, 
 					             SYSDATE , 
-					             #modifyUsrId#, 
+					             #empId#, 
 					             #modifyUsrIp#
 					)
 			
@@ -489,7 +489,7 @@
 			           JEN_DESC = #jenDesc#            ,  
 			           USE_CD = #useCd#              ,  
 			           MODIFY_DTM = SYSDATE          ,  
-			           MODIFY_USR_ID = #modifyUsrId# ,  
+			           MODIFY_USR_ID = #empId# ,  
 			           MODIFY_USR_IP = #modifyUsrIp#    
 			WHERE
 					   1=1
@@ -510,7 +510,7 @@
 		            JOB_BLD_ACTION_CD = #jobBldActionCd#,
 			        USE_CD = #useCd#             		,  
 			        MODIFY_DTM = SYSDATE         	 	,  
-			        MODIFY_USR_ID = #modifyUsrId# 		,  
+			        MODIFY_USR_ID = #empId# 		,  
 			        MODIFY_USR_IP = #modifyUsrIp#   	 
 			WHERE 1=1
 				AND	JEN_ID 		= 	#jenId#              
@@ -582,7 +582,7 @@
 	        (
 	        	  #ciId#				,#jenId#				,#jobId#
 	           	 ,#jobParamKey#			,#jobParamVal#
-	        	 ,NOW()					,#regUsrId#			,#regUsrIp#
+	        	 ,SYSDATE					,#regUsrId#			,#regUsrIp#
 	        )
 		]]>
 	</insert>
@@ -662,6 +662,14 @@
 	</select>
 	
 	
+	<delete id="jen1000DAO.deleteJen1101CIList" parameterClass="java.util.Map">
+		 
+		DELETE FROM	JEN1101
+		WHERE 1=1
+        AND		CI_ID = #ciId#
+	</delete>
+	
+	
 	<delete id="jen1000DAO.deleteJen1101CIJobInfo" parameterClass="java.util.Map">
 		 
 		DELETE FROM	JEN1101
@@ -709,7 +717,7 @@
 				,BLD_CLASS		,BLD_RESULT				,BLD_RESULT_CD
 				,BLD_ETM_DURATION_TM	,BLD_DURATION_TM
 				,BLD_START_DTM	,BLD_CONSOLE_LOG		,BLD_CAUSES
-				,REG_DTM
+				,REG_DTM		,REG_USR_ID
 					    
 			)
 			VALUES
@@ -718,7 +726,7 @@
 				,#bldClass#		,#bldResult#			,#bldResultCd#
 				,#bldEtmDurationTm#		,#bldDurationTm#
 				,#bldStartDtm#	,#bldConsoleLog#		,#bldCauses#		
-				,SYSDATE
+				,SYSDATE		,#empId#
 			)
 		]]>
 	</insert>
@@ -1005,7 +1013,7 @@
 				,#bldResult#			,#bldResultCd#				,#bldEtmDurationTm#
 				,#bldDurationTm#		,#bldStartDtm#				,#bldConsoleLog#		,#bldCauses#
 				,#ciId#					,#ticketId#					,#dplId#				,#bldActionLog#
-				,SYSDATE				,#regUsrId#					,#regUsrIp#
+				,SYSDATE				,#bldStartUsrId#			,#bldStartUsrIp#
 			)
 		]]>
 	</insert>
@@ -1015,7 +1023,9 @@
 		
 		UPDATE JEN1200 A
 		SET
-			A.MODIFY_DTM = SYSDATE
+			A.MODIFY_USR_ID = #bldStartUsrId#
+			, A.MODIFY_USR_IP = #bldStartUsrIp#
+			, A.MODIFY_DTM = SYSDATE
 			<isNotEmpty property="bldClass">
 				, BLD_CLASS = #bldClass#
 			</isNotEmpty>
