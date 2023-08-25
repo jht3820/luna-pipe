@@ -48,7 +48,7 @@
 		            REP_NM ,                
 		            REP_TYPE_CD ,			
 		            SF_CMM1001_COM_CD_INFO('REP00001', REP_TYPE_CD, '1') as REP_TYPE_NM ,
-		            REPLACE (REP_TXT ,'<br>' , '&nbsp;&nbsp;&nbsp;&nbsp;' ) AS REP_TXT  ,                   
+		            REPLACE (REP_TXT ,'<br>' , '&nbsp;&nbsp;&nbsp;&nbsp;' ) AS REP_TXT  ,                  
 		            SVN_REP_URL ,               
 		            GIT_REP_URL ,               
 		            USE_CD ,                   
@@ -114,14 +114,14 @@
 					) A
     </select>
     
-  
+	 
 	<select id="rep1000DAO.selectRep1000Info" parameterClass="java.util.Map"  resultMap="resultMapRepVO">
 		
 			SELECT
 			            REP_ID,               
 			            REP_NM,              
 			            REP_TYPE_CD,			 
-			            REP_TXT,                  
+			            REP_TXT,                 
 			            SVN_REP_URL,              
 			            SVN_USR_ID,               
 			            SVN_USR_PW,               
@@ -140,9 +140,14 @@
 			FROM
 			            REP1000
 			WHERE       1=1
-			  AND       REP_ID = #repId# 
-
+			<isNotEmpty property="repUuid">
+				AND		REP_UUID = #repUuid#			
+			</isNotEmpty>
+			<isEmpty property="repUuid">
+				AND       REP_ID = #repId# 
+			</isEmpty>
 	</select>
+
 
     <insert id="rep1000DAO.insertRep1000Info" parameterClass="java.util.Map">
 		<selectKey resultClass="java.lang.String" keyProperty="newRepId">
@@ -164,24 +169,25 @@
 			 
 			INSERT     INTO     REP1000
 					(
-					            REP_ID             ,  
-					            REP_NM             ,  
-					            REP_TYPE_CD			, 
-					            REP_TXT                , 
+					            REP_ID             		,  
+					            REP_NM             		,  
+					            REP_TYPE_CD				, 
+					            REP_TXT                	, 
+					            REP_UUID				,
 					            <isEqual property="repTypeCd" compareValue="02">
-						            SVN_REP_URL            ,  
-						            SVN_USR_ID             ,  
-						            SVN_USR_PW             ,  
+						            SVN_REP_URL         ,  
+						            SVN_USR_ID          ,  
+						            SVN_USR_PW          ,  
 					            </isEqual>
 					            <isEqual property="repTypeCd" compareValue="01">
 						            GIT_USR_AUTH_TYPE_CD,	
-						            GIT_REP_URL            ,  
+						            GIT_REP_URL         ,  
 						            <isEqual property="gitUsrAuthTypeCd" compareValue="02">
-							            GIT_USR_ID             ,  
-							            GIT_USR_PW             ,  
+							            GIT_USR_ID      ,  
+							            GIT_USR_PW      ,  
 						            </isEqual>
 						            <isEqual property="gitUsrAuthTypeCd" compareValue="01">
-						            	GIT_USR_TK             ,  
+						            	GIT_USR_TK      ,  
 						            </isEqual>
 					            </isEqual>
 					            USE_CD                 ,  
@@ -198,6 +204,7 @@
 					             #repNm#    	, 
 					             #repTypeCd#    , 
 					             #repTxt#		, 
+					             #repUuid#		,
 					             <isEqual property="repTypeCd" compareValue="02">
 						             #svnRepUrl#	, 
 						             #svnUsrId#		, 
@@ -216,10 +223,10 @@
 					             </isEqual>
 					             #useCd#       , 
 					             SYSDATE       , 
-					             #regUsrId#    , 
+					             #empId#    , 
 					             #regUsrIp#    , 
 					             SYSDATE       , 
-					             #modifyUsrId# , 
+					             #empId# , 
 					             #modifyUsrIp# 
 					)
 			
@@ -231,7 +238,8 @@
 		UPDATE     REP1000     SET 
             REP_NM = #repNm#             , 
             REP_TYPE_CD = #repTypeCd# 			, 
-            REP_TXT = #repTxt#                  ,  
+            REP_TXT = #repTxt#                  , 
+            REP_UUID = #repUuid#				,
             <isEqual property="repTypeCd" compareValue="02">
 	            SVN_REP_URL = #svnRepUrl#           ,  
 	            SVN_USR_ID = #svnUsrId#             ,  
@@ -250,7 +258,7 @@
             </isEqual> 
             USE_CD = #useCd#                    ,  
             MODIFY_DTM = SYSDATE                ,  
-            MODIFY_USR_ID = #modifyUsrId#       ,  
+            MODIFY_USR_ID = #empId#       ,  
             MODIFY_USR_IP = #modifyUsrIp#          
 		WHERE 1=1
 		AND   		REP_ID = #repId#               
