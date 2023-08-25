@@ -14,6 +14,7 @@
     <!-- <sqlMap resource="egovframework/sqlmap/rte/sample/EgovSample_Sample_SQL_Oracle.xml"/> -->
     
 	<sqlMap resource="egovframework/sqlmap/lunaops/oracle/rep/rep1000/rep1000/rep1000_SQL_Oracle.xml"/>
+	<sqlMap resource="egovframework/sqlmap/lunaops/oracle/rep/rep1000/rep1100/rep1100_SQL_Oracle.xml"/>
 	
 </sqlMapConfig>
 
