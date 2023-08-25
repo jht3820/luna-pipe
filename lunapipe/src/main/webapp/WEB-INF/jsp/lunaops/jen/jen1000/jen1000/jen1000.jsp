@@ -149,6 +149,7 @@ $(function(){
 					var svcId = $("form#jen1000Form > #svcId").val();
 					var fId = $("form#jen1000Form > #fId").val();
 					var eGeneUrl = $("form#jen1000Form > #eGeneUrl").val();
+					var callbakApiId = $("form#jen1000Form > #callbakApiId").val();
 					
 					var urows = [];
 					
@@ -177,23 +178,23 @@ $(function(){
 						
 						//반환 값 세팅
 						var jobInfo = {
-							"key": jobInfo.jenId
+							"key": jobInfo.jobId
+							, "jks_jen_id": jobInfo.jenId
 							, "jks_name": jobInfo.jenNm
 							, "jks_src_id": srcId
 							, "jks_descr": jobInfo.jenDesc
 							, "jks_order": jobInfo.jobStartOrd
 							, "jks_used": (jobInfo.useCd == "01")?1:2
-							, "jks_job_id": jobInfo.jobId
 							, "jks_job_type": jobInfo.jobTypeNm
 							, "jks_var": jobParamData
-						}; 
+						};
 						
 						urows.push(jobInfo);
 					});
 					
 					//리시브 전달 데이터
 					var returnMap = {
-						"svcid": svcId
+						"svc_id": svcId
 						, "urows": urows
 					};
 					
@@ -202,6 +203,7 @@ $(function(){
 						"f_id": fId
 						, "src_id": srcId
 						, "api_id": apiId
+						, "callbak_api_id": callbakApiId
 					};
 					
 					//data값 receiver에 전달
@@ -226,7 +228,7 @@ $(function(){
 							var enCtlData = data.enCtlData;
 							
 							//eController 호출
-							var egene_controller = eGeneUrl+'/plugins/jsp/lunaController.jsp?data='+encodeURIComponent(enCtlData);
+							var egene_controller = eGeneUrl+'plugins/jsp/lunaController.jsp?data='+encodeURIComponent(enCtlData);
 							window.location.href = egene_controller;
 							
 						}else{
@@ -1223,6 +1225,7 @@ function fnSelectJen1000JobBldLog(jobList){
 		<input type="hidden" name="fId" id="fId" value="${requestScope.fId }"/>
 		<input type="hidden" name="empId" id="empId" value="${requestScope.empId }"/>
 		<input type="hidden" name="eGeneUrl" id="eGeneUrl" value="${requestScope.eGeneUrl }"/>
+		<input type="hidden" name="callbakApiId" id="callbakApiId" value="${requestScope.callbakApiId }"/>
 	</form>
 	<div class = "tab_contents menu" >
 		<div class="main_frame left">
