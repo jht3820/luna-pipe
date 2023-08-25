@@ -574,7 +574,7 @@
 	        	#ciId#					,#ticketId#
 				,#dplId#				,#jenId#			,#jobId#
 				,#jobParamKey#			,#jobParamVal#
-				,NOW()					,#regUsrId#			,#regUsrIp#
+				,SYSDATE					,#regUsrId#			,#regUsrIp#
 	        )
 		]]>
 	</insert>
