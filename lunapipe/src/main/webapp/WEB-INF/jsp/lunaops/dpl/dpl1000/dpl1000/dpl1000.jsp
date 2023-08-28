@@ -805,6 +805,10 @@ function fnDplStart(item){
 		clearTimeout(consoleTimer);
 	}
 	
+	//item에 emp_id 넣기
+	var empId = $("form#dpl1000Form > #empId").val();
+	item["empId"] = empId;
+	
 	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
 			{"url":"<c:url value='/dpl/dpl1000/dpl1000/selectDpl1000JobBuildAjax.do'/>","loadingShow":false}
@@ -1067,7 +1071,9 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 </script>
 <div class="main_contents" style="height: auto;">
 	<div class="tab_contents menu" style="max-width: 1500px;position: relative;">
-		<form:form commandName="dpl1000VO" id="searchFrm" name="searchFrm" method="post" onsubmit="return false"></form:form>
+		<form name="dpl1000Form" id="dpl1000Form">
+			<input type="hidden" name="empId" id="empId" value="${requestScope.empId }"/>
+		</form>
 		<div id="dplJobSearch" style="border-top: 1px solid #ccc;" guide="dpl1000DplJobBtn"></div>
 		<br />
 		<div data-ax5grid="dplJobGrid" data-ax5grid-config="{}" style="height: 250px;" guide="dpl1000DplJobList"></div>
