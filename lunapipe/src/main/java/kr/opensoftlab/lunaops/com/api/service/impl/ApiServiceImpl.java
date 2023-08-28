@@ -905,10 +905,13 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			paramMap.put("repId", repId);
 			
 			
-			String branchePath = OslUtil.jsonGetString(jsonObj, "branche_path");
 			
 			
 			RepVO repVo = rep1000Service.selectRep1000Info(paramMap);
+			
+			
+			String branchePath = repVo.getSvnBrcPath();
+			
 			
 			
 			String branchNm = EgovProperties.getProperty("Globals.svn.branchNm");
