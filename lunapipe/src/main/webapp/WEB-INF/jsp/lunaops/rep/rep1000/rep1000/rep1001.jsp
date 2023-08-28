@@ -108,7 +108,7 @@ $(document).ready(function() {
 	gfnInputValChk(arrChkObj);
 	
 	//탭인덱스 부여
-	//gfnSetFormAllObjTabIndex(document.getElementById("rep1000PopupFrm"));
+	//gfnSetFormAllObjTabIndex(document.getElementById("rep1001PopupFrm"));
 	
 	/* 타이틀 변경 및 버튼명 변경, 수정일경우 값 세팅 */
 	if('${param.popupGb}' == 'insert'){
@@ -139,7 +139,7 @@ $(document).ready(function() {
 	$('#btn_update_popup').click(function() {
 		
 		/* 필수입력값 체크 공통 호출 */
-		var strFormId = "rep1000PopupFrm";
+		var strFormId = "rep1001PopupFrm";
 		var strCheckObjArr = ["repNm"];
 		var sCheckObjNmArr = ["저장소 명"];
 		
@@ -173,14 +173,14 @@ $(document).ready(function() {
 			return;	
 		}
 		
-		var formObj = document.getElementById("rep1000PopupFrm");
+		var formObj = document.getElementById("rep1001PopupFrm");
 		
 		// 등록/수정 전 유효성 체크
 		if(!gfnSaveInputValChk(arrChkObj)){
 			return false;	
 		}
 		
-		fnInsertReqInfoAjax("rep1000PopupFrm");
+		fnInsertReqInfoAjax("rep1001PopupFrm");
 
 	});
 	
@@ -270,7 +270,7 @@ $(document).ready(function() {
 		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
         	//디테일폼 세팅
-        	gfnSetData2ParentObj(data.repInfo, "rep1000PopupFrm");
+        	gfnSetData2ParentObj(data.repInfo, "rep1001PopupFrm");
         	
         	var repTypeCd = data.repInfo.repTypeCd;
         	
@@ -292,7 +292,7 @@ $(document).ready(function() {
 	//소스저장소 등록 함수
 	function fnInsertReqInfoAjax(formId){
 		//FormData에 input값 넣기
-		gfnFormDataAutoValue('rep1000PopupFrm',fd);
+		gfnFormDataAutoValue('rep1001PopupFrm',fd);
 		
 		//기존 비밀번호 넘기기
 		fd.append("nowSvnPw",nowSvnPw);
@@ -492,9 +492,10 @@ $(document).ready(function() {
 </script>
 
 <div class="popup" >
-<form id="rep1000PopupFrm" name="rep1000PopupFrm" method="post">
+<form id="rep1001PopupFrm" name="rep1001PopupFrm" method="post">
 	<input type="hidden" name="popupGb" id="popupGb" value="${param.popupGb}"/>
 	<input type="hidden" name="repId" id="repId" value="${param.repId}" />
+	<input type="hidden" name="empId" id="empId" value="${param.empId}" />
 	<input type="hidden" name="reqStatusCd" id="reqStatusCd" value="01"/>
 	<input type="hidden" name="repTypeCd" id="repTypeCd" value="02"/>
 
