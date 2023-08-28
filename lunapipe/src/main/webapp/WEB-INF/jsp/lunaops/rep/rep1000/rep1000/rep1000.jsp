@@ -41,6 +41,7 @@ $(function(){
 			var svcId = $("form#rep1000Form > #svcId").val();
 			var fId = $("form#rep1000Form > #fId").val();
 			var eGeneUrl = $("form#rep1000Form > #eGeneUrl").val();
+			var callbakApiId = $("form#rep1000Form > #callbakApiId").val();
 			
 			//저장소 param
 			var urows = [];
@@ -71,6 +72,7 @@ $(function(){
 				"f_id": fId
 				, "src_id": srcId
 				, "api_id": apiId
+				, "callbak_api_id": callbakApiId
 			};
 			
 			//data값 receiver에 전달
@@ -95,7 +97,7 @@ $(function(){
 					var enCtlData = data.enCtlData;
 					
 					//eController 호출
-					var egene_controller = eGeneUrl+'/plugins/jsp/lunaController.jsp?data='+encodeURIComponent(enCtlData);
+					var egene_controller = eGeneUrl+'plugins/jsp/lunaController.jsp?data='+encodeURIComponent(enCtlData);
 					window.location.href = egene_controller;
 					
 				}else{
@@ -198,9 +200,11 @@ function fnRepGridSetting(){
    				repGridObj.select(this.doindex, {selected: !this.item.__selected__});	
              },
              onDBLClick:function(){
+            	 //암호화 값
+            	 var enRepIdData = this.item.enRepIdData;
+            	 
              	//data값
-             	var paramData = '<c:out value="${rtnData}"/>'
- 				window.open("/rep/rep1000/rep1000/selectRep1002View.do?data="+encodeURIComponent(paramData)+"&repId="+repGridObj.list[this.doindex].repId, "repositoryDetailPopup", "width=1320, height=870, status=no, menubar=no");
+ 				window.open("/rep/rep1000/rep1000/selectRep1002View.do?data="+encodeURIComponent(enRepIdData), "repositoryDetailPopup", "width=1320, height=870, status=no, menubar=no");
              }
          },
          contextMenu: {
@@ -654,12 +658,14 @@ function fnRep1000GuideShow(){
 
 <div class="main_contents" style="height: auto;" >
 	<form name="rep1000Form" id="rep1000Form">
+		<input type="hidden" name="repId" id="repId" value="${requestScope.repId }"/>
 		<input type="hidden" name="ciId" id="ciId" value="${requestScope.ciId }"/>
 		<input type="hidden" name="apiId" id="apiId" value="${requestScope.apiId }"/>
 		<input type="hidden" name="svcId" id="svcId" value="${requestScope.svcId }"/>
 		<input type="hidden" name="fId" id="fId" value="${requestScope.fId }"/>
 		<input type="hidden" name="empId" id="empId" value="${requestScope.empId }"/>
 		<input type="hidden" name="eGeneUrl" id="eGeneUrl" value="${requestScope.eGeneUrl }"/>
+		<input type="hidden" name="callbakApiId" id="callbakApiId" value="${requestScope.callbakApiId }"/>
 	</form>
 	<div class="tab_contents menu">
 		<div class="sub_title">

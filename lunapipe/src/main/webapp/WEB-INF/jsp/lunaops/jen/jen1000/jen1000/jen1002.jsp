@@ -659,14 +659,31 @@ function fnJenIdSelecetd(){
 									// job 선택한 경우
 									selJobId = treeNode.jobId;
 									
-									zTreeJen1002.checkNode(treeNode, true);
+									zTreeJen1002.checkNode(treeNode, true, false, true);
 									
 									//trigger 값 조회
 									fnSelJobCronSpec(treeNode.jobId);
 								}else{
 									selJobId = "";
 									selJobPath = "";
+
+									//선택된 node 있는 경우
+									if(!gfnIsNull(zTreeJen1002.getSelectedNodes()[0])){
+										//선택 해제
+										zTreeJen1002.cancelSelectedNode(zTreeJen1002.getSelectedNodes()[0]);
+									}
+									//체크된 node 있는 경우
+									if(!gfnIsNull(zTreeJen1002.getCheckedNodes()[0])){
+										//체크 해제
+										zTreeJen1002.checkNode(zTreeJen1002.getCheckedNodes()[0], false, true, false);
+									}
+									
 								}
+							},
+							onCheck: function(event, treeId, treeNode){
+								//해당 job 선택
+								zTreeJen1002.selectNode(treeNode);
+								
 							},
 							onAsyncError: fnAsyncError
 						},
@@ -872,6 +889,7 @@ function fnSelJobCronSpec(paramJobId){
 <div class="popup jen1002-popup" >
 <form id="jen1100PopupFrm" name="jen1100PopupFrm" method="post">
 	<input type="hidden" name="popupGb" id="popupGb" value="${param.popupGb}"/>
+	<input type="hidden" name="empId" id="empId" value="${param.empId}"/>
 
 	<div class="pop_title">JOB 설정 등록</div>
 	<div class="pop_sub" guide="jobInfo" >
@@ -966,7 +984,7 @@ function fnSelJobCronSpec(paramJobId){
 					</div>
 				</div>
 				<div class="pop_menu_row">
-					<div class="pop_menu_col1 menu_col1_subStyle"><label for="jobBldActionCd">빌드 실행 가능 유무</label></div>
+					<div class="pop_menu_col1 menu_col1_subStyle"><label for="jobBldActionCd">수동 실행 가능 유무</label></div>
 					<div class="pop_menu_col2 menu_col2_subStyle">
 						<span class="search_select">
 							<select class="select_useCd" name="jobBldActionCd" id="jobBldActionCd" value="" style="height:100%; width:100%;" data-osl-value="01"></select>
