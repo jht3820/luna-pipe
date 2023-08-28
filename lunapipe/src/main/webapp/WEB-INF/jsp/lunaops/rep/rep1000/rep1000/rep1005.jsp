@@ -256,6 +256,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 	<form id="rep1005PopupFrm" name="rep1005PopupFrm" method="post">
 		<input type="hidden" name="repId" id="repId" value="${param.repId}" />
 		<input type="hidden" name="filePath" id="filePath" value="${param.filePath}" />
+		<input type="hidden" name="selRepPath" id="selRepPath" value="${param.selRepPath}" />
 	</form>
 	<div class="pop_title">비교 대상 파일 리비전 목록</div>
 	<div class="rep1005Pop_sub">

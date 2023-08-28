@@ -189,6 +189,7 @@ function fnJen1001GuideShow(){
 <form id="jen1000PopupFrm" name="jen1000PopupFrm" method="post">
 	<input type="hidden" name="popupGb" id="popupGb" value="${param.popupGb}"/>
 	<input type="hidden" name="jenId" id="jenId" value="${param.jenId}" />
+	<input type="hidden" name="empId" id="empId" value="${param.empId}" />
 	<input type="hidden" name="reqStatusCd" id="reqStatusCd" value="01"/>
 
 	<div class="pop_title">JENKINS 설정 등록</div>
