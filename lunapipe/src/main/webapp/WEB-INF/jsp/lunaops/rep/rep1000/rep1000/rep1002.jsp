@@ -13,6 +13,11 @@
     vertical-align: top;
     *vertical-align: middle;
 }
+/* type이 local인경우 하단 자르기 */
+.tab_contents.menu.rep1002_local .rep1002SelRivsionBtnFrame,
+.tab_contents.menu.rep1002_local .selRvTitle, 
+.tab_contents.menu.rep1002_local .rep1002SelRivisionFrame{display:none;}
+.tab_contents.menu.rep1002_local .rep1002RevisionFrame.rep1002FrameBox{height: 590px;} 
 </style>
 <script>
 	//상단 리비전 검색
@@ -132,53 +137,124 @@
 		
 		//리비전 선택 버튼
 		$("#repDataSendBtn").click(function(){
-			//팝업이 아닌 경우 동작 안함
-			if(opener){
-				var repId = $("form#rep1002PopupFrm > #repId").val();
-				//callback function 값
-				var rtnValue = [];
-				
-				//선택한 JOB
-				var selRepList = selRepPopupGrid.getList();
-				
-				//선택된 리비전 없는 경우
-				if (gfnIsNull(selRepList)) {
-					jAlert("선택한  리비전이 없습니다.</br>리비전을 선택해주세요.", "알림창");
-					return false;
-				}
-				//선택된 리비전번호 문구
-				var addMsg = "";
-				$.each(selRepList, function(idx, map){
-					if(idx > 0){
-						addMsg += ", ";
-					}
-					addMsg += map.revision;
-					
-					//반환값 세팅
-					var repInfo = {
-						"rep_id": repId
-						, "revision": map.revision
-						, "comment": map.comment
-						, "author": map.author
-						, "logDate": map.logDate
-						, "sDate": map.sDate
-						, "svnFileList": map.svnFileList
-					}
-					
-					rtnValue.push(repInfo);
-				});
-				
-				jConfirm("선택된 리비전 "+selRepList.length+"개를 연결하시겠습니까?</br></br>[선택 리비전]</br>"+addMsg,"알림창", function(result){
-					if(result) {
-						//function 체크
-						if(typeof opener.parent.setRepItems == "function"){
-							opener.parent.setRepItems(rtnValue);
-						}
-						window.close();
-					}
-				});
-				
+			var repId = $("form#rep1002PopupFrm > #repId").val();
+			
+			//선택한 JOB
+			var selRepList = selRepPopupGrid.getList();
+			
+			//선택된 리비전 없는 경우
+			if (gfnIsNull(selRepList)) {
+				jAlert("선택한  리비전이 없습니다.</br>리비전을 선택해주세요.", "알림창");
+				return false;
 			}
+			
+			jConfirm("선택된 리비전 "+selRepList.length+"개를 연결하시겠습니까?</br></br>[선택 리비전]</br>"+addMsg,"알림창", function(result){
+				if(result) {
+					//필요 값
+					var ticketId = $("form#rep1002PopupFrm > #ticketId").val();
+					var apiId = $("form#rep1002PopupFrm > #apiId").val();
+					var srcId = $("form#rep1002PopupFrm > #ciId").val();
+					var svcId = $("form#rep1002PopupFrm > #svcId").val();
+					var fId = $("form#rep1002PopupFrm > #fId").val();
+					var eGeneUrl = $("form#rep1002PopupFrm > #eGeneUrl").val();
+					var callbakApiId = $("form#rep1002PopupFrm > #callbakApiId").val();
+					
+					//저장소 param
+					var urows = [];
+					
+					//선택된 리비전번호 문구
+					var addMsg = "";
+					$.each(selRepList, function(idx, map){
+						if(idx > 0){
+							addMsg += ", ";
+						}
+						addMsg += map.revision;
+						
+						//변경 파일 목록
+						var svnFileList = [];
+						
+						//변경 파일 수
+						var repChgFileCnt = 0;
+						
+						//변경 파일 목록 세팅
+						if(!gfnIsNull(map.svnFileList)){
+							repChgFileCnt = map.svnFileList.length;
+							
+							$.each(map.svnFileList, function(subIdx, subMap){
+								svnFileList.push({
+									"rsv_file_path": subMap.path
+									, "rsv_file_type": subMap.type
+									, "rsv_file_name": subMap.name
+									//, "rsv_file_type": subMap.kind
+								});
+							});
+						}
+						
+						//반환값 세팅
+						var repInfo = {
+							"key": ticketId+"-"+repId
+							, "rsv_tgt_id": ticketId
+							, "rsv_src_id": srcId
+							, "rsv_revision_id": map.revision
+							, "rsv_cmt_cnt": repChgFileCnt
+							, "rsv_cmt_dttm": map.logDate
+							, "rsv_cmt_descr": map.comment
+							, "rsv_cmt_emp_id": map.author
+							, "svn_file_list": svnFileList
+						}
+						
+						urows.push(repInfo);
+					});
+					
+					//리시브 전달 데이터
+					var returnMap = {
+						"svc_id": svcId
+						, "urows": urows
+					};
+					
+					//컨트롤러 전달 데이터
+					var ctrlMap = {
+						"f_id": fId
+						, "src_id": srcId
+						, "api_id": apiId
+						, "callbak_api_id": callbakApiId
+					};
+					
+					//data값 receiver에 전달
+					var ajaxObj = new gfnAjaxRequestAction(
+						{"url":"<c:url value='/api/selectSendDataReceiver'/>","loadingShow":true}
+						,{
+							//리시브 반환 데이터
+							data: JSON.stringify(returnMap),
+							//컨트롤러 전달 데이터
+							ctlData: JSON.stringify(ctrlMap)
+						}
+					);
+					
+					//AJAX 전송 성공 함수
+					ajaxObj.setFnSuccess(function(data){
+						//결과 값
+						var result = data.result;
+						
+						//결과 처리 성공
+						if(result == "SUCCESS"){
+							//컨트롤러 데이터
+							var enCtlData = data.enCtlData;
+							
+							//eController 호출
+							var egene_controller = eGeneUrl+'plugins/jsp/lunaController.jsp?data='+encodeURIComponent(enCtlData);
+							window.location.href = egene_controller;
+							
+						}else{
+							jAlert(data.msg, "알림창");
+							return false;
+						}
+					});
+					
+					//AJAX 전송
+					ajaxObj.send();
+				}
+			});
 		});
 	});
 
@@ -228,14 +304,20 @@
 		        },
 				callback: {
 					onClick: function(event, treeId, treeNode){
-						//path변경
-						$("form#rep1002PopupFrm > #selRepPath").val(treeNode.path);
+						var treeNodePath = treeNode.path;
+						
+						//path가 있는 경우
+						if(!gfnIsNull(treeNodePath)){
+							//path변경
+							$("form#rep1002PopupFrm > #selRepPath").val(treeNode.path);
+						}else{
+							$("form#rep1002PopupFrm > #selRepPath").val("/");
+						}
 						//그리드 데이터 불러오기
 						fnRepPopupGridListSet();
 					}
 				}
 		    };
-			
 			
 			//job list
 			var list = [];
@@ -304,8 +386,18 @@
 		}
 		
 		repPopupGrid = new ax5.ui.grid();
-	 
+		
+		//팝업 type
+		var type = $("form#rep1002PopupFrm > #type").val();
+		
+		//type이 local인경우 height 크게
+		var gridHeight = 250;
+		
+		if(type == "local"){
+			gridHeight = 575;
+		}
 		repPopupGrid.setConfig({
+			height: gridHeight,
 			target: $('[data-ax5grid="rep-grid"]'),
 			showRowSelector: true,
 			sortable:false,
@@ -335,11 +427,15 @@
 	            },
 	            onDBLClick:function(){
 	            	var repId = $("form#rep1002PopupFrm > #repId").val();
+	            	//대상 경로
+	            	var selRepPath = $("form#rep1002PopupFrm > #selRepPath").val();
+	            	
 					//배정된 요구사항 팝업
 					var data = {
                			 "repId": repId
                			, "revision": this.item.revision
                			, "commitId": this.item.commitId
+               			, "selRepPath": selRepPath
                 	};
 	 				gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1004View.do',data,"1265","565",'scroll');	
                 }
@@ -646,11 +742,14 @@
 	            },
 	            onDBLClick:function(){
 	            	var repId = $("form#rep1002PopupFrm > #repId").val();
+	            	//대상 경로
+	            	var selRepPath = $("form#rep1002PopupFrm > #selRepPath").val();
 					//배정된 요구사항 팝업
 					var data = {
                			 "repId": repId
                			, "revision": this.item.revision
                			, "commitId": this.item.commitId
+               			, "selRepPath": selRepPath
                 	};
 	 				gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1004View.do',data,"1100","690",'scroll');	
                 }
@@ -672,14 +771,22 @@
 </script>
 
 <div class="main_contents" style="height: auto;" >
-	<div class="tab_contents menu" style="width:1300px;">
+	<div class="tab_contents menu rep1002_${requestScope.type}" style="width:1300px;">
 		<form id="rep1002PopupFrm" name="rep1002PopupFrm" method="post">
-			<input type="hidden" name="repId" id="repId" value="${param.repId}" />
+			<input type="hidden" name="repId" id="repId" value="${requestScope.repId}" />
 			<input type="hidden" name="svnRepUrl" id="svnRepUrl" value="${repInfo.svnRepUrl}" />
 			<input type="hidden" name="svnUsrId" id="svnUsrId" value="${repInfo.svnUsrId}" />
 			<input type="hidden" name="svnUsrPw" id="svnUsrPw" value="${repInfo.svnUsrPw}" />
 			<input type="hidden" name="repTypeCd" id="repTypeCd" value="${repInfo.repTypeCd}" />
 			<input type="hidden" name="selRepPath" id="selRepPath" value="/" />
+			<input type="hidden" name="ciId" id="ciId" value="${requestScope.ciId }"/>
+			<input type="hidden" name="ticketId" id="ticketId" value="${requestScope.ticketId }"/>
+			<input type="hidden" name="apiId" id="apiId" value="${requestScope.apiId }"/>
+			<input type="hidden" name="svcId" id="svcId" value="${requestScope.svcId }"/>
+			<input type="hidden" name="fId" id="fId" value="${requestScope.fId }"/>
+			<input type="hidden" name="eGeneUrl" id="eGeneUrl" value="${requestScope.eGeneUrl }"/>
+			<input type="hidden" name="callbakApiId" id="callbakApiId" value="${requestScope.callbakApiId }"/>
+			<input type="hidden" name="type" id="type" value="${requestScope.type}"/>
 		</form>
 		<div class="rep1002LeftFrame">
 			<div class="sub_title">
@@ -698,7 +805,7 @@
 			</div>
 			<div class="rep1002SearchFrame rep1002FrameBox" id="repSearchTarget" guide="rep1002RepBtn"></div>
 			<div class="rep1002RevisionFrame rep1002FrameBox">
-				<div data-ax5grid="rep-grid" data-ax5grid-config="{}" style="height: 250px;" guide="rep1002RepList"></div>	
+				<div data-ax5grid="rep-grid" data-ax5grid-config="{}" guide="rep1002RepList"></div>	
 			</div>
 			<div class="rep1002CommitLogFrame rep1002FrameBox">
 				<textarea id="svnCommitLogDetail" class="svnCommitLogDetail" readonly="readonly" guide="rep1002RepCommitLog"></textarea>
@@ -707,7 +814,7 @@
 				<button type="button" class="AXButton revisionAddDelBtn" id="selRevisionAddBtn"><i class="fa fa-arrow-alt-circle-down"></i>&nbsp;추가</button>
 				<button type="button" class="AXButton revisionAddDelBtn" id="selRevisionDelBtn"><i class="fa fa-arrow-alt-circle-up"></i>&nbsp;제거</button>
 			</div>
-			<div class="sub_title">
+			<div class="sub_title selRvTitle">
 				선택 리비전 목록
 			</div>
 			<div class="rep1002SelRivisionFrame">
@@ -715,7 +822,9 @@
 			</div>
 		</div>
 		<div class="btnFrame">
-			<div class="mainPopupBtn" id="repDataSendBtn"><i class="fas fa-paperclip"></i>&nbsp;리비전 선택 완료</div>
+			<c:if test="${empty requestScope.type or requestScope.type ne 'local' }">
+				<div class="mainPopupBtn" id="repDataSendBtn"><i class="fas fa-paperclip"></i>&nbsp;리비전 선택 완료</div>
+			</c:if>
 			<div class="mainPopupBtn" id="repDetailCloseBtn">닫기</div>
 		</div>
 	</div>
