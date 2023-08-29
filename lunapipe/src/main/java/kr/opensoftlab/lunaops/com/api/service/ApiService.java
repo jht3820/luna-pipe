@@ -26,7 +26,7 @@ public interface ApiService {
 	
 	
 	@SuppressWarnings({ "rawtypes" })
-	void insertJobBldLogInfo(Map paramMap) throws Exception;
+	Map insertJobBldLogInfo(Map paramMap) throws Exception;
 	
 	
 	@SuppressWarnings({ "rawtypes" })
@@ -43,4 +43,8 @@ public interface ApiService {
 	
 	@SuppressWarnings({ "rawtypes" })
 	Map selectTicketRvDataList(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings({ "rawtypes" })
+	Map selectTicketCheck(Map paramMap) throws Exception;
 }
