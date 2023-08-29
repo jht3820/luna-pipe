@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -99,9 +100,45 @@ public class Rep1000Controller {
 			String fId = OslUtil.jsonGetString(jsonObj, "f_id");
 			String empId = OslUtil.jsonGetString(jsonObj, "emp_id");
 			String callbakApiId = OslUtil.jsonGetString(jsonObj, "callbak_api_id");
+			
+			
+			String items = OslUtil.jsonGetString(jsonObj, "items");
+			String repIdList = "";
+			
+			if(items != null) {
+				try {
+					JSONArray jsonArr = new JSONArray(items);
+					for(int i=0;i<jsonArr.length();i++) {
+						JSONObject repIds = jsonArr.getJSONObject(i);
+						
+						
+						if(repIds.has("svn_id")) {
+							
+							if(!"".equals(repIdList)) {
+								repIdList += ",";
+							}
+							repIdList += repIds.getString("svn_id");
+						}
+					}
+				}catch(Exception e) {
+					Log.error(e);
+					e.printStackTrace();
+				}
+			}
 
 			
-			String eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
+			String eGeneUrl = OslUtil.jsonGetString(jsonObj, "egene_url");
+			
+			
+			if(eGeneUrl == null || "".equals(eGeneUrl)) {
+				eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
+			}
+			
+			
+			if(eGeneUrl.lastIndexOf("/") != (eGeneUrl.length()-1)) {
+				
+				eGeneUrl = eGeneUrl + "/";
+			}
 			
 			model.addAttribute("ciId", ciId);
 			model.addAttribute("apiId", apiId);
@@ -110,6 +147,7 @@ public class Rep1000Controller {
 			model.addAttribute("empId", empId);
 			model.addAttribute("eGeneUrl", eGeneUrl);
 			model.addAttribute("callbakApiId", callbakApiId);
+			model.addAttribute("repIdList", repIdList);
 		}catch(Exception e) {
 			Log.error(e);
 			e.printStackTrace();
@@ -403,6 +441,24 @@ public class Rep1000Controller {
 						repVo.setGitUsrPw(newEnPw);
 					}
 					
+				}
+			}
+			
+			else if("update".equals(popupGb)){
+				
+				String nowSvnPw = (String)paramMap.get("nowSvnPw");
+				
+				
+				String svnUsrPw = (String)paramMap.get("svnUsrPw");
+				
+				
+				if(!nowSvnPw.equals(svnUsrPw)) {
+					
+					String newEnPw = CommonScrty.encryptedAria(svnUsrPw, salt);
+					
+					
+					paramMap.put("svnUsrPw", newEnPw);
+					repVo.setSvnUsrPw(newEnPw);
 				}
 			}
 			
@@ -864,9 +920,7 @@ public class Rep1000Controller {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value="/rep/rep1000/rep1000/selectRep1006FileDiffContentAjax.do")
 	public ModelAndView selectRep1006FileDiffContentAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-
 		try{
-
 			
 			Map paramMap = RequestConvertor.requestParamToMap(request,true);
 
@@ -941,15 +995,23 @@ public class Rep1000Controller {
 			String svnRepUrl = (String) paramMap.get("svnRepUrl");
 			String svnUsrId = (String) paramMap.get("svnUsrId");
 			String svnUsrPw = (String) paramMap.get("svnUsrPw");
+			String nowSvnPw = (String) paramMap.get("nowSvnPw");
 			String repTypeCd = (String) paramMap.get("repTypeCd");
 			
 			
 			String type = (String) paramMap.get("type");
 			
+			
+			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
+			
+			
 			if(type != null && "insert".equals(type)) {
 				
-				String salt = EgovProperties.getProperty("Globals.lunaops.salt");
 				
+				svnUsrPw = CommonScrty.encryptedAria(svnUsrPw, salt);
+			}
+			
+			else if("update".equals(type) && !nowSvnPw.equals(svnUsrPw)) {
 				
 				svnUsrPw = CommonScrty.encryptedAria(svnUsrPw, salt);
 			}
