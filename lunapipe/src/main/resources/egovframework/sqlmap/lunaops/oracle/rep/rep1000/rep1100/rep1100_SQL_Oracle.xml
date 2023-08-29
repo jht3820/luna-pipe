@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="rep1100DAO">
+	<typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	
+	
+    <resultMap id="resultRvListExt" class="HashMap">
+		<result property="ticket_id"		column="TICKET_ID" />
+		<result property="rep_id" 			column="REP_ID" />
+		<result property="rep_rv" 			column="REP_RV" />
+		<result property="rep_comment" 		column="REP_COMMENT" />
+		<result property="rep_cmt_date" 	column="REP_CMT_DATE" />
+		<result property="rep_cmt_author" 	column="REP_CMT_AUTHOR" />
+		<result property="rep_chg_file_cnt" column="REP_CHG_FILE_CNT" />
+	</resultMap>
+	
+	
+    <resultMap id="resultRvChgFileListExt" class="HashMap">
+		<result property="ticket_id"		column="TICKET_ID" />
+		<result property="rep_id" 			column="REP_ID" />
+		<result property="rep_rv" 			column="REP_RV" />
+		<result property="rep_chg_id" 		column="REP_CHG_ID" />
+		<result property="rep_chg_type" 	column="REP_CHG_TYPE" />
+		<result property="rep_chg_file_path" column="REP_CHG_FILE_PATH" />
+		<result property="rep_chg_file_nm"	column="REP_CHG_FILE_NM" />
+	</resultMap>
+	
+	 
+	<select id="rep1100DAO.selectRep1100RvInfo" parameterClass="java.util.Map" resultMap="resultRvListExt">
+		
+		SELECT
+			A.TICKET_ID
+			, A.REP_ID
+			, A.REP_RV
+			, A.REP_COMMENT
+			, A.REP_CMT_DATE
+			, A.REP_CMT_AUTHOR
+			, A.REP_CHG_FILE_CNT
+		FROM REP1100 A
+		WHERE 1=1
+		AND A.TICKET_ID = #ticketId#
+		<isNotEmpty property="repId">
+			AND A.REP_ID = #repId#
+		</isNotEmpty>
+		<isNotEmpty property="repRv">
+			AND A.REP_RV = #repRv#
+		</isNotEmpty>
+	</select>
+	
+	 
+	<select id="rep1100DAO.selectRep1100RvChgFileList" parameterClass="java.util.Map" resultMap="resultRvChgFileListExt">
+		
+		SELECT
+			A.TICKET_ID
+			, A.REP_ID
+			, A.REP_RV
+			, A.REP_CHG_ID
+			, A.REP_CHG_TYPE
+			, A.REP_CHG_FILE_PATH
+			, A.REP_CHG_FILE_NM
+		FROM REP1101 A
+		WHERE 1=1
+		AND A.TICKET_ID = #ticketId#
+		<isNotEmpty property="repId">
+			AND A.REP_ID = #repId#
+		</isNotEmpty>
+		<isNotEmpty property="repRv">
+			AND A.REP_RV = #repRv#
+		</isNotEmpty>
+	</select>
+
+	 
+    <insert id="rep1100DAO.insertRep1100RvInfo" parameterClass="java.util.Map">
+		 
+		INSERT INTO REP1100
+		(
+			TICKET_ID
+			, REP_ID
+			, REP_RV
+			, REP_COMMENT
+			, REP_CMT_DATE
+			, REP_CMT_AUTHOR
+			, REP_CHG_FILE_CNT
+		)
+		VALUES
+		(
+			#ticketId#
+			, #repId#
+			, #repRv#
+			, #repComment#
+			, TO_DATE(#repCmtDate#, 'YYYY-MM-DD HH24:MI:SS')
+			, #repCmtAuthor#
+			, #repChgFileCnt#
+		)
+	</insert>
+    
+	
+	<update id="rep1100DAO.updateRep1100RvInfo" parameterClass="java.util.Map">
+		 
+		UPDATE REP1100 SET
+			REP_COMMENT = #repComment#
+			, REP_CMT_DATE = #repCmtDate#
+			, REP_CMT_AUTHOR = #repCmtAuthor#
+			, REP_CHG_FILE_CNT = #repChgFileCnt#
+		WHERE 1=1
+		AND TICKET_ID = #ticketId#
+		AND REP_ID = #repId#
+		AND REP_RV = #repRv#
+	</update>
+	
+	
+	<insert id="rep1100DAO.insertRep1101RvChgInfo" parameterClass="java.util.Map">
+		<selectKey resultClass="java.lang.String" keyProperty="newRepChgId">
+		<![CDATA[
+			 
+			SELECT	NVL( 
+							SUBSTR(NEW_REP_CHG_ID, 1, 11) || LPAD( (TO_NUMBER(SUBSTR(NEW_REP_CHG_ID, 12, 5)) + 1) , 5, '0')
+						,	'CHG' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '00001'
+            		) AS NEW_REP_CHG_ID 
+			FROM	(
+			            SELECT	MAX(REP_CHG_ID)  AS NEW_REP_CHG_ID
+			            FROM	REP1101 A
+			            WHERE	1=1
+			          	AND		REP_ID = #repId#
+			          	AND		REP_RV = #repRv#
+			            AND		REP_CHG_ID LIKE 'CHG' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '%'
+					)
+		]]>
+		</selectKey>
+		 
+		INSERT INTO REP1101
+		(
+			TICKET_ID
+			, REP_ID
+			, REP_RV
+			, REP_CHG_ID
+			, REP_CHG_TYPE
+			, REP_CHG_FILE_PATH
+			, REP_CHG_FILE_NM
+		)
+		VALUES
+		(
+			#ticketId#
+			, #repId#
+			, #repRv#
+			, #newRepChgId#
+			, #repChgType#
+			, #repChgFilePath#
+			, #repChgFileNm#
+		)
+	</insert>
+	
+	
+	<delete id="rep1100DAO.deleteRep1101RvChgList" parameterClass="java.util.Map">
+		 
+		DELETE FROM REP1101
+		WHERE 1=1
+		AND TICKET_ID = #ticketId#
+		AND REP_ID = #repId#
+		AND REP_RV = #repRv#
+		<isNotEmpty property="repChgId">
+			AND REP_CHG_ID = #repChgId#
+		</isNotEmpty>
+	</delete>
+</sqlMap>

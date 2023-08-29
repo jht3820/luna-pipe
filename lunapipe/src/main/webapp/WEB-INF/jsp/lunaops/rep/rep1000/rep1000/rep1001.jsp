@@ -19,8 +19,8 @@
 /* SVN 수정시 알림 메시지 영역 */
 .warning_message{display:none; text-align: left; font-size: 13px;}
 
-.pop_dpl_div_sub.divDetail_sub_left{width: 530px;float: left;margin-right: 10px;height: 405px;}
-.pop_dpl_div_sub.divDetail_sub_right {width: 460px;float: left;height: 402px;position: relative;}
+.pop_dpl_div_sub.divDetail_sub_left{width: 590px;float: left;margin-right: 10px;height: 448px;}
+.pop_dpl_div_sub.divDetail_sub_right {width: 400px;float: left;height: 448px;position: relative;}
 
 /* 소스저장소 종류에따른 show/hide */
 .rep1001GitFrame{display:none;}
@@ -37,7 +37,7 @@ ul#repDetailTree {
     float: left;
     width: calc(100% - 10px);
     margin: 5px 5px 0 5px;
-    height: 336px;
+    height: 380px;
 	overflow: scroll;
 }
 .treeNodeUrlFrame {
@@ -513,6 +513,12 @@ $(document).ready(function() {
 					<div class="pop_menu_col1 pop_oneRow_col1"><label for="svnRepUrl">URL</label><span class="required_info">&nbsp;*</span></div>
 					<div class="pop_menu_col2 pop_oneRow_col2" guide="svnUrl" >
 						<input type="text" title="URL" class="input_txt" name="svnRepUrl" id="svnRepUrl" value=""  maxlength="500"  />
+					</div>
+				</div>
+				<div class="pop_menu_row pop_menu_oneRow">
+					<div class="pop_menu_col1 pop_oneRow_col1"><label for="svnBrcPath">Branche 생성 경로</label></div>
+					<div class="pop_menu_col2 pop_oneRow_col2" guide="svnBrcPath" >
+						<input type="text" title="Branche 생성 경로" class="input_txt" name="svnBrcPath" id="svnBrcPath" value=""  maxlength="500"  />
 					</div>
 				</div>
 				<div class="pop_menu_row">
