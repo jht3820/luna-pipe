@@ -31,6 +31,7 @@
 		<result property="svnRepUrl"    column="SVN_REP_URL" /> 
 		<result property="svnUsrId"    column="SVN_USR_ID" />
 		<result property="svnUsrPw"    column="SVN_USR_PW" />
+		<result property="svnBrcPath"    column="SVN_BRC_PATH" />
 		<result property="gitUsrAuthTypeCd"    column="GIT_USR_AUTH_TYPE_CD" />  
 		<result property="gitRepUrl"    column="GIT_REP_URL" /> 
 		<result property="gitUsrId"    column="GIT_USR_ID" />
@@ -125,6 +126,7 @@
 			            SVN_REP_URL,              
 			            SVN_USR_ID,               
 			            SVN_USR_PW,               
+			            SVN_BRC_PATH,
 			            GIT_USR_AUTH_TYPE_CD,	
 			            GIT_REP_URL,              
 			            GIT_USR_ID,               
@@ -178,6 +180,7 @@
 						            SVN_REP_URL         ,  
 						            SVN_USR_ID          ,  
 						            SVN_USR_PW          ,  
+						            SVN_BRC_PATH		,
 					            </isEqual>
 					            <isEqual property="repTypeCd" compareValue="01">
 						            GIT_USR_AUTH_TYPE_CD,	
@@ -209,6 +212,7 @@
 						             #svnRepUrl#	, 
 						             #svnUsrId#		, 
 						             #svnUsrPw#		, 
+						             #svnBrcPath#	,
 					             </isEqual>
 					             <isEqual property="repTypeCd" compareValue="01">
 						             #gitUsrAuthTypeCd#,
@@ -244,6 +248,7 @@
 	            SVN_REP_URL = #svnRepUrl#           ,  
 	            SVN_USR_ID = #svnUsrId#             ,  
 	            SVN_USR_PW = #svnUsrPw#             , 
+	            SVN_BRC_PATH = #svnBrcPath#			,
             </isEqual> 
             <isEqual property="repTypeCd" compareValue="01">
 	            GIT_USR_AUTH_TYPE_CD = #gitUsrAuthTypeCd#	,	
