@@ -96,6 +96,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
                     	var paramRepId = $("form#rep1004PopupFrm > #repId").val();
                     	var paramRevision = $("form#rep1004PopupFrm > #revision").val();
                     	var paramCommitId = $("form#rep1004PopupFrm > #commitId").val();
+                    	var paramSelRepPath =  $("form#rep1002PopupFrm > #selRepPath").val();
                     	
                     	//배정된 요구사항 팝업
     					var data = {
@@ -109,6 +110,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
                     			, "selCommitId": paramCommitId
                     			, "fileName": selItem.name
                     			, "repTypeCd": repTypeCd
+                    			, "selRepPath": paramSelRepPath
                     			};
     	 				gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1005View.do',data,"1100","690",'scroll');	
                     }
@@ -133,7 +135,9 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 	
 	function fnSearchFileDirTree(revisionIndex, commitId){
 		var paramRepId = $("form#rep1004PopupFrm > #repId").val();
-		var data = {"revision" : revisionIndex, "commitId" : commitId , "repId" : paramRepId};
+		var paramSelRepPath =  $("form#rep1002PopupFrm > #selRepPath").val();
+		
+		var data = {"revision" : revisionIndex, "commitId" : commitId , "repId" : paramRepId, "selRepPath": paramSelRepPath};
 		
 		//AJAX 설정
 		var ajaxObj = new gfnAjaxRequestAction(
@@ -261,6 +265,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 		<input type="hidden" name="repId" id="repId" value="${param.repId}" />
 		<input type="hidden" name="revision" id="revision" value="${param.revision}" />
 		<input type="hidden" name="commitId" id="commitId" value="${param.commitId}" />
+		<input type="hidden" name="selRepPath" id="selRepPath" value="${param.selRepPath}" />
 	</form>
 	<div class="pop_title">리비전 변경 파일 목록</div>
 	<div class="rep1004Pop_sub" guide="rep1004RepChgLog">
