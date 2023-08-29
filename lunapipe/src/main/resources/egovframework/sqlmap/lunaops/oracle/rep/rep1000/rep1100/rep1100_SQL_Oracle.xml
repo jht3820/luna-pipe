@@ -10,8 +10,8 @@
 		<result property="rep_id" 			column="REP_ID" />
 		<result property="rep_rv" 			column="REP_RV" />
 		<result property="rep_comment" 		column="REP_COMMENT" />
-		<result property="rep_date" 		column="REP_DATE" />
-		<result property="rep_author" 		column="REP_AUTHOR" />
+		<result property="rep_cmt_date" 	column="REP_CMT_DATE" />
+		<result property="rep_cmt_author" 	column="REP_CMT_AUTHOR" />
 		<result property="rep_chg_file_cnt" column="REP_CHG_FILE_CNT" />
 	</resultMap>
 	
@@ -34,8 +34,8 @@
 			, A.REP_ID
 			, A.REP_RV
 			, A.REP_COMMENT
-			, A.REP_DATE
-			, A.REP_AUTHOR
+			, A.REP_CMT_DATE
+			, A.REP_CMT_AUTHOR
 			, A.REP_CHG_FILE_CNT
 		FROM REP1100 A
 		WHERE 1=1
@@ -79,8 +79,8 @@
 			, REP_ID
 			, REP_RV
 			, REP_COMMENT
-			, REP_DATE
-			, REP_AUTHOR
+			, REP_CMT_DATE
+			, REP_CMT_AUTHOR
 			, REP_CHG_FILE_CNT
 		)
 		VALUES
@@ -89,8 +89,8 @@
 			, #repId#
 			, #repRv#
 			, #repComment#
-			, TO_DATE(#repDate#, 'YYYY-MM-DD HH24:MI:SS')
-			, #repAuthor#
+			, TO_DATE(#repCmtDate#, 'YYYY-MM-DD HH24:MI:SS')
+			, #repCmtAuthor#
 			, #repChgFileCnt#
 		)
 	</insert>
@@ -100,8 +100,8 @@
 		 
 		UPDATE REP1100 SET
 			REP_COMMENT = #repComment#
-			, REP_DATE = #repDate#
-			, REP_AUTHOR = #repAuthor#
+			, REP_CMT_DATE = #repCmtDate#
+			, REP_CMT_AUTHOR = #repCmtAuthor#
 			, REP_CHG_FILE_CNT = #repChgFileCnt#
 		WHERE 1=1
 		AND TICKET_ID = #ticketId#
