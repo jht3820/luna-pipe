@@ -1,7 +1,6 @@
 package kr.opensoftlab.lunaops.com.api.web;
 
 import java.net.URI;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +14,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -223,6 +221,7 @@ public class ApiController {
 	}
 	
 	
+	@SuppressWarnings("rawtypes")
 	@RequestMapping(value="/api/insertJobBldLogInfo", method=RequestMethod.GET)
 	public ModelAndView insertJobBldLogInfo(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try{
@@ -230,9 +229,37 @@ public class ApiController {
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 						
 			
-			apiService.insertJobBldLogInfo(paramMap);
+			Map rtnMap = apiService.insertJobBldLogInfo(paramMap);
+			
+			if(rtnMap == null) {
+				
+				response.setStatus(500);
+				model.addAttribute("result", "FAIL");
+				model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+				model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+				return new ModelAndView("jsonView");
+			}
+			
+			
+			boolean result = (boolean) rtnMap.get("result");
+			
+			if(result) {
+				response.setStatus(200);
+				model.addAttribute("result", "SUCCESS");
+				model.addAttribute("msg", "정상적으로 생성되었습니다.");
+			}else {
+				response.setStatus(500);
+				String errorCode = (String) rtnMap.get("error_code");
+				model.addAttribute("result", "FAIL");
+				model.addAttribute("error_code", errorCode);
+				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
+			}
+			
+			return new ModelAndView("jsonView");
+			
 			
 		}catch(Exception ex){
+			response.setStatus(500);
 			model.addAttribute("result", "ERROR");
 			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
 			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
@@ -252,20 +279,32 @@ public class ApiController {
 			
 			Map rtnMap = apiService.insertJobBldAction(paramMap);
 			
+			if(rtnMap == null) {
+				
+				response.setStatus(500);
+				model.addAttribute("result", "FAIL");
+				model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+				model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+				return new ModelAndView("jsonView");
+			}
+			
 			
 			boolean result = (boolean) rtnMap.get("result");
 			
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
+				response.setStatus(500);
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
 			}else {
+				response.setStatus(200);
 				model.addAttribute("result", "SUCCESS");
 				model.addAttribute("msg", "정상적으로 실행되었습니다.");
 			}
 		}catch(Exception ex){
+			response.setStatus(500);
 			model.addAttribute("result", "ERROR");
 			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
 			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
@@ -299,6 +338,33 @@ public class ApiController {
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
 			}else {
 				model.addAttribute("result", "SUCCESS");
+				
+				
+				String brancheNm = "";
+				if(rtnMap.containsKey("brancheNm")) {
+					brancheNm = (String) rtnMap.get("brancheNm");
+				}
+				
+				String branchePath = "";
+				if(rtnMap.containsKey("branchePath")) {
+					branchePath = (String) rtnMap.get("branchePath");
+				}
+				
+				
+				String ticketId = "";
+				if(rtnMap.containsKey("ticketId")) {
+					ticketId = (String) rtnMap.get("ticketId");
+				}
+				
+				String repId = "";
+				if(rtnMap.containsKey("repId")) {
+					repId = (String) rtnMap.get("repId");
+				}
+				
+				model.addAttribute("branche_nm", brancheNm);
+				model.addAttribute("branche_path", branchePath);
+				model.addAttribute("ticket_id", ticketId);
+				model.addAttribute("rep_id", repId);
 				model.addAttribute("msg", "정상적으로 생성되었습니다.");
 			}
 			
@@ -397,6 +463,52 @@ public class ApiController {
 	}
 	
 	
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value="/api/selectTicketCheck", method=RequestMethod.GET)
+	public ModelAndView selectTicketCheck(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+
+			
+			Map rtnMap = apiService.selectTicketCheck(paramMap);
+			
+			if(rtnMap == null) {
+				
+				response.setStatus(500);
+				model.addAttribute("result", "FAIL");
+				model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+				model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+				return new ModelAndView("jsonView");
+			}
+			
+			boolean result = (boolean) rtnMap.get("result");
+			
+			String errorCode = (String) rtnMap.get("error_code");
+			
+			if(!result) {
+				response.setStatus(500);
+				model.addAttribute("result", "FAIL");
+				model.addAttribute("error_code", errorCode);
+				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
+			}else {
+				response.setStatus(200);
+				model.addAttribute("result", "SUCCESS");
+				model.addAttribute("rvInfoList", rtnMap.get("rvInfoList"));
+				model.addAttribute("msg", "데이터 체크 성공");
+			}
+		}catch(Exception ex){
+			response.setStatus(500);
+			ex.printStackTrace();
+			model.addAttribute("result", "ERROR");
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+			Log.error("selectTicketCheck()", ex);
+		}
+		return new ModelAndView("jsonView");
+	}
+	
+	
 	@RequestMapping(value="/api/selectSendDataReceiver", method=RequestMethod.POST)
 	public ModelAndView selectSendDataReceiver(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try{
@@ -420,7 +532,12 @@ public class ApiController {
 			String enCtlData = CommonScrty.encryptedAria(ctlData, salt);
 			
 			
-			String eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
+			String eGeneUrl = (String) paramMap.get("eGeneUrl");
+			
+			
+			if(eGeneUrl == null || "".equals(eGeneUrl)) {
+				eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
+			}
 			
 			
 			if(eGeneUrl.lastIndexOf("/") != (eGeneUrl.length()-1)) {
@@ -437,12 +554,16 @@ public class ApiController {
 			
 			
 			
+			
+			
+			
 			List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(1);
 			
 			nameValuePair.add(new BasicNameValuePair("data",enData));
 			
 			
 			methodPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
+			
 			
 			HttpClient client = OslConnHttpClient.getHttpClient();
 			
@@ -493,37 +614,35 @@ public class ApiController {
 	@RequestMapping(value="/api/test/receiver.do")
 	public String selectTestReceiver(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try {
-			
-			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			// request 파라미터를 map으로 변환
+			//Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 						
-			String data = (String) paramMap.get("data");
-			System.out.println("###########");
-			System.out.println(data);
-			
-			
+			//String data = (String) paramMap.get("data");
+			/*
+			//암호화 키
 			String salt = EgovProperties.getProperty("Globals.data.salt");
 
-			
+			//대상 솔루션 url
 			String eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
 			
-			
+			//티켓 id 암호화
 			String reciverData = "{\"key\":\""+salt+"\", \"ticket_id\":\"CH2211-00009\"}";
 			
 			String enReciverData = CommonScrty.encryptedAria(reciverData, salt);
-			
-			
+			//enReciverData = "KFgbSAp3JbGg9HC1BRw1eotLCw4ExGxQ5gGJw6wmzm3e/m6eQYAi04TPI8KiCJFa3K52BrjUEDCORK2DXFN6gKDx2Yqs8oJkFafMMh3nGUWb1KOgYuTGrU3RMKy0vIeGmwIimP/HKVlJ1HYGxMEEFw==";
+			//GET METHOD 구성
 			HttpGet methodGet = new HttpGet();
 			URI uri = new URI(eGeneUrl+"plugins/jsp/isTicket.jsp?data="+URLEncoder.encode(enReciverData,"UTF-8"));
 			methodGet.setURI(uri);
 			
 			HttpClient client = OslConnHttpClient.getHttpClient();
 			
-			
+			//data 전송
 			HttpResponse responseResult = client.execute(methodGet);
 			
-			
+			//결과 값 성공인경우
 			if(responseResult.getStatusLine() != null && responseResult.getStatusLine().getStatusCode() == 200) {
-				
+				//전송 완료된 값 JSON으로 파싱
 	    		String returnContent = EntityUtils.toString(responseResult.getEntity());
 	    		
 	    		System.out.println("############");
@@ -536,7 +655,7 @@ public class ApiController {
 	    			System.out.println("fail");
 	    		}
 			}
-			
+			*/
 		}catch(Exception e) {
 			e.printStackTrace();
 		}

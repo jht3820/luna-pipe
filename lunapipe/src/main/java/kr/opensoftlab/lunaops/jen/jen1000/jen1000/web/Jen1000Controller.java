@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Controller;
@@ -92,9 +94,51 @@ public class Jen1000Controller {
 			String fId = OslUtil.jsonGetString(jsonObj, "f_id");
 			String empId = OslUtil.jsonGetString(jsonObj, "emp_id");
 			String callbakApiId = OslUtil.jsonGetString(jsonObj, "callbak_api_id");
-
 			
-			String eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
+			
+			String items = OslUtil.jsonGetString(jsonObj, "items");
+			String jobIdList = "";
+			
+			
+			String addSalt = EgovProperties.getProperty("Globals.data.addSalt");
+			
+			if(items != null) {
+				try {
+					JSONArray jsonArr = new JSONArray(items);
+					
+					
+					
+					for(int i=0;i<jsonArr.length();i++) {
+						JSONObject jobIds = jsonArr.getJSONObject(i);
+						
+						
+						if(jobIds.has("jks_jen_id") && jobIds.has("jks_id")) {
+							
+							if(!"".equals(jobIdList)) {
+								jobIdList += ",";
+							}
+							jobIdList += jobIds.getString("jks_jen_id")+addSalt+jobIds.getString("jks_id");
+						}
+					}
+				}catch(Exception e) {
+					Log.error(e);
+					e.printStackTrace();
+				}
+			}
+			
+			
+			String eGeneUrl = OslUtil.jsonGetString(jsonObj, "egene_url");
+			
+			
+			if(eGeneUrl == null || "".equals(eGeneUrl)) {
+				eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
+			}
+			
+			
+			if(eGeneUrl.lastIndexOf("/") != (eGeneUrl.length()-1)) {
+				
+				eGeneUrl = eGeneUrl + "/";
+			}
 			
 			model.addAttribute("ciId", ciId);
 			model.addAttribute("apiId", apiId);
@@ -103,6 +147,8 @@ public class Jen1000Controller {
 			model.addAttribute("empId", empId);
 			model.addAttribute("eGeneUrl", eGeneUrl);
 			model.addAttribute("callbakApiId", callbakApiId);
+			model.addAttribute("jobIdList", jobIdList);
+			model.addAttribute("addSalt", addSalt);
 			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -129,9 +175,50 @@ public class Jen1000Controller {
 			String ticketId = OslUtil.jsonGetString(jsonObj, "ticket_id");
 			String fId = OslUtil.jsonGetString(jsonObj, "f_id");
 			String callbakApiId = OslUtil.jsonGetString(jsonObj, "callbak_api_id");
-
 			
-			String eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
+			
+			String items = OslUtil.jsonGetString(jsonObj, "items");
+			String jobIdList = "";
+			
+			
+			String addSalt = EgovProperties.getProperty("Globals.data.addSalt");
+			
+			if(items != null) {
+				try {
+					JSONArray jsonArr = new JSONArray(items);
+					
+					
+					
+					for(int i=0;i<jsonArr.length();i++) {
+						JSONObject jobIds = jsonArr.getJSONObject(i);
+						
+						
+						if(jobIds.has("tkt_jen_id") && jobIds.has("tkt_id")) {
+							
+							if(!"".equals(jobIdList)) {
+								jobIdList += ",";
+							}
+							jobIdList += jobIds.getString("tkt_jen_id")+addSalt+jobIds.getString("tkt_id");
+						}
+					}
+				}catch(Exception e) {
+					Log.error(e);
+					e.printStackTrace();
+				}
+			}
+			
+			String eGeneUrl = OslUtil.jsonGetString(jsonObj, "egene_url");
+			
+			
+			if(eGeneUrl == null || "".equals(eGeneUrl)) {
+				eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
+			}
+			
+			
+			if(eGeneUrl.lastIndexOf("/") != (eGeneUrl.length()-1)) {
+				
+				eGeneUrl = eGeneUrl + "/";
+			}
 			
 			model.addAttribute("ciId", ciId);
 			model.addAttribute("apiId", apiId);
@@ -140,6 +227,8 @@ public class Jen1000Controller {
 			model.addAttribute("ticketId", ticketId);
 			model.addAttribute("eGeneUrl", eGeneUrl);
 			model.addAttribute("callbakApiId", callbakApiId);
+			model.addAttribute("jobIdList", jobIdList);
+			model.addAttribute("addSalt", addSalt);
 			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -1629,6 +1718,77 @@ public class Jen1000Controller {
 		catch(Exception ex){
 			Log.error("selectJen1000JobApiKeyAjax()", ex);
 
+			model.addAttribute("errorYn", "Y");
+			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+			return new ModelAndView("jsonView");
+		}
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1000SelJobList.do")
+	public ModelAndView selectJen1000SelJobList(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			String jenJobStrList = (String) paramMap.get("jenJobList");
+			
+			
+			String addSalt = EgovProperties.getProperty("Globals.data.addSalt");
+			
+			
+			List<Map> jenJobList = null;
+			
+			try {
+				jenJobList = new ArrayList<Map>();
+				
+				String[] jenList = jenJobStrList.split(",");
+				
+				
+				Map newMap = null;
+				
+				
+				for(String jenJobInfo : jenList) {
+					newMap = new HashMap<>();
+					
+					
+					String[] jenJobIdStr = jenJobInfo.split(Pattern.quote(addSalt));
+					
+					
+					String jenId = jenJobIdStr[0];
+					String jobId = jenJobIdStr[1];
+					
+					
+					newMap.put("jenId", jenId);
+					newMap.put("jobId", jobId);
+					
+					
+					Map jobInfo = jen1000Service.selectJen1100JobInfo(newMap);
+					
+					
+					if(jobInfo == null) {
+						continue;
+					}
+					
+					
+					jenJobList.add(jobInfo);
+				}
+				
+			}catch(Exception e) {
+				Log.error("selectJen1000SelJobList()", e);
+			}
+			
+			
+			model.addAttribute("errorYn", "N");
+			model.addAttribute("jenJobList", jenJobList);
+
+			
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("selectJen1000SelJobList()", ex);
+			
 			model.addAttribute("errorYn", "Y");
 			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
 			return new ModelAndView("jsonView");

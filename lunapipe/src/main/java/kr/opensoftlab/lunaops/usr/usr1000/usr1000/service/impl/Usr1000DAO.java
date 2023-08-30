@@ -6,11 +6,11 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
-import kr.opensoftlab.lunaops.com.dao.ComOslitsAbstractDAO2;
+import kr.opensoftlab.lunaops.com.dao.ComOslitsAbstractDAO;
 
 
 @Repository("usr1000DAO")
-public class Usr1000DAO extends ComOslitsAbstractDAO2 {
+public class Usr1000DAO extends ComOslitsAbstractDAO {
 	
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
