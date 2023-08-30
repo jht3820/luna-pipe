@@ -5,7 +5,9 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -23,10 +25,17 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import com.offbytwo.jenkins.JenkinsServer;
+import com.offbytwo.jenkins.model.Build;
+import com.offbytwo.jenkins.model.BuildCause;
+import com.offbytwo.jenkins.model.BuildChangeSet;
+import com.offbytwo.jenkins.model.BuildChangeSetItem;
+import com.offbytwo.jenkins.model.BuildChangeSetPath;
+import com.offbytwo.jenkins.model.BuildWithDetails;
+
 import egovframework.com.cmm.service.EgovProperties;
 import egovframework.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import kr.opensoftlab.lunaops.com.api.service.ApiService;
-import kr.opensoftlab.lunaops.com.exception.UserDefineException;
 import kr.opensoftlab.lunaops.com.vo.OslErrorCode;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.service.Dpl1000Service;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
@@ -160,7 +169,6 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 		}else {
 			
 			JSONObject jsonObj = (JSONObject) checkParam;
-			
 			
 			
 			
@@ -698,169 +706,412 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 	
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void insertJobBldLogInfo(Map paramMap) throws Exception {
+	public Map insertJobBldLogInfo(Map paramMap) throws Exception {
 		
-		String paramKey = (String) paramMap.get("key");
+		String data = (String) paramMap.get("data");
+				
 		
+		Object checkParam = checkParamDataKey(data);
 		
-		String salt = EgovProperties.getProperty("Globals.data.salt");
+		Map rtnMap = new HashMap<String, String>();
 		
-		String addSalt = EgovProperties.getProperty("Globals.data.addSalt");
-		
-		
-		String deKey = CommonScrty.decryptedAria(paramKey, salt);
-		
-		
-		String[] deKeys = deKey.split(addSalt);
-		
-		
-		String jenId = CommonScrty.decryptedAria(deKeys[0],salt);
-		
-		
-		String jobId = CommonScrty.decryptedAria(deKeys[1],salt);
-		
-		Map newMap = new HashMap<>();
-		newMap.put("jenId", jenId);
-		newMap.put("jobId", jobId);
-		
-		
-		Map jobInfo = jen1000Service.selectJen1100JobInfo(newMap);
-		
-		if(jobInfo == null) {
-			throw new UserDefineException("JOB 정보가 없습니다.");
-		}
-		
-		
-		
-		
-		
-	}
-	
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Map insertJobBldAction(Map paramMap) throws Exception {
-		Map rtnValue = new HashMap<>();
-		
-		
-		JenStatusVO jenStatusVo = null;
-		
-		try {
+		if(checkParam instanceof String) {
+			rtnMap.put("result", false);
+			rtnMap.put("error_code", checkParam.toString());
+			return rtnMap;
+		}else {
+			
+			JSONObject jsonObj = (JSONObject) checkParam;
 			
 			
 			
-			
-			String paramKey = (String) paramMap.get("key");
-
-			
-			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
+			String paramJobKey = OslUtil.jsonGetString(jsonObj, "jobKey");
 			
 			
-			String dataSalt = EgovProperties.getProperty("Globals.data.salt");
+			if(paramJobKey == null) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.JEN_JOB_ID_INFO_NULL);
+				return rtnMap;
+			}
+			
+			
+			String paramBldNum = OslUtil.jsonGetString(jsonObj, "bldNum");
+			
+			
+			if(paramBldNum == null) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.BLD_NUM_NULL);
+				return rtnMap;
+			}
+			
+			
+			if(paramJobKey.indexOf("%") != -1) {
+				
+				paramJobKey = URLDecoder.decode(paramJobKey,"utf-8");
+			}
+			
+			
+			String salt = EgovProperties.getProperty("Globals.data.salt");
 			
 			String addSalt = EgovProperties.getProperty("Globals.data.addSalt");
 			
 			
-			String deKey = CommonScrty.decryptedAria(paramKey, dataSalt);
+			String deJobKey = CommonScrty.decryptedAria(paramJobKey, salt);
 			
 			
-			String[] deKeys = deKey.split(Pattern.quote(addSalt));
+			String[] deJobKeys = deJobKey.split(Pattern.quote(addSalt));
+
+			
+			String jenId = CommonScrty.decryptedAria(deJobKeys[0],salt);
 			
 			
-			String jenId = CommonScrty.decryptedAria(deKeys[0],dataSalt);
-			
-			
-			String jobId = CommonScrty.decryptedAria(deKeys[1],dataSalt);
+			String jobId = CommonScrty.decryptedAria(deJobKeys[1],salt);
 			
 			Map newMap = new HashMap<>();
 			newMap.put("jenId", jenId);
 			newMap.put("jobId", jobId);
 			
 			
-			Map jobDbInfo = jen1000Service.selectJen1100JobInfo(newMap);
+			Map jobInfo = jen1000Service.selectJen1100JobInfo(newMap);
+			
+			if(jobInfo == null) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.JEN_JOB_ID_INFO_NULL);
+				return rtnMap;
+			}
+			
+			String jenUsrId = (String) jobInfo.get("jenUsrId");
+			String jenUsrTok = (String) jobInfo.get("jenUsrTok");
+			String jenUrl = (String) jobInfo.get("jenUrl");
 			
 			
-			if(jobDbInfo == null) {
-				rtnValue.put("result", false);
-				rtnValue.put("error_code", OslErrorCode.JOB_ID_INFO_NULL);
-				return rtnValue;
+			String pwSalt = EgovProperties.getProperty("Globals.lunaops.salt");
+			
+			
+			jenUsrTok = CommonScrty.decryptedAria(jenUsrTok, pwSalt);
+			
+			
+			if(jenUsrTok == null || "".equals(jenUsrTok)){
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.DATA_DECODE_FAIL);
+				return rtnMap;
 			}
 			
 			
-			String jenUrl= (String)jobDbInfo.get("jenUrl");
-			String jenUsrId= (String)jobDbInfo.get("jenUsrId");
-			String jenUsrTok= (String)jobDbInfo.get("jenUsrTok");
-			String dplTypeCd= (String)paramMap.get("dplTypeCd");
-			
-			
-			String deJenUsrTok = CommonScrty.decryptedAria(jenUsrTok, salt);
-			
-			
-			jenStatusVo = newJenkinsClient.connect(jenUrl, jenUsrId, deJenUsrTok);
+			JenStatusVO jenStatusVo = newJenkinsClient.connect(jenUrl, jenUsrId, jenUsrTok);
 			
 			
 			if(jenStatusVo.isErrorFlag()) {
-				rtnValue.put("result", false);
-				rtnValue.put("error_code", OslErrorCode.JENKINS_CONN_FAIL);
-				return rtnValue;
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.JENKINS_CONN_FAIL);
+				return rtnMap;
 			}
 			
 			
-			Map jobInfo = newJenkinsClient.getJobInfo(jenStatusVo, jobId);
+			JenkinsServer jenkins = jenStatusVo.getJenkins();
 			
 			
-			if(jobInfo == null) {
-				newJenkinsClient.close(jenStatusVo);
-				
-				rtnValue.put("result", false);
-				rtnValue.put("error_code", OslErrorCode.JOB_ID_INFO_NULL);
-				return rtnValue;
+			int bldNum = Integer.parseInt(paramBldNum);
+			
+			
+			newMap.put("bldNum", bldNum);
+			
+			
+			int bldLogChk = jen1000Service.selectJen1200JobBldLogCheck(newMap);
+			
+			
+			if(bldLogChk > 0) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.SERVER_ERROR);
+				return rtnMap;
 			}
-			
-			
-			boolean isStartBuildable = (boolean) jobInfo.get("isStartBuildable");
-			
-			
-			if(!isStartBuildable) {
-				newJenkinsClient.close(jenStatusVo);
-				rtnValue.put("result", false);
-				rtnValue.put("error_code", OslErrorCode.JOB_DUPLE_ACTION);
-				return rtnValue;
-			}
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			BuildVO buildVo = new BuildVO();
-			buildVo.setJenId(jenId);
-			buildVo.setJenUrl(jenUrl);
-			buildVo.setUserId(jenUsrId);
-			buildVo.setDeTokenId(deJenUsrTok);
-			buildVo.setJobId(jobId);
-			buildVo.setDplTypeCd(dplTypeCd);
-			buildVo.setJenStatusVo(jenStatusVo);
-			
-			
-			
-			buildVo.addBldActionLog(jobId+" JOB 빌드를 준비 중입니다.");
-			
-			
-			BuildVO rtnBuildVo = buildService.insertJobBuildAction(buildVo);
-			
-			rtnValue.put("result", true);
-			rtnValue.put("bldNum", rtnBuildVo.getBldNum());
-			rtnValue.put("bldActionLog", rtnBuildVo.getBldActionLog());
-			rtnValue.put("bldResult", rtnBuildVo.getBldResult());
 
-		}catch(Exception e) {
-			Log.error("insertJobBldAction()", e);
-			rtnValue.put("result", false);
-			rtnValue.put("error_code", OslErrorCode.SERVER_ERROR);
-			return rtnValue;
+			
+			Build build = jenkins.getJob(jobId).getBuildByNumber(bldNum);
+			
+			
+			BuildWithDetails bwd = build.details();
+			
+			
+			if(bwd.isBuilding()) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.JOB_DUPLE_ACTION);
+				return rtnMap;
+			}
+			
+			
+			@SuppressWarnings("serial")
+			Map<String, String> bldResultMap = new HashMap<String, String>() {{
+			    put("BUILDING", "02");
+			    put("SUCCESS", "03");
+			    put("FAILURE", "04");
+			    put("ABORTED", "05");
+			    put("NOT_BUILT", "06");
+			    put("UNSTABLE", "07");
+			    put("UNKNOWN", "08");
+			    put("CANCELLED", "09");
+			    put("SYSTEM ERROR", "10");
+			}};
+			
+			
+			String bldResultCd = "08";
+			
+			if(bldResultMap.containsKey(bwd.getResult().name())) {
+				bldResultCd = bldResultMap.get(bwd.getResult().name());
+			}
+			
+			newMap.put("bldClass", bwd.get_class());
+			newMap.put("bldResult", bwd.getResult().name());
+			newMap.put("bldResultCd", bldResultCd);
+			newMap.put("bldEtmDurationTm", bwd.getEstimatedDuration());
+			newMap.put("bldDurationTm", bwd.getDuration());
+			newMap.put("bldStartDtm", new Date(bwd.getTimestamp()));
+			newMap.put("bldConsoleLog", bwd.getConsoleOutputHtml());
+			newMap.put("regDtm", paramMap.get("regDtm"));
+			
+			
+			List<BuildCause> bcList = bwd.getCauses();
+			if(bcList != null && bcList.size() > 0) {
+				newMap.put("bldCauses", bcList.get(0).getShortDescription());
+			}
+			
+			
+			jen1000Service.insertJen1200JobBldLogInfo(newMap);
+			
+			
+			BuildChangeSet bcs = bwd.getChangeSet();
+			
+			if(bcs != null) {
+				List<BuildChangeSetItem> bcsiList = bcs.getItems();
+				
+				
+				if(bcsiList != null && bcsiList.size() > 0) {
+					for(int l=0;l<bcsiList.size();l++) {
+						BuildChangeSetItem bcsInfo = bcsiList.get(l);
+						
+						
+						Map changeItemMap = new HashMap<>();
+						changeItemMap.put("jenId", jenId);
+						changeItemMap.put("jobId", jobId);
+						changeItemMap.put("bldNum", bldNum);
+						changeItemMap.put("chgRevision", bcsInfo.getCommitId());
+						changeItemMap.put("chgTimestamp", bcsInfo.getTimestamp());
+						changeItemMap.put("chgDate", bcsInfo.getDate());
+						changeItemMap.put("chgMsg", bcsInfo.getMsg());
+						changeItemMap.put("chgUser", bcsInfo.getAuthor().getFullName());
+						
+						jen1000Service.insertJen1201JobBldChangeLogInfo(changeItemMap);
+						
+						
+						List<BuildChangeSetPath> bcspList = bcsInfo.getPaths();
+						
+						if(bcspList != null && bcspList.size() > 0) {
+							for(int m=0;m<bcspList.size();m++) {
+								BuildChangeSetPath bcsp = bcspList.get(m);
+								
+								
+								Map changePathMap = new HashMap<>();
+								changePathMap.put("jenId", jenId);
+								changePathMap.put("jobId", jobId);
+								changePathMap.put("bldNum", bldNum);
+								changePathMap.put("chgRevision", bcsInfo.getCommitId());
+								changePathMap.put("filePath", bcsp.getFile());
+								changePathMap.put("editTypeCd", bcsp.getEditType());
+								
+								jen1000Service.insertJen1202JobBldChangeFileLogInfo(changePathMap);
+							}
+						}
+					}
+				}
+			}
+			
+			
+			Map<String, String> buildParam = bwd.getParameters();
+			if(!buildParam.isEmpty()) {
+				Iterator itr = buildParam.keySet().iterator();
+				while(itr.hasNext()) {
+					String key = (String) itr.next();
+					Map bldParamMap = new HashMap<>();
+					bldParamMap.put("jenId", jenId);
+					bldParamMap.put("jobId", jobId);
+					bldParamMap.put("bldNum", bldNum);
+					bldParamMap.put("jobParamKey", key);
+					bldParamMap.put("jobParamVal", buildParam.get(key));
+					
+					
+					jen1000Service.insertJen1203JobBldParameterInfo(bldParamMap);
+				}
+			}
+			
+			rtnMap.put("result", true);
+		}
+		
+		
+		return rtnMap;
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Map insertJobBldAction(Map paramMap) throws Exception {
+		
+		Map rtnValue = new HashMap<>();
+				
+		
+		String data = (String) paramMap.get("data");
+				
+		
+		Object checkParam = checkParamDataKey(data);
+		
+		Map rtnMap = new HashMap<String, String>();
+		
+		if(checkParam instanceof String) {
+			rtnMap.put("result", false);
+			rtnMap.put("error_code", checkParam.toString());
+			return rtnMap;
+		}else {
+			
+			JSONObject jsonObj = (JSONObject) checkParam;
+			
+			
+			
+			String jobKey = OslUtil.jsonGetString(jsonObj, "jobKey");
+			
+			
+			if(jobKey == null) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.JEN_JOB_ID_INFO_NULL);
+				return rtnMap;
+			}
+			
+			
+			String rv = OslUtil.jsonGetString(jsonObj, "rv");
+			
+			
+			if(rv == null) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.REP_REVISION_PARAM_NULL);
+				return rtnMap;
+			}
+			
+			
+			JenStatusVO jenStatusVo = null;
+			
+			try {
+				
+				String salt = EgovProperties.getProperty("Globals.lunaops.salt");
+				
+				String dataSalt = EgovProperties.getProperty("Globals.data.salt");
+				
+				String addSalt = EgovProperties.getProperty("Globals.data.addSalt");
+				
+				
+				if(jobKey.indexOf("%") != -1) {
+					jobKey = URLDecoder.decode(jobKey, "UTF-8");
+				}
+				
+				
+				String deJobKey = CommonScrty.decryptedAria(jobKey, dataSalt);
+				
+				
+				String[] deJobKeys = deJobKey.split(Pattern.quote(addSalt));
+				
+				
+				String jenId = CommonScrty.decryptedAria(deJobKeys[0],dataSalt);
+				
+				
+				String jobId = CommonScrty.decryptedAria(deJobKeys[1],dataSalt);
+				
+				Map newMap = new HashMap<>();
+				newMap.put("jenId", jenId);
+				newMap.put("jobId", jobId);
+				
+				
+				Map jobDbInfo = jen1000Service.selectJen1100JobInfo(newMap);
+				
+				
+				if(jobDbInfo == null) {
+					rtnValue.put("result", false);
+					rtnValue.put("error_code", OslErrorCode.JOB_ID_INFO_NULL);
+					return rtnValue;
+				}
+				
+				
+				String jenUrl= (String)jobDbInfo.get("jenUrl");
+				String jenUsrId= (String)jobDbInfo.get("jenUsrId");
+				String jenUsrTok= (String)jobDbInfo.get("jenUsrTok");
+				String dplTypeCd= (String)paramMap.get("dplTypeCd");
+				
+				
+				String deJenUsrTok = CommonScrty.decryptedAria(jenUsrTok, salt);
+				
+				
+				jenStatusVo = newJenkinsClient.connect(jenUrl, jenUsrId, deJenUsrTok);
+				
+				
+				if(jenStatusVo.isErrorFlag()) {
+					rtnValue.put("result", false);
+					rtnValue.put("error_code", OslErrorCode.JENKINS_CONN_FAIL);
+					return rtnValue;
+				}
+				
+				
+				Map jobInfo = newJenkinsClient.getJobInfo(jenStatusVo, jobId);
+				
+				
+				if(jobInfo == null) {
+					newJenkinsClient.close(jenStatusVo);
+					
+					rtnValue.put("result", false);
+					rtnValue.put("error_code", OslErrorCode.JOB_ID_INFO_NULL);
+					return rtnValue;
+				}
+				
+				
+				boolean isStartBuildable = (boolean) jobInfo.get("isStartBuildable");
+				
+				
+				if(!isStartBuildable) {
+					newJenkinsClient.close(jenStatusVo);
+					rtnValue.put("result", false);
+					rtnValue.put("error_code", OslErrorCode.JOB_DUPLE_ACTION);
+					return rtnValue;
+				}
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				BuildVO buildVo = new BuildVO();
+				buildVo.setJenId(jenId);
+				buildVo.setJenUrl(jenUrl);
+				buildVo.setUserId(jenUsrId);
+				buildVo.setDeTokenId(deJenUsrTok);
+				buildVo.setJobId(jobId);
+				buildVo.setDplTypeCd(dplTypeCd);
+				buildVo.setJenStatusVo(jenStatusVo);
+				
+				
+				
+				buildVo.addBldActionLog(jobId+" JOB 빌드를 준비 중입니다.");
+				
+				
+				BuildVO rtnBuildVo = buildService.insertJobBuildAction(buildVo);
+				
+				rtnValue.put("result", true);
+				rtnValue.put("bldNum", rtnBuildVo.getBldNum());
+				rtnValue.put("bldActionLog", rtnBuildVo.getBldActionLog());
+				rtnValue.put("bldResult", rtnBuildVo.getBldResult());
+				
+			}catch(Exception e) {
+				Log.error("insertJobBldAction()", e);
+				rtnValue.put("result", false);
+				rtnValue.put("error_code", OslErrorCode.SERVER_ERROR);
+				return rtnValue;
+			}
 		}
 		
 		return rtnValue;
@@ -905,13 +1156,10 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			paramMap.put("repId", repId);
 			
 			
-			
-			
 			RepVO repVo = rep1000Service.selectRep1000Info(paramMap);
 			
 			
 			String branchePath = repVo.getSvnBrcPath();
-			
 			
 			
 			String branchNm = EgovProperties.getProperty("Globals.svn.branchNm");
@@ -919,6 +1167,10 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			
 			
 			rtnValue = repModule.createFolderInfo(repVo, folderNm, branchePath);
+			
+			
+			rtnValue.put("repId", repId);
+			rtnValue.put("ticketId", ticketId);
 			
 			return rtnValue;
 			
@@ -938,7 +1190,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 		String data = (String) paramMap.get("data");
 
 		
-		String salt = EgovProperties.getProperty("Globals.data.salt");
+		
 		
 		
 		Object checkParam = checkParamDataKey(data);
@@ -1035,53 +1287,27 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
 				
 				
+				String author = rvInfo.getAuthor();
+				
+				
 				Map newMap = new HashMap<>();
 				newMap.put("repId", repVo.getRepId());
 				newMap.put("repRv", rvInfo.getRevision());
 				newMap.put("repComment", rvInfo.getComment());
-				newMap.put("repDate", sdf.format(rvInfo.getLogDate()));
-				newMap.put("repAuthor", rvInfo.getAuthor());
+				newMap.put("repCmtDate", sdf.format(rvInfo.getLogDate()));
+				newMap.put("repCmtAuthor", author);
 				newMap.put("repChgFileCnt", chgFileCnt);
 				
 				
+				newMap.put("repRvTypeCd", "01");
+				
+				
 				if(rvInfo.getComment() != null) {
+					
 					String[] comments = rvInfo.getComment().split("\n");
 					String ticketId = comments[0];
 					
-					
-					
-					String reciverData = "{\"key\":\""+salt+"\", \"ticket_id\":\""+ticketId+"\"}";
-					String enReciverData = CommonScrty.encryptedAria(reciverData, salt);
-					
-					
-					HttpGet methodGet = new HttpGet();
-					URI uri = new URI(eGeneUrl+"plugins/jsp/isTicket.jsp?data="+URLEncoder.encode(enReciverData,"UTF-8"));
-					methodGet.setURI(uri);
-					
-					HttpClient client = OslConnHttpClient.getHttpClient();
-					
-					
-					HttpResponse responseResult = client.execute(methodGet);
-					
-					
-					if(responseResult.getStatusLine() != null && responseResult.getStatusLine().getStatusCode() == 200) {
-						
-			    		String returnContent = EntityUtils.toString(responseResult.getEntity());
-			    		returnContent = returnContent.replaceAll("\\s", "");
-			    		
-			    		
-			    		if(!"true".equals(returnContent)) {
-			    			
-							rtnValue.put("result", false);
-							rtnValue.put("error_code", OslErrorCode.PARAM_TICKET_ID_NULL);
-							return rtnValue;
-			    		}
-					}else {
-						
-						rtnValue.put("result", false);
-						rtnValue.put("error_code", OslErrorCode.PARAM_TICKET_ID_NULL);
-						return rtnValue;
-					}
+					 
 					
 					
 					newMap.put("ticketId", ticketId);
@@ -1220,5 +1446,54 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			rtnValue.put("error_code", OslErrorCode.DATA_DECODE_FAIL);
 			return rtnValue;
 		}
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Map selectTicketCheck(Map paramMap) throws Exception {
+		Map rtnValue = new HashMap<>();
+		
+		
+		String data = (String) paramMap.get("data");
+		
+		
+		String eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
+		
+		
+		if(eGeneUrl.lastIndexOf("/") != (eGeneUrl.length()-1)) {
+			
+			eGeneUrl = eGeneUrl + "/";
+		}
+				
+		
+		HttpGet methodGet = new HttpGet();
+		URI uri = new URI(eGeneUrl+"plugins/jsp/isTicket.jsp?data="+URLEncoder.encode(data,"UTF-8"));
+		methodGet.setURI(uri);
+		
+		HttpClient client = OslConnHttpClient.getHttpClient();
+		
+		
+		HttpResponse responseResult = client.execute(methodGet);
+		
+		
+		if(responseResult.getStatusLine() != null && responseResult.getStatusLine().getStatusCode() == 200) {
+			
+    		String returnContent = EntityUtils.toString(responseResult.getEntity());
+    		returnContent = returnContent.replaceAll("\\s", "");
+    		
+    		
+    		if(!"true".equals(returnContent)) {
+    			
+				rtnValue.put("result", false);
+				rtnValue.put("error_code", OslErrorCode.DATA_INSERT_COUNT_NULL);
+    		}else {
+    			rtnValue.put("result", true);
+    		}
+		}else {
+			
+			rtnValue.put("result", false);
+			rtnValue.put("error_code", OslErrorCode.DATA_CHECK_FAIL);
+		}
+		return rtnValue;
 	}
 }

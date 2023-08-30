@@ -11,8 +11,6 @@
 	<!-- DataSource -->
 	<alias name="dataSource-${Globals.DbType}" alias="lunaops.dataSource"/>
     <alias name="dataSource-${Globals.DbType}" alias="dataSource"/>
-   <!-- 인사연동 datasource -->
-	<alias name="dataSource2-${Globals.DbType2}" alias="lunaops.dataSource2"/>
 	
     <!-- lunaops DB DataSource -->
     <!-- property 암호화 적용 데이터소스 -->
@@ -31,17 +29,5 @@
 				<value>ALTER SESSION SET NLS_DATE_FORMAT='YYYY/MM/DD HH24:MI:SS'</value>
 			</list>
 		</property>
-    </bean>
-    
-	<bean id="dataSource2-oracle-usr" class="kr.opensoftlab.sdf.commons.dbcp.BasicDataSourceEnDe" destroy-method="close">
-        <property name="driverClassName" 		value="${Globals.lunaops.oracleUsr.driver}"/>
-        <property name="url" 					value="${Globals.lunaops.oracleUsr.url}"/>
-        <property name="username" 				value="${Globals.lunaops.oracleUsr.username}"/>
-        <property name="password" 				value="${Globals.lunaops.oracleUsr.password}"/>
-      	<property name="maxActive" 				value="${Globals.lunaops.maxActive}" />
-		<property name="maxIdle" 				value="${Globals.lunaops.maxIdle}" />
-		<property name="maxWait" 				value="${Globals.lunaops.maxWait}" />
-		<property name="validationQuery" 		value="${Globals.lunaops.oracleUsr.validationQuery}"/>
-		<property name="validationQueryTimeout" value="${Globals.lunaops.validationQueryTimeout}"/>
     </bean>
 </beans>
