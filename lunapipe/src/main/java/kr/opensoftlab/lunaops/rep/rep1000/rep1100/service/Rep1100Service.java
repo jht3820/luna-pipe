@@ -34,4 +34,12 @@ public interface Rep1100Service {
 	
 	@SuppressWarnings("rawtypes")
 	void deleteRep1101RvChgList(Map paramMap) throws Exception;
+
+	
+	@SuppressWarnings({ "rawtypes" })
+	List<Map> selectRep1100TktRvFileChgList(Map paramMap) throws Exception;
+
+	
+	@SuppressWarnings("rawtypes")
+	int selectRep1100TktRvFileChgListCnt(Map paramMap) throws Exception;
 }
