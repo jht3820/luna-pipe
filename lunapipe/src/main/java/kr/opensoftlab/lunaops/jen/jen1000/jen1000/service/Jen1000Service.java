@@ -156,4 +156,13 @@ public interface Jen1000Service {
 
 	
 	int updateJen1200DeployJobBuildLogInfo(BuildVO buildVo)  throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	int selectJen1200JobBldLogCheck(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	String insertJen1200JobBldLogInfo(Map paramMap) throws Exception;
+
 }

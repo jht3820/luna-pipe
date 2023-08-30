@@ -19,6 +19,7 @@ public class OslErrorCode {
 		put("009", "REP_ID에 해당하는 소스저장소 정보가 없음");
 		put("010", "JEN_ID, JOB_ID에 해당하는 JENKINS&JOB 정보가 없음");
 		put("011", "등록된 데이터 없음");
+		put("012", "데이터 체크 실패");
 		
 		
 		put("100", "구성항목 저장 중 오류");
@@ -30,10 +31,12 @@ public class OslErrorCode {
 		put("200", "Brache 명 중복");
 		put("201", "소스저장소 고유 식별 ID 'UUID' 값 없음");
 		put("202", "소스저장소 리비전 'rv' 값 없음");
+		put("203", "Trunk 경로에 복사 대상이 없음");
 		
 		
 		put("300", "JENKINS 연결 실패");
-		put("301", "해당 JOB이 이미 실행 중입니다.");
+		put("301", "해당 JOB이 실행 중입니다.");
+		put("302", "빌드 번호 정보가 없습니다.");
 		
 		
 		put("999", "서버 내 처리 중 오류");
@@ -83,6 +86,9 @@ public class OslErrorCode {
 	public final static String DATA_INSERT_COUNT_NULL = "011";
 	
 	
+	public final static String DATA_CHECK_FAIL = "012";
+	
+	
 	public final static String CI_INSERT_FAIL = "100";
 	
 	
@@ -104,10 +110,17 @@ public class OslErrorCode {
 	public final static String REP_REVISION_PARAM_NULL = "202";
 	
 	
+	
+	public final static String REP_TRUNK_PATH_NULL = "203";
+	
+	
 	public final static String JENKINS_CONN_FAIL = "300";
 	
 	
 	public final static String JOB_DUPLE_ACTION = "301";
+	
+	
+	public final static String BLD_NUM_NULL = "302";
 	
 	
 	public final static String SERVER_ERROR = "999";
