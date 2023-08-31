@@ -553,4 +553,15 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	public int updateJen1200DeployJobBuildLogInfo(BuildVO buildVo)  throws Exception{
 		return jen1000DAO.updateJen1200DeployJobBuildLogInfo(buildVo);
 	}
+	
+	@SuppressWarnings("rawtypes")
+	public int selectJen1200JobBldLogCheck(Map paramMap) throws Exception {
+		return jen1000DAO.selectJen1200JobBldLogCheck(paramMap);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	public String insertJen1200JobBldLogInfo(Map paramMap) throws Exception{
+		return jen1000DAO.insertJen1200JobBldLogInfo(paramMap);
+	}
 }
