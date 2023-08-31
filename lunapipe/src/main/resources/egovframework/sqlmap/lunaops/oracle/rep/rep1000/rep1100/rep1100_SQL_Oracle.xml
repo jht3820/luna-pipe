@@ -9,6 +9,7 @@
 		<result property="ticket_id"		column="TICKET_ID" />
 		<result property="rep_id" 			column="REP_ID" />
 		<result property="rep_rv" 			column="REP_RV" />
+		<result property="rep_rv_type_cd" 	column="REP_RV_TYPE_CD" />
 		<result property="rep_comment" 		column="REP_COMMENT" />
 		<result property="rep_cmt_date" 	column="REP_CMT_DATE" />
 		<result property="rep_cmt_author" 	column="REP_CMT_AUTHOR" />
@@ -27,12 +28,44 @@
 	</resultMap>
 	
 	 
+	<sql id="selectRep1100List">
+		SELECT
+			A.REP_ID
+			, D.REP_NM
+			, D.SVN_REP_URL
+			, D.REP_TYPE_CD
+			, A.REP_RV
+			, C.REP_COMMENT
+			, C.REP_CMT_DATE
+			, C.REP_CMT_AUTHOR
+			, A.REP_CHG_ID
+			, A.TICKET_ID
+			, A.REP_CHG_TYPE
+			, A.REP_CHG_FILE_PATH
+			, A.REP_CHG_FILE_NM
+		FROM REP1101 A
+		INNER JOIN
+		(
+			SELECT REP_ID, MAX(REP_RV) AS MAX_REP_RV, REP_CHG_FILE_PATH, REP_CHG_FILE_NM
+			FROM REP1101
+			WHERE 1=1
+			AND TICKET_ID = #ticketId#
+			GROUP BY REP_ID, REP_CHG_FILE_PATH, REP_CHG_FILE_NM
+		) B
+		ON (A.REP_ID = B.REP_ID AND A.REP_RV = B.MAX_REP_RV AND A.REP_CHG_FILE_PATH = B.REP_CHG_FILE_PATH AND A.REP_CHG_FILE_NM = B.REP_CHG_FILE_NM)
+		INNER JOIN REP1100 C ON (A.REP_ID = C.REP_ID AND A.REP_RV = C.REP_RV)
+		INNER JOIN REP1000 D ON (A.REP_ID = D.REP_ID)
+		WHERE 1=1
+	
+	</sql>
+	 
 	<select id="rep1100DAO.selectRep1100RvInfo" parameterClass="java.util.Map" resultMap="resultRvListExt">
 		
 		SELECT
 			A.TICKET_ID
 			, A.REP_ID
 			, A.REP_RV
+			, A.REP_RV_TYPE_CD
 			, A.REP_COMMENT
 			, A.REP_CMT_DATE
 			, A.REP_CMT_AUTHOR
@@ -78,6 +111,7 @@
 			TICKET_ID
 			, REP_ID
 			, REP_RV
+			, REP_RV_TYPE_CD
 			, REP_COMMENT
 			, REP_CMT_DATE
 			, REP_CMT_AUTHOR
@@ -88,6 +122,7 @@
 			#ticketId#
 			, #repId#
 			, #repRv#
+			, #repRvTypeCd#
 			, #repComment#
 			, TO_DATE(#repCmtDate#, 'YYYY-MM-DD HH24:MI:SS')
 			, #repCmtAuthor#
@@ -163,4 +198,32 @@
 			AND REP_CHG_ID = #repChgId#
 		</isNotEmpty>
 	</delete>
+	
+	
+    <select id="rep1100DAO.selectRep1100TktRvFileChgList" parameterClass="java.util.Map"  resultClass="egovMap">
+	    
+		SELECT *
+		FROM
+		(
+	   		SELECT 
+	   			ROWNUM RN,
+				SUBT1.*
+	   		FROM
+	   		(
+				<include refid="selectRep1100List"/>
+    		) SUBT1
+    	) T1
+		WHERE T1.RN BETWEEN (#firstIndex#+1) AND #lastIndex#
+    </select>
+    
+    
+    <select id="rep1100DAO.selectRep1100TktRvFileChgListCnt" parameterClass="java.util.Map"  resultClass="java.lang.Integer">
+	    
+	    	SELECT
+	    		COUNT(*)
+			FROM
+			(
+				<include refid="selectRep1100List"/>
+			) T1
+    </select>
 </sqlMap>

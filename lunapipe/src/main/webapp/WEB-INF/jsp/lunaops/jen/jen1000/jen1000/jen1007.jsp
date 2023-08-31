@@ -39,6 +39,13 @@ $(function(){
 	fnSelJobGridSetting();
 	fnSelJobSearchSetting();
 	
+	//jobIdList 데이터 있는 경우 넣기
+	var jobIdList = $("form#jen1007Form > #jobIdList").val();
+	if(!gfnIsNull(jobIdList)){
+		//사전에 등록되있던 데이터 있는 경우 해당 데이터 조회하기
+		fnStartJobDataSetting(jobIdList);
+	}
+	
 	//가이드 상자 호출
 	gfnGuideStack("add",fnJen1007GuideShow);
 	
@@ -184,7 +191,7 @@ $(function(){
 						
 						//반환 값 세팅
 						var jobInfo = {
-							"key": jobInfo.jobId
+							"key": jobInfo.jobId+"_"+ticketId
 							, "tkt_jen_id": jobInfo.jenId
 							, "tkt_name": jobInfo.jenNm
 							, "tkt_src_id": srcId
@@ -194,6 +201,7 @@ $(function(){
 							, "tkt_job_type": jobInfo.jobTypeNm
 							, "tkt_var": jobParamData
 							, "tkt_tgt_id": ticketId
+							, "tkt_job_id": jobInfo.jobId
 						}; 
 						
 						urows.push(jobInfo);
@@ -221,7 +229,8 @@ $(function(){
 							//리시브 반환 데이터
 							data: JSON.stringify(returnMap),
 							//컨트롤러 전달 데이터
-							ctlData: JSON.stringify(ctrlMap)
+							ctlData: JSON.stringify(ctrlMap),
+							eGeneUrl: eGeneUrl
 						}
 					);
 					
@@ -1183,6 +1192,41 @@ function fnSelectJen1000JobBldLog(jobList){
 		}
 	});
 }
+
+//사전에 등록되있던 데이터 있는 경우 해당 데이터 조회하기
+function fnStartJobDataSetting(paramJobIdList){
+	
+	//AJAX 설정
+	var ajaxObj = new gfnAjaxRequestAction(
+			{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000SelJobList.do'/>"}
+			,{"jenJobList": paramJobIdList});
+	//AJAX 전송 성공 함수
+	ajaxObj.setFnSuccess(function(data){
+		var jenJobList = data.jenJobList;
+		
+		//선 추가된 데이터 있는 경우 세팅
+		if(!gfnIsNull(jenJobList)){
+			addDataIdx = 0;
+			
+			$.each(jenJobList, function(idx, map){
+				//jenkins있는지 체크
+				if(!overlapJob.hasOwnProperty(map.jenId)){
+					overlapJob[map.jenId] = {};
+				}
+				
+				overlapJob[map.jenId][map.jobId] = true;
+				map["jobStartOrd"] = (selJobGrid.getList().length+1)+addDataIdx;
+				addDataIdx++;
+				//job추가
+				selJobGrid.addRow(map);
+			});
+		}
+		
+	});
+	
+	//AJAX 전송
+	ajaxObj.send();
+}
 </script>
 
 
@@ -1195,6 +1239,7 @@ function fnSelectJen1000JobBldLog(jobList){
 		<input type="hidden" name="ticketId" id="ticketId" value="${requestScope.ticketId }"/>
 		<input type="hidden" name="eGeneUrl" id="eGeneUrl" value="${requestScope.eGeneUrl }"/>
 		<input type="hidden" name="callbakApiId" id="callbakApiId" value="${requestScope.callbakApiId }"/>
+		<input type="hidden" name="jobIdList" id="jobIdList" value="<c:out value="${requestScope.jobIdList}"/>"/>
 	</form>
 	<div class = "tab_contents menu" >
 		<div class="main_frame left">
