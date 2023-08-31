@@ -57,4 +57,16 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 	public void deleteRep1101RvChgList(Map paramMap) throws Exception{
 		rep1100DAO.deleteRep1101RvChgList(paramMap);
 	}
+
+	
+	@SuppressWarnings({ "rawtypes"})
+	public List<Map> selectRep1100TktRvFileChgList(Map paramMap) throws Exception{
+		return rep1100DAO.selectRep1100TktRvFileChgList(paramMap);
+	}
+
+	
+	@SuppressWarnings("rawtypes")
+	public int selectRep1100TktRvFileChgListCnt(Map paramMap) throws Exception{
+		return rep1100DAO.selectRep1100TktRvFileChgListCnt(paramMap);
+	}
 }
