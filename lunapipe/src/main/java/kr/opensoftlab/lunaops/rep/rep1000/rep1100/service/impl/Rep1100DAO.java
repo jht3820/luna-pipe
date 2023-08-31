@@ -53,4 +53,16 @@ public class Rep1100DAO extends ComOslitsAbstractDAO {
 	public void deleteRep1101RvChgList(Map paramMap) throws Exception{
 		delete("rep1100DAO.deleteRep1101RvChgList", paramMap);
 	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public List<Map> selectRep1100TktRvFileChgList(Map paramMap) throws Exception{
+		return (List) list("rep1100DAO.selectRep1100TktRvFileChgList", paramMap);
+	}
+
+	
+	@SuppressWarnings("rawtypes")
+	public int selectRep1100TktRvFileChgListCnt(Map paramMap) throws Exception{
+		return (Integer) select("rep1100DAO.selectRep1100TktRvFileChgListCnt", paramMap);
+	}
 }

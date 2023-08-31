@@ -17,15 +17,6 @@
 		<property name="lobHandler" ref="egov.lobHandler"/>
 	</bean>
 
-	<bean id="lunaops.sqlMapClient2" class="egovframework.rte.psl.orm.ibatis.SqlMapClientFactoryBean">
-		<property name="configLocations">
-			<list>
-				<value>classpath:/egovframework/sqlmap/config/lunaops/${Globals.DbType2}/sql-map-*.xml</value>
-			</list>
-		</property>
-		<property name="dataSource" ref="lunaops.dataSource2"/>
-		<property name="lobHandler" ref="egov.lobHandler2"/>
-	</bean>
 	<!-- SqlMap setup for iBATIS Database Layer -->
 	<!-- dummy를 이용해 sqlmap들을 팩토리 빈으로 스프링 컨테이너 구동시 전부 물고 올라오도록 설정함. -->
 	<!-- 해당 설정으로 개발자들이 각자 sql-map-config에 일일이 등록해줄 필요 없이 sqlmap 파일의 저장 위치만 맞춰주면 되도록 설정. -->
