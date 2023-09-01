@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="whk1000DAO">
+	<typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+
+	
+	<sql id="selectWhk1000">
+		<![CDATA[
+			SELECT
+		            WEBHOOK_ID ,
+		            WEBHOOK_NM ,
+		            WEBHOOK_TYPE_CD ,
+		            WEBHOOK_TARGET_URL ,
+		            USE_CD ,
+				    TO_CHAR(REG_DTM, 'YYYY-MM-DD HH24:MI:SS') AS REG_DTM ,
+		            REG_USR_ID ,                
+		            REG_USR_IP ,                
+		            MODIFY_DTM ,                
+		            MODIFY_USR_ID ,             
+		            MODIFY_USR_IP               
+			FROM
+		            WHK1000
+			WHERE   1=1
+			AND WEBHOOK_TYPE_CD = #webhookTypeCd#
+		]]>
+		<isNotEmpty property="useCd">
+			AND USE_CD = #useCd#
+		</isNotEmpty>
+		ORDER BY REG_DTM DESC
+    </sql>
+    
+	
+	<sql id="selectWhk1001">
+		<![CDATA[
+			SELECT
+		            A.WEBHOOK_ID ,
+		            A.WEBHOOK_NM ,
+		            A.WEBHOOK_TYPE_CD ,
+		            A.WEBHOOK_TARGET_URL ,
+		            A.USE_CD ,
+		            B.WEBHOOK_LOG_ID
+		            B.WEBHOOK_RESULT
+		            TO_CHAR(B.WEBHOOK_DATE, 'YYYY-MM-DD HH24:MI:SS') AS WEBHOOK_DATE
+		            B.WEBHOOK_DATA
+		            B.WEBHOOK_LOG
+		            B.WEBHOOK_RESULT_DATA
+				    TO_CHAR(A.REG_DTM, 'YYYY-MM-DD HH24:MI:SS') AS REG_DTM ,
+		            A.REG_USR_ID ,                
+		            A.REG_USR_IP ,                
+		            A.MODIFY_DTM ,                
+		            A.MODIFY_USR_ID ,             
+		            A.MODIFY_USR_IP               
+			FROM
+		            WHK1000 A INNER JOIN WHK1001 ON (A.WEBHOOK_ID = B.WEBHOOK_ID)
+			WHERE   1=1
+			AND A.WEBHOOK_ID = #webhookId#
+		]]>
+		<isNotEmpty property="useCd">
+			AND A.USE_CD = #useCd#
+		</isNotEmpty>
+		ORDER BY B.WEBHOOK_DATE DESC
+    </sql>
+    
+	 
+	<select id="whk1000DAO.selectWhk1000Info" parameterClass="java.util.Map"  resultClass="egovMap">
+		
+		SELECT T1.*
+		FROM
+		(
+			<include refid="selectWhk1000"/>
+		) T1
+		WHERE 1=1
+		<isNotEmpty property="webhookId">
+			AND T1.WEBHOOK_ID = #webhookId#
+		</isNotEmpty>
+	</select>
+	
+	 
+	<select id="whk1000DAO.selectWhk1001Info" parameterClass="java.util.Map"  resultClass="egovMap">
+		
+		SELECT T1.*
+		FROM
+		(
+			<include refid="selectWhk1001"/>
+		) T1
+		WHERE 1=1
+		<isNotEmpty property="webhookLogId">
+			AND T1.WEBHOOK_LOG_ID = #webhookLogId#
+		</isNotEmpty>
+	</select>
+	
+	 
+	<select id="whk1000DAO.selectWhk1000List" parameterClass="java.util.Map"  resultClass="egovMap">
+		
+		SELECT T1.*
+		FROM
+		(
+			<include refid="selectWhk1000"/>
+		) T1
+		WHERE 1=1
+	</select>
+	
+	 
+	<select id="whk1000DAO.selectWhk1001List" parameterClass="java.util.Map"  resultClass="egovMap">
+		
+		SELECT T1.*
+		FROM
+		(
+			<include refid="selectWhk1001"/>
+		) T1
+		WHERE 1=1
+	</select>
+
+	 
+    <insert id="whk1000DAO.insertWhk1000Info" parameterClass="java.util.Map">
+		<selectKey resultClass="java.lang.String" keyProperty="newWebhookId">
+		<![CDATA[
+			 
+			SELECT	NVL( 
+							SUBSTR(NEW_WEBHOOK_ID, 1, 11) || LPAD( (TO_NUMBER(SUBSTR(NEW_WEBHOOK_ID, 12, 5)) + 1) , 5, '0')
+						,	'WHK' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '00001'
+            		) AS NEW_WEBHOOK_ID 
+			FROM	(
+			            SELECT	MAX(WEBHOOK_ID)  AS NEW_WEBHOOK_ID
+			            FROM	WHK1000 A
+			            WHERE	1=1
+			            AND		REP_ID LIKE 'WHK' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '%'
+					)
+		]]>
+		</selectKey>
+		 
+		INSERT INTO WHK1000
+		(
+            WEBHOOK_ID ,
+            WEBHOOK_NM ,
+            WEBHOOK_TYPE_CD ,
+            WEBHOOK_TARGET_URL ,
+            USE_CD ,
+            REG_DTM ,
+            REG_USR_ID ,
+            REG_USR_IP ,
+            MODIFY_DTM ,
+            MODIFY_USR_ID , 
+            MODIFY_USR_IP          
+		)
+		VALUES
+		(
+			#newWebhookId# ,
+			#webhookNm# ,
+			#webhookTypeCd# ,
+			#webhookTargetUrl# ,
+            #useCd# , 
+            SYSDATE , 
+            #empId# , 
+            #regUsrIp# , 
+            SYSDATE , 
+            #empId# , 
+            #modifyUsrIp# 
+		)
+	</insert>
+    
+	
+	<update id="whk1000DAO.updateWhk1000Info" parameterClass="java.util.Map">
+		
+		UPDATE WHK1000 SET
+			WEBHOOK_NM ,
+			WEBHOOK_TYPE_CD ,
+			WEBHOOK_TARGET_URL ,
+			USE_CD ,
+		 	MODIFY_DTM = SYSDATE ,
+            MODIFY_USR_ID = #empId# ,
+            MODIFY_USR_IP = #modifyUsrIp#
+		WHERE 1=1
+			AND WEBHOOK_ID = #webhookId#
+	</update>
+	
+	
+	<delete id="whk1000DAO.deleteWhk1000Info" parameterClass="java.util.Map">
+		DELETE FROM	WHK1000 A
+		WHERE	1=1
+		AND WEBHOOK_ID = #webhookId#
+	</delete>
+	
+	
+	<insert id="whk1000DAO.insertWhk1001Info" parameterClass="java.util.Map">
+		<selectKey resultClass="java.lang.String" keyProperty="newWebhookLogId">
+		<![CDATA[
+			 
+			SELECT	NVL( 
+							SUBSTR(NEW_WEBHOOK_LOG_ID, 1, 11) || LPAD( (TO_NUMBER(SUBSTR(NEW_WEBHOOK_LOG_ID, 12, 5)) + 1) , 5, '0')
+						,	'LOG' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '00001'
+            		) AS NEW_WEBHOOK_LOG_ID 
+			FROM	(
+			            SELECT	MAX(WEBHOOK_LOG_ID)  AS NEW_WEBHOOK_LOG_ID
+			            FROM	WHK1000 A
+			            WHERE	1=1
+			            AND		WEBHOOK_ID = #webhookId#
+			            AND		REP_ID LIKE 'LOG' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '%'
+					)
+		]]>
+		</selectKey>
+		 
+		INSERT INTO WHK1001 (
+			WEBHOOK_ID,			WEBHOOK_LOG_ID,		WEBHOOK_RESULT
+			,WEBHOOK_DATE,		WEBHOOK_DATA,		WEBHOOK_LOG
+			,WEBHOOK_RESULT_DATA
+			,REG_DTM,			REG_USR_ID,			REG_USR_IP
+            ,MODIFY_DTM,		MODIFY_USR_ID,		MODIFY_USR_IP
+		)
+		VALUES (
+			#webhookId#,		#newWebhookLogId#,	#webhookResult#
+			,SYSDATE,			#webhookData#,		#webhookLog#
+			,#webhookResultData#
+			#ciId#,				#repId#
+			,SYSDATE,			#regUsrId#,			#regUsrIp#
+			,SYSDATE,			#regUsrId#,			#regUsrIp#
+		)
+	</insert>
+	
+	
+	<delete id="whk1000DAO.deleteWhk1001Info" parameterClass="java.util.Map">
+		
+		DELETE FROM	WHK1001 A
+		WHERE	1=1
+		AND WEBHOOK_ID = #webhookId#
+	</delete>
+</sqlMap>
