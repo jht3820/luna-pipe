@@ -19,8 +19,8 @@
 /* SVN 수정시 알림 메시지 영역 */
 .warning_message{display:none; text-align: left; font-size: 13px;}
 
-.pop_dpl_div_sub.divDetail_sub_left{width: 590px;float: left;margin-right: 10px;height: 448px;}
-.pop_dpl_div_sub.divDetail_sub_right {width: 400px;float: left;height: 448px;position: relative;}
+.pop_dpl_div_sub.divDetail_sub_left{width: 590px;float: left;margin-right: 10px;/* height: 448px; */}
+.pop_dpl_div_sub.divDetail_sub_right {width: 400px;float: left;position: relative;/* height: 448px; */}
 
 /* 소스저장소 종류에따른 show/hide */
 .rep1001GitFrame{display:none;}
@@ -48,6 +48,12 @@ ul#repDetailTree {
     padding: 0 5px;
 }
 input#selTreeNodeUrl{background-color: #fff !important;}
+.pop_menu_btn_row {
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 6px 5px;
+    margin: 2px 5px;
+}
 </style>
 <script>
 
@@ -376,6 +382,7 @@ $(document).ready(function() {
 				"svnRepUrl": svnRepUrl,
 				"svnUsrId": svnUsrId,
 				"svnUsrPw": svnUsrPw,
+				"nowSvnPw": nowSvnPw,
 				"repTypeCd": repTypeCd,
 				"type": '${param.popupGb}'
 			   };
@@ -594,6 +601,11 @@ $(document).ready(function() {
 			<div class="treeNodeUrlFrame">
 				<input type="text" class="input_text" id="selTreeNodeUrl" name="selTreeNodeUrl" placeholder="선택한 노드의 전체 경로가 표시됩니다." readonly />
 			</div>
+			<!-- 
+			<div class="pop_menu_btn_row">
+				<div class="button_normal button_col" id="btnSvnConnCheck">접속 체크</div>
+			</div>
+			 -->
 		</div>
 		<div class="btn_div">
 			<div class="button_normal save_btn" id="btn_update_popup">등록</div>

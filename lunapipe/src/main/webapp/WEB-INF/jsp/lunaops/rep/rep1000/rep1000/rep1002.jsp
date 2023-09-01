@@ -430,7 +430,6 @@
 	            	//대상 경로
 	            	var selRepPath = $("form#rep1002PopupFrm > #selRepPath").val();
 	            	
-					//배정된 요구사항 팝업
 					var data = {
                			 "repId": repId
                			, "revision": this.item.revision
