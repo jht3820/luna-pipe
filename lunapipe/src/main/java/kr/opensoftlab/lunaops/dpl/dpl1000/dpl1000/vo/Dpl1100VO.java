@@ -37,6 +37,9 @@ public class Dpl1100VO extends PageVO{
 	
 	private String buildingChkFlag;
 	
+	
+	private String paramJobType;
+	
 	public String getRn() {
 		return rn;
 	}
@@ -203,6 +206,12 @@ public class Dpl1100VO extends PageVO{
 	}
 	public void setBuildingChkFlag(String buildingChkFlag) {
 		this.buildingChkFlag = buildingChkFlag;
+	}
+	public String getParamJobType() {
+		return paramJobType;
+	}
+	public void setParamJobType(String paramJobType) {
+		this.paramJobType = paramJobType;
 	}
 	
 	
