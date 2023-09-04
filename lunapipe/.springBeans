@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[3.9.5.201807030714-RELEASE]]></pluginVersion>
+	<pluginVersion><![CDATA[3.9.11.201912160804-RELEASE]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -15,7 +15,6 @@
 		<config>src/main/resources/egovframework/spring/context-common.xml</config>
 		<config>src/main/resources/egovframework/spring/context-aspect.xml</config>
 		<config>src/main/resources/egovframework/spring/context-properties.xml</config>
-		<config>src/main/webapp/WEB-INF/config/egovframework/springmvc/dispatcher-servlet.xml</config>
 		<config>src/main/resources/egovframework/spring/context-osl.xml</config>
 		<config>src/main/resources/egovframework/spring/context-datasource.xml</config>
 	</autoconfigs>
