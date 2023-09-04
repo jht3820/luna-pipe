@@ -5,9 +5,6 @@
 
 <link rel='stylesheet' href='<c:url value='/css/lunaops/rep.css'/>' type='text/css'>
 <style type="text/css">
-	.accptFont{color:#4b73eb !important;text-shadow: none !important;}
-	.rejectFont{color:#eb4b6a !important;text-shadow: none !important;}
-	.defaultFont{color:#000 !important;}
 	.tab_contents.menu{width:1500px;}
 </style>
 <script>
@@ -26,88 +23,76 @@ $(function(){
 	gfnGuideStack("add",fnRep1100GuideShow);
 	
 	//전송 버튼
-	$("#repDataSendBtn").click(function(){
+	$("#repDataCommitBtn").click(function(){
 		
 		var rtnValue = [];
 		
 		//선택한 저장소
-		var selRepList = tktFileGridObj.getList('selected');
+		var selTktFileList = tktFileGridObj.getList('selected');
 		
-		if (gfnIsNull(selRepList)) {
-			jAlert("선택한 저장소가 없습니다.", "알림창");
+		if (gfnIsNull(selTktFileList)) {
+			jAlert("커밋 대상 파일을 선택해주세요.", "알림창");
 			return false;
 		}
-		jConfirm("선택된 저장소 "+selRepList.length+"개를 연결하시겠습니까?","알림창", function(result){
+		jConfirm("선택된 파일 "+selTktFileList.length+"개를 커밋하시겠습니까?","알림창", function(result){
 			if(result){
 				//필요 값
-				var apiId = $("form#rep1100Form > #apiId").val();
-				var srcId = $("form#rep1100Form > #ciId").val();
-				var svcId = $("form#rep1100Form > #svcId").val();
-				var fId = $("form#rep1100Form > #fId").val();
-				var eGeneUrl = $("form#rep1100Form > #eGeneUrl").val();
-				var callbakApiId = $("form#rep1100Form > #callbakApiId").val();
+				var ticketId = $("form#rep1100Form > #ticketId").val();
+				var empId = $("form#rep1100Form > #empId").val();
 				
 				//저장소 param
-				var urows = [];
+				var returnMap = [];
 				
-				//선택 저장소 값 loop
-				$.each(selRepList, function(idx, map){
-					var repInfo = {
-						"key": map.repId+"_"+srcId
-						, "svn_name": map.repNm
-						, "svn_src_id": srcId
-						, "svn_mod": ""
-						, "svn_url": map.svnRepUrl
-						, "svn_descr": map.repTxt
-						, "svn_used": (map.useCd == "01")?1:2
-						, "svn_rep_id": map.repId
+				//데이터 세팅
+				$.each(selTktFileList, function(idx, map){
+					//디렉토리인경우 path 모으기
+					
+					var tktFileInfo = {
+						"repId": map.repId
+						, "repRv": map.repRv
+						, "repChgId": map.repChgId
+						, "repChgFilePath": map.repChgFilePath
+						, "repChgFileNm": map.repChgFileNm
+						, "ticketId": map.ticketId
+						, "repChgTypeCd": map.repChgTypeCd
+						, "repChgFileKind": map.repChgFileKind
+						, "empId": empId
 					};
 					
-					urows.push(repInfo);
+					returnMap.push(tktFileInfo);
 				});
 				
-				//리시브 전달 데이터
-				var returnMap = {
-					"svc_id": svcId
-					, "urows": urows
-				};
-				
-				//컨트롤러 전달 데이터
-				var ctrlMap = {
-					"f_id": fId
-					, "src_id": srcId
-					, "api_id": apiId
-					, "callbak_api_id": callbakApiId
-				};
-				
-				//data값 receiver에 전달
+				//data값 전달 후 해당 파일 커밋
 				var ajaxObj = new gfnAjaxRequestAction(
-					{"url":"<c:url value='/api/selectSendDataReceiver'/>","loadingShow":true}
+					{"url":"<c:url value='/rep/rep1000/rep1100/insertRep1100SelTktFileCommitAjax.do'/>","loadingShow":true}
 					,{
-						//리시브 반환 데이터
-						data: JSON.stringify(returnMap),
 						//컨트롤러 전달 데이터
-						ctlData: JSON.stringify(ctrlMap),
-						eGeneUrl: eGeneUrl
+						returnMap: JSON.stringify(returnMap),
 					}
 				);
 				
 				//AJAX 전송 성공 함수
 				ajaxObj.setFnSuccess(function(data){
 					//결과 값
-					var result = data.result;
+					var errorYn = data.errorYn;
+					
+					//오류 메시지
+					var errorMsgList = data.errorMsgList;
+					
+					//오류 메시지 있는 경우 추가 메시지 담기
+					var addMsg = "";
+					if(!gfnIsNull(errorMsgList) && errorMsgList.length > 0){
+						addMsg += "</br>[예외처리 내역]</br>"+errorMsgList.join("</br>");
+					}
 					
 					//결과 처리 성공
-					if(result == "SUCCESS"){
-						//컨트롤러 데이터
-						var enCtlData = data.enCtlData;
+					if(errorYn == "N"){
+						jAlert(data.message+"</br>성공 개수: "+data.succCnt+addMsg, "알림창");
 						
-						//eController 호출
-						var egene_controller = eGeneUrl+'plugins/jsp/lunaController.jsp?data='+encodeURIComponent(enCtlData);
-						window.location.href = egene_controller;
-						
+						//목록 재 조회
+						axdom("#" + tktFileSearchObj.getItemId("btn_search_rep")).click();
 					}else{
-						jAlert(data.msg, "알림창");
+						jAlert(data.message+addMsg, "알림창");
 						return false;
 					}
 				});
@@ -144,25 +129,7 @@ function fnTktFileGridSetting(){
 				}	
 			} ,
 			{key: "repCmtAuthor", label: "커밋 대상자", width: 100, align: "center"} ,
-			{key: "repChgType", label: "파일 변경 타입", width: 95, align: "center"
-				,formatter: function(){
-					var repChgType = this.item.repChgType;
-					var repChgTypeNm = "-";
-					
-					//수정 타입 분기
-					if(repChgType == "A"){
-						repChgTypeNm = "추가";
-					}
-					else if(repChgType == "M"){
-						repChgTypeNm = "수정";
-					}
-					else if(repChgType == "D"){
-						repChgTypeNm = "삭제";
-					}
-					
-					return repChgTypeNm;
-				}	
-			} ,
+			{key: "repChgTypeNm", label: "파일 변경 타입", width: 95, align: "center"} ,
 			{key: "repChgFilePath", label: "변경 파일 경로", width: 1000, align: "left"} 
 			/* 
 			,{key: "repUrl", label: "저장소 URL", width: 250, align: "left", 
@@ -188,6 +155,10 @@ function fnTktFileGridSetting(){
         body: {
     		align: "center",
 			columnHeight: 30,
+			onClick: function () {
+        		// 클릭 이벤트
+   				tktFileGridObj.select(this.doindex, {selected: !this.item.__selected__});
+             },
 			onDBLClick:function(){
 				var item = this.item;
 				
@@ -227,9 +198,7 @@ function fnTktFileGridSetting(){
                  'arrow': '<i class="fa fa-caret-right"></i>'
              },
              items: [
-                 {type: "repConnCheck", label: "접속 확인", icon:"<i class='fa fa-info-circle' aria-hidden='true'></i>"},
-                 {type: "repUpdate", label: "수정", icon:"<i class='fa fa-info-circle' aria-hidden='true'></i>"},
-                 {type: "repDelete", label: "삭제", icon:"<i class='fa fa-info-circle' aria-hidden='true'></i>"},
+                 {type: "trunkDiff", label: "trunk 소스 비교", icon:"<i class='fa fa-info-circle' aria-hidden='true'></i>"},
              ],
              popupFilter: function (item, param) {
              	var selItem = tktFileGridObj.list[param.doindex];
@@ -243,34 +212,21 @@ function fnTktFileGridSetting(){
              	var selItem = tktFileGridObj.list[param.doindex];
 
              	//접속 확인
-				if(item.type == "repConnCheck"){
-					//접속확인 index 목록
-					var idxList = [];
+				if(item.type == "trunkDiff"){
+					var item = selItem;
 					
-					//선택 저장소 추가
-					idxList.push(selItem.__original_index);
+	            	//파일 내용 비교
+	         		var data = {
+	           			"repId": item.repId
+	           			, "repTypeCd": item.repTypeCd
+	           			, "revision": item.repRv
+	           			, "diffRevision": item.revision
+	           			, "path": item.repChgFilePath
+	           			, "fileName": item.repChgFileNm
+	            	};
+	         		gfnLayerPopupOpen('/rep/rep1000/rep1100/selectRep1101View.do',data,"1200","780",'scroll');
 					
-					fnSelectRep1100ConfirmConnect(idxList);
-					
-			}
-             	//수정
-             	else if(item.type == "repUpdate"){
-             		var empId = $("form#rep1100Form > #empId").val();
-             		
-             		var data = {"popupGb": "update", "repId": selItem.repId, "empId": empId};
-					gfnLayerPopupOpen('/rep/rep1100/rep1100/selectRep1001RepositoryDetailView.do',data,"1060","640",'scroll');
-             	}
-             	//삭제
-             	else if(item.type == "repDelete"){
-             		jConfirm("저장소를 삭제 하시겠습니까?</br>배정된 구성항목이 있는 경우 연결 정보가 함께 삭제됩니다.","알림", function(result){
-						if(result){
-							var repIdListStr = "&repId="+selItem.repId;
-							
-							fnDeleteRep1100Info(repIdListStr);
-						}
-					});
-             	}
-             	
+				}
 				//닫기
 				tktFileGridObj.contextMenu.close();
              }
@@ -330,28 +286,6 @@ function fnInGridListSet(_pageNo,ajaxParam){
 	//AJAX 전송
 	ajaxObj.send();
 }
-/**
- * Repository 삭제
- */
-function fnDeleteRep1100Info(repIds){
-	//AJAX 설정
-	var ajaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/rep/rep1100/rep1100/deleteRep1100InfoAjax.do'/>"}
-			,repIds);
-	//AJAX 전송 성공 함수
-	ajaxObj.setFnSuccess(function(data){
-		
-		jAlert(data.message, "알림창");
-		
-		//삭제된 데이터 1건 이상인경우
-		if(data.errorYn == "N"){
-			axdom("#" + tktFileSearchObj.getItemId("btn_search_rep")).click();
-		}
-	});
-	
-	//AJAX 전송
-	ajaxObj.send();
-} 
 //검색 상자
 function fnSearchBoxControl(){
 	var pageID = "AXSearch";
@@ -370,8 +304,11 @@ function fnSearchBoxControl(){
 
                                 {optionValue:"0", optionText:"전체 보기",optionAll:true},
                                 {optionValue:'repNm', optionText:'저장소 명'},
-                                {optionValue:'repTxt', optionText:'저장소 설명'},
-                                {optionValue:'useCd', optionText:'사용 여부' , optionCommonCode:"CMM00001" }                                
+                                {optionValue:'repRv', optionText:'리비전'},
+                                {optionValue:'repChgFileNm', optionText:'변경 파일명'},
+                                {optionValue:'repChgFilePath', optionText:'변경 파일 경로'},
+                                {optionValue:'repCmtAuthor', optionText:'커밋 대상자'},
+                                {optionValue:'repChgTypeCd', optionText:'파일 변경 타입' , optionCommonCode:"REP00004" }                                
                                 
                             ],onChange: function(selectedObject, value){
                             	//선택 값이 전체목록인지 확인 후 입력 상자를 readonly처리
@@ -452,120 +389,6 @@ function fnSearchBoxControl(){
 	});
 }
 
-/**
- * 선택 소스저장소 연결 체크
- */
-function fnSelectRep1100ConfirmConnect(indexList){
-	if(gfnIsNull(indexList) || indexList.length == 0){
-		return false;
-	}
-	
-	//첫번째 index 빼기
-	var targetIdx = indexList[0];
-	
-	//index 제거
-	indexList.splice(0, 1);
-	
-	//소스저장소 정보
-	var repGridListData = tktFileGridObj.getList()[targetIdx];
-	
-	//ajax동작전 progress 주입
-	tktFileGridObj.setValue(targetIdx, "result", "progress");
-	tktFileGridObj.setValue(targetIdx, "resultMsg", "확인중");
-	
-	//AJAX 설정
-	var ajaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/rep/rep1100/rep1100/selectRep1100ConfirmConnect.do'/>","loadingShow":false}
-			,{ "repId" : repGridListData.repId , "gitRepUrlCheckCd": "Y"});
-	
-	//AJAX 전송 성공 함수
-	ajaxObj.setFnSuccess(function(data){
-		
-		if(data.MSG_CD =="REP_OK"){
-			tktFileGridObj.setValue(targetIdx, "result", "success");
-			tktFileGridObj.setValue(targetIdx, "resultMsg", "접속성공");
-			
-		}else if(data.MSG_CD =="SVN_EXCEPTION"){
-			tktFileGridObj.setValue(targetIdx, "result", "exception");
-			tktFileGridObj.setValue(targetIdx, "resultMsg", "SVN 접속오류");
-		}else if(data.MSG_CD =="SVN_AUTHENTICATION_EXCEPTION"){
-			tktFileGridObj.setValue(targetIdx, "result", "authException");
-			tktFileGridObj.setValue(targetIdx, "resultMsg", "사용자 권한없음");
-		}else{
-			tktFileGridObj.setValue(targetIdx, "result", "fail");
-			tktFileGridObj.setValue(targetIdx, "resultMsg", "기타 오류");
-		}
-		if(data.saveYN == "N"){
-			jAlert(data.message,"경고");
-		}
-		
-		fnSelectRep1100ConfirmConnect(indexList);
-	});
-	
-	//AJAX 전송
-	ajaxObj.send();
-} 
-
-
-//저장소 전체 접속 확인
-function fnSelectRep1100AllConfirmConnect(repId, index){
-	// 재귀 멈춤 조건
-	//index -1인경우 return
-	if(index == -1){
-		return false;
-	}
-	
-	tktFileGridObj.setValue(index, "result", "progress");
-	
-	//소스저장소 정보
-	var repGridListData = tktFileGridObj.getList()[index];
-	
-	//AJAX 설정
-	var repConnAjaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/rep/rep1100/rep1100/selectRep1100ConfirmConnect.do'/>","loadingShow":false}
-			,{ "repId" : repId });
-	//AJAX 전송 성공 함수
-	repConnAjaxObj.setFnSuccess(function(data){
-		
-		
-		//return 값 확인
-		if(data.MSG_CD =="REP_OK"){	//접속 성공
-			tktFileGridObj.setValue(index, "result", "success");
-			tktFileGridObj.setValue(index, "resultMsg", "접속성공");
-		}else if(data.MSG_CD =="SVN_EXCEPTION"){ //URL 및 입력 값 오류
-			tktFileGridObj.setValue(index, "result", "exception");
-			tktFileGridObj.setValue(index, "resultMsg", "SVN 접속오류");
-		}else if(data.MSG_CD =="SVN_AUTHENTICATION_EXCEPTION"){ //권한 오류
-			tktFileGridObj.setValue(index, "result", "authException");
-			tktFileGridObj.setValue(index, "resultMsg", "사용자 권한없음");
-		}else{ //그 외 오류
-			tktFileGridObj.setValue(index, "result", "fail");
-			tktFileGridObj.setValue(index, "resultMsg", "기타 오류");
-		} 	
-		
-		//index가 현재 grid갯수보다 크면 return
-		if((++index) >= tktFileGridObj.getList().length){
-			return false;
-		}
-		
-		//job 정보
-		var repGridListData = tktFileGridObj.getList()[index];
-		var repId = repGridListData.repId;
-		
-		//실패해도 다음 job 체크
-		fnSelectRep1100AllConfirmConnect(repId, index);
-		
-	});
-	
-	//AJAX 전송 오류 함수
-	repConnAjaxObj.setFnError(function(xhr, status, err){
-		
-		jAlert(data.message, "알림창");
-	});
-	
-	//AJAX 전송
-	repConnAjaxObj.send();
-}
 //가이드 상자
 function fnRep1100GuideShow(){
 	var mainObj = $(".main_contents");
@@ -583,15 +406,8 @@ function fnRep1100GuideShow(){
 
 <div class="main_contents" style="height: auto;" >
 	<form name="rep1100Form" id="rep1100Form">
-		<input type="hidden" name="repId" id="repId" value="${requestScope.repId }"/>
-		<input type="hidden" name="ciId" id="ciId" value="${requestScope.ciId }"/>
-		<input type="hidden" name="apiId" id="apiId" value="${requestScope.apiId }"/>
-		<input type="hidden" name="svcId" id="svcId" value="${requestScope.svcId }"/>
-		<input type="hidden" name="fId" id="fId" value="${requestScope.fId }"/>
-		<input type="hidden" name="ticketId" id="ticketId" value="CH2211-00009"/>
+		<input type="hidden" name="ticketId" id="ticketId" value="${requestScope.ticketId }"/>
 		<input type="hidden" name="empId" id="empId" value="${requestScope.empId }"/>
-		<input type="hidden" name="eGeneUrl" id="eGeneUrl" value="${requestScope.eGeneUrl }"/>
-		<input type="hidden" name="callbakApiId" id="callbakApiId" value="${requestScope.callbakApiId }"/>
 	</form>
 	<div class="tab_contents menu">
 		<div class="sub_title">
@@ -600,7 +416,7 @@ function fnRep1100GuideShow(){
 		<div id="tktFileSearchTarget" guide="rep1100button" ></div>
 		<div data-ax5grid="tktFileGridTarget" data-ax5grid-config="{}" style="height: 600px;"></div>
 		<div class="btnFrame">
-			<div class="mainPopupBtn" id="repDataSendBtn"><i class="fas fa-paperclip"></i>&nbsp;Commit</div>
+			<div class="mainPopupBtn" id="repDataCommitBtn"><i class="fas fa-paperclip"></i>&nbsp;Commit</div>
 			<div class="mainPopupBtn" id="repCloseBtn"><i class="fas fa-times-circle"></i>&nbsp;닫기</div>
 		</div>
 			

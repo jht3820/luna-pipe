@@ -1,0 +1,70 @@
+@charset "UTF-8";
+
+.tab_contents.menu{
+    display: inline-block;
+    width: 1550px;
+    height: auto;
+    padding: 10px;
+    background: #fff;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+.sub_title {
+    font-weight: bold;
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    border-left: none;
+    border-right: none;
+    padding: 6px 5px;
+    height: 30px;
+    font-size: 14px;
+}
+.whk1000Frame {
+    display: inline-block;
+    width: 100%;
+}
+.whk1000SearchFrame .searchGroup {
+    font-size: 13px;
+}
+.whk1000DataFrame.whk1000FrameBox {
+    display: inline-block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    overflow-y: scroll;
+    border: 1px solid #ccc;
+    height: 300px;
+}
+.whkMainFrame {
+    display: inline-block;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 5px;
+    font-size: 14px;
+}
+.whkHeaderFrame {
+    display: inline-block;
+    width: 100%;
+    height: 35px;
+    line-height: 30px;
+}
+.whkHeaderLeftFrame {
+    display: inline-block;
+    float: left;
+    width: 70%;
+    height: 100%;
+}
+.whkHeaderRightFrame {
+    display: inline-block;
+    float: right;
+    width: 30%;
+    height: 100%;
+    text-align: right;
+}
+.whkBodyFrame {
+    display: inline-block;
+    width: 100%;
+    min-height: 20px;
+    line-height: 20px;
+}
