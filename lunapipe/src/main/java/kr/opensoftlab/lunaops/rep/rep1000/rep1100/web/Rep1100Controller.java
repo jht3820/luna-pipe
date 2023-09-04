@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
@@ -76,36 +75,11 @@ public class Rep1100Controller {
 			JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
 			
 			
-			String ciId = OslUtil.jsonGetString(jsonObj, "src_id"); 
-			String apiId = OslUtil.jsonGetString(jsonObj, "api_id");
-			String svcId = OslUtil.jsonGetString(jsonObj, "svc_id");
-			String fId = OslUtil.jsonGetString(jsonObj, "f_id");
 			String empId = OslUtil.jsonGetString(jsonObj, "emp_id");
-			String ticketId = OslUtil.jsonGetString(jsonObj, "ticketId");
-			String callbakApiId = OslUtil.jsonGetString(jsonObj, "callbak_api_id");
+			String ticketId = OslUtil.jsonGetString(jsonObj, "ticket_id");
 			
-			
-			String eGeneUrl = OslUtil.jsonGetString(jsonObj, "egene_url");
-			
-			
-			if(eGeneUrl == null || "".equals(eGeneUrl)) {
-				eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
-			}
-			
-			
-			if(eGeneUrl.lastIndexOf("/") != (eGeneUrl.length()-1)) {
-				
-				eGeneUrl = eGeneUrl + "/";
-			}
-			
-			model.addAttribute("ciId", ciId);
-			model.addAttribute("apiId", apiId);
-			model.addAttribute("svcId", svcId);
-			model.addAttribute("fId", fId);
 			model.addAttribute("empId", empId);
 			model.addAttribute("ticketId", ticketId);
-			model.addAttribute("eGeneUrl", eGeneUrl);
-			model.addAttribute("callbakApiId", callbakApiId);
 		}catch(Exception e) {
 			Log.error(e);
 			e.printStackTrace();
@@ -208,7 +182,10 @@ public class Rep1100Controller {
 			String path = (String) paramMap.get("path");
 			
 			
-			String branchePath = "/branches/bB";
+			String buildBrancheNm = EgovProperties.getProperty("Globals.svn.buildBranchNm");
+			
+			
+			String branchePath = "/branches/"+buildBrancheNm;
 			
 			
 			if(branchePath.lastIndexOf("/") == (branchePath.length()-1)) {
@@ -269,6 +246,50 @@ public class Rep1100Controller {
 			
 			model.addAttribute("errorYn", "Y");
 			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+			return new ModelAndView("jsonView");
+		}
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value="/rep/rep1000/rep1100/insertRep1100SelTktFileCommitAjax.do")
+	public ModelAndView insertRep1100SelTktFileCommitAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map paramMap = RequestConvertor.requestParamToMap(request,true);
+			
+			
+			Map rtnMap = rep1100Service.insertRep1100SelTktFileCommitAjax(paramMap);
+			
+			
+			boolean result = (boolean)rtnMap.get("result");
+			
+			int succCnt = (int)rtnMap.get("succCnt");
+			
+			List<String> errorMsgList = (List<String>) rtnMap.get("errorMsg");
+			
+			model.addAttribute("succCnt", succCnt);
+			model.addAttribute("errorMsgList", errorMsgList);
+			
+			if(result) {
+				
+				model.addAttribute("errorYn", "N");
+				model.addAttribute("message", egovMessageSource.getMessage("success.common.insert"));
+			}else {
+				
+				model.addAttribute("errorYn", "Y");
+				model.addAttribute("message", egovMessageSource.getMessage("fail.common.insert"));
+			}
+			
+			
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("insertRep1100SelTktFileCommitAjax()", ex);
+			
+			
+			model.addAttribute("errorYn", "Y");
+			model.addAttribute("message", egovMessageSource.getMessage("fail.common.insert"));
 			return new ModelAndView("jsonView");
 		}
 	}
