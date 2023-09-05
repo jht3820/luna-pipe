@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -109,10 +110,14 @@ public class Dpl1000Controller {
 			
 			String empId = OslUtil.jsonGetString(jsonObj, "emp_id");
 			
-			model.put("ciId", ciId);
-			model.put("ticketId", ticketId);
-			model.put("dplId", dplId);
-			model.put("empId", empId);
+			
+			String jobType = OslUtil.jsonGetString(jsonObj, "job_type");
+			
+			model.addAttribute("ciId", ciId);
+			model.addAttribute("ticketId", ticketId);
+			model.addAttribute("dplId", dplId);
+			model.addAttribute("empId", empId);
+			model.addAttribute("jobType", jobType);
 			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -169,6 +174,35 @@ public class Dpl1000Controller {
     		 
     		 paramMap.put("buildingChkFlag", "Y");
     		 
+    		 
+    		 String paramJobType = (String) paramMap.get("jobType");
+    		 if(paramJobType != null) {
+    			 try {
+    				 
+    				 JSONArray jobTypeArr = new JSONArray(paramJobType);
+    				 
+    				 String jobTypeVal = "";
+    				 
+    				 
+    				 for(int i=0;i<jobTypeArr.length();i++) {
+    					 String jobType = jobTypeArr.getString(i);
+    					 
+    					 if(i > 0) {
+    						 jobTypeVal += ",";
+    					 }
+    					 
+    					 
+    					 jobTypeVal += "'"+jobType+"'";
+    				 }
+    				 
+    				 System.out.println("#####################");
+    	    		 System.out.println(jobTypeVal);
+    			 }catch(Exception e) {
+    				 e.printStackTrace();
+    			 }
+    		 }
+    		 
+    		 
     		 List<Map> bldingJobList = dpl1000Service.selectDpl1100DeployJobList(paramMap);
     		 
     		 model.addAttribute("bldingJobList", bldingJobList);
@@ -215,6 +249,40 @@ public class Dpl1000Controller {
 			dpl1100VO.setPageSize(_pageSize);
 			dpl1100VO.setPageUnit(_pageSize);
         	
+			
+			String jobTypeList = (String)paramMap.get("jobType");
+			if(jobTypeList != null && !"".equals(jobTypeList)) {
+				try {
+					JSONArray jobTypeJson = new JSONArray(jobTypeList);
+					String paramJobType = "";
+					
+					String regex = "[0-9]+";
+					
+					
+					for(int i=0;i<jobTypeJson.length();i++) {
+						JSONObject jsonObj = jobTypeJson.getJSONObject(i);
+						String jobType = jsonObj.getString("job_type");
+						
+						
+						if(!jobType.matches(regex)) {
+							continue;
+						}
+						
+						if(i > 0) {
+							paramJobType += ",";
+						}
+						
+						paramJobType += "'"+jobType+"'";
+					}
+					if(!"".equals(paramJobType)) {
+						dpl1100VO.setParamJobType(paramJobType);
+					}
+				}catch(Exception e) {
+					
+					Log.debug(e);
+					model.addAttribute("addMsg", "JOB_TYPE 데이터를 읽는 도중 오류가 발생했습니다.");
+				}
+			}
         	
         	PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(dpl1100VO); 
 			List<Dpl1100VO> dpl1300List = null;
@@ -239,6 +307,7 @@ public class Dpl1000Controller {
 			model.addAttribute("page", pageMap);
         	
         	
+			model.addAttribute("errorYn", "N");
         	model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
         	
         	return new ModelAndView("jsonView", model);
@@ -247,6 +316,7 @@ public class Dpl1000Controller {
     		Log.error("selectDpl1100DplJobListAjax()", ex);
     		
     		
+    		model.addAttribute("errorYn", "Y");
     		model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
     		return new ModelAndView("jsonView", model);
     	}
