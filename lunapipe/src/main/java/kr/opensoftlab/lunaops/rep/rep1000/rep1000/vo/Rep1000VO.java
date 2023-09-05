@@ -22,7 +22,9 @@ public class Rep1000VO extends PageVO {
 	private String repTxt;              
 	private String svnRepUrl;               
 	private String gitRepUrl;               
+	private String dplRepUrl;               
 	private String useCd;               
+	private String dplUseCd;               
 	private String useNm;              
 	private String prjNm;
 	private String gitUsrAuthTypeCd;
@@ -84,11 +86,25 @@ public class Rep1000VO extends PageVO {
 	public void setSvnRepUrl(String svnRepUrl) {
 		this.svnRepUrl = svnRepUrl;
 	}
+	
+	public String getDplRepUrl() {
+		return dplRepUrl;
+	}
+	public void setDplRepUrl(String dplRepUrl) {
+		this.dplRepUrl = dplRepUrl;
+	}
 	public String getUseCd() {
 		return useCd;
 	}
 	public void setUseCd(String useCd) {
 		this.useCd = useCd;
+	}
+	
+	public String getDplUseCd() {
+		return dplUseCd;
+	}
+	public void setDplUseCd(String dplUseCd) {
+		this.dplUseCd = dplUseCd;
 	}
 	public String getUseNm() {
 		return useNm;
