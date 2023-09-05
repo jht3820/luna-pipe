@@ -238,6 +238,9 @@
 		AND A.CI_ID = #ciId#
 		AND A.TICKET_ID = #ticketId#
 		AND A.DPL_ID = #dplId#
+		<isNotEmpty property="paramJobType">
+			AND D.JOB_TYPE_CD IN ($paramJobType$)
+		</isNotEmpty>
 		<isNotEmpty property="searchSelect">
 			<isNotEmpty property="searchTxt">
 			<isEqual property="searchSelect" compareValue="jenNm"> 
