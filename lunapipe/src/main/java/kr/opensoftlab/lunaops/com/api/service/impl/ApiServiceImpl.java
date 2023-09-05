@@ -1441,7 +1441,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 					
 					
 					String repId = (String)ticketRvInfo.get("rep_id");
-					String repRv = (String)ticketRvInfo.get("rep_rv");
+					String repRv = String.valueOf(ticketRvInfo.get("rep_rv"));
 					
 					
 					newMap.put("ticketId", ticketId);
