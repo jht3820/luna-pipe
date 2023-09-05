@@ -391,6 +391,9 @@ public class Rep1000Controller {
 			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
 			
 			
+			String dplUseCd = (String) paramMap.get("dplUseCd");
+			
+			
 			if("insert".equals(popupGb)){
 				
 				if(repTypeCd != null && "01".equals(repTypeCd)) {
@@ -440,7 +443,18 @@ public class Rep1000Controller {
 						paramMap.put("gitUsrPw", newEnPw);
 						repVo.setGitUsrPw(newEnPw);
 					}
+				}
+				
+				if(dplUseCd != null && "01".equals(dplUseCd)) {
 					
+					String dplUsrPw = (String)paramMap.get("dplUsrPw");
+					
+					
+					String newEnPw = CommonScrty.encryptedAria(dplUsrPw, salt);
+					
+					
+					paramMap.put("dplUsrPw", newEnPw);
+					repVo.setDplUsrPw(newEnPw);
 				}
 			}
 			
@@ -460,6 +474,25 @@ public class Rep1000Controller {
 					paramMap.put("svnUsrPw", newEnPw);
 					repVo.setSvnUsrPw(newEnPw);
 				}
+				
+				
+				if(dplUseCd != null && "01".equals(dplUseCd)) {
+					
+					String nowDplPw = (String)paramMap.get("nowDplPw");
+					
+					
+					String dplUsrPw = (String)paramMap.get("dplUsrPw");
+					
+					
+					if(!nowDplPw.equals(dplUsrPw)) {
+						
+						String newEnPw = CommonScrty.encryptedAria(dplUsrPw, salt);
+						
+						
+						paramMap.put("dplUsrPw", newEnPw);
+						repVo.setDplUsrPw(newEnPw);
+					}
+				}
 			}
 			
 			
@@ -477,6 +510,14 @@ public class Rep1000Controller {
 				}
 				
 				else if(resultCode.equals(repResultVO.REPOSITORY_NOT_ACCESS)) {
+					model.addAttribute("message", repResultVO.getResultMsg()+"</br>입력된 값을 확인해주세요.</br>");
+				}
+				
+				else if(resultCode.equals(repResultVO.DPL_USER_AUTH_CHECK_FAIL)) {
+					model.addAttribute("message", repResultVO.getResultMsg()+"</br>입력된 값을 확인해주세요.</br>");
+				}
+				
+				else if(resultCode.equals(repResultVO.DPL_USER_AUTH_CHECK_FAIL)) {
 					model.addAttribute("message", repResultVO.getResultMsg()+"</br>입력된 값을 확인해주세요.</br>");
 				}
 				else {
