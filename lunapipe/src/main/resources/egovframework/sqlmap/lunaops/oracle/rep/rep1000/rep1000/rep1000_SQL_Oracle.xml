@@ -16,7 +16,9 @@
 		<result property="repTxt"       column="REP_TXT" />  
 		<result property="svnRepUrl"    column="SVN_REP_URL" />  
 		<result property="gitRepUrl"    column="GIT_REP_URL" />  
+		<result property="dplRepUrl"    column="DPL_REP_URL" />  
 		<result property="gitUsrAuthTypeCd"    column="GIT_USR_AUTH_TYPE_CD" />  
+		<result property="dplUseCd"        column="DPL_USE_CD" />  
 		<result property="useCd"        column="USE_CD" />  
 		<result property="regDtm"  		column="REG_DTM"/>
 		<result property="useNm"  		column="USE_NM"/>
@@ -37,6 +39,10 @@
 		<result property="gitUsrId"    column="GIT_USR_ID" />
 		<result property="gitUsrPw"    column="GIT_USR_PW" /> 
 		<result property="gitUsrTk"    column="GIT_USR_TK" /> 
+		<result property="dplRepUrl"    column="DPL_REP_URL" /> 
+		<result property="dplUsrId"    column="DPL_USR_ID" />
+		<result property="dplUsrPw"    column="DPL_USR_PW" />
+		<result property="dplUseCd"        column="DPL_USE_CD" />  
 		<result property="useCd"        column="USE_CD" />  
     </resultMap>
    	
@@ -52,6 +58,8 @@
 		            REPLACE (REP_TXT ,'<br>' , '&nbsp;&nbsp;&nbsp;&nbsp;' ) AS REP_TXT  ,                  
 		            SVN_REP_URL ,               
 		            GIT_REP_URL ,               
+		            DPL_REP_URL ,
+		            DPL_USE_CD ,                   
 		            USE_CD ,                   
 		            SF_CMM1001_COM_CD_INFO('CMM00001', USE_CD, '1') as USE_NM ,
 		            GIT_USR_AUTH_TYPE_CD , 
@@ -132,6 +140,10 @@
 			            GIT_USR_ID,               
 			            GIT_USR_PW,              
 			            GIT_USR_TK,				 
+			            DPL_REP_URL,              
+			            DPL_USR_ID,               
+			            DPL_USR_PW,              
+			            DPL_USE_CD,
 			            USE_CD,                   
 			            REG_DTM,                  
 			            REG_USR_ID,               
@@ -193,6 +205,12 @@
 						            	GIT_USR_TK      ,  
 						            </isEqual>
 					            </isEqual>
+					            <isEqual property="dplUseCd" compareValue="01">
+					            	DPL_REP_URL			,
+					            	DPL_USR_ID			,
+					            	DPL_USR_PW			,
+					            </isEqual>
+					            DPL_USE_CD             ,  
 					            USE_CD                 ,  
 					            REG_DTM                ,  
 					            REG_USR_ID             ,  
@@ -225,6 +243,12 @@
 						             	#gitUsrTk#		, 
 						             </isEqual>
 					             </isEqual>
+					             <isEqual property="dplUseCd" compareValue="01">
+						             #dplRepUrl#			,
+						             #dplUsrId#				,
+						             #dplUsrPw#				,
+					             </isEqual>
+					             #dplUseCd#    , 
 					             #useCd#       , 
 					             SYSDATE       , 
 					             #empId#    , 
@@ -261,6 +285,12 @@
 					GIT_USR_TK = #gitUsrTk#             , 
 	            </isEqual>
             </isEqual> 
+            <isEqual property="dplUseCd" compareValue="01">
+            	DPL_REP_URL = #dplRepUrl#	,
+				DPL_USR_ID = #dplUsrId#		,
+				DPL_USR_PW = #dplUsrPw#		,
+            </isEqual>
+            DPL_USE_CD = #dplUseCd#                    ,  
             USE_CD = #useCd#                    ,  
             MODIFY_DTM = SYSDATE                ,  
             MODIFY_USR_ID = #empId#       ,  
