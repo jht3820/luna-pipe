@@ -22,6 +22,7 @@
 		<result property="rep_id" 			column="REP_ID" />
 		<result property="rep_rv" 			column="REP_RV" />
 		<result property="rep_target_rv"	column="REP_TARGET_RV" />
+		<result property="rep_target_file_path"	column="REP_TARGET_FILE_PATH" />
 		<result property="rep_chg_id" 		column="REP_CHG_ID" />
 		<result property="rep_chg_type_cd" 	column="REP_CHG_TYPE_CD" />
 		<result property="rep_chg_file_path" column="REP_CHG_FILE_PATH" />
@@ -58,7 +59,7 @@
 			GROUP BY REP_ID, REP_CHG_FILE_PATH, REP_CHG_FILE_NM
 		) B
 		ON (A.REP_ID = B.REP_ID AND A.REP_RV = B.MAX_REP_RV AND A.REP_CHG_FILE_PATH = B.REP_CHG_FILE_PATH AND A.REP_CHG_FILE_NM = B.REP_CHG_FILE_NM)
-		INNER JOIN REP1100 C ON (A.REP_ID = C.REP_ID AND A.REP_RV = C.REP_RV)
+		INNER JOIN REP1100 C ON (A.REP_ID = C.REP_ID AND A.REP_RV = C.REP_RV AND C.TICKET_ID = A.TICKET_ID)
 		INNER JOIN REP1000 D ON (A.REP_ID = D.REP_ID)
 		WHERE 1=1
 		AND A.TICKET_ID = #ticketId#
@@ -138,6 +139,8 @@
 			, A.REP_CHG_FILE_PATH
 			, A.REP_CHG_FILE_NM
 			, A.REP_CHG_FILE_KIND
+			, A.REP_TARGET_RV
+			, A.REP_TARGET_FILE_PATH
 		FROM REP1101 A
 		WHERE 1=1
 		AND A.TICKET_ID = #ticketId#
