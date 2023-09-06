@@ -139,4 +139,11 @@ public interface Dpl1000Service {
 
 	
 	String insertDpl1102DplBuildInfo(BuildVO buildVo) throws Exception;
+	
+	@SuppressWarnings({ "rawtypes"})
+	List<Map> selectDpl1102OprDplActionList(Map paramMap) throws Exception;
+
+	
+	@SuppressWarnings("rawtypes")
+	int selectDpl1102OprDplActionListCnt(Map paramMap) throws Exception;
 }
