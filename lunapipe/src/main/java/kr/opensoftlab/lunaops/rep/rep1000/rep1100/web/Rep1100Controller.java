@@ -69,7 +69,6 @@ public class Rep1100Controller {
 	
 	@RequestMapping(value="/rep/rep1000/rep1100/selectRep1100View.do")
 	public String selectRep1100View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-		
 		try {
 			
 			JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
@@ -86,6 +85,27 @@ public class Rep1100Controller {
 		}
 		
 		return "/rep/rep1000/rep1100/rep1100";
+	}
+	
+	
+	@RequestMapping(value="/rep/rep1000/rep1100/selectRep1102View.do")
+	public String selectRep1102View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try {
+			
+			JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
+			
+			
+			String empId = OslUtil.jsonGetString(jsonObj, "emp_id");
+			String ticketId = OslUtil.jsonGetString(jsonObj, "ticket_id");
+			
+			model.addAttribute("empId", empId);
+			model.addAttribute("ticketId", ticketId);
+		}catch(Exception e) {
+			Log.error(e);
+			e.printStackTrace();
+		}
+		
+		return "/rep/rep1000/rep1100/rep1102";
 	}
 	
 	
