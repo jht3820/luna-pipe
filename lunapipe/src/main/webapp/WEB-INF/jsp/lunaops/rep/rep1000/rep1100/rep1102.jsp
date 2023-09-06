@@ -20,7 +20,7 @@ $(function(){
 	fnSearchBoxControl();
 	
 	//가이드 상자 호출
-	gfnGuideStack("add",fnRep1100GuideShow);
+	gfnGuideStack("add",fnRep1102GuideShow);
 	
 	//전송 버튼
 	$("#repDataCommitBtn").click(function(){
@@ -37,8 +37,8 @@ $(function(){
 		jConfirm("선택된 파일 "+selTktFileList.length+"개를 커밋하시겠습니까?","알림창", function(result){
 			if(result){
 				//필요 값
-				var ticketId = $("form#rep1100Form > #ticketId").val();
-				var empId = $("form#rep1100Form > #empId").val();
+				var ticketId = $("form#rep1102Form > #ticketId").val();
+				var empId = $("form#rep1102Form > #empId").val();
 				
 				//저장소 param
 				var returnMap = [];
@@ -64,7 +64,7 @@ $(function(){
 				
 				//data값 전달 후 해당 파일 커밋
 				var ajaxObj = new gfnAjaxRequestAction(
-					{"url":"<c:url value='/rep/rep1000/rep1100/insertRep1100SelTktFileCommitAjax.do'/>","loadingShow":true}
+					{"url":"<c:url value='/rep/rep1000/rep1100/insertRep1102SelTktFileCommitAjax.do'/>","loadingShow":true}
 					,{
 						//컨트롤러 전달 데이터
 						returnMap: JSON.stringify(returnMap),
@@ -162,14 +162,6 @@ function fnTktFileGridSetting(){
 			onDBLClick:function(){
 				var item = this.item;
 				
-				//변경 파일 종류
-				var repChgFileKind = item.repChgFileKind;
-				
-				//file이 아닌 경우 diff불가
-				if(repChgFileKind != "file"){
-					jAlert("대상이 파일인 경우에만 비교가 가능합니다.","알림");
-					return false;
-				}
             	//파일 내용 비교
          		var data = {
            			"repId": item.repId
@@ -182,7 +174,6 @@ function fnTktFileGridSetting(){
          		gfnLayerPopupOpen('/rep/rep1000/rep1100/selectRep1101View.do',data,"1200","780",'scroll');
         	},
 	        onDataChanged: function(){
-	        	/* 
 				//해당 데이터 체크 시 선택 배열에 넣기
 				if(this.item.__selected__){
 					//이미 세팅된 데이터 없는 경우만 추가
@@ -197,7 +188,6 @@ function fnTktFileGridSetting(){
 						selRepData.splice(repIdx, 1);
 					}
 				}
-				 */
 			}
 		},
 		contextMenu: {
@@ -214,10 +204,6 @@ function fnTktFileGridSetting(){
              	var selItem = tktFileGridObj.list[param.doindex];
              	//선택 개체 없는 경우 중지
              	if(typeof selItem == "undefined"){
-             		return false;
-             	}
-             	//파일 아닌 경우 중지
-             	if(selItem.repChgFileKind != "file"){
              		return false;
              	}
              	return true;
@@ -267,7 +253,7 @@ function fnInGridListSet(_pageNo,ajaxParam){
 	/* 그리드 데이터 가져오기 */
    	//파라미터 세팅
    	if(gfnIsNull(ajaxParam)){
-		ajaxParam = $('form#rep1100Form').serialize();
+		ajaxParam = $('form#rep1102Form').serialize();
 	}
    	
    	//페이지 세팅
@@ -279,7 +265,7 @@ function fnInGridListSet(_pageNo,ajaxParam){
     	
    	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/rep/rep1000/rep1100/selectRep1100TktRvFileChgListAjax.do'/>","loadingShow":true}
+			{"url":"<c:url value='/rep/rep1000/rep1100/selectRep1102TktRvFileChgListAjax.do'/>","loadingShow":true}
 			,ajaxParam);
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
@@ -367,7 +353,7 @@ function fnSearchBoxControl(){
 							onclick:function(){
 								/* 검색 조건 설정 후 reload */
 	 							var pars = tktFileSearchObj.getParam();
-							    var ajaxParam = $('form#rep1100Form').serialize();
+							    var ajaxParam = $('form#rep1102Form').serialize();
 
 							    if(!gfnIsNull(pars)){
 							    	ajaxParam += "&"+pars;
@@ -404,7 +390,7 @@ function fnSearchBoxControl(){
 }
 
 //가이드 상자
-function fnRep1100GuideShow(){
+function fnRep1102GuideShow(){
 	var mainObj = $(".main_contents");
 	
 	//mainObj가 없는경우 false return
@@ -412,23 +398,46 @@ function fnRep1100GuideShow(){
 		return false;
 	}
 	//guide box setting
-	var guideBoxInfo = globals_guideContents["rep1100"];
+	var guideBoxInfo = globals_guideContents["rep1102"];
 	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
 }
 </script>
 
 
 <div class="main_contents" style="height: auto;" >
-	<form name="rep1100Form" id="rep1100Form">
+	<form name="rep1102Form" id="rep1102Form">
 		<input type="hidden" name="ticketId" id="ticketId" value="${requestScope.ticketId }"/>
 		<input type="hidden" name="empId" id="empId" value="${requestScope.empId }"/>
 	</form>
 	<div class="tab_contents menu">
-		<div class="sub_title">
-			소스저장소 관리
+		<div class="rep1102MainTopFrame">
+			<div class="sub_title">
+				티켓 소스저장소별 Trunk 변경 파일 목록
+			</div>
+			<div id="tktFileSearchTarget" guide="rep1102button" ></div>
+			<div data-ax5grid="tktChgDataGridTarget" data-ax5grid-config="{}" style="height: 400px;"></div>
 		</div>
-		<div id="tktFileSearchTarget" guide="rep1100button" ></div>
-		<div data-ax5grid="tktFileGridTarget" data-ax5grid-config="{}" style="height: 600px;"></div>
+		<div class="rep1102MainMiddleFrame">
+			<div class="rep1102MiddleLeftFrame">
+				<div class="sub_title">
+					운영빌드 목록
+				</div>
+				<div data-ax5grid="buildDataGridTarget" data-ax5grid-config="{}" style="height: 400px;"></div>
+			</div>
+			<div class="rep1102MiddleRightFrame">
+				<div class="sub_title">
+					Source-Deploy 비교 결과 변경 파일
+				</div>
+				<div data-ax5grid="rsyncDataGridTarget" data-ax5grid-config="{}" style="height: 400px;"></div>
+			</div>
+		</div>
+		<div class="rep1102MainBottomFrame">
+			<div class="sub_title">
+				선택 변경 파일
+			</div>
+			<div id="tktFileSearchTarget" guide="rep1102button" ></div>
+			<div data-ax5grid="selCommitDataGridTarget" data-ax5grid-config="{}" style="height: 400px;"></div>
+		</div>
 		<div class="btnFrame">
 			<div class="mainPopupBtn" id="repDataCommitBtn"><i class="fas fa-paperclip"></i>&nbsp;Commit</div>
 			<div class="mainPopupBtn" id="repCloseBtn"><i class="fas fa-times-circle"></i>&nbsp;닫기</div>
