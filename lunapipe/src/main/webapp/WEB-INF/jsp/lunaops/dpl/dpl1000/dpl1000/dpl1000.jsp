@@ -54,11 +54,13 @@ var jobBuildingConsoleLog = '';
 var ciId = '<c:out value="${requestScope.ciId}"/>';
 var ticketId = '<c:out value="${requestScope.ticketId}"/>';
 var dplId = '<c:out value="${requestScope.dplId}"/>';
+var jobType = "";
 
 //console timer
 var consoleTimer;
 
 $(document).ready(function() {
+	jobType = $("form#dpl1000Form #jobType").val();
 	/* 
 	//모니터링 메시지 출력
 	fnJobAutoCheckMsgChg(true);
@@ -238,7 +240,7 @@ function fnJobStatusCheckLoop(){
 	    //AJAX 설정
 		var ajaxObj = new gfnAjaxRequestAction(
 			{"url":"<c:url value='/dpl/dpl1000/dpl1000/selectDpl1100BldingJobList.do'/>","loadingShow":false}
-			,"&pageNo="+dplJobGrid.page.currentPage+"&ciId="+ciId+"&ticketId="+ticketId+"&dplId="+dplId);
+			,"&pageNo="+dplJobGrid.page.currentPage+"&ciId="+ciId+"&ticketId="+ticketId+"&dplId="+dplId+"&jobType="+jobType);
 		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
 			//job이 존재할때
@@ -647,7 +649,7 @@ function fnInGridListSet(_pageNo,ajaxParam){
    	}
    	
    	//매개변수 세팅
-   	ajaxParam += "&ciId="+ciId+"&ticketId="+ticketId+"&dplId="+dplId;
+   	ajaxParam += "&ciId="+ciId+"&ticketId="+ticketId+"&dplId="+dplId+"&jobType="+jobType;
     	
     	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
@@ -1072,7 +1074,8 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 <div class="main_contents" style="height: auto;">
 	<div class="tab_contents menu" style="max-width: 1500px;position: relative;">
 		<form name="dpl1000Form" id="dpl1000Form">
-			<input type="hidden" name="empId" id="empId" value="${requestScope.empId }"/>
+			<input type="hidden" name="empId" id="empId" value="<c:out value="${requestScope.empId}"/>"/>
+			<input type="hidden" name="jobType" id="jobType" value="<c:out value="${requestScope.jobType}"/>"/>
 		</form>
 		<div id="dplJobSearch" style="border-top: 1px solid #ccc;" guide="dpl1000DplJobBtn"></div>
 		<br />
