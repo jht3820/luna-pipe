@@ -205,4 +205,16 @@ public class Dpl1000DAO extends ComOslitsAbstractDAO {
 	public void deleteDpl1102DplActionInfo(Map paramMap) throws Exception{
 		delete("dpl1000DAO.deleteDpl1102DplActionInfo", paramMap);
     }
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public List<Map> selectDpl1102OprDplActionList(Map paramMap) throws Exception{
+		return (List) list("dpl1000DAO.selectDpl1102OprDplActionList", paramMap);
+	}
+
+	
+	@SuppressWarnings("rawtypes")
+	public int selectDpl1102OprDplActionListCnt(Map paramMap) throws Exception{
+		return (Integer) select("dpl1000DAO.selectDpl1102OprDplActionListCnt", paramMap);
+	}
 }
