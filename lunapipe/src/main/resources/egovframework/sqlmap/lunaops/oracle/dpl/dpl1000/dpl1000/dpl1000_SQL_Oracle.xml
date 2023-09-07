@@ -289,6 +289,35 @@
 		    AND A.JOB_ID = #jobId#
 	</sql>
 	
+	<sql id="selectDpl1102List">
+		SELECT
+			A.CI_ID
+			, A.TICKET_ID
+			, A.JEN_ID
+			, A.JOB_ID
+			, A.DPL_ID
+			, A.BLD_NUM
+			, A.REG_DTM
+			, B.JEN_NM
+			, D.DPL_NM
+			, E.BLD_DURATION_TM
+			, E.REG_USR_ID
+			, E.BLD_START_DTM
+		FROM DPL1102 A
+			INNER JOIN JEN1000 B
+			ON (A.JEN_ID = B.JEN_ID AND B.USE_CD = '01' AND B.DEL_CD = '02')
+			INNER JOIN JEN1100 C
+			ON (A.JEN_ID = C.JEN_ID AND A.JOB_ID = C.JOB_ID AND C.USE_CD = '01' AND C.JOB_TYPE_CD = '04')
+			INNER JOIN DPL1000 D
+			ON (A.DPL_ID = D.DPL_ID AND D.DPL_DEL_CD = '02')
+			INNER JOIN JEN1200 E
+			ON (A.JEN_ID = E.JEN_ID AND A.JOB_ID = E.JOB_ID AND A.CI_ID = E.CI_ID AND A.TICKET_ID = E.TICKET_ID AND A.DPL_ID = E.DPL_ID AND A.BLD_NUM = E.BLD_NUM AND BLD_RESULT_CD = '03')
+		WHERE 1=1
+		AND A.CI_ID = #ciId#
+		AND A.TICKET_ID = #ticketId#
+		ORDER BY A.CI_ID, A.TICKET_ID, A.JEN_ID, A.JOB_ID, A.BLD_NUM DESC
+	</sql>
+	
 	
 	<select id="dpl1000DAO.selectDpl1000DeployVerNormalList" parameterClass="java.util.Map" resultClass="egovMap">
 			
@@ -979,4 +1008,32 @@
        	AND		JEN_ID = #jenId#
        	AND		JOB_ID = #jobId#
 	</delete>
+	
+	
+    <select id="dpl1000DAO.selectDpl1102OprDplActionList" parameterClass="java.util.Map"  resultClass="egovMap">
+	    
+		SELECT *
+		FROM
+		(
+	   		SELECT 
+	   			ROWNUM RN,
+				SUBT1.*
+	   		FROM
+	   		(
+				<include refid="selectDpl1102List"/>
+    		) SUBT1
+    	) T1
+		WHERE T1.RN BETWEEN (#firstIndex#+1) AND #lastIndex#
+    </select>
+    
+    
+    <select id="dpl1000DAO.selectDpl1102OprDplActionListCnt" parameterClass="java.util.Map"  resultClass="java.lang.Integer">
+	    
+	    	SELECT
+	    		COUNT(*)
+			FROM
+			(
+				<include refid="selectDpl1102List"/>
+			) T1
+    </select>
 </sqlMap>
