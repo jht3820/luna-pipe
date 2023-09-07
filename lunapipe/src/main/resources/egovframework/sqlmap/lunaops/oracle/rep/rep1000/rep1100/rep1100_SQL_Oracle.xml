@@ -63,7 +63,7 @@
 		INNER JOIN REP1000 D ON (A.REP_ID = D.REP_ID)
 		WHERE 1=1
 		AND A.TICKET_ID = #ticketId#
-		AND C.REP_RV_TYPE_CD = '01'
+		AND C.REP_RV_TYPE_CD = #repRvTypeCd#
 		AND NOT EXISTS
 		(
 			SELECT *
@@ -74,6 +74,9 @@
 			AND REP_TARGET_RV = A.REP_RV
 			AND REP_TARGET_FILE_PATH = A.REP_CHG_FILE_PATH
 		)
+		<isNotEmpty property="repChgfileKind">
+			AND A.REP_CHG_FILE_KIND = #repChgfileKind#
+		</isNotEmpty>
 		<isNotEmpty property="searchSelect">
 			<isNotEmpty property="searchTxt">
 			<isEqual property="searchSelect" compareValue="repNm"> 
@@ -104,6 +107,7 @@
 		ORDER BY C.REP_CMT_DATE DESC, A.REP_CHG_FILE_NM, A.REP_CHG_TYPE_CD
 	
 	</sql>
+	
 	 
 	<select id="rep1100DAO.selectRep1100RvInfo" parameterClass="java.util.Map" resultMap="resultRvListExt">
 		
