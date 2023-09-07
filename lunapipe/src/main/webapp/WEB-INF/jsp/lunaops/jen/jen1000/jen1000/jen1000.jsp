@@ -129,7 +129,6 @@ $(function(){
 		
 		//그리드 다시 그리기
 		selJobGrid.repaint();
-		
 	});
 	
 	//전송 버튼
