@@ -319,4 +319,16 @@ public class Dpl1000ServiceImpl  extends EgovAbstractServiceImpl implements Dpl1
 	public String insertDpl1102DplBuildInfo(BuildVO buildVo) throws Exception{
 		return dpl1000DAO.insertDpl1102DplBuildInfo(buildVo);
 	}
+	
+	
+	@SuppressWarnings({ "rawtypes"})
+	public List<Map> selectDpl1102OprDplActionList(Map paramMap) throws Exception{
+		return dpl1000DAO.selectDpl1102OprDplActionList(paramMap);
+	}
+
+	
+	@SuppressWarnings("rawtypes")
+	public int selectDpl1102OprDplActionListCnt(Map paramMap) throws Exception{
+		return dpl1000DAO.selectDpl1102OprDplActionListCnt(paramMap);
+	}
 }
