@@ -6,21 +6,128 @@
 <link rel='stylesheet' href='<c:url value='/css/lunaops/rep.css'/>' type='text/css'>
 <style type="text/css">
 	.tab_contents.menu{width:1500px;}
+	
 </style>
 <script>
-var tktFileGridObj;
-var tktFileSearchObj;
+var tktChgDataGridObj;
+var buildDataGridObj;
+var rsyncDataGridObj;
+var commitTargetDataGridObj;
+
+//선택 변경파일 중복 체크
+var overlapFileChg = {};
 
 //선택된 소스저장소 데이터 목록
 var selRepData = [];
 
+//티켓 trunk 변경 path 따로 저장
+var tktChgDataList = [];
+
 $(function(){
-	//그리드 검색 호출
-	fnTktFileGridSetting();
-	fnSearchBoxControl();
+	//티켓 변경 파일 목록 조회
+	fnTktChgDataGridSetting();
+	//운영빌드 데이터 조회
+	fnBuildDataGridSetting();
+	//운영빌드 대상 변경 파일목록 조회
+	fnRsyncDataGridSetting();
+	//커밋대상 파일목록 조회
+	fnCommitTargetDataGridSetting();
 	
 	//가이드 상자 호출
 	gfnGuideStack("add",fnRep1102GuideShow);
+	
+	//추가
+	$("#selFileChgAddBtn").click(function(){
+		var chkList = rsyncDataGridObj.getList('selected');
+		if (gfnIsNull(chkList)) {
+			jAlert("선택한 JOB이 없습니다.", "알림창");
+			return false;
+		}
+		
+		//중복 개수
+		var overlapCnt = 0;
+		
+		//실제 추가되는 row
+		var addDataRow = [];
+		
+		//추가 인덱스 숫자
+		var addDataIdx = 0;
+		
+		//변경파일 중복 체크
+		$.each(chkList, function(idx, map){
+			//변경 파일 경로있는지 체크
+			if(overlapFileChg.hasOwnProperty(map.changeFilePath)){
+				overlapCnt++;
+				return true;
+			}
+
+			map["__selected__"] = false;
+			overlapFileChg[map.changeFilePath] = true;
+			
+			//제일 높은 점수 추출
+			var highScore = 0;
+			//대상 경로
+			var targetFilePath;
+			//대상 리비전
+			var targetRvNum;
+			
+			//변경 티켓 내용중에서 유사한 경로 가져오기
+			$.each(tktChgDataList, function(idx, str){
+				//str 나누기
+				var strArr = str.split("$");
+				var rvNum = strArr[0];
+				var fileChgPath = strArr[1];
+				
+				var score = fnStringPathCheck(map.filePath, fileChgPath);
+				
+				//제일 높은 점수 추출
+				if(score > highScore){
+					highScore = score;
+					targetFilePath = fileChgPath;
+					targetRvNum = rvNum;
+				}
+			});
+			map.targetFilePath = targetFilePath;
+			map.targetRvNum = targetRvNum;
+			
+			addDataRow.push(map);
+			addDataIdx++;
+		});
+		
+		//alert 메시지
+		var alertAddMsg = "";
+		
+		if(overlapCnt == chkList.length){
+			jAlert("선택된 변경 파일은 이미 추가되있습니다.");
+			return false;
+		}
+		else if(overlapCnt > 0){
+			alertAddMsg = "</br>중복된 "+overlapCnt+"개의 변경파일이 제외되었습니다.";
+		}
+		
+		jAlert("commit 대상 변경 파일이 추가되었습니다."+alertAddMsg);
+		
+		//변경 파일 추가
+		commitTargetDataGridObj.addRow(addDataRow);
+		
+	});
+	//제거
+	$("#selFileChgDelBtn").click(function(){
+		var chkList = commitTargetDataGridObj.getList('selected');
+		if (gfnIsNull(chkList)) {
+			jAlert("선택한 변경 파일이 없습니다.", "알림창");
+			return false;
+		}
+		
+		//선택 변경 파일 제거
+		$.each(chkList, function(idx, map){
+			//중복체크 제거
+			delete overlapFileChg[map.changeFilePath];
+		});
+		
+		//row 삭제
+		commitTargetDataGridObj.removeRow("selected");
+	});
 	
 	//전송 버튼
 	$("#repDataCommitBtn").click(function(){
@@ -28,7 +135,7 @@ $(function(){
 		var rtnValue = [];
 		
 		//선택한 저장소
-		var selTktFileList = tktFileGridObj.getList('selected');
+		var selTktFileList = tktChgDataGridObj.getList('selected');
 		
 		if (gfnIsNull(selTktFileList)) {
 			jAlert("커밋 대상 파일을 선택해주세요.", "알림창");
@@ -110,14 +217,14 @@ $(function(){
 });
 
 //axisj5 그리드
-function fnTktFileGridSetting(){
-	tktFileGridObj = new ax5.ui.grid();
+function fnTktChgDataGridSetting(){
+	tktChgDataGridObj = new ax5.ui.grid();
  
-	tktFileGridObj.setConfig({
-		target: $('[data-ax5grid="tktFileGridTarget"]'),
+	tktChgDataGridObj.setConfig({
+		target: $('[data-ax5grid="tktChgDataGridTarget"]'),
 		frozenColumnIndex: 3,
 		sortable:false,
-		showRowSelector: true,
+		showRowSelector: false,
 		header: {align:"center",columnHeight: 30},
 		columns: [
 			{key: "repNm", label: "저장소 명", width: 260, align: "center"},
@@ -131,107 +238,12 @@ function fnTktFileGridSetting(){
 			{key: "repCmtAuthor", label: "커밋 대상자", width: 100, align: "center"} ,
 			{key: "repChgTypeNm", label: "파일 변경 타입", width: 95, align: "center"} ,
 			{key: "repChgFilePath", label: "변경 파일 경로", width: 1000, align: "left"} 
-			/* 
-			,{key: "repUrl", label: "저장소 URL", width: 250, align: "left", 
-				formatter:function(){
-					var repUrl = "";
-					//github
-					if(this.item.repTypeCd == "01"){
-						repUrl = this.item.gitRepUrl;
-					}
-					//svn
-					else if(this.item.repTypeCd == "02"){
-						repUrl = this.item.svnRepUrl;
-					}
-					//gitlab
-					else if(this.item.repTypeCd == "03"){
-						repUrl = this.item.gitRepUrl;
-					}
-					return repUrl;
-				}
-			}
-			 */
         ],
         body: {
     		align: "center",
-			columnHeight: 30,
-			onClick: function () {
-        		// 클릭 이벤트
-   				tktFileGridObj.select(this.doindex, {selected: !this.item.__selected__});
-             },
-			onDBLClick:function(){
-				var item = this.item;
-				
-            	//파일 내용 비교
-         		var data = {
-           			"repId": item.repId
-           			, "repTypeCd": item.repTypeCd
-           			, "revision": item.repRv
-           			, "diffRevision": item.revision
-           			, "path": item.repChgFilePath
-           			, "fileName": item.repChgFileNm
-            	};
-         		gfnLayerPopupOpen('/rep/rep1000/rep1100/selectRep1101View.do',data,"1200","780",'scroll');
-        	},
-	        onDataChanged: function(){
-				//해당 데이터 체크 시 선택 배열에 넣기
-				if(this.item.__selected__){
-					//이미 세팅된 데이터 없는 경우만 추가
-					if(selRepData.indexOf(this.item.repId) == -1){
-						selRepData.push(this.item.repId);
-					}
-				}else{
-					var repIdx = selRepData.indexOf(this.item.repId);
-	         			
-					//제외
-					if(repIdx != -1){
-						selRepData.splice(repIdx, 1);
-					}
-				}
-			}
+			columnHeight: 30
 		},
-		contextMenu: {
-             iconWidth: 20,
-             acceleratorWidth: 100,
-             itemClickAndClose: false,
-             icons: {
-                 'arrow': '<i class="fa fa-caret-right"></i>'
-             },
-             items: [
-                 {type: "trunkDiff", label: "trunk 소스 비교", icon:"<i class='fa fa-info-circle' aria-hidden='true'></i>"},
-             ],
-             popupFilter: function (item, param) {
-             	var selItem = tktFileGridObj.list[param.doindex];
-             	//선택 개체 없는 경우 중지
-             	if(typeof selItem == "undefined"){
-             		return false;
-             	}
-             	return true;
-             },
-             onClick: function (item, param) {
-             	var selItem = tktFileGridObj.list[param.doindex];
-
-             	//접속 확인
-				if(item.type == "trunkDiff"){
-					var item = selItem;
-					
-	            	//파일 내용 비교
-	         		var data = {
-	           			"repId": item.repId
-	           			, "repTypeCd": item.repTypeCd
-	           			, "revision": item.repRv
-	           			, "diffRevision": item.revision
-	           			, "path": item.repChgFilePath
-	           			, "fileName": item.repChgFileNm
-	            	};
-	         		gfnLayerPopupOpen('/rep/rep1000/rep1100/selectRep1101View.do',data,"1200","780",'scroll');
-					
-				}
-				//닫기
-				tktFileGridObj.contextMenu.close();
-             }
-         },
-         page: {
+		page: {
              navigationItemCount: 9,
              height: 30,
              display: true,
@@ -240,7 +252,7 @@ function fnTktFileGridSetting(){
              nextIcon: '<i class="fa fa-caret-right" aria-hidden="true"></i>',
              lastIcon: '<i class="fa fa-step-forward" aria-hidden="true"></i>',
              onChange: function () {
-				fnInGridListSet(this.page.selectPage,tktFileSearchObj.getParam());
+				fnInGridListSet(this.page.selectPage);
              }
          } 
 		});
@@ -249,30 +261,118 @@ function fnTktFileGridSetting(){
 }
 
 //그리드 데이터 넣는 함수
-function fnInGridListSet(_pageNo,ajaxParam){
+function fnInGridListSet(_pageNo){
 	/* 그리드 데이터 가져오기 */
-   	//파라미터 세팅
-   	if(gfnIsNull(ajaxParam)){
-		ajaxParam = $('form#rep1102Form').serialize();
-	}
+	ajaxParam = $('form#rep1102Form').serialize();
    	
    	//페이지 세팅
-   	if(!gfnIsNull(_pageNo)){
-   		ajaxParam += "&pageNo="+_pageNo;
-   	}else if(typeof tktFileGridObj.page.currentPage != "undefined"){
-   		ajaxParam += "&pageNo="+tktFileGridObj.page.currentPage;
+   	if(typeof tktChgDataGridObj.page.currentPage != "undefined"){
+   		ajaxParam += "&pageNo="+tktChgDataGridObj.page.currentPage;
    	}
-    	
+   	
+	//조회 typeCd 넘기기
+   	ajaxParam += "&repRvTypeCd=02&repChgfileKind=file";
+	
    	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/rep/rep1000/rep1100/selectRep1102TktRvFileChgListAjax.do'/>","loadingShow":true}
+			{"url":"<c:url value='/rep/rep1000/rep1100/selectRep1100TktRvFileChgListAjax.do'/>","loadingShow":true}
 			,ajaxParam);
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
 		var list = data.list;
 		var page = data.page;
 		
-	   	tktFileGridObj.setData({
+	   	tktChgDataGridObj.setData({
+			list:list,
+			page: {
+				currentPage: _pageNo || 0,
+				pageSize: page.pageSize,
+				totalElements: page.totalElements,
+				totalPages: page.totalPages
+			}
+		});
+	   	
+	   	//티켓 변경 파일 경로 재선언
+	   	var temp = [];
+	   	$.each(list, function(idx, map){
+	   		temp.push(map.repRv+"$"+map.repChgFilePath);
+	   	});
+	   	tktChgDataList = temp;
+	});
+	
+	//AJAX 전송
+	ajaxObj.send();
+}
+
+//axisj5 그리드
+function fnBuildDataGridSetting(){
+	buildDataGridObj = new ax5.ui.grid();
+ 
+	buildDataGridObj.setConfig({
+		target: $('[data-ax5grid="buildDataGridTarget"]'),
+		sortable:false,
+		showRowSelector: false,
+		header: {align:"center",columnHeight: 30},
+		columns: [
+			{key: "dplNm", label: "운영빌드 명", width: 150, align: "center"},
+			{key: "jobId", label: "JOB ID", width: 150, align: "center"} ,
+			{key: "bldNum", label: "빌드 번호", width: 80, align: "center"} ,
+			{key: "regUsrId", label: "빌드 실행자", width: 100, align: "center"} ,
+			{key: "bldStartDtm", label: "빌드 일시", width: 135, align: "center"
+				,formatter: function(){
+					return new Date(this.item.bldStartDtm).format('yyyy-MM-dd HH:mm:ss');
+				}	
+			} ,
+        ],
+        body: {
+    		align: "center",
+			columnHeight: 30,
+			onClick: function () {
+				buildDataGridObj.clearSelect();
+				// 클릭 이벤트
+   				buildDataGridObj.select(this.doindex, {selected: !this.item.__selected__});
+				
+				//rsync 결과 값 조회
+				fuRsyncResultList(this.item);
+			}
+		},
+		page: {
+             navigationItemCount: 9,
+             height: 30,
+             display: true,
+             firstIcon: '<i class="fa fa-step-backward" aria-hidden="true"></i>',
+             prevIcon: '<i class="fa fa-caret-left" aria-hidden="true"></i>',
+             nextIcon: '<i class="fa fa-caret-right" aria-hidden="true"></i>',
+             lastIcon: '<i class="fa fa-step-forward" aria-hidden="true"></i>',
+             onChange: function () {
+				fnInGridListSet(this.page.selectPage);
+             }
+         } 
+		});
+	//그리드 데이터 불러오기
+	fnBuildDataListSet();
+}
+
+//그리드 데이터 넣는 함수
+function fnBuildDataListSet(_pageNo){
+	/* 그리드 데이터 가져오기 */
+	ajaxParam = $('form#rep1102Form').serialize();
+   	
+   	//페이지 세팅
+   	if(typeof buildDataGridObj.page.currentPage != "undefined"){
+   		ajaxParam += "&pageNo="+buildDataGridObj.page.currentPage;
+   	}
+	
+   	//AJAX 설정
+	var ajaxObj = new gfnAjaxRequestAction(
+			{"url":"<c:url value='/dpl/dpl1000/dpl1100/selectDpl1102OprDplActionListAjax.do'/>","loadingShow":true}
+			,ajaxParam);
+	//AJAX 전송 성공 함수
+	ajaxObj.setFnSuccess(function(data){
+		var list = data.list;
+		var page = data.page;
+		
+	   	buildDataGridObj.setData({
 			list:list,
 			page: {
 				currentPage: _pageNo || 0,
@@ -286,106 +386,105 @@ function fnInGridListSet(_pageNo,ajaxParam){
 	//AJAX 전송
 	ajaxObj.send();
 }
-//검색 상자
-function fnSearchBoxControl(){
-	var pageID = "AXSearch";
-	tktFileSearchObj = new AXSearch();
 
-	var fnObjSearch = {
-		pageStart: function(){
-			//검색도구 설정 01 ---------------------------------------------------------
-			tktFileSearchObj.setConfig({
-				targetID:"tktFileSearchTarget",
-				theme : "AXSearch",
-				rows:[
-					{display:true, addClass:"", style:"", list:[
-						{label:"<i class='fa fa-search'></i>&nbsp;", labelWidth:"50", type:"selectBox", width:"", key:"searchSelect", addClass:"", valueBoxStyle:"", value:"all",
-							options:[
+//axisj5 그리드
+function fnRsyncDataGridSetting(){
+	rsyncDataGridObj = new ax5.ui.grid();
 
-                                {optionValue:"0", optionText:"전체 보기",optionAll:true},
-                                {optionValue:'repNm', optionText:'저장소 명'},
-                                {optionValue:'repRv', optionText:'리비전'},
-                                {optionValue:'repChgFileNm', optionText:'변경 파일명'},
-                                {optionValue:'repChgFilePath', optionText:'변경 파일 경로'},
-                                {optionValue:'repCmtAuthor', optionText:'커밋 대상자'},
-                                {optionValue:'repChgTypeCd', optionText:'파일 변경 타입' , optionCommonCode:"REP00004" }                                
-                                
-                            ],onChange: function(selectedObject, value){
-                            	//선택 값이 전체목록인지 확인 후 입력 상자를 readonly처리
-    							if(!gfnIsNull(selectedObject.optionAll) && selectedObject.optionAll == true){
-									axdom("#" + tktFileSearchObj.getItemId("searchTxt")).attr("readonly", "readonly");	
-									axdom("#" + tktFileSearchObj.getItemId("searchTxt")).val('');	
-								}else{
-									axdom("#" + tktFileSearchObj.getItemId("searchTxt")).removeAttr("readonly");
-								}
-								
-								//공통코드 처리 후 select box 세팅이 필요한 경우 사용
-								if(!gfnIsNull(selectedObject.optionCommonCode)){
-									gfnCommonSetting(tktFileSearchObj,selectedObject.optionCommonCode,"searchCd","searchTxt");
-								}else{
-									//공통코드 처리(추가 selectbox 작업이 아닌 경우 type=text를 나타낸다.)
-									axdom("#" + tktFileSearchObj.getItemId("searchTxt")).show();
-									axdom("#" + tktFileSearchObj.getItemId("searchCd")).hide();
-								}
-    						},
-
-						},
-						{label:"", labelWidth:"", type:"inputText", width:"225", key:"searchTxt", addClass:"secondItem sendBtn", valueBoxStyle:"padding-left:0px;", value:"",
-							onkeyup:function(e){
-								if(e.keyCode == '13' ){
-									axdom("#" + tktFileSearchObj.getItemId("btn_search_rep")).click();
-								}
-							} 
-						},
-						{label:"", labelWidth:"", type:"selectBox", width:"100", key:"searchCd", addClass:"selectBox", valueBoxStyle:"padding-left:0px;", value:"01",
-							options:[]
-						},
-						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_print_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-print' aria-hidden='true'></i>&nbsp;<span>프린트</span>",
-							onclick:function(){
-								$(tktFileGridObj.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
-						}},
-						
-						{label:"", labelWidth:"", type:"button", width:"55",style:"float:right;", key:"btn_excel_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-file-excel' aria-hidden='true'></i>&nbsp;<span>엑셀</span>",
-							onclick:function(){
-								tktFileGridObj.exportExcel("저장소 목록.xls");
-						}},
-						{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_rep",style:"float:right;", valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
-							onclick:function(){
-								/* 검색 조건 설정 후 reload */
-	 							var pars = tktFileSearchObj.getParam();
-							    var ajaxParam = $('form#rep1102Form').serialize();
-
-							    if(!gfnIsNull(pars)){
-							    	ajaxParam += "&"+pars;
-							    }
-								
-					            fnInGridListSet(0,ajaxParam);
-					            
-					            //폼 데이터 변경
-								$('#searchSelect').val(axdom("#" + tktFileSearchObj.getItemId("searchSelect")).val());
-								$('#searchCd').val(axdom("#" + tktFileSearchObj.getItemId("searchCd")).val());
-								$('#searchTxt').val(axdom("#" + tktFileSearchObj.getItemId("searchTxt")).val());
-						}}
-					]}
-				]
-			});
+	rsyncDataGridObj.setConfig({
+		target: $('[data-ax5grid="rsyncDataGridTarget"]'),
+		/* frozenColumnIndex: 1, */
+		sortable:false,
+		showRowSelector: true,
+		header: {align:"center",columnHeight: 30},
+		columns: [
+			{key: "fileKind", label: "파일 변경 타입", width: 95, align: "center",
+				formatter: function(){
+					var fileKind = this.item.fileKind;
+					var fileKindNm = "-";
+					//파일 변경 타입에따라 문자열 구하기
+					if(fileKind == "A"){
+						fileKindNm = "등록"
+					}
+					else if(fileKind == "M"){
+						fileKindNm = "수정"
+					}
+					else if(fileKind == "D"){
+						fileKindNm = "삭제"
+					}
+					return fileKindNm;
+				}
+			},
+			{key: "filePath", label: "파일 경로", width: 676, align: "left"},
+      ],
+      body: {
+  		align: "center",
+			columnHeight: 30
+		},
+	});
+}
+//rsync 결과 값 조회
+function fuRsyncResultList(paramItem){
+	//AJAX 설정
+	var ajaxObj = new gfnAjaxRequestAction(
+			{"url":"<c:url value='/rep/rep1000/rep1100/selectRep1102RsyncResultListAjax.do'/>","loadingShow":true}
+			,{"ciId": paramItem.ciId, "ticketId": paramItem.ticketId, "jobId": paramItem.jobId, "bldNum": paramItem.bldNum});
+	//AJAX 전송 성공 함수
+	ajaxObj.setFnSuccess(function(data){
+		//오류 발생 여부
+		if(data.errorYn == "Y"){
+			jAlert(data.message,"알림");
+		}else{
+			var fileChgList = data.fileChgList;
+			rsyncDataGridObj.setData(fileChgList);
 		}
-		/*,
-		search1: function(){
-			var pars = tktFileSearchObj.getParam();
-			fnAxGridView(pars);
-		}
-		*/
-	};
+	});
 	
-	jQuery(document.body).ready(function(){
-		
-		fnObjSearch.pageStart();
-		//검색 상자 로드 후 텍스트 입력 폼 readonly 처리
-		axdom("#" + tktFileSearchObj.getItemId("searchTxt")).attr("readonly", "readonly");
-		
-		//공통코드 selectBox hide 처리
-		axdom("#" + tktFileSearchObj.getItemId("searchCd")).hide();
+	//AJAX 전송
+	ajaxObj.send();
+}
+//axisj5 그리드
+function fnCommitTargetDataGridSetting(){
+	commitTargetDataGridObj = new ax5.ui.grid();
+
+	commitTargetDataGridObj.setConfig({
+		target: $('[data-ax5grid="selCommitDataGridTarget"]'),
+		frozenColumnIndex: 2, 
+		sortable:false,
+		showRowSelector: true,
+		header: {align:"center",columnHeight: 30},
+		columns: [
+			{key: "targetRvNum", label: "대상 소스 리비전 번호", width: 135, align: "center", editor:{"type": "number"}} ,
+			{key: "targetFilePath", label: "대상 소스 파일 경로", width: 400, align: "left", editor:{"type": "text"}} ,
+			{key: "fileKind", label: "파일 변경 타입", width: 95, align: "center",
+				formatter: function(){
+					var fileKind = this.item.fileKind;
+					var fileKindNm = "-";
+					//파일 변경 타입에따라 문자열 구하기
+					if(fileKind == "A"){
+						fileKindNm = "등록"
+					}
+					else if(fileKind == "M"){
+						fileKindNm = "수정"
+					}
+					else if(fileKind == "D"){
+						fileKindNm = "삭제"
+					}
+					return fileKindNm;
+				}
+			},
+			{key: "filePath", label: "파일 경로", width: 700, align: "left"},
+			{key: "jobId", label: "JOB ID", width: 150, align: "center"} ,
+			{key: "bldNum", label: "빌드 번호", width: 80, align: "center"} 
+      ],
+      body: {
+  			align: "center",
+			columnHeight: 30,
+			onClick: function () {
+				// 클릭 이벤트
+   				commitTargetDataGridObj.select(this.doindex, {selected: !this.item.__selected__});
+			}
+		},
 	});
 }
 
@@ -401,11 +500,48 @@ function fnRep1102GuideShow(){
 	var guideBoxInfo = globals_guideContents["rep1102"];
 	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
 }
+
+//문자열 유사도
+function fnStringPathCheck(str1, str2) {
+    var strArr1 = []
+    var strArr2 = []
+    var intersection = 0;  //교집합 원소 개수
+    var union = 0;  //합집합 원소 개수
+    var check = new RegExp(/[a-z]{2}/);
+    for (let i=0; i<str1.length-1; i++){
+        var str = str1.slice(i,i+2).toLowerCase();
+        if(check.test(str)) {
+            strArr1.push(str)
+        }
+    }
+    for (let i=0; i<str2.length-1; i++){
+    	var str = str2.slice(i,i+2).toLowerCase();
+    	if(check.test(str)) {
+            strArr2.push(str);
+        }
+    }
+    strArr1.sort();
+    strArr2.sort();
+    for (let i=0; i<strArr1.length; i++) {
+        if(strArr2.indexOf(strArr1[i]) >= 0){
+            intersection++;
+            strArr2.splice(strArr2.indexOf(strArr1[i]),1);
+        }
+        union++;
+    }
+    union += strArr2.length;
+    if (union === 0){
+    	return 1
+    }else{
+		return Math.floor((intersection / union)*100)
+    }
+}
 </script>
 
 
 <div class="main_contents" style="height: auto;" >
 	<form name="rep1102Form" id="rep1102Form">
+		<input type="hidden" name="ciId" id="ciId" value="${requestScope.ciId }"/>
 		<input type="hidden" name="ticketId" id="ticketId" value="${requestScope.ticketId }"/>
 		<input type="hidden" name="empId" id="empId" value="${requestScope.empId }"/>
 	</form>
@@ -414,35 +550,37 @@ function fnRep1102GuideShow(){
 			<div class="sub_title">
 				티켓 소스저장소별 Trunk 변경 파일 목록
 			</div>
-			<div id="tktFileSearchTarget" guide="rep1102button" ></div>
-			<div data-ax5grid="tktChgDataGridTarget" data-ax5grid-config="{}" style="height: 400px;"></div>
+			<div data-ax5grid="tktChgDataGridTarget" data-ax5grid-config="{}" style="height: 250px;"></div>
 		</div>
 		<div class="rep1102MainMiddleFrame">
 			<div class="rep1102MiddleLeftFrame">
 				<div class="sub_title">
 					운영빌드 목록
 				</div>
-				<div data-ax5grid="buildDataGridTarget" data-ax5grid-config="{}" style="height: 400px;"></div>
+				<div data-ax5grid="buildDataGridTarget" data-ax5grid-config="{}" style="height: 250px;"></div>
 			</div>
 			<div class="rep1102MiddleRightFrame">
 				<div class="sub_title">
 					Source-Deploy 비교 결과 변경 파일
 				</div>
-				<div data-ax5grid="rsyncDataGridTarget" data-ax5grid-config="{}" style="height: 400px;"></div>
+				<div data-ax5grid="rsyncDataGridTarget" data-ax5grid-config="{}" style="height: 250px;"></div>
 			</div>
+		</div>
+		<div class="rep1102DataTransferBtnFrame">
+			<button type="button" class="AXButton" id="selFileChgAddBtn"><i class="fa fa-arrow-alt-circle-down"></i>&nbsp;추가</button>
+			<button type="button" class="AXButton" id="selFileChgDelBtn"><i class="fa fa-arrow-alt-circle-up"></i>&nbsp;제거</button>
 		</div>
 		<div class="rep1102MainBottomFrame">
 			<div class="sub_title">
 				선택 변경 파일
 			</div>
 			<div id="tktFileSearchTarget" guide="rep1102button" ></div>
-			<div data-ax5grid="selCommitDataGridTarget" data-ax5grid-config="{}" style="height: 400px;"></div>
+			<div data-ax5grid="selCommitDataGridTarget" data-ax5grid-config="{}" style="height: 250px;"></div>
 		</div>
 		<div class="btnFrame">
 			<div class="mainPopupBtn" id="repDataCommitBtn"><i class="fas fa-paperclip"></i>&nbsp;Commit</div>
 			<div class="mainPopupBtn" id="repCloseBtn"><i class="fas fa-times-circle"></i>&nbsp;닫기</div>
 		</div>
-			
 	</div>
 </div>
 		
