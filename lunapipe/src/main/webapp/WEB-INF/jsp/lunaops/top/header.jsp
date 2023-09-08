@@ -11,12 +11,12 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta charset="UTF-8">
-	
+	<!-- 모바일 : viewport 제거-->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="viewport" content="width=device-width, user-scalable=no">
 	<title>Open Soft Lab</title>
 	
-	
+	<!-- 파비콘 -->
 	<link rel="apple-touch-icon" sizes="180x180" href="<c:url value='/images/favicon/apple-touch-icon.png'/>">
 	<link rel="icon" type="image/png" sizes="32x32" href="<c:url value='/images/favicon/favicon-32x32.png'/>">
 	<link rel="icon" type="image/png" sizes="16x16" href="<c:url value='/images/favicon/favicon-16x16.png'/>">
@@ -34,6 +34,7 @@
 	<link rel="stylesheet" type="text/css" href="<c:url value='/css/axisj/ui/osl/ax5menu.css'/>">
 	<link rel="stylesheet" type="text/css" href="<c:url value='/css/axisj/ui/osl/ax5dialog.css'/>">
 	<link rel="stylesheet" type="text/css" href="<c:url value='/css/axisj/ui/osl/ax5select.css'/>">
+	<link rel="stylesheet" type="text/css" href="<c:url value='/css/axisj/ui/osl/ax5formatter.css'/>">
 	
 	
 	<script src="<c:url value='/js/jquery/jquery-1.11.2.min.js'/>" ></script>
@@ -42,14 +43,15 @@
 	<script type="text/javascript" src="<c:url value='/js/axisj/dist/ax5/ax5core.js'/>"></script>
 	<script type="text/javascript" src="<c:url value='/js/axisj/dist/ax5/ax5menu.min.js'/>"></script>
 	
-	
+	<!-- Sortable - 배포 쪽에서 사용 추후 대시보드에서 사용 예정 -->
 	<script type="text/javascript" src="<c:url value='/js/sortable/Sortable.js'/>"></script>
 	
 	<script src="/js/axisj/lib/mask/ax5mask.min.js"></script>
 	<link href="/css/axisj/ui/osl/ax5mask.css" rel="stylesheet">
 	<script type="text/javascript" src="<c:url value='/js/axisj/dist/ax5/ax5grid.js'/>"></script>
+	<script type="text/javascript" src="<c:url value='/js/axisj/dist/ax5/ax5formatter.min.js'/>"></script>
 	<script src="<c:url value='/js/common/common.js'/>" ></script>
-	
+	<!-- select2 -->
 	<link href="/vendors/select2/css/select2.css" rel="stylesheet">
 	<link rel="stylesheet" href="<c:url value='/css/common/footer.css'/>">
 	

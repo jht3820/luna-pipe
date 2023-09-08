@@ -464,6 +464,45 @@ public class ApiController {
 	
 	
 	@SuppressWarnings("rawtypes")
+	@RequestMapping(value="/api/selectTicketDplFileDataList", method=RequestMethod.POST)
+	public ModelAndView selectTicketDplFileDataList(@RequestBody HashMap<String, Object> paramMap, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map rtnMap = apiService.selectTicketDplFileDataList(paramMap);
+			
+			if(rtnMap == null) {
+				model.addAttribute("result", "FAIL");
+				model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+				model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+				return new ModelAndView("jsonView");
+			}
+			
+			boolean result = (boolean) rtnMap.get("result");
+			
+			String errorCode = (String) rtnMap.get("error_code");
+			
+			if(!result) {
+				model.addAttribute("result", "FAIL");
+				model.addAttribute("error_code", errorCode);
+				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
+			}else {
+				model.addAttribute("result", "SUCCESS");
+				model.addAttribute("ticket_deploy_file_list", rtnMap.get("ticketDplSelFileList"));
+				model.addAttribute("msg", "정상적으로 조회되었습니다.");
+			}
+			
+		}catch(Exception ex){
+			ex.printStackTrace();
+			model.addAttribute("result", "ERROR");
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+			Log.error("selectTicketRvDataList()", ex);
+		}
+		return new ModelAndView("jsonView");
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
 	@RequestMapping(value="/api/selectTicketCheck", method=RequestMethod.GET)
 	public ModelAndView selectTicketCheck(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try{
@@ -614,35 +653,35 @@ public class ApiController {
 	@RequestMapping(value="/api/test/receiver.do")
 	public String selectTestReceiver(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try {
-			// request 파라미터를 map으로 변환
+		
 			//Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 						
 			//String data = (String) paramMap.get("data");
 			/*
-			//암호화 키
+			
 			String salt = EgovProperties.getProperty("Globals.data.salt");
 
-			//대상 솔루션 url
+			
 			String eGeneUrl = EgovProperties.getProperty("Globals.eGene.url");
 			
-			//티켓 id 암호화
+			
 			String reciverData = "{\"key\":\""+salt+"\", \"ticket_id\":\"CH2211-00009\"}";
 			
 			String enReciverData = CommonScrty.encryptedAria(reciverData, salt);
-			//enReciverData = "KFgbSAp3JbGg9HC1BRw1eotLCw4ExGxQ5gGJw6wmzm3e/m6eQYAi04TPI8KiCJFa3K52BrjUEDCORK2DXFN6gKDx2Yqs8oJkFafMMh3nGUWb1KOgYuTGrU3RMKy0vIeGmwIimP/HKVlJ1HYGxMEEFw==";
-			//GET METHOD 구성
+			
+			
 			HttpGet methodGet = new HttpGet();
 			URI uri = new URI(eGeneUrl+"plugins/jsp/isTicket.jsp?data="+URLEncoder.encode(enReciverData,"UTF-8"));
 			methodGet.setURI(uri);
 			
 			HttpClient client = OslConnHttpClient.getHttpClient();
 			
-			//data 전송
+			
 			HttpResponse responseResult = client.execute(methodGet);
 			
-			//결과 값 성공인경우
+			
 			if(responseResult.getStatusLine() != null && responseResult.getStatusLine().getStatusCode() == 200) {
-				//전송 완료된 값 JSON으로 파싱
+				
 	    		String returnContent = EntityUtils.toString(responseResult.getEntity());
 	    		
 	    		System.out.println("############");
