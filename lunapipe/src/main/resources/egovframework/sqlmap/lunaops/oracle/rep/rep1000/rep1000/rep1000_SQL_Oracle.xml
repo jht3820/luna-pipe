@@ -157,8 +157,13 @@
 			<isNotEmpty property="repUuid">
 				AND		REP_UUID = #repUuid#			
 			</isNotEmpty>
+			<isNotEmpty property="repDplUuid">
+				AND		REP_DPL_UUID = #repDplUuid#			
+			</isNotEmpty>
 			<isEmpty property="repUuid">
-				AND       REP_ID = #repId# 
+				<isEmpty property="repDplUuid">
+					AND       REP_ID = #repId# 
+				</isEmpty>
 			</isEmpty>
 	</select>
 
@@ -188,6 +193,7 @@
 					            REP_TYPE_CD				, 
 					            REP_TXT                	, 
 					            REP_UUID				,
+					            REP_DPL_UUID			,
 					            <isEqual property="repTypeCd" compareValue="02">
 						            SVN_REP_URL         ,  
 						            SVN_USR_ID          ,  
@@ -226,6 +232,7 @@
 					             #repTypeCd#    , 
 					             #repTxt#		, 
 					             #repUuid#		,
+					             #repDplUuid#	,
 					             <isEqual property="repTypeCd" compareValue="02">
 						             #svnRepUrl#	, 
 						             #svnUsrId#		, 
@@ -268,6 +275,7 @@
             REP_TYPE_CD = #repTypeCd# 			, 
             REP_TXT = #repTxt#                  , 
             REP_UUID = #repUuid#				,
+            REP_DPL_UUID = #repDplUuid#				,
             <isEqual property="repTypeCd" compareValue="02">
 	            SVN_REP_URL = #svnRepUrl#           ,  
 	            SVN_USR_ID = #svnUsrId#             ,  
