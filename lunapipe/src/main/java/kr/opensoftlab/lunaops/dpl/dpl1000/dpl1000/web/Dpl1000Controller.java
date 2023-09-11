@@ -589,6 +589,11 @@ public class Dpl1000Controller {
 			
 			Map jobMap = jen1000Service.selectJen1100JobInfo(paramMap);
 			
+			if(jobMap == null) {
+				model.addAttribute("errorYn", "Y");
+				model.addAttribute("message", "해당 티켓에서 실행된 JOB의 빌드 이력이 없습니다.");
+				return new ModelAndView("jsonView", model);
+			}
 			String jenUrl = (String) jobMap.get("jenUrl");
 			String jenUsrId = (String) jobMap.get("jenUsrId");
 			String jenUsrTok = (String) jobMap.get("jenUsrTok");
