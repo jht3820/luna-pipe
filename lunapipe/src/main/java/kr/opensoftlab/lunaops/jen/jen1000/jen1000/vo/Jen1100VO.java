@@ -42,7 +42,9 @@ public class Jen1100VO extends PageVO {
     private String lastBldDurationTm;
     private String lastBldStartDtm;
     
-    
+	
+  	private String paramJobType;
+  	
 	public String getCiId() {
 		return ciId;
 	}
@@ -226,6 +228,12 @@ public class Jen1100VO extends PageVO {
 	}
 	public void setLastBldStartDtm(String lastBldStartDtm) {
 		this.lastBldStartDtm = lastBldStartDtm;
+	}
+	public String getParamJobType() {
+		return paramJobType;
+	}
+	public void setParamJobType(String paramJobType) {
+		this.paramJobType = paramJobType;
 	}
 	
 }
