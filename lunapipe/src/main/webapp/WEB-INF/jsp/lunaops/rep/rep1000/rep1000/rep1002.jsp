@@ -302,7 +302,18 @@
 						pIdKey: "pId",
 		            }
 		        },
+				// 동적 트리 설정
+		        async: {
+					enable: true, // async 사용여부 (true:사용, false:미사용)
+					contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+					url:"<c:url value='/rep/rep1000/rep1000/selectRep1001RepTreeListAjax.do'/>",
+					autoParam:["id", "path"],	// 노드의 값을 서버로 보낼경우 배열형식으로 autoParam에 세팅
+					otherParam: param,  // 노드의 값을 제외한 다른 값을 서버로 보낼 경우 otherParam에 세팅
+					dataType: "json",
+					dataFilter: fnTreeFilter	// 데이터 조회 후 처리할 필터 function, async 사용시 dataFilter는 반드시 지정해야 한다.
+				},
 				callback: {
+					onAsyncError: fnAsyncError,
 					onClick: function(event, treeId, treeNode){
 						var treeNodePath = treeNode.path;
 						
@@ -333,11 +344,14 @@
 			});
 			
 		    $.each(data.list, function(idx, obj){
-				if(obj["type"] == 0){
+		    	if(obj["type"] == 0){
+					obj.isParent = true;
+					
+					if(gfnIsNull(obj["pId"])){
+						obj["pId"] = repId;
+					}
+					
 					list.push(obj);
-					obj.isParent = false;
-					obj["iconSkin"] = "folder";
-					obj["pId"] = repId;
 				}
 			});
 		    
@@ -350,6 +364,38 @@
 	
 		//AJAX 전송
 		ajaxObj.send();
+	}
+	
+	/*
+	* [+] 아이콘 클릭 또는 더블클릭하여 트리 확장시 조회된 결과에 대한 처리를 한다.
+	*
+	* @param treeId : 트리 ID
+	* @param parentNode : 트리에서 [+]아이콘 클릭 또는 더블클릭한 노드
+	* @param result : 동적조회 결과값
+	*/
+	function fnTreeFilter(treeId, parentNode, result) {
+	 	
+		// 조회된 하위 조직 목록
+	 	var childNodes = result.list;
+		// filter에서 모든 자식 노드를 부모형(폴더 아이콛)으로 변경한다.
+		// 해당 옵션 추가해야  트리의  [+] 아이콘 클릭 시 한번에 트리가 펼쳐진다. 
+		$.each(childNodes, function(idx, node){
+			// 트리 노드가 부모형이 아닐 경우
+			if(node["type"] == 0){
+				node.isParent = true;
+			}
+			zTreeRep1002.updateNode(node);
+		});
+		// 선택한 노드의 자식 노드를 리턴하면 자동으로 트리에 자식 노드가 추가된다.
+		return childNodes;
+	}
+	
+	/*
+	 * 동적트리 조회 실패시 처리
+	 */
+	function fnAsyncError(event, treeId, treeNode, XMLHttpRequest, textStatus, errorThrown){
+		// 조회 실패 메시지 출력
+	   	toast.push("하위 디렉토리 조회에 실패하였습니다.");
 	}
 	
 	//axisj5 그리드
@@ -624,15 +670,6 @@
 							},
 							searchItem1,
 							searchItem2,
-							{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_print_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-print' aria-hidden='true'></i>&nbsp;<span>프린트</span>",
-								onclick:function(){
-									$(repPopupGrid.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
-							}},
-							
-							{label:"", labelWidth:"", type:"button", width:"55",style:"float:right;", key:"btn_excel_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-file-excel' aria-hidden='true'></i>&nbsp;<span>엑셀</span>",
-								onclick:function(){
-									repPopupGrid.exportExcel("<c:out value='${sessionScope.selMenuNm }'/>.xls");
-							}},
 							{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_svn",style:"float:right;", valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 								onclick:function(){
 									/* 검색 조건 설정 후 reload */
