@@ -20,9 +20,6 @@ var overlapFileChg = {};
 //선택된 소스저장소 데이터 목록
 var selRepData = [];
 
-//티켓 trunk 변경 path 따로 저장
-var tktChgDataList = [];
-
 $(function(){
 	//티켓 변경 파일 목록 조회
 	fnTktChgDataGridSetting();
@@ -46,6 +43,9 @@ $(function(){
 		
 		//중복 개수
 		var overlapCnt = 0;
+
+		//추가 메시지
+		var addMsg = "";
 		
 		//실제 추가되는 row
 		var addDataRow = [];
@@ -56,39 +56,25 @@ $(function(){
 		//변경파일 중복 체크
 		$.each(chkList, function(idx, map){
 			//변경 파일 경로있는지 체크
-			if(overlapFileChg.hasOwnProperty(map.changeFilePath)){
+			if(overlapFileChg.hasOwnProperty(map.filePath)){
+				//해당 경로 빌드 번호
+				var targetBldNum = overlapFileChg[map.filePath];
+				
+				//해당 파일 빌드 번호가 현재 빌드 번호보다 낮은 경우
+				if(targetBldNum < map.bldNum) {
+					addMsg += "</br>["+map.filePath+"] 선택 파일 빌드번호("+map.bldNum+")보다 추가된 파일의 빌드 번호("+targetBldNum+")가 낮습니다. 기존 파일을 제거해주세요.";
+				}
+				//해당 파일 빌드 번호가 현재 빌드 번호보다 높은 경우
+				else if(targetBldNum > map.bldNum) {
+					addMsg += "</br>["+map.filePath+"] 서택 파일 빌드번호("+map.bldNum+")보다 추가된 파일의 빌드 번호("+targetBldNum+")가 더 높습니다. ";
+				}
+				
 				overlapCnt++;
 				return true;
 			}
 
 			map["__selected__"] = false;
-			overlapFileChg[map.changeFilePath] = true;
-			
-			//제일 높은 점수 추출
-			var highScore = 0;
-			//대상 경로
-			var targetFilePath;
-			//대상 리비전
-			var targetRvNum;
-			
-			//변경 티켓 내용중에서 유사한 경로 가져오기
-			$.each(tktChgDataList, function(idx, str){
-				//str 나누기
-				var strArr = str.split("$");
-				var rvNum = strArr[0];
-				var fileChgPath = strArr[1];
-				
-				var score = fnStringPathCheck(map.filePath, fileChgPath);
-				
-				//제일 높은 점수 추출
-				if(score > highScore){
-					highScore = score;
-					targetFilePath = fileChgPath;
-					targetRvNum = rvNum;
-				}
-			});
-			map.targetFilePath = targetFilePath;
-			map.targetRvNum = targetRvNum;
+			overlapFileChg[map.filePath] = map.bldNum;
 			
 			addDataRow.push(map);
 			addDataIdx++;
@@ -97,15 +83,15 @@ $(function(){
 		//alert 메시지
 		var alertAddMsg = "";
 		
-		if(overlapCnt == chkList.length){
-			jAlert("선택된 변경 파일은 이미 추가되있습니다.");
+		if(overlapCnt == chkList.length) {
+			jAlert("선택된 변경 파일은 이미 추가되있습니다."+addMsg);
 			return false;
 		}
-		else if(overlapCnt > 0){
+		else if(overlapCnt > 0) {
 			alertAddMsg = "</br>중복된 "+overlapCnt+"개의 변경파일이 제외되었습니다.";
 		}
 		
-		jAlert("commit 대상 변경 파일이 추가되었습니다."+alertAddMsg);
+		jAlert("commit 대상 변경 파일이 추가되었습니다."+alertAddMsg+addMsg);
 		
 		//변경 파일 추가
 		commitTargetDataGridObj.addRow(addDataRow);
@@ -122,7 +108,7 @@ $(function(){
 		//선택 변경 파일 제거
 		$.each(chkList, function(idx, map){
 			//중복체크 제거
-			delete overlapFileChg[map.changeFilePath];
+			delete overlapFileChg[map.filePath];
 		});
 		
 		//row 삭제
@@ -130,48 +116,45 @@ $(function(){
 	});
 	
 	//전송 버튼
-	$("#repDataCommitBtn").click(function(){
+	$("#selCommitDataCommitBtn").click(function(){
 		
 		var rtnValue = [];
 		
 		//선택한 저장소
-		var selTktFileList = tktChgDataGridObj.getList('selected');
+		var selCommitTargetList = commitTargetDataGridObj.getList();
 		
-		if (gfnIsNull(selTktFileList)) {
+		if (gfnIsNull(selCommitTargetList)) {
 			jAlert("커밋 대상 파일을 선택해주세요.", "알림창");
 			return false;
 		}
-		jConfirm("선택된 파일 "+selTktFileList.length+"개를 커밋하시겠습니까?","알림창", function(result){
+		jConfirm("선택된 파일 "+selCommitTargetList.length+"개를 커밋하시겠습니까?","알림창", function(result){
 			if(result){
 				//필요 값
-				var ticketId = $("form#rep1102Form > #ticketId").val();
 				var empId = $("form#rep1102Form > #empId").val();
 				
 				//저장소 param
 				var returnMap = [];
 				
 				//데이터 세팅
-				$.each(selTktFileList, function(idx, map){
-					//디렉토리인경우 path 모으기
-					
-					var tktFileInfo = {
-						"repId": map.repId
-						, "repRv": map.repRv
-						, "repChgId": map.repChgId
-						, "repChgFilePath": map.repChgFilePath
-						, "repChgFileNm": map.repChgFileNm
+				$.each(selCommitTargetList, function(idx, map){
+					var commitTargetInfo = {
+						"ciId": map.ciId
 						, "ticketId": map.ticketId
-						, "repChgTypeCd": map.repChgTypeCd
-						, "repChgFileKind": map.repChgFileKind
 						, "empId": empId
+						, "jobId": map.jobId
+						, "bldNum": map.bldNum
+						, "filePath": map.filePath
+						, "fileRealPath": map.fileRealPath
+						, "fileTypeNm": map.fileTypeNm
+						, "repId": map.repId
 					};
 					
-					returnMap.push(tktFileInfo);
+					returnMap.push(commitTargetInfo);
 				});
 				
 				//data값 전달 후 해당 파일 커밋
 				var ajaxObj = new gfnAjaxRequestAction(
-					{"url":"<c:url value='/rep/rep1000/rep1100/insertRep1102SelTktFileCommitAjax.do'/>","loadingShow":true}
+					{"url":"<c:url value='/rep/rep1000/rep1100/insertRep1102TargetDataDeployCommitAjax.do'/>","loadingShow":true}
 					,{
 						//컨트롤러 전달 데이터
 						returnMap: JSON.stringify(returnMap),
@@ -196,8 +179,12 @@ $(function(){
 					if(errorYn == "N"){
 						jAlert(data.message+"</br>성공 개수: "+data.succCnt+addMsg, "알림창");
 						
-						//목록 재 조회
-						axdom("#" + tktFileSearchObj.getItemId("btn_search_rep")).click();
+						//선택 rsync결과값 제거
+						rsyncDataGridObj.setData([]);
+						//추가된 대상 파일 목록 제거
+						commitTargetDataGridObj.setData([]);
+						//중복 변수 초기화
+						overlapFileChg = {};
 					}else{
 						jAlert(data.message+addMsg, "알림창");
 						return false;
@@ -222,13 +209,13 @@ function fnTktChgDataGridSetting(){
  
 	tktChgDataGridObj.setConfig({
 		target: $('[data-ax5grid="tktChgDataGridTarget"]'),
-		frozenColumnIndex: 3,
+		/* frozenColumnIndex: 3, */
 		sortable:false,
 		showRowSelector: false,
 		header: {align:"center",columnHeight: 30},
 		columns: [
-			{key: "repNm", label: "저장소 명", width: 260, align: "center"},
-			{key: "repRv", label: "리비전", width: 80, align: "center"} ,
+			{key: "repChgTypeNm", label: "파일 변경 타입", width: 95, align: "center"} ,
+			{key: "repChgFilePath", label: "변경 파일 경로", width: 1000, align: "left"} ,
 			{key: "repChgFileNm", label: "변경 파일명", width: 240, align: "left"} ,
 			{key: "repCmtDate", label: "커밋 일시", width: 135, align: "center"
 				,formatter: function(){
@@ -236,8 +223,9 @@ function fnTktChgDataGridSetting(){
 				}	
 			} ,
 			{key: "repCmtAuthor", label: "커밋 대상자", width: 100, align: "center"} ,
-			{key: "repChgTypeNm", label: "파일 변경 타입", width: 95, align: "center"} ,
-			{key: "repChgFilePath", label: "변경 파일 경로", width: 1000, align: "left"} 
+			{key: "repNm", label: "저장소 명", width: 260, align: "center"},
+			{key: "repRv", label: "리비전", width: 80, align: "center"}
+			 
         ],
         body: {
     		align: "center",
@@ -271,7 +259,7 @@ function fnInGridListSet(_pageNo){
    	}
    	
 	//조회 typeCd 넘기기
-   	ajaxParam += "&repRvTypeCd=02&repChgfileKind=file";
+   	ajaxParam += "&repRvTypeCd=02&repChgfileKind=file&type=all";
 	
    	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
@@ -280,24 +268,8 @@ function fnInGridListSet(_pageNo){
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
 		var list = data.list;
-		var page = data.page;
 		
-	   	tktChgDataGridObj.setData({
-			list:list,
-			page: {
-				currentPage: _pageNo || 0,
-				pageSize: page.pageSize,
-				totalElements: page.totalElements,
-				totalPages: page.totalPages
-			}
-		});
-	   	
-	   	//티켓 변경 파일 경로 재선언
-	   	var temp = [];
-	   	$.each(list, function(idx, map){
-	   		temp.push(map.repRv+"$"+map.repChgFilePath);
-	   	});
-	   	tktChgDataList = temp;
+	   	tktChgDataGridObj.setData(list);
 	});
 	
 	//AJAX 전송
@@ -398,28 +370,32 @@ function fnRsyncDataGridSetting(){
 		showRowSelector: true,
 		header: {align:"center",columnHeight: 30},
 		columns: [
-			{key: "fileKind", label: "파일 변경 타입", width: 95, align: "center",
+			{key: "fileTypeNm", label: "파일 변경 타입", width: 95, align: "center",
 				formatter: function(){
-					var fileKind = this.item.fileKind;
-					var fileKindNm = "-";
+					var fileTypeNm = this.item.fileTypeNm;
+					var fileKindStr = "-";
 					//파일 변경 타입에따라 문자열 구하기
-					if(fileKind == "A"){
-						fileKindNm = "등록"
+					if(fileTypeNm == "A"){
+						fileKindStr = "등록"
 					}
-					else if(fileKind == "M"){
-						fileKindNm = "수정"
+					else if(fileTypeNm == "M"){
+						fileKindStr = "수정"
 					}
-					else if(fileKind == "D"){
-						fileKindNm = "삭제"
+					else if(fileTypeNm == "D"){
+						fileKindStr = "삭제"
 					}
-					return fileKindNm;
+					return fileKindStr;
 				}
 			},
 			{key: "filePath", label: "파일 경로", width: 676, align: "left"},
-      ],
-      body: {
-  		align: "center",
-			columnHeight: 30
+		],
+		body: {
+	  		align: "center",
+			columnHeight: 30,
+			onClick: function () {
+				// 클릭 이벤트
+	  			rsyncDataGridObj.select(this.doindex, {selected: !this.item.__selected__});
+			}
 		},
 	});
 }
@@ -449,33 +425,31 @@ function fnCommitTargetDataGridSetting(){
 
 	commitTargetDataGridObj.setConfig({
 		target: $('[data-ax5grid="selCommitDataGridTarget"]'),
-		frozenColumnIndex: 2, 
+		/* frozenColumnIndex: 2,  */
 		sortable:false,
 		showRowSelector: true,
 		header: {align:"center",columnHeight: 30},
 		columns: [
-			{key: "targetRvNum", label: "대상 소스 리비전 번호", width: 135, align: "center", editor:{"type": "number"}} ,
-			{key: "targetFilePath", label: "대상 소스 파일 경로", width: 400, align: "left", editor:{"type": "text"}} ,
-			{key: "fileKind", label: "파일 변경 타입", width: 95, align: "center",
+			{key: "fileTypeNm", label: "파일 변경 타입", width: 95, align: "center",
 				formatter: function(){
-					var fileKind = this.item.fileKind;
-					var fileKindNm = "-";
+					var fileTypeNm = this.item.fileTypeNm;
+					var fileKindStr = "-";
 					//파일 변경 타입에따라 문자열 구하기
-					if(fileKind == "A"){
-						fileKindNm = "등록"
+					if(fileTypeNm == "A"){
+						fileKindStr = "등록"
 					}
-					else if(fileKind == "M"){
-						fileKindNm = "수정"
+					else if(fileTypeNm == "M"){
+						fileKindStr = "수정"
 					}
-					else if(fileKind == "D"){
-						fileKindNm = "삭제"
+					else if(fileTypeNm == "D"){
+						fileKindStr = "삭제"
 					}
-					return fileKindNm;
+					return fileKindStr;
 				}
 			},
+			{key: "bldNum", label: "빌드 번호", width: 80, align: "center"} ,
 			{key: "filePath", label: "파일 경로", width: 700, align: "left"},
 			{key: "jobId", label: "JOB ID", width: 150, align: "center"} ,
-			{key: "bldNum", label: "빌드 번호", width: 80, align: "center"} 
       ],
       body: {
   			align: "center",
@@ -501,41 +475,6 @@ function fnRep1102GuideShow(){
 	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
 }
 
-//문자열 유사도
-function fnStringPathCheck(str1, str2) {
-    var strArr1 = []
-    var strArr2 = []
-    var intersection = 0;  //교집합 원소 개수
-    var union = 0;  //합집합 원소 개수
-    var check = new RegExp(/[a-z]{2}/);
-    for (let i=0; i<str1.length-1; i++){
-        var str = str1.slice(i,i+2).toLowerCase();
-        if(check.test(str)) {
-            strArr1.push(str)
-        }
-    }
-    for (let i=0; i<str2.length-1; i++){
-    	var str = str2.slice(i,i+2).toLowerCase();
-    	if(check.test(str)) {
-            strArr2.push(str);
-        }
-    }
-    strArr1.sort();
-    strArr2.sort();
-    for (let i=0; i<strArr1.length; i++) {
-        if(strArr2.indexOf(strArr1[i]) >= 0){
-            intersection++;
-            strArr2.splice(strArr2.indexOf(strArr1[i]),1);
-        }
-        union++;
-    }
-    union += strArr2.length;
-    if (union === 0){
-    	return 1
-    }else{
-		return Math.floor((intersection / union)*100)
-    }
-}
 </script>
 
 
@@ -546,12 +485,6 @@ function fnStringPathCheck(str1, str2) {
 		<input type="hidden" name="empId" id="empId" value="${requestScope.empId }"/>
 	</form>
 	<div class="tab_contents menu">
-		<div class="rep1102MainTopFrame">
-			<div class="sub_title">
-				티켓 소스저장소별 Trunk 변경 파일 목록
-			</div>
-			<div data-ax5grid="tktChgDataGridTarget" data-ax5grid-config="{}" style="height: 250px;"></div>
-		</div>
 		<div class="rep1102MainMiddleFrame">
 			<div class="rep1102MiddleLeftFrame">
 				<div class="sub_title">
@@ -570,15 +503,22 @@ function fnStringPathCheck(str1, str2) {
 			<button type="button" class="AXButton" id="selFileChgAddBtn"><i class="fa fa-arrow-alt-circle-down"></i>&nbsp;추가</button>
 			<button type="button" class="AXButton" id="selFileChgDelBtn"><i class="fa fa-arrow-alt-circle-up"></i>&nbsp;제거</button>
 		</div>
-		<div class="rep1102MainBottomFrame">
-			<div class="sub_title">
-				선택 변경 파일
+		<div class="rep1102MainMiddleFrame">
+			<div class="rep1102MiddleLeftFrame">
+				<div class="sub_title">
+					[<c:out value="${requestScope.ticketId}"/>] 티켓 소스저장소별 Trunk 변경 파일 목록
+				</div>
+				<div data-ax5grid="tktChgDataGridTarget" data-ax5grid-config="{}" style="height: 450px;"></div>
 			</div>
-			<div id="tktFileSearchTarget" guide="rep1102button" ></div>
-			<div data-ax5grid="selCommitDataGridTarget" data-ax5grid-config="{}" style="height: 250px;"></div>
+			<div class="rep1102MiddleRightFrame">
+				<div class="sub_title">
+					선택 변경 파일
+				</div>
+				<div data-ax5grid="selCommitDataGridTarget" data-ax5grid-config="{}" style="height: 450px;"></div>
+			</div>
 		</div>
 		<div class="btnFrame">
-			<div class="mainPopupBtn" id="repDataCommitBtn"><i class="fas fa-paperclip"></i>&nbsp;Commit</div>
+			<div class="mainPopupBtn" id="selCommitDataCommitBtn"><i class="fas fa-paperclip"></i>&nbsp;Commit</div>
 			<div class="mainPopupBtn" id="repCloseBtn"><i class="fas fa-times-circle"></i>&nbsp;닫기</div>
 		</div>
 	</div>
