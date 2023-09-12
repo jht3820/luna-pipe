@@ -334,6 +334,10 @@ function fnSelJobBuildInfo(paramBldItem){
 					ciIdStr = (jobBuildInfo.hasOwnProperty("ciId"))?jobBuildInfo["ciId"]:"-";
 					ticketIdStr = (jobBuildInfo.hasOwnProperty("ticketId"))?jobBuildInfo["ticketId"]:"-";
 					dplIdStr = (jobBuildInfo.hasOwnProperty("dplId"))?jobBuildInfo["dplId"]:"-";
+					
+					ciIdStr = (gfnIsNull(ciIdStr))?"-":ciIdStr;
+					ticketIdStr = (gfnIsNull(ticketIdStr))?"-":ticketIdStr;
+					dplIdStr = (gfnIsNull(dplIdStr))?"-":dplIdStr;
 				}catch(e){
 					console.log(e);
 				}
