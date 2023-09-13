@@ -100,15 +100,6 @@
 							            fnRepPopupGridListSet(0,ajaxParam);
 		    						}
 						},
-						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_print_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-print' aria-hidden='true'></i>&nbsp;<span>프린트</span>",
-							onclick:function(){
-								$(repPopupGrid.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
-						}},
-						
-						{label:"", labelWidth:"", type:"button", width:"55",style:"float:right;", key:"btn_excel_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-file-excel' aria-hidden='true'></i>&nbsp;<span>엑셀</span>",
-							onclick:function(){
-								repPopupGrid.exportExcel("<c:out value='${sessionScope.selMenuNm }'/>.xls");
-						}},
 						{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_svn",style:"float:right;", valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 							onclick:function(){
 								/* 검색 조건 설정 후 reload */
