@@ -426,6 +426,8 @@ public class Jen1000Controller {
 	
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1005View.do")
 	public String selectJen1005View( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		String jobParamTicketId = EgovProperties.getProperty("Globals.buildParam.ticketId");
+		model.addAttribute("jobParamTicketId", jobParamTicketId);
 		return "/jen/jen1000/jen1000/jen1005";
 	}
 	
