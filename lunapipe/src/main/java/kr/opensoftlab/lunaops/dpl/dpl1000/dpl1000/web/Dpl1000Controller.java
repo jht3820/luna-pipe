@@ -1,6 +1,7 @@
 
 package kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.web;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,8 @@ import kr.opensoftlab.lunaops.com.vo.PageVO;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.service.Dpl1000Service;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
+import kr.opensoftlab.lunaops.rep.rep1000.rep1000.service.Rep1000Service;
+import kr.opensoftlab.lunaops.rep.rep1000.rep1100.service.Rep1100Service;
 import kr.opensoftlab.sdf.jenkins.NewJenkinsClient;
 import kr.opensoftlab.sdf.jenkins.service.BuildService;
 import kr.opensoftlab.sdf.jenkins.vo.BuildVO;
@@ -62,6 +65,14 @@ public class Dpl1000Controller {
 	@Resource(name = "jen1000Service")
 	private Jen1000Service jen1000Service;
 
+	
+	@Resource(name = "rep1000Service")
+	private Rep1000Service rep1000Service;
+	
+	
+	@Resource(name = "rep1100Service")
+	private Rep1100Service rep1100Service;
+	
 	
 	@Resource(name = "newJenkinsClient")
 	private NewJenkinsClient newJenkinsClient;
@@ -114,11 +125,25 @@ public class Dpl1000Controller {
 			
 			String jobType = OslUtil.jsonGetString(jsonObj, "job_type");
 			
+			
+			String ticketList = OslUtil.jsonGetString(jsonObj, "ticket_list");
+			
+			
+			String eGeneDplId = OslUtil.jsonGetString(jsonObj, "egene_dpl_id");
+			
 			model.addAttribute("ciId", ciId);
 			model.addAttribute("ticketId", ticketId);
 			model.addAttribute("dplId", dplId);
 			model.addAttribute("empId", empId);
 			model.addAttribute("jobType", jobType);
+			model.addAttribute("ticketList", ticketList);
+			model.addAttribute("eGeneDplId", eGeneDplId);
+			
+			
+			String jobParamTicketId = EgovProperties.getProperty("Globals.buildParam.ticketId");
+			String jobParamRevision = EgovProperties.getProperty("Globals.buildParam.revision");
+			model.addAttribute("jobParamTicketId", jobParamTicketId);
+			model.addAttribute("jobParamRevision", jobParamRevision);
 			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -176,33 +201,6 @@ public class Dpl1000Controller {
     		 paramMap.put("buildingChkFlag", "Y");
     		 
     		 
-    		 String paramJobType = (String) paramMap.get("jobType");
-    		 if(paramJobType != null) {
-    			 try {
-    				 
-    				 JSONArray jobTypeArr = new JSONArray(paramJobType);
-    				 
-    				 String jobTypeVal = "";
-    				 
-    				 
-    				 for(int i=0;i<jobTypeArr.length();i++) {
-    					 String jobType = jobTypeArr.getString(i);
-    					 
-    					 if(i > 0) {
-    						 jobTypeVal += ",";
-    					 }
-    					 
-    					 
-    					 jobTypeVal += "'"+jobType+"'";
-    				 }
-    				 
-    				 System.out.println("#####################");
-    	    		 System.out.println(jobTypeVal);
-    			 }catch(Exception e) {
-    				 e.printStackTrace();
-    			 }
-    		 }
-    		 
     		 
     		 List<Map> bldingJobList = dpl1000Service.selectDpl1100DeployJobList(paramMap);
     		 
@@ -224,6 +222,7 @@ public class Dpl1000Controller {
      }
     
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1100DplJobListAjax.do")
     public ModelAndView selectDpl1100DplJobListAjax(@ModelAttribute("dpl1100VO") Dpl1100VO dpl1100VO, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
     	try{
@@ -296,6 +295,9 @@ public class Dpl1000Controller {
         	paginationInfo.setTotalRecordCount(totCnt);
         	
         	model.addAttribute("list", dpl1300List);
+        	
+        	List<Map> jobParamList = dpl1000Service.selectDpl1101JenParameterList(paramMap);
+        	model.addAttribute("jobParamList", jobParamList);
         	
 			
 			Map<String, Integer> pageMap = new HashMap<String, Integer>();
@@ -486,10 +488,16 @@ public class Dpl1000Controller {
 			String jenUsrTok= (String)paramMap.get("jenUsrTok");
 			String jobId= (String)paramMap.get("jobId");
 			String dplTypeCd= (String)paramMap.get("dplTypeCd");
+			String jobTypeCd= (String)paramMap.get("jobTypeCd");
 			String ciId= (String)paramMap.get("ciId");
 			String ticketId= (String)paramMap.get("ticketId");
 			String dplId= (String)paramMap.get("dplId");
 			String empId= (String)paramMap.get("empId");
+			String jobParamList= (String)paramMap.get("jobParamList");
+			
+			
+			String jobParamTicketId = EgovProperties.getProperty("Globals.buildParam.ticketId");
+			String jobParamRevision = EgovProperties.getProperty("Globals.buildParam.revision");
 			
 			
 			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
@@ -529,8 +537,80 @@ public class Dpl1000Controller {
 				return new ModelAndView("jsonView", model);
 			}
 			
-			List<Map> jobParamList = dpl1000Service.selectDpl1101JenParameterList(paramMap);
+			
+			List<Map> newJobParamList = new ArrayList<Map>();
+			
+			
+			if(jobParamList != null && !"".equals(jobParamList)) {
+				try {
+					
+					boolean jobRecentRvCheckFlag = false;
+					
+					JSONArray jobParamArr = new JSONArray(jobParamList);
+					
+					for(int i=0;i<jobParamArr.length();i++) {
+						Map jobParamMap = new HashMap<>();
+						JSONObject jobParamInfo = jobParamArr.getJSONObject(i);
+						
+						
+						if(!jobParamInfo.has("jobParamKey") || !jobParamInfo.has("jobParamVal")) {
+							
+							continue;
+						}
+						
+						
+						String jobParamKey = jobParamInfo.getString("jobParamKey");
+						String jobParamVal = jobParamInfo.getString("jobParamVal");
+						
+						
+						jobParamMap.put("jobParamKey", jobParamKey);
+
+						
+						if("04".equals(jobTypeCd) && jobParamRevision.equals(jobParamKey)) {
+							if(jobParamVal == null || "".equals(jobParamVal)) {
+								jobParamVal = "-1";
+							}
+							
+							
+							jobRecentRvCheckFlag = true;
+						}
+						
+						jobParamMap.put("jobParamVal", jobParamVal);						
+						
+						newJobParamList.add(jobParamMap);
+					}
+					
+					
+					if("04".equals(jobTypeCd)) {
+						Map jobParamMap = new HashMap<>();
+						
+						jobParamMap.put("jobParamKey", jobParamTicketId);
+						jobParamMap.put("jobParamVal", ticketId);
+						
+						newJobParamList.add(jobParamMap);
+						
+						
+						if(!jobRecentRvCheckFlag) {
+							
+							jobParamMap = new HashMap<>();
+							
+							jobParamMap.put("jobParamKey", jobParamRevision);
+							jobParamMap.put("jobParamVal", "-1");
+							
+							newJobParamList.add(jobParamMap);
+						}
+					}
+				}catch(Exception e) {
+					e.printStackTrace();
+					
+					model.addAttribute("errorYn", "Y");
+					model.addAttribute("message", "파라미터 설정 중 오류가 발생했습니다.");
+					return new ModelAndView("jsonView", model);
+				}
+			}
    		 
+			
+			
 			
 			BuildVO buildVo = new BuildVO();
 			buildVo.setJenId(jenId);
@@ -540,16 +620,16 @@ public class Dpl1000Controller {
 			buildVo.setJobId(jobId);
 			buildVo.setDplTypeCd(dplTypeCd);
 			buildVo.setJenStatusVo(jenStatusVo);
-			buildVo.setJobParamList(jobParamList);
 			buildVo.setCiId(ciId);
 			buildVo.setTicketId(ticketId);
 			buildVo.setDplId(dplId);
 			buildVo.setBldStartUsrId(empId);
 			buildVo.setBldStartUsrIp(request.getRemoteAddr());
+			buildVo.setJobParamList(newJobParamList);
 			
 			
 			buildVo.addBldActionLog(jobId+" JOB 빌드를 준비 중입니다.");
-			
+
 			
 			BuildVO rtnBuildVo = buildService.insertJobBuildAction(buildVo);
 			
@@ -561,7 +641,7 @@ public class Dpl1000Controller {
 			
 			model.addAttribute("bldActionLog", rtnBuildVo.getBldActionLog());
 			model.addAttribute("bldNum", rtnBuildVo.getBldNum());
-			
+
 			
 			model.addAttribute("errorYn", "N");
 			model.addAttribute("message", egovMessageSource.getMessage("success.deploy.build"));
@@ -585,6 +665,10 @@ public class Dpl1000Controller {
 		try{
 			
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			
+			paramMap.remove("ciId");
+			paramMap.remove("ticketId");
 			
 			
 			Map jobMap = jen1000Service.selectJen1100JobInfo(paramMap);
