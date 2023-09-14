@@ -54,13 +54,29 @@ var jobBuildingConsoleLog = '';
 var ciId = '<c:out value="${requestScope.ciId}"/>';
 var ticketId = '<c:out value="${requestScope.ticketId}"/>';
 var dplId = '<c:out value="${requestScope.dplId}"/>';
+
+//운영빌드에 사용되는 파라미터 key값
+var jobParamTicketId = '<c:out value="${requestScope.jobParamTicketId}"/>';
+var jobParamRevision = '<c:out value="${requestScope.jobParamRevision}"/>';
+
+//job type 조건
 var jobType = "";
+//운영 배포 티켓 목록
+var ticketList = "";
+//운영 배포 E-GENE 배포계획 ID
+var eGeneDplId = "";
 
 //console timer
 var consoleTimer;
 
+//JOB 빌드 파라미터
+var ADD_JOB_PARAM_LIST = {};
+
 $(document).ready(function() {
 	jobType = $("form#dpl1000Form #jobType").val();
+	ticketList = $("form#dpl1000Form #ticketList").val();
+	eGeneDplId = $("form#dpl1000Form #eGeneDplId").val();
+	
 	/* 
 	//모니터링 메시지 출력
 	fnJobAutoCheckMsgChg(true);
@@ -127,10 +143,42 @@ $(document).ready(function() {
 			toast.push('실행(빌드)하려는 JOB을 선택해주세요.');
 			return;
 		}
+		var addMsg = "";
 		
-		jConfirm("선택 JOB("+item.jobId+")을 수동 실행 하시겠습니까?","알림창",
+		//선택 JOB이 운영빌드일때
+		if(item.jobTypeCd == "04"){
+			//파라미터 체크 진행했는지
+			var paramCheckFlag = false;
+			
+			//JOB 파라미터에 리비전 값 입력됬는지 체크
+			var targetJobParam = ADD_JOB_PARAM_LIST[item.jenId][item.jobId];
+			$.each(targetJobParam, function(idx, map){
+				if(map.jobParamKey == jobParamRevision){
+					//값 입력 체크
+					if(gfnIsNull(map.jobParamVal)){
+						addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br>";
+					}
+					paramCheckFlag = true;
+					return false;
+				}
+			});
+			
+			//파라미터 체크 안된 경우
+			if(!paramCheckFlag){
+				addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br>";
+			}
+		}
+		//JOB이 운영 배포인경우 배포계획ID, 티켓목록 체크
+		else if(item.jobTypeCd == "05"){
+			if(gfnIsNull(ticketList) || gfnIsNull(eGeneDplId)){
+				jAlert("운영배포 실행에 필요한 정보가 없습니다.(필요 데이터: 배포계획ID, 티켓 목록)", "알림");
+				return true;
+			}
+		}
+		
+		jConfirm(addMsg+"선택 JOB("+item.jobId+")을 수동 실행 하시겠습니까?","알림창",
 			function(result) {
-				if (result) {
+				if (result) {					
 					//수동배포 시작
 					fnDplStart(item);
 					return;
@@ -341,7 +389,7 @@ function fnJobBuildResultStatus(targetJobInfo){
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
 		if(data.errorYn == "Y"){
-			jAlert("빌드 정보 조회 중 오류가 발생했습니다.</br>페이지를 새로고침해주세요.</br></br>[Message]</br>"+data.message);
+			//jAlert("빌드 정보 조회 중 오류가 발생했습니다.</br>페이지를 새로고침해주세요.</br></br>[Message]</br>"+data.message);
 			return false;
 		}
 		
@@ -671,6 +719,25 @@ function fnInGridListSet(_pageNo,ajaxParam){
 			}
 		});
 	   	
+		// jobParamList가 있는 경우 세팅
+	   	if(data.hasOwnProperty("jobParamList") && data.jobParamList != null && data.jobParamList.length > 0){
+	   		$.each(data.jobParamList, function(idx, map){
+	   			//jenId있는지 체크
+	   			if(!ADD_JOB_PARAM_LIST.hasOwnProperty(map["jenId"])){
+	   				ADD_JOB_PARAM_LIST[map["jenId"]] = {};
+	   			}
+	   			
+	   			//jobId있는지 체크
+	   			if(!ADD_JOB_PARAM_LIST[map["jenId"]].hasOwnProperty(map["jobId"])){
+	   				ADD_JOB_PARAM_LIST[map["jenId"]][map["jobId"]] = [];
+	   			}
+	   			ADD_JOB_PARAM_LIST[map["jenId"]][map["jobId"]].push({
+	   				"jobParamKey": map["jobParamKey"],
+	   				"jobParamVal": map["jobParamVal"]
+	   			});
+	   		});
+	   	}
+	  
 	   	//로그 초기화
 		$("#buildConsoleLog").text("-");
 	});
@@ -728,6 +795,33 @@ function fnDplJobSearchSetting() {
 									}
 								},
 								{label : "",labelWidth : "",type : "selectBox",width : "100",key : "searchCd",addClass : "selectBox",valueBoxStyle : "padding-left:0px;",value : "01",options : []},
+								{label:"", labelWidth:"", type:"button", width:"125", key:"btn_update_job_param",style:"float:right;",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-indent' aria-hidden='true'></i>&nbsp;<span>빌드 파라미터 입력</span>",
+									onclick:function(){
+										var selJobList = dplJobGrid.getList('selected');
+										if (gfnIsNull(selJobList)) {
+											jAlert("선택된 JOB이 없습니다.", "알림창");
+											return false;
+										}
+										if(selJobList.length > 1){
+											jAlert("1개의 JOB만 선택해주세요.", "알림창");
+											return false;
+										}
+										
+										var data = {
+												"jenId" : selJobList[0].jenId,
+												"jenUrl" : selJobList[0].jenUrl,
+												"jobUrl" : selJobList[0].jobUrl,
+												"jobId" : selJobList[0].jobId,
+												"jenUsrId" : selJobList[0].jenUsrId,
+												"jenUsrTok" : selJobList[0].jenUsrTok,
+												"jobTok" : selJobList[0].jobTok,
+												"jobTypeCd": selJobList[0].jobTypeCd 
+										};
+										
+										// 빌드 파라미터 팝업 호출
+										gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1005View.do',data,"840","300",'scroll');
+										
+								}},
 								{label : "",labelWidth : "",type : "button",width : "55",key : "btn_search_dlp",style : "float:right;",valueBoxStyle : "padding:5px;",value : "<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 									onclick : function() {
 										/* 검색 조건 설정 후 reload */
@@ -800,6 +894,23 @@ function fnDplStart(item){
 	//item에 emp_id 넣기
 	var empId = $("form#dpl1000Form > #empId").val();
 	item["empId"] = empId;
+	
+	var jobParamList = [];
+	
+	//job param 넣기
+	if(ADD_JOB_PARAM_LIST.hasOwnProperty(item.jenId) && ADD_JOB_PARAM_LIST[item.jenId].hasOwnProperty(item.jobId)){
+		jobParamList = ADD_JOB_PARAM_LIST[item.jenId][item.jobId];
+	}
+	item["jobParamList"] = JSON.stringify(jobParamList);
+	
+	//운영 배포인경우 배포계획 ID, 티켓 목록 세팅
+	if(item.jobTypeCd == "05"){
+		item["ticketList"] = JSON.stringify(ticketList);
+		item["eGeneDplId"] = JSON.stringify(eGeneDplId);
+		console.log(item);
+		//test
+		return true;
+	}
 	
 	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
@@ -1066,6 +1177,8 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 		<form name="dpl1000Form" id="dpl1000Form">
 			<input type="hidden" name="empId" id="empId" value="<c:out value="${requestScope.empId}"/>"/>
 			<input type="hidden" name="jobType" id="jobType" value="<c:out value="${requestScope.jobType}"/>"/>
+			<input type="hidden" name="ticketList" id="ticketList" value="<c:out value="${requestScope.ticketList}"/>"/>
+			<input type="hidden" name="eGeneDplId" id="eGeneDplId" value="<c:out value="${requestScope.eGeneDplId}"/>"/>
 		</form>
 		<div id="dplJobSearch" style="border-top: 1px solid #ccc;" guide="dpl1000DplJobBtn"></div>
 		<br />
