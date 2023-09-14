@@ -294,8 +294,12 @@
 		    AND A.CI_ID = #ciId#
 		    AND A.TICKET_ID = #ticketId#
 		    AND A.DPL_ID = #dplId#
-		    AND A.JEN_ID = #jenId#
-		    AND A.JOB_ID = #jobId#
+		    <isNotEmpty property="jenId">
+			    AND A.JEN_ID = #jenId#
+		    </isNotEmpty>
+		    <isNotEmpty property="jobId">
+			    AND A.JOB_ID = #jobId#
+		    </isNotEmpty>
 	</sql>
 	
 	<sql id="selectDpl1102List">
