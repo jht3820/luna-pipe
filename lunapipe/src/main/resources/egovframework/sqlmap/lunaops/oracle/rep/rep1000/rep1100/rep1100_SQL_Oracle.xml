@@ -549,6 +549,21 @@
 		AND REP_ID = #repId#
 		AND REP_RV = #repRv#
 		AND REP_CHG_ID = #repChgId#
-		
 	</update>
+	    
+    
+    <select id="rep1100DAO.selectRep1100TktChgMaxRv" parameterClass="java.util.Map"  resultClass="java.lang.Integer">
+	    
+	    	SELECT T1.*
+			FROM
+			(
+				SELECT MAX(A.REP_RV) AS MAX_REP_RV
+				FROM REP1101 A
+				INNER JOIN REP1100 B ON (A.REP_ID = B.REP_ID AND A.TICKET_ID = B.TICKET_ID AND A.REP_RV = B.REP_RV)
+				WHERE 1=1
+				AND A.TICKET_ID = #ticketId#
+				AND A.REP_ID = #repId#
+				AND B.REP_RV_TYPE_CD = '02'
+			) T1
+    </select>
 </sqlMap>
