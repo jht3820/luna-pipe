@@ -40,8 +40,8 @@
 
 .layer_popup_box .pop_left, .layer_popup_box .pop_right { height: 54px; }
 .button_normal { width: 39px; height: 22px; line-height: 22px; text-align: center; font-weight: bold; font-size: 1em; border-radius: 5px; box-shadow: 1px 1px 1px #ccd4eb; margin: 0 auto; border: 1px solid #b8b8b8; cursor: pointer; }
-div.pop_sub .pop_left {width:28%;} 
-div.pop_sub .pop_right {width:72%;} 
+div.pop_sub .pop_left {width:28%;} /* common.css pop_left width값 오버라이딩 */
+div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이딩 */
 .input_txt {padding-left: 5px;}
 
 .popup.jen1005-popup .job-parameter-div{
@@ -58,6 +58,9 @@ div.pop_sub .pop_right {width:72%;}
 .popup.jen1005-popup .pop_menu_row .pop_menu_col1>label{text-overflow: ellipsis;overflow: hidden;white-space: nowrap;}
 .popup.jen1005-popup .pop_menu_row .pop_menu_col2{width: 65% !important;}
 .popup.jen1005-popup .param-no-data{display: inline-block;height: 140px;line-height: 140px;font-size: 14px;text-align: center;font-weight: bold;}
+.popup.jen1005-popup .job-parameter-div .input_note {
+    height: 90px;
+}
 </style>
 <script type="text/javascript">
 	var jen1005ParamList = [];
@@ -71,8 +74,9 @@ div.pop_sub .pop_right {width:72%;}
 		var jenUsrId = 	'<c:out value="${param.jenUsrId}" />';
 		var jenUsrTok = '<c:out value="${param.jenUsrTok}" />';
 		var jobTok = 	'<c:out value="${param.jobTok}" />';
+		var jobTypeCd = 	'<c:out value="${param.jobTypeCd}" />';
 		
-		
+		//jenId 있는지 체크
 		if(!ADD_JOB_PARAM_LIST.hasOwnProperty(jenId)){
 			ADD_JOB_PARAM_LIST[jenId] = {};
 		}
@@ -88,21 +92,29 @@ div.pop_sub .pop_right {width:72%;}
 				"jobTok" : jobTok
 		}
 		
-		
+		//AJAX 설정
 		var ajaxObj = new gfnAjaxRequestAction(
 				{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000JobParameter.do'/>","loadingShow":true}
 				, jobParamMap );
-		
+		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
 			if(data.MSG_CD=="JENKINS_OK"){
-				
+				//jobParamList 세팅
 				var jobParamList = data.list;
 				if(!gfnIsNull(jobParamList)){
-					
+					// html
 					var paramHtml = "";
 					
+					//popup height
+					var popupHeight = 0;
 					
+					//항목 개수
+					var paramDivCnt = 0;
+					
+					//이전 데이터가 있으면 값 채우기
 					$.each(jobParamList,function(idx, map){
+						var paramDivNum = 1;
+						
 						if(!gfnIsNull(jen1005ParamList)){
 							$.each(jen1005ParamList,function(idx, map2){
 								if(map.jobParamKey == map2.jobParamKey){
@@ -110,6 +122,14 @@ div.pop_sub .pop_right {width:72%;}
 									return false;
 								}
 							});
+						}
+						
+						//추가되는 height
+						var addHeight = 0;
+						
+						//height 추가
+						if((idx%2) == 0){
+							addHeight = 48;
 						}
 						
 						var paramValue = map.jobParamVal;
@@ -124,7 +144,7 @@ div.pop_sub .pop_right {width:72%;}
 						}
 						
 						if(map.jobParamType == "choice"){
-							
+							// 셀렉트박스
 							var choiceList = map.choiceList;
 							paramHtml += 	 '<div class="pop_menu_row">'
 											+'	<div class="pop_menu_col1" title="'+map.jobParamKey+'"><label for="'+map.jobParamKey+'">'+map.jobParamKey+'</label></div>'
@@ -151,7 +171,7 @@ div.pop_sub .pop_right {width:72%;}
 								chkHtml = "checked";
 							}
 							
-							
+							//체크박스
 							paramHtml += 	 '<div class="pop_menu_row">'
 											+'	<div class="pop_menu_col1" title="'+map.jobParamKey+'" ><label for="'+map.jobParamKey+'">'+map.jobParamKey+'</label></div>'
 											+'	<div class="pop_menu_col2 pop_oneRow_col2 jobChk">'
@@ -159,34 +179,59 @@ div.pop_sub .pop_right {width:72%;}
 											+'		<label for="'+map.jobParamKey+'"></label>'
 											+'	</div>'
 											+'</div>';
-						}else{
+						}
+						else if(map.jobParamType == "text"){
+							//text 추가하는데 홀수인경우 빈영역 추가
+							if(paramDivCnt > 0 && (paramDivCnt % 2) != 0){
+								paramHtml += 	 '<div class="pop_menu_row">'
+												+'	<div class="pop_menu_col1"></div>'
+												+'	<div class="pop_menu_col2 pop_oneRow_col2"></div>'
+												+'</div>';
+							}
+							paramDivNum = 2;
+							addHeight = 120;
 							
+							//문자열
+							paramHtml += 	 '<div class="pop_note">'
+											+'	<div class="note_title" title="'+map.jobParamKey+'"><label for="'+map.jobParamKey+'">'+map.jobParamKey+'</label></div>'
+											+'	<textarea class="input_note" title="'+map.jobParamKey+'" name="'+map.jobParamKey+'" id="'+map.jobParamKey+'" rows="3" value="" maxlength="2000" placeholder="'+defaultVal+'">'+paramValue+'</textarea>'
+											+'</div>';
+						
+						}else{
+							var readonlyStr = "";
+							//job이 운영 빌드일 때
+							if(!gfnIsNull(jobTypeCd) && jobTypeCd == "04"){
+								//key값이 ticket_id, recent_rv이면 input skip
+								if(map.jobParamKey == '<c:out value="${requestScope.jobParamTicketId}"/>'){
+									return true;
+									//readonlyStr = "readonly=\"readonly\"";
+								}
+							}
+							//문자열
 							paramHtml += 	 '<div class="pop_menu_row">'
 											+'	<div class="pop_menu_col1" title="'+map.jobParamKey+'"><label for="'+map.jobParamKey+'">'+map.jobParamKey+'</label></div>'
 											+'	<div class="pop_menu_col2 pop_oneRow_col2">'
-											+'		<input type="text" title="'+map.jobParamKey+'" class="input_txt" name="'+map.jobParamKey+'" id="'+map.jobParamKey+'" placeholder="'+defaultVal+'" value="'+paramValue+'" maxlength="500" />'
+											+'		<input type="text" title="'+map.jobParamKey+'" class="input_txt" name="'+map.jobParamKey+'" id="'+map.jobParamKey+'" placeholder="'+defaultVal+'" value="'+paramValue+'" maxlength="500" '+readonlyStr+'/>'
 											+'	</div>'
 											+'</div>';
 						}
 						
-						
-					})
+						//팝업 크기 추가
+						popupHeight += addHeight;
+						//항목 개수 추가
+						paramDivCnt += paramDivNum;
+					});
 					
-					
+					//팝업사이즈 조절
 					var listLength = jobParamList.length;
 					var targetHeight;
 
-					if(listLength%2==1){
-						$('.layer_popup_box[layerurl="/jen/jen1000/jen1000/selectJen1005View.do"]').height(46*((listLength+1)/2) + 158);
-					}else{
-						$('.layer_popup_box[layerurl="/jen/jen1000/jen1000/selectJen1005View.do"]').height(46*(listLength/2) + 158);
-					}
+					$('.layer_popup_box[layerurl="/jen/jen1000/jen1000/selectJen1005View.do"]').height(popupHeight + 158);
 					
-					if(listLength>10){
-						$('.layer_popup_box[layerurl="/jen/jen1000/jen1000/selectJen1005View.do"]').height(385);
+					if(popupHeight > 780){
+						$('.layer_popup_box[layerurl="/jen/jen1000/jen1000/selectJen1005View.do"]').height(780);
 					}
-					
-					if( (jobParamList.length % 2) != 0){
+					if( (paramDivCnt % 2) != 0){
 						paramHtml += 	 '<div class="pop_menu_row">'
 										+'	<div class="pop_menu_col1"></div>'
 										+'	<div class="pop_menu_col2 pop_oneRow_col2"></div>'
@@ -198,7 +243,7 @@ div.pop_sub .pop_right {width:72%;}
 					ADD_JOB_PARAM_LIST[jenId][jobId] = jobParamList;
 					
 				}else{
-					
+					//파라미터가 없는 경우 html
 					var paramHtml = "<span class='param-no-data'>빌드 파라미터가 없습니다.</span>";
 					$("#btnPopJen1005Select").hide();
 					$("#jobParameterDiv").html(paramHtml);
@@ -215,11 +260,11 @@ div.pop_sub .pop_right {width:72%;}
 
 		});
 		
-		
+		//AJAX 전송
 		ajaxObj.send();
 		
 		
-		
+		//선택 버튼 클릭
 		$('#btnPopJen1005Select').click(function() {
 			if(!gfnIsNull(jen1005ParamList)){
 				$.each(jen1005ParamList,function(idx, map){
@@ -235,11 +280,11 @@ div.pop_sub .pop_right {width:72%;}
 				});
 				ADD_JOB_PARAM_LIST[jenId][jobId] = jen1005ParamList;
 			}
-			
+			//팝업 창 닫기
 			gfnLayerPopupClose();
 		});
 		
-		
+		/* 취소 */
 		$('#btnPopJen1005Cancle').click(function() {
 			gfnLayerPopupClose();
 		});
