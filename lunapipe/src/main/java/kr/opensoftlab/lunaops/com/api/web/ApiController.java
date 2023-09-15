@@ -758,4 +758,107 @@ public class ApiController {
 		}
 		return new ModelAndView("jsonView");
 	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value="/api/insertRepFileLock", method=RequestMethod.POST)
+	public ModelAndView insertRepFileLock(@RequestBody HashMap<String, Object> paramMap, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			paramMap.put("regUsrIp", request.getRemoteAddr());
+			Map rtnMap = apiService.insertPostRepFileLock(paramMap);
+			
+			model.addAllAttributes(rtnMap);
+		}catch(Exception ex){
+			model.addAttribute("result", "ERROR");
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+			Log.error("insertRepFileLock()", ex);
+			
+		}
+		return new ModelAndView("jsonView");
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value="/api/insertRepFileLock", method=RequestMethod.GET)
+	public ModelAndView insertRepFileLock(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+
+			
+			Map rtnMap = apiService.insertGetRepFileLock(paramMap);
+			if(rtnMap == null) {
+				
+				response.setStatus(500);
+				model.addAttribute("result", "FAIL");
+				model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+				model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+				return new ModelAndView("jsonView");
+			}
+			
+			boolean result = (boolean) rtnMap.get("result");
+			
+			String errorCode = (String) rtnMap.get("error_code");
+			
+			if(!result) {
+				response.setStatus(500);
+				model.addAttribute("result", "FAIL");
+				model.addAttribute("error_code", errorCode);
+				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
+			}else {
+				response.setStatus(200);
+				model.addAttribute("result", "SUCCESS");
+				
+				model.addAttribute("msg", "정상적으로 처리되었습니다.");
+			}
+		}catch(Exception ex){
+			response.setStatus(500);
+			ex.printStackTrace();
+			model.addAttribute("result", "ERROR");
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+			Log.error("insertRepFileLock()", ex);
+		}
+		return new ModelAndView("jsonView");
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value="/api/insertRepFileUnLock", method=RequestMethod.POST)
+	public ModelAndView insertRepFileUnLock(@RequestBody HashMap<String, Object> paramMap, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			paramMap.put("regUsrIp", request.getRemoteAddr());
+			Map rtnMap = apiService.insertRepFileUnLock(paramMap);
+			
+			model.addAllAttributes(rtnMap);
+		}catch(Exception ex){
+			model.addAttribute("result", "ERROR");
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+			Log.error("insertRepFileUnLock()", ex);
+			
+		}
+		return new ModelAndView("jsonView");
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value="/api/selectRepFileLockList", method=RequestMethod.POST)
+	public ModelAndView selectRepFileLockList(@RequestBody HashMap<String, Object> paramMap, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map rtnMap = apiService.selectRepFileLockList(paramMap);
+			
+			model.addAllAttributes(rtnMap);
+		}catch(Exception ex){
+			model.addAttribute("result", "ERROR");
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+			Log.error("selectRepFileLockList()", ex);
+		}
+		return new ModelAndView("jsonView");
+	}
 }
