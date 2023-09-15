@@ -1,6 +1,7 @@
 package kr.opensoftlab.lunaops.jen.jen1000.jen1000.web;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -138,6 +139,13 @@ public class Jen1000Controller {
 				eGeneUrl = eGeneUrl + "/";
 			}
 			
+			
+			String salt = EgovProperties.getProperty("Globals.data.salt");
+			
+			
+			String jsonParam = "{key: '"+salt+"', webhook_type_cd: '02', emp_id: '"+empId+"', current_date: '"+new Date().getTime()+"'}";
+			String enParam = CommonScrty.encryptedAria(jsonParam, salt);
+			
 			model.addAttribute("ciId", ciId);
 			model.addAttribute("apiId", apiId);
 			model.addAttribute("svcId", svcId);
@@ -147,6 +155,7 @@ public class Jen1000Controller {
 			model.addAttribute("callbakApiId", callbakApiId);
 			model.addAttribute("jobIdList", jobIdList);
 			model.addAttribute("addSalt", addSalt);
+			model.addAttribute("webhookDataKey", enParam);
 			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -427,7 +436,9 @@ public class Jen1000Controller {
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1005View.do")
 	public String selectJen1005View( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		String jobParamTicketId = EgovProperties.getProperty("Globals.buildParam.ticketId");
+		String jobParamRevision = EgovProperties.getProperty("Globals.buildParam.revision");
 		model.addAttribute("jobParamTicketId", jobParamTicketId);
+		model.addAttribute("jobParamRevision", jobParamRevision);
 		return "/jen/jen1000/jen1000/jen1005";
 	}
 	
