@@ -1,5 +1,6 @@
 package kr.opensoftlab.lunaops.rep.rep1000.rep1000.web;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,6 +141,13 @@ public class Rep1000Controller {
 				eGeneUrl = eGeneUrl + "/";
 			}
 			
+			
+			String salt = EgovProperties.getProperty("Globals.data.salt");
+			
+			
+			String jsonParam = "{key: '"+salt+"', webhook_type_cd: '01', emp_id: '"+empId+"', current_date: '"+new Date().getTime()+"'}";
+			String enParam = CommonScrty.encryptedAria(jsonParam, salt);
+			
 			model.addAttribute("ciId", ciId);
 			model.addAttribute("apiId", apiId);
 			model.addAttribute("svcId", svcId);
@@ -148,6 +156,8 @@ public class Rep1000Controller {
 			model.addAttribute("eGeneUrl", eGeneUrl);
 			model.addAttribute("callbakApiId", callbakApiId);
 			model.addAttribute("repIdList", repIdList);
+			model.addAttribute("webhookDataKey", enParam);
+			
 		}catch(Exception e) {
 			Log.error(e);
 			e.printStackTrace();
