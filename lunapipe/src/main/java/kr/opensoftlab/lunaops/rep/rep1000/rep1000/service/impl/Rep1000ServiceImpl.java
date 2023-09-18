@@ -12,6 +12,7 @@ import egovframework.com.cmm.service.EgovProperties;
 import egovframework.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import kr.opensoftlab.lunaops.rep.rep1000.rep1000.service.Rep1000Service;
 import kr.opensoftlab.lunaops.rep.rep1000.rep1000.vo.Rep1000VO;
+import kr.opensoftlab.lunaops.whk.whk1000.whk1000.service.Whk1000Service;
 import kr.opensoftlab.sdf.rep.com.vo.RepVO;
 import kr.opensoftlab.sdf.util.CommonScrty;
 
@@ -22,7 +23,9 @@ public class Rep1000ServiceImpl extends EgovAbstractServiceImpl implements Rep10
 	
 	@Resource(name="rep1000DAO")
     private Rep1000DAO rep1000DAO;
-	
+
+	@Resource(name = "whk1000Service")
+	private Whk1000Service whk1000Service;
 	
 	
 	@Override
@@ -47,6 +50,9 @@ public class Rep1000ServiceImpl extends EgovAbstractServiceImpl implements Rep10
 	public Object saveRep1000Info(Map<String, String> paramMap) throws Exception{
 		String insNewRepId ="";
 		int result = 0;
+		
+		
+		String empId = (String)paramMap.get("empId");
 		
 		
 		String popupGb = (String)paramMap.get("popupGb");
@@ -117,6 +123,9 @@ public class Rep1000ServiceImpl extends EgovAbstractServiceImpl implements Rep10
 		
 		if("insert".equals(popupGb)){			
 			insNewRepId = rep1000DAO.insertRep1000Info( paramMap);
+
+			
+			whk1000Service.insertWhk1000SendData("01", "01", insNewRepId, null, empId);
 			
 			return insNewRepId;
 			
@@ -136,6 +145,12 @@ public class Rep1000ServiceImpl extends EgovAbstractServiceImpl implements Rep10
 			}
 			
 			result = rep1000DAO.updateRep1000Info(paramMap);
+			if(result > 0) {
+				String repId = (String) paramMap.get("repId");
+				
+				
+				whk1000Service.insertWhk1000SendData("01", "02", repId, null, empId);
+			}
 			return result;
 		}
 		return null;
@@ -155,6 +170,12 @@ public class Rep1000ServiceImpl extends EgovAbstractServiceImpl implements Rep10
 		
 		
 		rep1000DAO.deleteRep1001RepInfo(paramMap);
+		
+		String repId = (String) paramMap.get("repId");
+		String empId = (String) paramMap.get("empId");
+		
+		
+		whk1000Service.insertWhk1000SendData("01", "02", repId, null, empId);
 	}
 	
 	
@@ -170,6 +191,7 @@ public class Rep1000ServiceImpl extends EgovAbstractServiceImpl implements Rep10
 		if(paramRepIds != null) {
 			for(Map paramRepMap : paramRepIds) {
 				String repId = (String) paramRepMap.get("repId");
+				String empId = (String) paramRepMap.get("empId");
 				
 				Map newMap = new HashMap<>();
 				newMap.put("repId", repId);
@@ -179,6 +201,9 @@ public class Rep1000ServiceImpl extends EgovAbstractServiceImpl implements Rep10
 				
 				rep1000DAO.deleteRep1001RepInfo(newMap);
 				delCount++;
+				
+				
+				whk1000Service.insertWhk1000SendData("01", "03", repId, null, empId);
 			}
 		}
 		return delCount;
