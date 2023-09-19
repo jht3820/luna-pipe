@@ -18,6 +18,10 @@ public interface Whk1000Service {
 	
 	@SuppressWarnings({"rawtypes"})
 	List<Map> selectWhk1000List(Map paramMap) throws Exception;
+
+	
+	@SuppressWarnings({"rawtypes"})
+	int selectWhk1000ListCnt(Map paramMap) throws Exception;
 	
 	
 	@SuppressWarnings({"rawtypes"})
@@ -37,4 +41,11 @@ public interface Whk1000Service {
 	
 	
 	void deleteWhk1001Info(Map<String, String> paramMap) throws Exception;
+	
+	
+	void deleteWhk1000List(Map<String, Object> paramMap) throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	Map insertWhk1000SendData(String paramWhkTypeCd, String paramWhkChgTypeCd, String paramKey1, String paramKey2, String empId) throws Exception;
 }

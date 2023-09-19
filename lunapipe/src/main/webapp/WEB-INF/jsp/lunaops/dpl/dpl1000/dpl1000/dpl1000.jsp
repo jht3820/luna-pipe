@@ -150,23 +150,29 @@ $(document).ready(function() {
 			//파라미터 체크 진행했는지
 			var paramCheckFlag = false;
 			
-			//JOB 파라미터에 리비전 값 입력됬는지 체크
-			var targetJobParam = ADD_JOB_PARAM_LIST[item.jenId][item.jobId];
-			$.each(targetJobParam, function(idx, map){
-				if(map.jobParamKey == jobParamRevision){
-					//값 입력 체크
-					if(gfnIsNull(map.jobParamVal)){
-						addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br>";
-					}
-					paramCheckFlag = true;
-					return false;
-				}
-			});
-			
-			//파라미터 체크 안된 경우
-			if(!paramCheckFlag){
+			//운영빌드 파라미터 있는지 체크
+			if(!ADD_JOB_PARAM_LIST.hasOwnProperty(item.jenId) || !ADD_JOB_PARAM_LIST[item.jenId].hasOwnProperty(item.jobId)){
 				addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br>";
+			}else{
+				//JOB 파라미터에 리비전 값 입력됬는지 체크
+				var targetJobParam = ADD_JOB_PARAM_LIST[item.jenId][item.jobId];
+				$.each(targetJobParam, function(idx, map){
+					if(map.jobParamKey == jobParamRevision){
+						//값 입력 체크
+						if(gfnIsNull(map.jobParamVal)){
+							addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br>";
+						}
+						paramCheckFlag = true;
+						return false;
+					}
+				});
+				
+				//파라미터 체크 안된 경우
+				if(!paramCheckFlag){
+					addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br>";
+				}
 			}
+			
 		}
 		//JOB이 운영 배포인경우 배포계획ID, 티켓목록 체크
 		else if(item.jobTypeCd == "05"){
@@ -614,7 +620,7 @@ function fnAxGrid5View(){
                		fnJobBuildResultStatus(this.item);
                 },onDBLClick:function(){
                 	// 더블클릭 시 상세보기
-					var data = {"jenId": this.item.jenId, "jobId": this.item.jobId};
+					var data = {"jenId": this.item.jenId, "jobId": this.item.jobId, "jobTypeCd": this.item.jobTypeCd};
 					gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1004JobDetailView.do',data,"1200", "870",'scroll');
                 }
             },
@@ -731,9 +737,17 @@ function fnInGridListSet(_pageNo,ajaxParam){
 	   			if(!ADD_JOB_PARAM_LIST[map["jenId"]].hasOwnProperty(map["jobId"])){
 	   				ADD_JOB_PARAM_LIST[map["jenId"]][map["jobId"]] = [];
 	   			}
+	   			
+	   			var jobParamVal = map["jobParamVal"];
+	   			
+	   			//key값이 jobParamRevision와 같은 경우
+	   			if(map["jobParamKey"] == jobParamRevision){
+	   				jobParamVal = $("form#dpl1000Form > #ticketLastRv").val();
+	   			}
+	   			
 	   			ADD_JOB_PARAM_LIST[map["jenId"]][map["jobId"]].push({
 	   				"jobParamKey": map["jobParamKey"],
-	   				"jobParamVal": map["jobParamVal"]
+	   				"jobParamVal": jobParamVal
 	   			});
 	   		});
 	   	}
@@ -817,6 +831,11 @@ function fnDplJobSearchSetting() {
 												"jobTok" : selJobList[0].jobTok,
 												"jobTypeCd": selJobList[0].jobTypeCd 
 										};
+										
+										//운영 빌드인경우 리비전 값 넘기기
+										if(data["jobTypeCd"] == "04"){
+											data["ticketLastRv"] = $("form#dpl1000Form > #ticketLastRv").val();
+										}
 										
 										// 빌드 파라미터 팝업 호출
 										gfnLayerPopupOpen('/jen/jen1000/jen1000/selectJen1005View.do',data,"840","300",'scroll');
@@ -905,11 +924,8 @@ function fnDplStart(item){
 	
 	//운영 배포인경우 배포계획 ID, 티켓 목록 세팅
 	if(item.jobTypeCd == "05"){
-		item["ticketList"] = JSON.stringify(ticketList);
-		item["eGeneDplId"] = JSON.stringify(eGeneDplId);
-		console.log(item);
-		//test
-		return true;
+		item["ticketList"] = ticketList;
+		item["eGeneDplId"] = eGeneDplId;
 	}
 	
 	//AJAX 설정
@@ -1031,6 +1047,19 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 	$("form#dpl1000JobInfoForm #jenUrl").text(paramJobInfo.jenUrl);
 	$("form#dpl1000JobInfoForm #jobId").text(paramJobInfo.jobId);
 	$("form#dpl1000JobInfoForm #jobTypeNm").text(paramJobInfo.jobTypeNm);
+	
+	//job 타입 eGeneDplId
+	var jobTypeCd = paramJobInfo.jobTypeCd;
+	
+	//job type에 따라 frame 분기
+	//운영배포인경우
+	if(jobTypeCd == "05"){
+		$("form#dpl1000JobInfoForm > .descMainFrame.dplInfo-ciTktId").hide();
+		$("form#dpl1000JobInfoForm > .descMainFrame.dplInfo-eGeneDplId").show();
+	}else{
+		$("form#dpl1000JobInfoForm > .descMainFrame.dplInfo-ciTktId").show();
+		$("form#dpl1000JobInfoForm > .descMainFrame.dplInfo-eGeneDplId").hide();
+	}
 	
 	//빌드 ci_id, ticket_id, dpl_id
 	var ciIdStr = "-";
@@ -1179,6 +1208,7 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 			<input type="hidden" name="jobType" id="jobType" value="<c:out value="${requestScope.jobType}"/>"/>
 			<input type="hidden" name="ticketList" id="ticketList" value="<c:out value="${requestScope.ticketList}"/>"/>
 			<input type="hidden" name="eGeneDplId" id="eGeneDplId" value="<c:out value="${requestScope.eGeneDplId}"/>"/>
+			<input type="hidden" name="ticketLastRv" id="ticketLastRv" value="<c:out value="${requestScope.ticketLastRv}"/>"/>
 		</form>
 		<div id="dplJobSearch" style="border-top: 1px solid #ccc;" guide="dpl1000DplJobBtn"></div>
 		<br />
@@ -1208,17 +1238,23 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 				</div>
 				<div class="jobDetailInfoFrame">
 					<form name="dpl1000JobInfoForm" id="dpl1000JobInfoForm" onsubmit="return false;">
-					<div class="descMainFrame">
+					<div class="descMainFrame dplInfo-eGeneDplId">
+						<div class="descLabelFrame"><label>배포 ID</label></div>
+						<div class="descValueFrame">
+							<span><c:out value="${requestScope.ticketId}"/></span>
+						</div>
+					</div>
+					<div class="descMainFrame dplInfo-ciTktId">
 						<div class="descSubFrame">
 							<div class="descLabelFrame"><label>CI ID</label></div>
 							<div class="descValueFrame">
-								<span id="ciId"><c:out value="${requestScope.ciId}"/></span>
+								<span><c:out value="${requestScope.ciId}"/></span>
 							</div>
 						</div>
 						<div class="descSubFrame">
 							<div class="descLabelFrame"><label>TICKET ID</label></div>
 							<div class="descValueFrame">
-								<span id="ticketId"><c:out value="${requestScope.ticketId}"/></span>
+								<span><c:out value="${requestScope.ticketId}"/></span>
 							</div>
 						</div>
 					</div>

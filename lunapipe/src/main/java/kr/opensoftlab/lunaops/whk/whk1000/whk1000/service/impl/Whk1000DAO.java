@@ -30,6 +30,12 @@ public class Whk1000DAO extends ComOslitsAbstractDAO {
 	}
 	
 	
+	@SuppressWarnings({"rawtypes"})
+	public int selectWhk1000ListCnt(Map paramMap) throws Exception{
+		return (int) select("whk1000DAO.selectWhk1000ListCnt", paramMap);
+	}
+	
+	
 	@SuppressWarnings({"rawtypes", "unchecked" })
 	public List<Map> selectWhk1001List(Map paramMap) throws Exception{
 		return (List) list("whk1000DAO.selectWhk1001List", paramMap);
