@@ -34,6 +34,19 @@ $(function(){
 	//가이드 상자 호출
 	gfnGuideStack("add",fnRep1000GuideShow);
 	
+	//웹훅 버튼
+	$("#repWebhookBtn").click(function(){
+		//팝업 암호화 키
+		var webhookDataKey = $("form#rep1000Form > #webhookDataKey").val();
+		
+		if(gfnIsNull(webhookDataKey)){
+			jAlert("웹훅 등록을 위한 암호화 키가 없습니다.","알림");
+			return;
+		}else{
+			window.open("/whk/whk1000/whk1000/selectWhk1000View.do?data="+encodeURIComponent(webhookDataKey), "webhookPopup", "width=1020, height=700, status=no, menubar=no");
+		}
+	});
+	
 	//전송 버튼
 	$("#repDataSendBtn").click(function(){
 		
@@ -461,7 +474,9 @@ function fnSearchBoxControl(){
 								
 								jConfirm("저장소 "+chkList.length+"개를 삭제 하시겠습니까?</br>배정된 구성항목이 있는 경우 연결 정보가 함께 삭제됩니다.","알림", function(result){
 									if(result){
-										var repIdListStr = "";
+										var empId = $("form#rep1000Form > #empId").val();
+										
+										var repIdListStr = "empId="+empId;
 										$.each(chkList, function(idx, map){
 											repIdListStr += "&repId="+map.repId;
 										});
@@ -714,14 +729,16 @@ function fnRep1000GuideShow(){
 		<input type="hidden" name="eGeneUrl" id="eGeneUrl" value="${requestScope.eGeneUrl }"/>
 		<input type="hidden" name="callbakApiId" id="callbakApiId" value="${requestScope.callbakApiId }"/>
 		<input type="hidden" name="repIdList" id="repIdList" value="<c:out value="${requestScope.repIdList}"/>"/>
+		<input type="hidden" name="webhookDataKey" id="webhookDataKey" value="<c:out value="${requestScope.webhookDataKey}"/>"/>
 	</form>
 	<div class="tab_contents menu">
 		<div class="sub_title">
 			소스저장소 관리
 		</div>
 		<div id="AXSearchTarget" guide="rep1000button" ></div>
-		<div data-ax5grid="repGridTarget" data-ax5grid-config="{}" style="height: 600px;"></div>
+		<div data-ax5grid="repGridTarget" data-ax5grid-config="{}" style="height: 600px;" guide="grid"></div>
 		<div class="btnFrame">
+			<!-- <div class="mainPopupBtn" id="repWebhookBtn"><i class="fas fa-bookmark"></i>&nbsp;소스저장소 웹훅 관리</div> -->
 			<div class="mainPopupBtn" id="repDataSendBtn"><i class="fas fa-paperclip"></i>&nbsp;소스저장소 연결</div>
 			<div class="mainPopupBtn" id="repCloseBtn"><i class="fas fa-times-circle"></i>&nbsp;닫기</div>
 		</div>
