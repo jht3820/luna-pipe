@@ -11,8 +11,14 @@
 		            WEBHOOK_ID ,
 		            WEBHOOK_NM ,
 		            WEBHOOK_TYPE_CD ,
+		            SF_CMM1001_COM_CD_INFO('WHK00001', WEBHOOK_TYPE_CD, '1') AS WEBHOOK_TYPE_NM ,
+		            WEBHOOK_CHG_TYPE_CD ,
+		            SF_CMM1001_COM_CD_INFO('WHK00003', WEBHOOK_CHG_TYPE_CD, '1') AS WEBHOOK_CHG_TYPE_NM ,
 		            WEBHOOK_TARGET_URL ,
+		            CONTENT_TYPE_CD ,
+		            SF_CMM1001_COM_CD_INFO('WHK00002', CONTENT_TYPE_CD, '1') AS CONTENT_TYPE_NM ,
 		            USE_CD ,
+		            SF_CMM1001_COM_CD_INFO('CMM00001', USE_CD, '1') AS USE_NM ,
 				    TO_CHAR(REG_DTM, 'YYYY-MM-DD HH24:MI:SS') AS REG_DTM ,
 		            REG_USR_ID ,                
 		            REG_USR_IP ,                
@@ -22,10 +28,38 @@
 			FROM
 		            WHK1000
 			WHERE   1=1
-			AND WEBHOOK_TYPE_CD = #webhookTypeCd#
 		]]>
+		<isNotEmpty property="webhookTypeCd">
+			AND WEBHOOK_TYPE_CD = #webhookTypeCd#
+		</isNotEmpty>
+		<isNotEmpty property="webhookChgTypeCd">
+			<isNotEqual property="webhookChgTypeCd" compareValue="01">
+				AND (WEBHOOK_CHG_TYPE_CD = '01' OR WEBHOOK_CHG_TYPE_CD = #webhookChgTypeCd#)
+			</isNotEqual>
+		</isNotEmpty>
 		<isNotEmpty property="useCd">
 			AND USE_CD = #useCd#
+		</isNotEmpty>
+		<isNotEmpty property="searchSelect">
+			<isNotEmpty property="searchTxt">
+			<isEqual property="searchSelect" compareValue="webhookNm"> 
+				AND		UPPER( WEBHOOK_NM ) like '%'|| UPPER( #searchTxt#  )  ||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="webhookTargetUrl"> 
+				AND		UPPER( WEBHOOK_TARGET_URL )  like '%'|| UPPER( #searchTxt#  )  ||'%'
+			</isEqual>
+			</isNotEmpty>
+		</isNotEmpty>
+		
+		<isNotEmpty property="searchSelect">
+			<isNotEmpty property="searchCd">
+				<isEqual property="searchSelect" compareValue="webhookTypeCd">
+					AND		WEBHOOK_TYPE_CD = #searchCd#
+				</isEqual>
+				<isEqual property="searchSelect" compareValue="contentTypeCd">
+					AND		CONTENT_TYPE_CD = #searchCd#
+				</isEqual>
+			</isNotEmpty>
 		</isNotEmpty>
 		ORDER BY REG_DTM DESC
     </sql>
@@ -37,7 +71,9 @@
 		            A.WEBHOOK_ID ,
 		            A.WEBHOOK_NM ,
 		            A.WEBHOOK_TYPE_CD ,
+		            A.WEBHOOK_CHG_TYPE_CD ,
 		            A.WEBHOOK_TARGET_URL ,
+		            A.CONTENT_TYPE_CD ,
 		            A.USE_CD ,
 		            B.WEBHOOK_LOG_ID
 		            B.WEBHOOK_RESULT
@@ -93,14 +129,35 @@
 	 
 	<select id="whk1000DAO.selectWhk1000List" parameterClass="java.util.Map"  resultClass="egovMap">
 		
-		SELECT T1.*
+		SELECT *
 		FROM
 		(
-			<include refid="selectWhk1000"/>
-		) T1
-		WHERE 1=1
+	   		SELECT 
+	   			ROWNUM RN,
+				SUBT1.*
+	   		FROM
+	   		(
+				<include refid="selectWhk1000"/>
+    		) SUBT1
+    	) T1
+    	<isNotEmpty property="firstIndex">
+	    	<isNotEmpty property="lastIndex">
+				WHERE T1.RN BETWEEN (#firstIndex#+1) AND #lastIndex#
+			</isNotEmpty>
+    	</isNotEmpty>
 	</select>
 	
+    
+    <select id="whk1000DAO.selectWhk1000ListCnt" parameterClass="java.util.Map"  resultClass="java.lang.Integer">
+	    
+	    	SELECT
+	    		COUNT(*)
+			FROM
+			(
+				<include refid="selectWhk1000"/>
+			) T1
+    </select>
+    
 	 
 	<select id="whk1000DAO.selectWhk1001List" parameterClass="java.util.Map"  resultClass="egovMap">
 		
@@ -125,7 +182,7 @@
 			            SELECT	MAX(WEBHOOK_ID)  AS NEW_WEBHOOK_ID
 			            FROM	WHK1000 A
 			            WHERE	1=1
-			            AND		REP_ID LIKE 'WHK' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '%'
+			            AND		WEBHOOK_ID LIKE 'WHK' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '%'
 					)
 		]]>
 		</selectKey>
@@ -135,7 +192,9 @@
             WEBHOOK_ID ,
             WEBHOOK_NM ,
             WEBHOOK_TYPE_CD ,
+            WEBHOOK_CHG_TYPE_CD ,
             WEBHOOK_TARGET_URL ,
+            CONTENT_TYPE_CD ,
             USE_CD ,
             REG_DTM ,
             REG_USR_ID ,
@@ -149,7 +208,9 @@
 			#newWebhookId# ,
 			#webhookNm# ,
 			#webhookTypeCd# ,
+			#webhookChgTypeCd# ,
 			#webhookTargetUrl# ,
+			#contentTypeCd# ,
             #useCd# , 
             SYSDATE , 
             #empId# , 
@@ -164,10 +225,12 @@
 	<update id="whk1000DAO.updateWhk1000Info" parameterClass="java.util.Map">
 		
 		UPDATE WHK1000 SET
-			WEBHOOK_NM ,
-			WEBHOOK_TYPE_CD ,
-			WEBHOOK_TARGET_URL ,
-			USE_CD ,
+			WEBHOOK_NM = #webhookNm#,
+			WEBHOOK_TYPE_CD = #webhookTypeCd#,
+			WEBHOOK_CHG_TYPE_CD = #webhookChgTypeCd#,
+			WEBHOOK_TARGET_URL = #webhookTargetUrl#,
+			CONTENT_TYPE_CD = #contentTypeCd#,
+			USE_CD = #useCd#,
 		 	MODIFY_DTM = SYSDATE ,
             MODIFY_USR_ID = #empId# ,
             MODIFY_USR_IP = #modifyUsrIp#
@@ -193,10 +256,10 @@
             		) AS NEW_WEBHOOK_LOG_ID 
 			FROM	(
 			            SELECT	MAX(WEBHOOK_LOG_ID)  AS NEW_WEBHOOK_LOG_ID
-			            FROM	WHK1000 A
+			            FROM	WHK1001 A
 			            WHERE	1=1
 			            AND		WEBHOOK_ID = #webhookId#
-			            AND		REP_ID LIKE 'LOG' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '%'
+			            AND		WEBHOOK_LOG_ID LIKE 'LOG' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '%'
 					)
 		]]>
 		</selectKey>
@@ -204,17 +267,14 @@
 		INSERT INTO WHK1001 (
 			WEBHOOK_ID,			WEBHOOK_LOG_ID,		WEBHOOK_RESULT
 			,WEBHOOK_DATE,		WEBHOOK_DATA,		WEBHOOK_LOG
-			,WEBHOOK_RESULT_DATA
-			,REG_DTM,			REG_USR_ID,			REG_USR_IP
-            ,MODIFY_DTM,		MODIFY_USR_ID,		MODIFY_USR_IP
+			,WEBHOOK_RESULT_DATA,					WEBHOOK_USR_ID
+			,WEBHOOK_TARGET_URL
 		)
 		VALUES (
 			#webhookId#,		#newWebhookLogId#,	#webhookResult#
 			,SYSDATE,			#webhookData#,		#webhookLog#
-			,#webhookResultData#
-			#ciId#,				#repId#
-			,SYSDATE,			#regUsrId#,			#regUsrIp#
-			,SYSDATE,			#regUsrId#,			#regUsrIp#
+			,#webhookResultData#,					#webhookUsrId#
+			,#webhookTargetUrl#
 		)
 	</insert>
 	
