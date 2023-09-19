@@ -566,4 +566,14 @@
 				AND B.REP_RV_TYPE_CD = '02'
 			) T1
     </select>
+        
+    
+    <select id="rep1100DAO.selectRep1101TktChgFileLastRvNum" parameterClass="java.util.Map"  resultClass="egovMap">
+	    
+		SELECT MAX(REP_RV) AS MAX_REP_RV
+		FROM REP1100
+		WHERE 1=1
+		AND TICKET_ID = #ticketId#
+		AND REP_RV_TYPE_CD = '02'
+    </select>
 </sqlMap>
