@@ -75,6 +75,14 @@ var jen1004BldListGrid;
 var jen1004BldSearchObj;
 globals_guideChkFn = fnJen1004GuideShow;
 $(document).ready(function() {
+	if('<c:out value="${param.jobTypeCd}"/>' == "05"){
+		$("form#jen1004JobInfoForm > .descMainFrame.dplInfo-ciTktId").hide();
+		$("form#jen1004JobInfoForm > .descMainFrame.dplInfo-eGeneDplId").show();
+	}else{
+		$("form#jen1004JobInfoForm > .descMainFrame.dplInfo-ciTktId").show();
+		$("form#jen1004JobInfoForm > .descMainFrame.dplInfo-eGeneDplId").hide();
+	}
+	
 	//그리드 선언
 	fnJobBldListGridSetting();
 	
@@ -252,6 +260,7 @@ function fnJobBldListGridDataSet(_pageNo){
    	//jenId, jobId
    	var jenId = '<c:out value="${param.jenId}"/>';
    	var jobId = '<c:out value="${param.jobId}"/>';
+   	
    	ajaxParam += "&jenId="+jenId+"&jobId="+jobId;
    	
    	
@@ -461,6 +470,7 @@ function fnSelJobBuildInfo(paramBldItem){
 		//job Id 정보 세팅
 		$("form#jen1004JobInfoForm #ciId").text(ciIdStr);
 		$("form#jen1004JobInfoForm #ticketId").text(ticketIdStr);
+		$("form#jen1004JobInfoForm #eGeneDplId").text(ticketIdStr);
 		$("form#jen1004JobInfoForm #dplId").text(dplIdStr);
 		
 		//job 빌드 정보 세팅
@@ -527,7 +537,13 @@ function fnJen1004GuideShow(){
 			</div>
 			<div class="jen1004JobDetailInfoFrame">
 				<form name="jen1004JobInfoForm" id="jen1004JobInfoForm" onsubmit="return false;">
-				<div class="descMainFrame">
+				<div class="descMainFrame dplInfo-eGeneDplId">
+					<div class="descLabelFrame"><label>배포 ID</label></div>
+					<div class="descValueFrame">
+						<span id="eGeneDplId"></span>
+					</div>
+				</div>
+				<div class="descMainFrame dplInfo-ciTktId">
 					<div class="descSubFrame">
 						<div class="descLabelFrame"><label>CI ID</label></div>
 						<div class="descValueFrame">
