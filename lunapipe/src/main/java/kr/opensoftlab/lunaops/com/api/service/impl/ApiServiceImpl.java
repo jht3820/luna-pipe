@@ -25,6 +25,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.model.Build;
 import com.offbytwo.jenkins.model.BuildCause;
@@ -39,6 +40,7 @@ import kr.opensoftlab.lunaops.com.api.service.ApiService;
 import kr.opensoftlab.lunaops.com.vo.OslErrorCode;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.service.Dpl1000Service;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
+import kr.opensoftlab.lunaops.lck.lck1000.lck1000.service.Lck1000Service;
 import kr.opensoftlab.lunaops.rep.rep1000.rep1000.service.Rep1000Service;
 import kr.opensoftlab.lunaops.rep.rep1000.rep1100.service.Rep1100Service;
 import kr.opensoftlab.sdf.jenkins.NewJenkinsClient;
@@ -47,6 +49,7 @@ import kr.opensoftlab.sdf.jenkins.vo.BuildVO;
 import kr.opensoftlab.sdf.jenkins.vo.JenStatusVO;
 import kr.opensoftlab.sdf.rep.com.RepModule;
 import kr.opensoftlab.sdf.rep.com.vo.RepDataVO;
+import kr.opensoftlab.sdf.rep.com.vo.RepLockVO;
 import kr.opensoftlab.sdf.rep.com.vo.RepResultVO;
 import kr.opensoftlab.sdf.rep.com.vo.RepVO;
 import kr.opensoftlab.sdf.rep.svn.vo.SVNFileVO;
@@ -76,6 +79,10 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 	
 	@Resource(name = "dpl1000Service")
 	protected Dpl1000Service dpl1000Service;
+	
+	
+	@Resource(name = "lck1000Service")
+	protected Lck1000Service lck1000Service;
 
 	
 	@Resource(name = "newJenkinsClient")
@@ -1788,4 +1795,651 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 		rtnMap.put("etcMsg", etcMsg);
 		return rtnMap;
     }
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Map insertPostRepFileLock(Map paramMap) throws Exception {
+		Map rtnMap = new HashMap<>();
+		
+		
+		String data = (String) paramMap.get("data");
+		
+		
+		List<String> etcMsg = new ArrayList<String>();
+				
+		
+		Object checkParam = checkParamDataKey(data);
+		
+		
+		int executed = 0;
+		
+		
+		if(checkParam instanceof String) {
+			rtnMap.put("result", false);
+			rtnMap.put("error_code", checkParam.toString());
+			return rtnMap;
+		}else {
+			
+			JSONObject jsonObj = (JSONObject) checkParam;
+			
+			
+			String pathListStr = OslUtil.jsonGetString(jsonObj, "path_list");
+			
+			
+			if(pathListStr == null) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.PARAM_PATH_LIST_NULL);
+				return rtnMap;
+			}
+			
+			String empId = OslUtil.jsonGetString(jsonObj, "emp_id");
+			
+			
+			String lockForce = OslUtil.jsonGetString(jsonObj, "force");
+			
+			if(lockForce == null) {
+				lockForce = "false";
+			}
+			
+			
+			String repId = OslUtil.jsonGetString(jsonObj, "rep_id");
+			
+			
+			String ticketId = OslUtil.jsonGetString(jsonObj, "ticket_id");
+			
+			
+			if(repId == null) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.PARAM_REP_ID_NULL);
+				return rtnMap;
+			}
+			
+			paramMap.put("repId", repId);
+			
+			
+			RepVO repVo = rep1000Service.selectRep1000Info(paramMap);
+			
+			
+			if(repVo == null) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.REP_ID_INFO_NULL);
+				rtnMap.put("etcMsg", "소스저장소 {REP_ID="+repId+"}에 대한 정보 없음");
+				return rtnMap;
+			}
+			
+			
+			RepResultVO repResultVO = repModule.repAuthCheck(repVo);
+			boolean repAuthCheck = repResultVO.isReturnValue();
+			
+			if(!repAuthCheck) {
+				
+				rtnMap.put("result", false);
+				
+				String resultCode = repResultVO.getResultCode();
+				rtnMap.put("error_code", OslErrorCode.REP_ID_INFO_NULL);
+				
+				
+				if(resultCode.equals(repResultVO.USER_AUTH_CHECK_FAIL)) {
+					rtnMap.put("etcMsg", "입력하신 소스저장소 사용자 인증에 실패했습니다.</br>입력된 값을 확인해주세요.");
+				}
+				
+				else if(resultCode.equals(repResultVO.REPOSITORY_NOT_ACCESS)) {
+					rtnMap.put("etcMsg", repResultVO.getResultMsg()+"</br>입력된 값을 확인해주세요.</br>");
+				}
+				else {
+					rtnMap.put("etcMsg", "입력하신 소스저장소 사용자 인증에 실패했습니다.</br>입력된 값을 확인해주세요.</br>"+repResultVO.getResultMsg());
+				}
+				return rtnMap;
+			}
+			
+			boolean force = false;
+			try {
+				force =  Boolean.valueOf(lockForce);
+			}catch(Exception e) {
+				Log.debug(e);
+			}
+			
+			
+			try {
+				JSONArray pathList = new JSONArray(pathListStr);
+				
+				
+				if(pathList == null || pathList.length() == 0) {
+					rtnMap.put("error_code", OslErrorCode.SERVER_ERROR);
+					rtnMap.put("etcMsg", "lock 대상 파일 정보가 없습니다.");
+					return rtnMap;
+				}
+
+				
+				Map resultDataMap = new HashMap<>();
+				
+				
+				rtnMap.put("total", pathList.length());
+				
+				
+				ObjectMapper om = new ObjectMapper();
+				
+				
+				for(int i=0;i<pathList.length();i++) {
+					JSONObject pathObj = pathList.getJSONObject(i);
+					if(!pathObj.has("path")) {
+						etcMsg.add("파일 경로 목록에서 경로(path) 데이터를 찾을 수 없습니다.");
+						continue;
+					}
+					
+					
+					String filePath = pathObj.getString("path");
+					
+					
+					String comment = "[사용자 ID="+empId+", path="+filePath+"] 파일을 락 설정 했습니다.";
+					
+					RepLockVO repLockVo = repModule.fileLockHandle(repVo, filePath, comment, force);
+					repLockVo.setLockUsrId(empId);
+					repLockVo.setRegDtm(String.valueOf(new Date().getTime()));
+					repLockVo.setRegUsrIp(String.valueOf(paramMap.get("regUsrIp")));
+					repLockVo.setLockForce(lockForce);
+					repLockVo.setRegUsrId(empId);
+					repLockVo.setLockTargetRv("HEAD");
+					repLockVo.setTicketId(ticketId);
+					
+					
+					if(repLockVo.isResult()) {
+						
+						lck1000Service.insertLck1000LockInfo(repLockVo);
+						
+						
+						resultDataMap.put(filePath, om.convertValue(repLockVo, Map.class));
+						executed++;
+					}else {
+						Map resultMap = new HashMap<>();
+						resultMap.put("result", false);
+						resultMap.put("lockPath", filePath);
+						resultMap.put("lockUsrId", empId);
+						resultMap.put("etcMsg", repLockVo.getResultMsg());
+						
+						resultDataMap.put(filePath, om.convertValue(repLockVo, Map.class));
+					}
+				}
+
+				rtnMap.put("data", resultDataMap);
+				
+			}catch(JSONException jsonE) {
+				Log.debug(jsonE);
+			}
+		}
+		rtnMap.put("executed", executed);
+		rtnMap.put("etcMsg", etcMsg);
+		
+		return rtnMap;
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Map insertGetRepFileLock(Map paramMap) throws Exception {
+		Map rtnValue = new HashMap<>();
+		
+		
+		String data = (String) paramMap.get("data");
+		
+		
+		Object checkParam = checkParamDataKey(data);
+		
+		
+		if(!(checkParam instanceof String)) {
+			
+			JSONObject jsonObj = (JSONObject) checkParam;
+			
+			
+			
+			String repUuid = OslUtil.jsonGetString(jsonObj, "repUuid");
+			
+			
+			String paramRv = (String) OslUtil.jsonGetString(jsonObj, "rv");
+			
+			try {
+				
+				if(repUuid == null) {
+					rtnValue.put("result", false);
+					rtnValue.put("error_code", OslErrorCode.REP_UUID_PARAM_NULL);
+					return rtnValue;
+				}
+				if(paramRv == null) {
+					rtnValue.put("result", false);
+					rtnValue.put("error_code", OslErrorCode.REP_REVISION_PARAM_NULL);
+					return rtnValue;
+				}
+				
+				long rv = Long.parseLong(paramRv);
+				
+				paramMap.put("repUuid", repUuid);
+				
+				
+				RepVO repVo = rep1000Service.selectRep1000Info(paramMap);
+				
+				
+				RepResultVO repResultVO = repModule.repAuthCheck(repVo);
+				boolean repAuthCheck = repResultVO.isReturnValue();
+				
+				if(!repAuthCheck) {
+					
+					rtnValue.put("result", false);
+					
+					String resultCode = repResultVO.getResultCode();
+					rtnValue.put("error_code", OslErrorCode.REP_ID_INFO_NULL);
+					
+					
+					if(resultCode.equals(repResultVO.USER_AUTH_CHECK_FAIL)) {
+						rtnValue.put("etcMsg", "입력하신 소스저장소 사용자 인증에 실패했습니다.</br>입력된 값을 확인해주세요.");
+					}
+					
+					else if(resultCode.equals(repResultVO.REPOSITORY_NOT_ACCESS)) {
+						rtnValue.put("etcMsg", repResultVO.getResultMsg()+"</br>입력된 값을 확인해주세요.</br>");
+					}
+					else {
+						rtnValue.put("etcMsg", "입력하신 소스저장소 사용자 인증에 실패했습니다.</br>입력된 값을 확인해주세요.</br>"+repResultVO.getResultMsg());
+					}
+					return rtnValue;
+				}
+				
+				
+				List<RepDataVO> rvInfoList = repModule.selectRepLogList(repResultVO, rv, rv, new String[] {"/"});
+				
+				
+				if(rvInfoList == null || rvInfoList.size() == 0) {
+					rtnValue.put("result", false);
+					rtnValue.put("error_code", OslErrorCode.REP_ID_INFO_NULL);
+					return rtnValue;
+				}
+				
+				
+				RepDataVO rvInfo = rvInfoList.get(0);
+				
+				
+				List<SVNFileVO> chgFileList = rvInfo.getSvnFileList();
+				
+				
+				int chgFileCnt = 0;
+				if(chgFileList != null) {
+					chgFileCnt = chgFileList.size();
+				}
+				
+				
+				String author = rvInfo.getAuthor();
+				
+				
+				if(rvInfo.getComment() != null) {
+					
+					String[] comments = rvInfo.getComment().split("\n");
+					String ticketId = comments[0];
+					
+					
+					if(ticketId.indexOf("[insert_data_no-flag]") != -1) {
+						
+						rtnValue.put("result", true);
+						return rtnValue;
+					}
+					
+					
+					if(chgFileCnt > 0) {
+						
+						int execute = 0;
+						
+						for(SVNFileVO chgFileInfo : chgFileList) {
+							try {
+								
+								String path = chgFileInfo.getPath();
+								
+								
+								char type = chgFileInfo.getType();
+
+								
+								if('D' == type) {
+									continue;
+								}
+								
+								
+								String comment = "[사용자 ID="+author+", path="+path+"] 파일을 락 설정 했습니다.";
+								
+								
+								RepLockVO repLockVo = repModule.fileLockHandle(repVo, path, rv, comment, false);
+								repLockVo.setLockUsrId(author);
+								repLockVo.setRegDtm(String.valueOf(new Date().getTime()));
+								repLockVo.setRegUsrIp(String.valueOf(paramMap.get("regUsrIp")));
+								repLockVo.setLockForce("true");
+								repLockVo.setRegUsrId(author);
+								repLockVo.setTicketId(ticketId);
+								repLockVo.setLockTargetRv(paramRv);
+								
+								
+								if(repLockVo.isResult()) {
+									
+									lck1000Service.insertLck1000LockInfo(repLockVo);
+									
+									
+									execute++;
+								}
+							}
+							catch(Exception e) {
+								Log.debug(e);
+								e.printStackTrace();
+								continue;
+							}
+						}
+						
+						
+						if(execute == 0) {
+							rtnValue.put("result", false);
+							rtnValue.put("error_code", OslErrorCode.FILE_LOCKED_FAIL);
+							return rtnValue;
+						}
+					}
+				}else {
+					
+					rtnValue.put("result", false);
+					rtnValue.put("error_code", OslErrorCode.PARAM_TICKET_ID_NULL);
+					return rtnValue;
+				}
+				
+				
+				
+				
+				rtnValue.put("rvInfoList", rvInfoList);
+				
+			}catch(Exception e) {
+				e.printStackTrace();
+				rtnValue.put("result", false);
+				rtnValue.put("error_code", OslErrorCode.SERVER_ERROR);
+				return rtnValue;
+			}
+		}else {
+			rtnValue.put("result", false);
+			rtnValue.put("error_code", OslErrorCode.DATA_DECODE_FAIL);
+			return rtnValue;
+		}
+		
+		
+		rtnValue.put("result", true);
+		return rtnValue;
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Map insertRepFileUnLock(Map paramMap) throws Exception {
+		Map rtnMap = new HashMap<>();
+		
+		
+		String data = (String) paramMap.get("data");
+		
+		
+		List<String> etcMsg = new ArrayList<String>();
+		
+		
+		Object checkParam = checkParamDataKey(data);
+		
+		
+		int executed = 0;
+		
+		
+		if(checkParam instanceof String) {
+			rtnMap.put("result", false);
+			rtnMap.put("error_code", checkParam.toString());
+			return rtnMap;
+		}else {
+			
+			JSONObject jsonObj = (JSONObject) checkParam;
+			
+			
+			String pathListStr = OslUtil.jsonGetString(jsonObj, "path_list");
+			
+			
+			if(pathListStr == null) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.PARAM_PATH_LIST_NULL);
+				return rtnMap;
+			}
+			
+			String empId = OslUtil.jsonGetString(jsonObj, "emp_id");
+			
+			
+			String lockForce = OslUtil.jsonGetString(jsonObj, "force");
+			
+			
+			String repId = OslUtil.jsonGetString(jsonObj, "rep_id");
+			
+			
+			String ticketId = OslUtil.jsonGetString(jsonObj, "ticket_id");
+			
+			
+			if(repId == null) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.PARAM_REP_ID_NULL);
+				return rtnMap;
+			}
+			
+			paramMap.put("repId", repId);
+			
+			
+			RepVO repVo = rep1000Service.selectRep1000Info(paramMap);
+			
+			
+			if(repVo == null) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.REP_ID_INFO_NULL);
+				rtnMap.put("etcMsg", "소스저장소 {REP_ID="+repId+"}에 대한 정보 없음");
+				return rtnMap;
+			}
+			
+			
+			RepResultVO repResultVO = repModule.repAuthCheck(repVo);
+			boolean repAuthCheck = repResultVO.isReturnValue();
+			
+			if(!repAuthCheck) {
+				
+				rtnMap.put("result", false);
+				
+				String resultCode = repResultVO.getResultCode();
+				rtnMap.put("error_code", OslErrorCode.REP_ID_INFO_NULL);
+				
+				
+				if(resultCode.equals(repResultVO.USER_AUTH_CHECK_FAIL)) {
+					rtnMap.put("etcMsg", "입력하신 소스저장소 사용자 인증에 실패했습니다.</br>입력된 값을 확인해주세요.");
+				}
+				
+				else if(resultCode.equals(repResultVO.REPOSITORY_NOT_ACCESS)) {
+					rtnMap.put("etcMsg", repResultVO.getResultMsg()+"</br>입력된 값을 확인해주세요.</br>");
+				}
+				else {
+					rtnMap.put("etcMsg", "입력하신 소스저장소 사용자 인증에 실패했습니다.</br>입력된 값을 확인해주세요.</br>"+repResultVO.getResultMsg());
+				}
+				return rtnMap;
+			}
+			
+			
+			boolean force = false;
+			try {
+				force =  Boolean.valueOf(lockForce);
+			}catch(Exception e) {
+				Log.debug(e);
+			}
+			
+			
+			try {
+				JSONArray pathList = new JSONArray(pathListStr);
+				
+				
+				if(pathList == null || pathList.length() == 0) {
+					rtnMap.put("error_code", OslErrorCode.SERVER_ERROR);
+					rtnMap.put("etcMsg", "unlock 대상 파일 정보가 없습니다.");
+					return rtnMap;
+				}
+				
+				
+				Map resultDataMap = new HashMap<>();
+				
+				
+				rtnMap.put("total", pathList.length());
+				
+				
+				for(int i=0;i<pathList.length();i++) {
+					JSONObject pathObj = pathList.getJSONObject(i);
+					if(!pathObj.has("path")) {
+						etcMsg.add("파일 경로 목록에서 경로(path) 데이터를 찾을 수 없습니다.");
+						continue;
+					}
+
+					
+					String filePath = pathObj.getString("path");
+					
+					
+					if(!force && !pathObj.has("lock_id")) {
+						Map resultMap = new HashMap<>();
+						resultMap.put("result", false);
+						resultMap.put("lockPath", filePath);
+						resultMap.put("lockUsrId", empId);
+						resultMap.put("etcMsg", "파일 경로 목록에서 lock id(lock_id) 데이터를 찾을 수 없습니다.");
+						
+						resultDataMap.put(filePath, resultMap);
+						continue;
+					}
+					
+					
+					String lockId = null;
+					String lockTargetRv = "HEAD";
+					
+					if(!force) {
+						lockId = pathObj.getString("lock_id");
+						
+						
+						Map newMap = new HashMap<>();
+						newMap.put("repId", repId);
+						newMap.put("lockId", lockId);
+						newMap.put("lockStateCd", "01");
+						
+						
+						Map lckInfo = lck1000Service.selectLck1000BaseInfo(newMap);
+						
+						
+						if(lckInfo == null) {
+							Map resultMap = new HashMap<>();
+							resultMap.put("result", false);
+							resultMap.put("lockPath", filePath);
+							resultMap.put("lockUsrId", empId);
+							resultMap.put("etcMsg", "해당하는 데이터를 찾을 수 없습니다.");
+							
+							resultDataMap.put(filePath, resultMap);
+							continue;
+						}
+						
+						
+						String lockUsrId = (String) lckInfo.get("lockUsrId");
+						
+						
+						if(!lockUsrId.equals(empId)) {
+							Map resultMap = new HashMap<>();
+							resultMap.put("result", false);
+							resultMap.put("lockPath", filePath);
+							resultMap.put("lockUsrId", empId);
+							resultMap.put("etcMsg", "Lock 설정한 사용자가 아닙니다.");
+							
+							resultDataMap.put(filePath, resultMap);
+							continue;
+						}
+						
+						
+						lockTargetRv = (String) lckInfo.get("lockTargetRv");
+					}
+					
+					
+					String comment = "[사용자 ID="+empId+", path="+filePath+"] 파일을 락 해제 했습니다.";
+					
+					
+					RepLockVO repLockVo = repModule.fileUnLockHandle(repVo, filePath, lockId, force);
+					repLockVo.setLockUsrId(empId);
+					repLockVo.setRegDtm(String.valueOf(new Date().getTime()));
+					repLockVo.setRegUsrIp(String.valueOf(paramMap.get("regUsrIp")));
+					repLockVo.setLockForce(lockForce);
+					repLockVo.setRegUsrId(empId);
+					repLockVo.setTicketId(ticketId);
+					repLockVo.setLockTargetRv(lockTargetRv);
+					
+					
+					if(repLockVo.isResult()) {
+						repLockVo.setLockComment(comment);
+						
+						
+						lck1000Service.insertLck1000LockInfo(repLockVo);
+						
+						
+						resultDataMap.put(filePath, repLockVo);
+						executed++;
+					}else {
+						repLockVo.setResultMsg(repLockVo.getResultMsg());
+						resultDataMap.put(filePath, repLockVo);
+					}
+				}
+				
+				rtnMap.put("data", resultDataMap);
+				
+			}catch(JSONException jsonE) {
+				Log.debug(jsonE);
+			}
+		}
+		rtnMap.put("executed", executed);
+		rtnMap.put("etcMsg", etcMsg);
+		
+		return rtnMap;
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked"})
+	public Map selectRepFileLockList(Map paramMap) throws Exception {
+		Map rtnMap = new HashMap<>();
+		
+		
+		String data = (String) paramMap.get("data");
+		
+		
+		Object checkParam = checkParamDataKey(data);
+		
+		
+		if(checkParam instanceof String) {
+			rtnMap.put("result", false);
+			rtnMap.put("error_code", checkParam.toString());
+			return rtnMap;
+		}else {
+			
+			JSONObject jsonObj = (JSONObject) checkParam;
+			
+			
+			String ticketId = OslUtil.jsonGetString(jsonObj, "ticket_id");
+			
+			
+			if(ticketId == null) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.PARAM_TICKET_ID_NULL);
+				return rtnMap;
+			}
+			
+			
+			String lockTargetRv = OslUtil.jsonGetString(jsonObj, "lock_target_rv");
+			
+			
+			String lockStateCd = OslUtil.jsonGetString(jsonObj, "lock_state_cd");
+			
+			
+			Map newMap = new HashMap<>();
+			newMap.put("ticketId", ticketId);
+			
+			
+			if(lockTargetRv != null) {
+				newMap.put("lockTargetRv", lockTargetRv);
+			}
+			if(lockStateCd != null) {
+				newMap.put("lockStateCd", lockStateCd);
+			}
+			List<Map> lckList = lck1000Service.selectLck1000TktLockList(newMap);
+			rtnMap.put("data", lckList);
+			rtnMap.put("result", true);
+		}
+		return rtnMap;
+	}
 }
