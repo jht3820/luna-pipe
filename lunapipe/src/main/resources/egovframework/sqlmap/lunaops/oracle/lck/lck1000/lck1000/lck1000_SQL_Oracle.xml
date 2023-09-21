@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="lck1000DAO">
+
+	
+	<typeAlias alias="egovMap" 	type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias alias="repLockVo"	type="kr.opensoftlab.sdf.rep.com.vo.RepLockVO"/>
+	
+	
+    <resultMap id="resultLckListExt" class="HashMap">
+		<result property="rep_id" 			column="REP_ID" />
+		<result property="rep_nm"			column="REP_NM" />
+		<result property="lock_id" 			column="LOCK_ID" />
+		<result property="lock_path" 		column="LOCK_PATH" />
+		<result property="lock_usr_id" 		column="LOCK_USR_ID" />
+		<result property="lock_comment" 	column="LOCK_COMMENT" />
+		<result property="lock_state_cd" 	column="LOCK_STATE_CD" />
+		<result property="lock_state_nm" 	column="LOCK_STATE_NM" />
+		<result property="lock_force" 		column="LOCK_FORCE" />
+		<result property="ticket_id" 		column="TICKET_ID" />
+		<result property="lock_target_rv" 	column="LOCK_TARGET_RV" />
+		<result property="reg_dtm" 			column="REG_DTM" />
+		<result property="reg_usr_id" 		column="REG_USR_ID" />
+		<result property="reg_usr_ip" 		column="REG_USR_IP" />
+	</resultMap>
+	
+   	<sql id="lck1000DAO.selectLck1000Base">
+		<![CDATA[
+		SELECT
+				A.REP_ID
+				, B.REP_NM
+				, B.REP_TYPE_CD
+				, A.LOCK_ID
+				, A.LOCK_PATH
+				, A.LOCK_USR_ID
+				, A.LOCK_COMMENT
+				, A.LOCK_STATE_CD
+				, SF_CMM1001_COM_CD_INFO('LCK00001', A.LOCK_STATE_CD, '1') AS LOCK_STATE_NM
+				, A.LOCK_FORCE
+				, A.TICKET_ID
+				, A.LOCK_TARGET_RV
+				, A.REG_DTM 
+	            , A.REG_USR_ID 
+	            , A.REG_USR_IP 
+		]]>
+	            <!-- 
+	            , A.MODIFY_DTM 
+	            , A.MODIFY_USR_ID 
+	            , A.MODIFY_USR_IP
+	             -->
+		<![CDATA[
+			FROM LCK1000 A INNER JOIN REP1000 B ON (A.REP_ID = B.REP_ID)
+			WHERE 1=1
+		]]>
+        	ORDER BY A.REG_DTM DESC	
+	</sql>
+	
+	
+	<select id="lck1000DAO.selectLck1000TktLockList" parameterClass="java.util.Map" resultMap="resultLckListExt">
+		<![CDATA[ 
+			
+			SELECT 
+				T1.*
+			FROM (
+			]]> 
+				<include refid="lck1000DAO.selectLck1000Base"/>
+			<![CDATA[ 
+			) T1
+			WHERE 1=1
+		]]>
+			<isEmpty property="lockTargetRv">
+				<isEmpty property="lockStateCd">
+					AND T1.LOCK_STATE_CD = '01'
+					AND NOT EXISTS
+					(
+						SELECT Z.LOCK_ID
+				        FROM LCK1000 Z
+				        WHERE 1=1
+				        AND Z.REP_ID = T1.REP_ID
+				        AND Z.LOCK_ID = T1.LOCK_ID
+				        AND Z.LOCK_STATE_CD = '02'
+					)
+					AND T1.TICKET_ID = #ticketId#
+				</isEmpty>
+			</isEmpty>
+			<isNotEmpty property="lockTargetRv">
+				AND T1.LOCK_TARGET_RV = #lockTargetRv#
+			</isNotEmpty>
+			<isNotEmpty property="lockStateCd">
+				AND T1.LOCK_STATE_CD = #lockStateCd#
+			</isNotEmpty>
+	</select>
+	
+	
+	<select id="lck1000DAO.selectLck1000BaseInfo" parameterClass="java.util.Map" resultClass="egovMap">
+		<![CDATA[ 
+			
+			SELECT 
+				T1.*
+			FROM (
+			]]> 
+				<include refid="lck1000DAO.selectLck1000Base"/>
+			<![CDATA[ 
+			) T1
+			WHERE 1=1
+			AND T1.REP_ID = #repId#
+			AND T1.LOCK_ID = #lockId#
+			AND T1.LOCK_STATE_CD = #lockStateCd#
+		]]>
+	</select>
+	
+	
+	<insert id="lck1000DAO.insertLck1000LockInfo" parameterClass="repLockVo">
+		<![CDATA[ 
+			
+			INSERT INTO LCK1000
+			(
+				REP_ID					,LOCK_ID						,LOCK_PATH
+				,LOCK_STATE_CD			,LOCK_USR_ID					,LOCK_COMMENT
+				,LOCK_FORCE				,TICKET_ID						,LOCK_TARGET_RV
+				,REG_DTM				,REG_USR_ID						,REG_USR_IP
+					    
+			)
+			VALUES
+			(
+				#repId#					,#lockId#						,#lockPath#
+				,#lockStateCd#			,#lockUsrId#					,#lockComment#
+				,#lockForce#			,#ticketId#						,#lockTargetRv#
+				,SYSDATE				,#lockUsrId#					,#regUsrIp#
+			)
+		]]>
+	</insert>
+	
+	
+	<update id="lck1000DAO.updateLck1000LockInfo" parameterClass="repLockVo">
+		
+		UPDATE LCK1000
+		SET    LOCK_STATE_CD 	= #lockStateCd#		 
+			 , MODIFY_DTM		= SYSDATE
+			 , MODIFY_USR_ID	= #lockUsrId#	
+			 , MODIFY_USR_IP	= #regUsrIp#
+			
+		WHERE	1=1
+			AND REP_ID = #repId#
+			AND LOCK_ID = #lockId#
+	</update>
+</sqlMap>
