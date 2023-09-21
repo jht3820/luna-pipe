@@ -1,6 +1,6 @@
 var globals_guideContents =
 	{
-		
+		// SVN 저장소 관리
 		"rep1000":   
 			[  {id:"repGuide_rep1000button",target:"rep1000button",mainTitle:"[소스 저장소 등록관리]",top:228,left:146,position:"left",targetPosition:"left"
 				,subBox:[
@@ -11,15 +11,13 @@ var globals_guideContents =
 						,{title:"<i class='fas fa fa-save' title='등록'></i>&nbsp;등록", content:"[팝업] 소스 저장소를 등록합니다."}
 						,{title:"<i class='fa fa-edit' title='수정'></i>&nbsp;수정", content:"[팝업] 목록에서 선택한 소스 저장소를 수정합니다."}
 						,{title:"<i class='fa fa fa-trash-alt' title='삭제'></i>&nbsp;삭제", content:"목록에서 선택한 소스 저장소를 삭제합니다."}
-						,{title:"<i class='fa fa-file-excel' title='엑셀'></i>&nbsp;엑셀", content:"소스 저장소 목록을 엑셀 파일로 다운로드 합니다."}
-						,{title:"<i class='fa fa-print' title='프린트'></i>&nbsp;프린트", content:"소스 저장소 목록을 프린트 합니다."}					
 				         ]},
 		         {id:"rep1000Guide_grid",target:"grid",mainTitle:"[소스 저장소 목록]",top:505,left:146,position:"left",targetPosition:"left", curve:false
 						,subBox:[
 						         	{title:"<i class='fas fa fa-list' title='소스 저장소 목록'></i>&nbsp;소스 저장소 목록", content:"시스템에 등록된 소스저장소 목록이 표시됩니다."}
 								]}      
 			]
-		,
+		,// 저장소 관리
 		"rep1001":   
 			[  {id:"repGuide_svnUrl",target:"svnUrl",mainTitle:"[URL]",top:100,left:280,position:"left",targetPosition:"left", curve:false
 				,subBox:[
@@ -42,14 +40,12 @@ var globals_guideContents =
 					 ]
 			 }
 			]
-		,
+		,// 저장소 상세정보
 		"rep1002":   
 			[  {id:"repGuide_repBtn",target:"rep1002RepBtn",mainTitle:"[소스저장소 리비전 버튼 영역]",top:100,left:280,position:"left",targetPosition:"left", curve:false
 				,subBox:[
 					{title:"<i class='fas fa-search' title='리비전 범위'></i>&nbsp;리비전 범위", content:"선택 소스저장소의 리비전 표시 범위를 지정합니다. "}
 					,{title:"<i class='fas fa fa-list' title='조회'></i>&nbsp;조회", content:"선택 소스저장소의 리비전 목록을 조회합니다."}
-					,{title:"<i class='fa fa-file-excel' title='엑셀'></i>&nbsp;엑셀", content:"리비전 목록을 엑셀 파일로 다운로드 합니다."}
-					,{title:"<i class='fa fa-print' title='프린트'></i>&nbsp;프린트", content:"리비전 목록을 프린트 합니다."}						     
 					]
 			}
 			, {id:"repGuide_repList",target:"rep1002RepList",mainTitle:"[소스저장소 리비전 목록]",top:355,left:200,position:"left",targetPosition:"left", curve:false
@@ -68,7 +64,46 @@ var globals_guideContents =
 					]
 			}
 			]
-		,
+		,//branche -> trunk 소스 커밋 화면
+		"rep1100":   
+			[  {id:"repGuide_rep1100button",target:"rep1100button",mainTitle:"[Branche -> Trunk 변경 파일 커밋 화면]",top:228,left:146,position:"left",targetPosition:"left"
+				,subBox:[
+						{title:"<i class='fas fa fa-list' title='조회'></i>&nbsp;조회", content:"등록된 소스 저장소를 조회합니다."}
+				         ]},
+		         {id:"rep1100Guide_grid",target:"tktFileGridTarget",mainTitle:"[변경 파일 목록]",top:505,left:146,position:"left",targetPosition:"left", curve:false
+						,subBox:[
+						         	{title:"<i class='fas fa fa-list' title='변경 파일 목록'></i>&nbsp;변경 파일 목록", content:"티켓의 소스저장소 Branche에 커밋된 변경 파일 목록입니다."}
+								]}      
+			]
+		,//운영빌드 결과, 배포저장소 커밋 화면
+		"rep1102":   
+			[  {
+				id:"rep1102Guide_rep1100BuildDataGrid",target:"buildDataGridTarget",mainTitle:"[운영 빌드 목록]",top:135,left:145,position:"left",targetPosition:"left"
+					,subBox: [{title:"<i></i>",content:"티켓에 실행된 운영 빌드 목록입니다."}]
+				},
+				{id:"rep1102Guide_rsyncDataGrid",target:"rsyncDataGridTarget",mainTitle:"[Source-Deploy 비교 결과 변경 파일]",top:135,left:785,position:"right",targetPosition:"right", curve:false
+					,subBox: [{title:"<i></i>", content:"운영 빌드 결과 배포 저장소 커밋 대상 파일 목록입니다.(Source <-> Deploy merge 결과"}]
+				}, 
+				{id:"rep1102Guide_tktChgDataGrid",target:"tktChgDataGridTarget",mainTitle:"[티켓 소스저장소별 Trunk 변경 파일 목록]",top:505,left:146,position:"left",targetPosition:"left", curve:false
+					,subBox: [{title:"<i></i>", content:"소스저장소 Trunk에 변경 등록된 파일 목록입니다."}]
+				}, 
+				{id:"rep1102Guide_commitDataGrid",target:"selCommitDataGridTarget",mainTitle:"[선택 변경 파일]",top:605,left:855,position:"right",targetPosition:"right", curve:false
+					,subBox: [{title:"<i></i>", content:"배포 저장소에 커밋되는 선택된 파일 목록입니다."}]
+				}, 
+				{id:"rep1102Guide_dataTransferBtn",target:"rep1102DataTransferBtnFrame",mainTitle:"[비교 결과 변경 파일 추가&제거]",top:445,left:845,position:"top",targetPosition:"right", curve:false
+					,subBox: [{title:"<i></i>", content:"배포 저장소에 커밋되는 파일을 추가 하거나 제거하는 버튼입니다."}]
+				},
+			]
+		,//branche -> trunk 소스 커밋 화면
+		"rep1103":   
+			[  {id:"repGuide_rep1103button",target:"rep1103button",mainTitle:"[티켓 배포 저장소 변경 파일 목록]",top:228,left:146,position:"left",targetPosition:"left"
+					,subBox:[{title:"<i class='fas fa fa-list' title='조회'></i>&nbsp;조회", content:"티켓 배포 저장소에 커밋된 변경 파일 목록을 조회합니다."}]
+				},
+		       {id:"rep1103Guide_grid",target:"tktDplFileGridTarget",mainTitle:"[변경 파일 목록]",top:505,left:146,position:"left",targetPosition:"left", curve:false
+					,subBox:[{title:"<i class='fas fa fa-list' title='변경 파일 목록'></i>&nbsp;변경 파일 목록", content:"배포 저장소에 커밋된 변경 파일 목록입니다.</br>실제 운영 배포 대상 파일을 선택해주세요."}]
+		       }
+			]
+		,// JENKINS 저장소 등록관리
 		"jen1000":   
 				[{id:"jen1000_jenkinsBtn",target:"jen1000JenkinsBtn",mainTitle:"[JENKINS 목록 그리드 버튼영역]",top:10,left:800,position:"left",targetPosition:"right", curve:false
 					,subBox:[
@@ -79,8 +114,6 @@ var globals_guideContents =
 								,{title:"<i class='fas fa fa-save' title='등록'></i>&nbsp;등록", content:"[팝업] JENKINS를 등록합니다."}
 								,{title:"<i class='fa fa-edit' title='수정'></i>&nbsp;수정", content:"[팝업] 목록에서 선택한 JENKINS를 수정합니다."}
 								,{title:"<i class='fa fa fa-trash-alt' title='삭제'></i>&nbsp;삭제", content:"목록에서 선택한 JENKINS를 삭제합니다."}
-								,{title:"<i class='fa fa-file-excel' title='엑셀'></i>&nbsp;엑셀", content:"JENKINS 목록을 엑셀 파일로 다운로드 합니다."}
-								,{title:"<i class='fa fa-print' title='프린트'></i>&nbsp;프린트", content:"JENKINS 목록을 프린트 합니다."}						     
 					         ]},
 				{id:"jen1000_jenkinsList",target:"jen1000JenkinsList",mainTitle:"[JENKINS 목록]",top:195,left:120,position:"right",targetPosition:"right", curve:false
 					,subBox:[
@@ -96,8 +129,6 @@ var globals_guideContents =
 								 ,{title:"<i class='fas fa fa-save' title='등록'></i>&nbsp;등록", content:"[팝업] JOB을 등록합니다."}
 								 ,{title:"<i class='fa fa-edit' title='수정'></i>&nbsp;수정", content:"[팝업] 목록에서 선택한 JOB을 수정합니다. <br/>JENKINS에 일치하는 JOB이 없을 경우 수정 할 수 없습니다."}
 								 ,{title:"<i class='fa fa fa-trash-alt' title='삭제'></i>&nbsp;삭제", content:"목록에서 선택한 JOB을 삭제합니다."}
-								 ,{title:"<i class='fa fa-file-excel' title='엑셀'></i>&nbsp;엑셀", content:"JOB 목록을 엑셀 파일로 다운로드 합니다."}
-								 ,{title:"<i class='fa fa-print' title='프린트'></i>&nbsp;프린트", content:"JOB 목록을 프린트 합니다."}						     
 							]},	
 				{id:"jen1000_jobList",target:"jen1000JobList",mainTitle:"[JENKINS JOB 목록]",top:595,left:120,position:"right",targetPosition:"right", curve:false
 					,subBox:[
@@ -113,7 +144,7 @@ var globals_guideContents =
 					         	{title:"<i class='fas fa fa-list' title='JOB 목록'></i>&nbsp;JOB 목록",content:"구성항목에 등록하려는 선택된 JOB 목록입니다."}
 							]},		
 			]
-		,
+		,// JENKINS 저장소 등록관리
 		"jen1007":   
 			[{id:"jen1007_jenkinsBtn",target:"jen1007JenkinsBtn",mainTitle:"[JENKINS 목록 그리드 버튼영역]",top:10,left:800,position:"left",targetPosition:"right", curve:false
 				,subBox:[
@@ -121,8 +152,6 @@ var globals_guideContents =
 									"<br/><i class='fas fa-check-circle result-success'></i> 정상접속, <i class='fas fa-times-circle result-fail'></i> 접속실패"}
 							,{title:"<i class='fas fa-angle-double-right' title='선택 접속확인'></i>&nbsp;선택 접속확인", content:"목록에서 선택한 JENKINS의 접속 여부를 체크합나다."}
 							,{title:"<i class='fas fa fa-list' title='조회'></i>&nbsp;조회", content:"등록된 JENKINS를 조회합니다."}
-							,{title:"<i class='fa fa-file-excel' title='엑셀'></i>&nbsp;엑셀", content:"JENKINS 목록을 엑셀 파일로 다운로드 합니다."}
-							,{title:"<i class='fa fa-print' title='프린트'></i>&nbsp;프린트", content:"JENKINS 목록을 프린트 합니다."}						     
 				         ]},
 			{id:"jen1007_jenkinsList",target:"jen1007JenkinsList",mainTitle:"[JENKINS 목록]",top:195,left:120,position:"right",targetPosition:"right", curve:false
 				,subBox:[
@@ -134,8 +163,6 @@ var globals_guideContents =
 									"<br/><i class='fas fa-check-circle result-success'></i> 정상접속, <i class='fas fa-times-circle result-fail'></i> 접속실패"}
 							 ,{title:"<i class='fas fa-angle-double-right' title='선택 접속확인'></i>&nbsp;선택 접속확인", content:"목록에서 선택한 JOB의 접속 여부를 체크합나다."}
 							 ,{title:"<i class='fas fa fa-list' title='조회'></i>&nbsp;조회", content:"등록된 JOB을 조회합니다."}
-							 ,{title:"<i class='fa fa-file-excel' title='엑셀'></i>&nbsp;엑셀", content:"JOB 목록을 엑셀 파일로 다운로드 합니다."}
-							 ,{title:"<i class='fa fa-print' title='프린트'></i>&nbsp;프린트", content:"JOB 목록을 프린트 합니다."}						     
 						]},	
 			{id:"jen1007_jobList",target:"jen1007JobList",mainTitle:"[JENKINS JOB 목록]",top:595,left:120,position:"right",targetPosition:"right", curve:false
 				,subBox:[
@@ -153,18 +180,18 @@ var globals_guideContents =
 				         	{title:"<i class='fas fa fa-list' title='JOB 목록'></i>&nbsp;JOB 목록",content:"구성항목에 등록하려는 선택된 JOB 목록입니다."}
 						]},		
 		]
-		,
+		,// JENKINS 설정 관리
 		"jen1001":   
 			[  {id:"jenGuide_jenkinsInfo",target:"jenkinsInfo",mainTitle:"[JENKINS 설정]",top:304,left:146,position:"top",targetPosition:"top", curve: false
 				,subBox:[
-				         {title:"<i></i>",content:"URL : JEKINS 시스템의 접속 URL(http:
+				         {title:"<i></i>",content:"URL : JEKINS 시스템의 접속 URL(http://URL:PORT/jenkins/)에<br/>jenkins/을 제거(http://URL:PORT/)하고 입력합니다 ."}
 				         ,{title:"<i></i>",content:"USER : JEKINS 시스템의 접속가능한 사용자 ID를 입력합니다."}
 				         ,{title:"<i></i>",content:"USER TOKEN KEY : JEKINS 시스템의 접속가능한 사용자의 API TOKEN을 가져와 입력합니다."}
 				         ]
 			}
 			
 			]
-		,
+		,// JENKINS 설정 관리(JOB 등록 팝업)
 		"jen1002":   
 			[	{id:"jen1002Guide_jobInfo",target:"jen1002LeftJobForm",mainTitle:"[JOB 정보 입력]",top:304,left:46,position:"top",targetPosition:"top", curve: false
 					,subBox:[
@@ -179,7 +206,7 @@ var globals_guideContents =
 				}
 			
 			]
-		,
+		,// JOB 빌드 이력 팝업
 		"jen1004":   
 			[	{id:"jen1004Guide_jobBldDetailInfo",target:"jen1004JobBldDetailInfo",mainTitle:"[JOB 빌드 상세 정보]",top:175,left:715,position:"top",targetPosition:"top", curve: false
 				,subBox:[
@@ -198,6 +225,7 @@ var globals_guideContents =
 	        		 ]} 
 			
 			]
+		// 배포 계획 생성 관리
 		,"dpl1000":
 			[{id:"dpl1000_dplJobList",target:"dpl1000DplJobList",mainTitle:"[배포 계획 배정 JOB 목록]",top:155,left:500,position:"bottom",targetPosition:"top",curve:false	
 			,subBox:[
