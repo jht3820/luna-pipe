@@ -343,7 +343,7 @@ function fnRep1103GuideShow(){
 			[<c:out value="${requestScope.ticketId}"/>] 티켓 배포 저장소 변경 파일 목록
 		</div>
 		<div id="tktDplFileSearchTarget" guide="rep1103button" ></div>
-		<div data-ax5grid="tktDplFileGridTarget" data-ax5grid-config="{}" style="height: 600px;"></div>
+		<div data-ax5grid="tktDplFileGridTarget" data-ax5grid-config="{}" style="height: 600px;" guide="tktDplFileGridTarget"></div>
 		<div class="btnFrame">
 			<div class="mainPopupBtn" id="dplFileDataSelectBtn"><i class="fas fa-paperclip"></i>&nbsp;배포 파일 선택</div>
 			<div class="mainPopupBtn" id="repCloseBtn"><i class="fas fa-times-circle"></i>&nbsp;닫기</div>
