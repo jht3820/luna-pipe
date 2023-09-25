@@ -71,4 +71,8 @@ public interface ApiService {
 	
 	@SuppressWarnings({ "rawtypes"})
 	Map selectRepFileLockList(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings({ "rawtypes"})
+	Map insertTempRepFileLock(Map paramMap) throws Exception;
 }
