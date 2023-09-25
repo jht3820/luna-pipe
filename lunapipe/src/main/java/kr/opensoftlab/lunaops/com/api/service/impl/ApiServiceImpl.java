@@ -1366,6 +1366,8 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 									typeName = "02";
 								}else if( 'D'==type ) {
 									typeName = "03";
+								}else {
+									typeName = "02";
 								}
 
 								newMap = new HashMap<>();
