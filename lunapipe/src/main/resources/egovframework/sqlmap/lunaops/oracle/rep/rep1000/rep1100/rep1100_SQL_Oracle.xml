@@ -576,4 +576,27 @@
 		AND TICKET_ID = #ticketId#
 		AND REP_RV_TYPE_CD = '02'
     </select>
+    
+    
+    <select id="rep1100DAO.selectTempDataList" parameterClass="java.util.Map"  resultClass="egovMap">
+	    
+		SELECT *
+		FROM
+		(
+	   		SELECT REP_ID, PATH, EMP_ID
+			FROM TEMP
+			WHERE 1=1
+			AND SUCC_CD = '01'
+    	) T1
+    </select>
+    
+    
+	<update id="rep1100DAO.updateTempDataInfo" parameterClass="java.util.Map">
+		 
+		UPDATE TEMP SET
+			SUCC_CD = '02'
+		WHERE 1=1
+		AND REP_ID = #repId#
+		AND PATH = #path#
+	</update>
 </sqlMap>
