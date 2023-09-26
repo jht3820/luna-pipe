@@ -42,7 +42,7 @@ var buildResultWaitTime = 3000;
 //선택 JOB 있는 경우
 var selJobStatusFlag = true;
 //사용자 모니터링 중지 flag
-var userJobStatusFlag = true;
+var userJobStatusFlag = false;
 
 //콘솔 로그
 var jobConsoleLog = {};
@@ -154,7 +154,21 @@ $(document).ready(function() {
 			
 			//운영빌드 파라미터 있는지 체크
 			if(!ADD_JOB_PARAM_LIST.hasOwnProperty(item.jenId) || !ADD_JOB_PARAM_LIST[item.jenId].hasOwnProperty(item.jobId)){
-				addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br>";
+				//파라미터 정보 없는데 최종 리비전 값이 있는 경우
+				var ticketLastRv = $("form#dpl1000Form > #ticketLastRv").val();
+				if(!gfnIsNull(ticketLastRv)){
+					//파라미터 자동 세팅
+					if(!ADD_JOB_PARAM_LIST.hasOwnProperty(item.jenId)){
+						ADD_JOB_PARAM_LIST[item.jenId] = {};
+					}
+					ADD_JOB_PARAM_LIST[item.jenId][item.jobId].push({
+		   				"jobParamKey": jobParamRevision,
+		   				"jobParamVal": ticketLastRv
+		   			});
+				}else{
+					addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br>";
+				}
+				
 			}else{
 				//JOB 파라미터에 리비전 값 입력됬는지 체크
 				var targetJobParam = ADD_JOB_PARAM_LIST[item.jenId][item.jobId];
