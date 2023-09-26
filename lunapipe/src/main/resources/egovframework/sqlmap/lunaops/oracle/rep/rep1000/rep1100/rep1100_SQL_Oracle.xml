@@ -69,7 +69,7 @@
 		FROM REP1101 A
 		INNER JOIN
 		(
-			SELECT REP_ID, MAX(REP_RV) AS MAX_REP_RV, REP_CHG_FILE_PATH, REP_CHG_FILE_NM
+			SELECT REP_ID, MAX(TO_NUMBER(REP_RV)) AS MAX_REP_RV, REP_CHG_FILE_PATH, REP_CHG_FILE_NM
 			FROM REP1101
 			WHERE 1=1
 			AND TICKET_ID = #ticketId#
@@ -576,4 +576,27 @@
 		AND TICKET_ID = #ticketId#
 		AND REP_RV_TYPE_CD = '02'
     </select>
+    
+    
+    <select id="rep1100DAO.selectTempDataList" parameterClass="java.util.Map"  resultClass="egovMap">
+	    
+		SELECT *
+		FROM
+		(
+	   		SELECT REP_ID, PATH, EMP_ID
+			FROM TEMP
+			WHERE 1=1
+			AND SUCC_CD = '01'
+    	) T1
+    </select>
+    
+    
+	<update id="rep1100DAO.updateTempDataInfo" parameterClass="java.util.Map">
+		 
+		UPDATE TEMP SET
+			SUCC_CD = '02'
+		WHERE 1=1
+		AND REP_ID = #repId#
+		AND PATH = #path#
+	</update>
 </sqlMap>
