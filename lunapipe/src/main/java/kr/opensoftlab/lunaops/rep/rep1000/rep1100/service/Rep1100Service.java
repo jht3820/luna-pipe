@@ -86,4 +86,11 @@ public interface Rep1100Service {
 	
 	@SuppressWarnings("rawtypes")
 	Map selectRep1101TktChgFileLastRvNum(Map paramMap) throws Exception;
+	
+	@SuppressWarnings({ "rawtypes"})
+	List<Map> selectTempDataList(Map paramMap) throws Exception;
+
+	
+	@SuppressWarnings("rawtypes")
+	int updateTempDataInfo(Map paramMap) throws Exception;
 }
