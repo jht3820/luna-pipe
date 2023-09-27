@@ -247,12 +247,18 @@ div.svn_mask_content#repDplInputMask {
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+.rep1102MainMiddleFrame.top > .rep1102MiddleLeftFrame {
+	width: 480px;
+}
+.rep1102MainMiddleFrame.top > .rep1102MiddleRightFrame {
+	width: 990px;
+}
 .rep1102DataTransferBtnFrame {
     display: inline-block;
     width: 100%;
     height: 35px;
     text-align: right;
-    padding-right: 300px;
+    padding-right: 400px;
 }
 .rep1102DataTransferBtnFrame > button#selFileChgAddBtn {
     margin-right: 40px;
