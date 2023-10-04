@@ -22,7 +22,7 @@
 .ztree {
 	overflow: scroll;
 }
-textarea#jobDesc{height:110px;}
+textarea#jobDesc{height:288px;}
 input#jobTriggerVal{min-width: 100px;}
 .input_txt.readonlyBgNone{background-color:#fff !important;}
 textarea#jobTriggerVal {height: 100px;}
@@ -259,11 +259,6 @@ $(document).ready(function() {
 			return;	
 		}
  */
-		if(gfnIsNull(selJobId)){
-			jAlert("JOB ID은(는) 필수 입력 사항입니다.\n\n\r JOB ID 항목을 입력하세요.",'알림창');
-			return;
-		}
-		
 		// 등록/수정 전 유효성 체크
 		if(!gfnSaveInputValChk(arrChkObj)){
 			return false;	
@@ -427,14 +422,26 @@ function fnInsertJobInfoAjax(formId){
 	
 	//jobID
 	var jobNm = selJobId;
+	var alertMsg = "JOB("+jobNm+")을 저장하시겠습니까?";
+	var selJobList = [];
 	
 	if('${param.popupGb}' == 'insert'){
+		//선택 job
+		selJobList = zTreeJen1002.getCheckedNodes();
+		
+		if(!selJobList || !selJobList.length){
+			jAlert("등록하려는 JOB을 체크해주세요.");
+			return;
+		}
 		//insert시 선택 job
+		/* 
 		selJobInfo = zTreeJen1002.getCheckedNodes()[0];
 		jobNm = selJobInfo["name"];
+		 */
+		alertMsg = "JOB "+selJobList.length+"개를 등록하시겠습니까?";
 	}
 
-	jConfirm("JOB("+jobNm+")을 저장하시겠습니까?", "알림창", function( result ) {
+	jConfirm(alertMsg, "알림창", function( result ) {
 		if( result ){
 
 			var fd = new FormData();
@@ -456,16 +463,18 @@ function fnInsertJobInfoAjax(formId){
 
 			fd.append("jenUrl",jenUrl);
 			
-			//job url
-			if(!gfnIsNull(zTreeJen1002)){
-				fd.append("jobUrl",selJobInfo.url);
+			//등록인경우 선택된 job id 전체 전송
+			if('${param.popupGb}' == 'insert'){
+				var addJobList = [];
+				$.each(selJobList, function(idx, map){
+					addJobList.push({jobId: map.jobId, jobUrl: map.url});
+				});
+				fd.append("addJobList", JSON.stringify(addJobList));
 			}else{
 				fd.append("jobUrl",jobUrl);
+				//job full name 넣기
+				fd.set("jobId",selJobId);
 			}
-			
-			//job full name 넣기
-			fd.set("jobId",selJobId);
-			
 			//AJAX 설정
 			var ajaxObj = new gfnAjaxRequestAction(
 					{"url":"<c:url value='/jen/jen1000/jen1000/saveJen1100JobInfoAjax.do'/>"
@@ -638,7 +647,7 @@ function fnJenIdSelecetd(){
 				        },
 				        check: {
 				    		enable: true,
-				    		chkStyle: "radio",
+				    		chkStyle: "checkbox",
 				    		radioType: "all"
 				    	},
 				        // 동적 트리 설정
@@ -666,24 +675,11 @@ function fnJenIdSelecetd(){
 								}else{
 									selJobId = "";
 									selJobPath = "";
-
-									//선택된 node 있는 경우
-									if(!gfnIsNull(zTreeJen1002.getSelectedNodes()[0])){
-										//선택 해제
-										zTreeJen1002.cancelSelectedNode(zTreeJen1002.getSelectedNodes()[0]);
-									}
-									//체크된 node 있는 경우
-									if(!gfnIsNull(zTreeJen1002.getCheckedNodes()[0])){
-										//체크 해제
-										zTreeJen1002.checkNode(zTreeJen1002.getCheckedNodes()[0], false, true, false);
-									}
-									
 								}
 							},
 							onCheck: function(event, treeId, treeNode){
 								//해당 job 선택
 								zTreeJen1002.selectNode(treeNode);
-								
 							},
 							onAsyncError: fnAsyncError
 						},
@@ -991,13 +987,15 @@ function fnSelJobCronSpec(paramJobId){
 						</span>
 					</div>
 				</div>
-				<div class="pop_note" style="margin-bottom:0px;">
+				<!-- 
+				<div class="pop_note" style="margin-bottom:0px;"> 
 					<div class="note_title"><label for="jobTriggerVal">Cron 값</label></div>
 					<textarea class="input_note" title="Cron 값" name="jobTriggerVal" id="jobTriggerVal" rows="7" value="" maxlength="2000" readonly></textarea>
 				</div>
 				<div class="jenkinsTriggerMsg" id="jenkinsTriggerMsg">
 					* 값 체크 메시지가 출력되는 영역입니다. (포커스 해제 시)
 				</div>
+				 -->
 				<div class="pop_note" style="margin-bottom:0px;">
 					<div class="note_title">JOB 설명</div>
 					<textarea class="input_note" title="JOB 설명" name="jobDesc" id="jobDesc" rows="7" value="" maxlength="2000"  ></textarea>

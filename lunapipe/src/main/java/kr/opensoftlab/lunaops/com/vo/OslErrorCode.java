@@ -35,11 +35,15 @@ public class OslErrorCode {
 		put("202", "소스저장소 리비전 'rv' 값 없음");
 		put("203", "Trunk 경로에 복사 대상이 없음");
 		put("204", "파일 락 중 오류가 발생했습니다.");
+		put("205", "소스저장소 UUID로 REP_ID값 조회 중 오류 발생.");
 		
 		
 		put("300", "JENKINS 연결 실패");
 		put("301", "해당 JOB이 실행 중입니다.");
 		put("302", "빌드 번호 정보가 없습니다.");
+		
+		
+		put("400", "티켓 검증 오류");
 		
 		
 		put("999", "서버 내 처리 중 오류");
@@ -123,8 +127,10 @@ public class OslErrorCode {
 	public final static String REP_TRUNK_PATH_NULL = "203";
 	
 	
-	
 	public final static String FILE_LOCKED_FAIL = "204";
+	
+	
+	public final static String UUID_TO_REP_ID_FAIL = "205";
 	
 	
 	public final static String JENKINS_CONN_FAIL = "300";
@@ -134,6 +140,9 @@ public class OslErrorCode {
 	
 	
 	public final static String BLD_NUM_NULL = "302";
+	
+	
+	public final static String IS_TICKET_FAIL = "400";
 	
 	
 	public final static String SERVER_ERROR = "999";
