@@ -537,6 +537,12 @@ public class Jen1000Controller {
 			}
 
 			
+			if(paramMap.containsKey("useCd")) {
+				String useCd = paramMap.get("useCd");
+				jen1100VO.setUseCd(useCd);
+			}
+			
+			
 			jen1100VO.setPageIndex(_pageNo);
 			jen1100VO.setPageSize(_pageSize);
 			jen1100VO.setPageUnit(_pageSize);
