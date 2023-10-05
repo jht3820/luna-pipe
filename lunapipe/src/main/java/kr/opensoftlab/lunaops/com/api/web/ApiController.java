@@ -248,8 +248,8 @@ public class ApiController {
 				model.addAttribute("result", "SUCCESS");
 				model.addAttribute("msg", "정상적으로 생성되었습니다.");
 			}else {
-				response.setStatus(500);
 				String errorCode = (String) rtnMap.get("error_code");
+				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -294,7 +294,7 @@ public class ApiController {
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
-				response.setStatus(500);
+				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -402,7 +402,7 @@ public class ApiController {
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
-				response.setStatus(500);
+				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -526,7 +526,7 @@ public class ApiController {
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
-				response.setStatus(500);
+				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -803,7 +803,7 @@ public class ApiController {
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
-				response.setStatus(500);
+				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
