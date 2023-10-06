@@ -324,7 +324,7 @@ function fnSelJobBuildInfo(paramBldItem){
 		var buildResult = "-";
 		var buildDurationStr = "-";
 		var buildEstimatedDurationStr = "-";
-		var buildChgLog = '<div class="buildChgMainFrame">-</div>';
+		var buildChgLog = '<div class="buildChgMainFrame">빌드 내역 없음.</div>';
 		var buildConsoleLog = "-";
 		var jobClass = "-";
 		var bldActionLog = "-";
@@ -654,7 +654,7 @@ function fnJen1004GuideShow(){
 				</div>
 				<div class="descMainFrame">
 					<div class="descHeaderLabelFrame"><label>변경 내용</label></div>
-					<div class="descBodyValueFrame" id="buildChgLog"><div class="buildChgMainFrame">-</div></div>
+					<div class="descBodyValueFrame" id="buildChgLog"><div class="buildChgMainFrame">빌드 내역 없음.</div></div>
 				</div>
 				<!-- 
 				<div class="descMainFrame descFullFrame">
