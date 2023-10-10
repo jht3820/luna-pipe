@@ -229,9 +229,7 @@ public class Rep1100Controller {
 			}
 			
 			
-			
 			rep1100List =  rep1100Service.selectRep1100TktRvFileChgList(paramMap);
-			
 			paginationInfo.setTotalRecordCount(totCnt);
 			
 			model.addAttribute("list", rep1100List);
@@ -551,6 +549,8 @@ public class Rep1100Controller {
 												}
 												else if(fileTypeNm == 'D') {
 													fileTypeCd = "03";
+												}else {
+													fileTypeCd = "02";
 												}
 												
 												Map newMap = new HashMap<>();
