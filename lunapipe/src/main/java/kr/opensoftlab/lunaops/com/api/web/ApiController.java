@@ -248,8 +248,8 @@ public class ApiController {
 				model.addAttribute("result", "SUCCESS");
 				model.addAttribute("msg", "정상적으로 생성되었습니다.");
 			}else {
+				response.setStatus(500);
 				String errorCode = (String) rtnMap.get("error_code");
-				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -294,7 +294,7 @@ public class ApiController {
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
-				response.setStatus(Integer.parseInt("9"+errorCode));
+				response.setStatus(500);
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -402,7 +402,7 @@ public class ApiController {
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
-				response.setStatus(Integer.parseInt("9"+errorCode));
+				response.setStatus(500);
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -464,45 +464,6 @@ public class ApiController {
 	
 	
 	@SuppressWarnings("rawtypes")
-	@RequestMapping(value="/api/selectTicketDplFileDataList", method=RequestMethod.POST)
-	public ModelAndView selectTicketDplFileDataList(@RequestBody HashMap<String, Object> paramMap, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-		try{
-			
-			Map rtnMap = apiService.selectTicketDplFileDataList(paramMap);
-			
-			if(rtnMap == null) {
-				model.addAttribute("result", "FAIL");
-				model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
-				model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
-				return new ModelAndView("jsonView");
-			}
-			
-			boolean result = (boolean) rtnMap.get("result");
-			
-			String errorCode = (String) rtnMap.get("error_code");
-			
-			if(!result) {
-				model.addAttribute("result", "FAIL");
-				model.addAttribute("error_code", errorCode);
-				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
-			}else {
-				model.addAttribute("result", "SUCCESS");
-				model.addAttribute("ticket_deploy_file_list", rtnMap.get("ticketDplSelFileList"));
-				model.addAttribute("msg", "정상적으로 조회되었습니다.");
-			}
-			
-		}catch(Exception ex){
-			ex.printStackTrace();
-			model.addAttribute("result", "ERROR");
-			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
-			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
-			Log.error("selectTicketRvDataList()", ex);
-		}
-		return new ModelAndView("jsonView");
-	}
-	
-	
-	@SuppressWarnings("rawtypes")
 	@RequestMapping(value="/api/selectTicketCheck", method=RequestMethod.GET)
 	public ModelAndView selectTicketCheck(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try{
@@ -526,7 +487,7 @@ public class ApiController {
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
-				response.setStatus(Integer.parseInt("9"+errorCode));
+				response.setStatus(500);
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -701,183 +662,5 @@ public class ApiController {
 		}
 		
 		return "/top/lunaReceiver_test";
-	}
-	
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value="/api/deleteCIRepJenJob", method=RequestMethod.POST)
-	public ModelAndView deleteCIRepJenJob(@RequestBody HashMap<String, Object> paramMap, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-		try{
-			
-			Map rtnMap = apiService.deleteCIRepJenJob(paramMap);
-			
-			
-			boolean result = (boolean) rtnMap.get("result"); 
-			
-			
-			int total = (int) rtnMap.get("total");
-			int executed = (int) rtnMap.get("executed");
-			
-			
-			List etcMsg = (List) rtnMap.get("etcMsg");
-			
-			
-			if(executed == 0) {
-				model.addAttribute("result", "FAIL");
-				model.addAttribute("total", total);
-				model.addAttribute("executed", executed);
-				model.addAttribute("error_code", OslErrorCode.DATA_DELETE_COUNT_NULL);
-				model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.DATA_DELETE_COUNT_NULL));
-				model.addAttribute("etc_msg", String.join("\n", etcMsg));
-			}
-			
-			else if(result) {
-				
-				if(executed < total) {
-					model.addAttribute("etc_msg", String.join("\n", etcMsg));
-				}
-				
-				model.addAttribute("result", "SUCCESS");
-				model.addAttribute("total", total);
-				model.addAttribute("executed", executed);
-				model.addAttribute("msg", "삭제에 성공했습니다.");
-			}else {
-				
-				String errorCode = (String) rtnMap.get("error_code");
-				
-				model.addAttribute("result", "FAIL");
-				model.addAttribute("error_code", errorCode);
-				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
-			}
-		}catch(Exception ex){
-			model.addAttribute("result", "ERROR");
-			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
-			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
-			Log.error("deleteCIRepJenJob()", ex);
-			
-		}
-		return new ModelAndView("jsonView");
-	}
-	
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value="/api/insertRepFileLock", method=RequestMethod.POST)
-	public ModelAndView insertRepFileLock(@RequestBody HashMap<String, Object> paramMap, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-		try{
-			
-			paramMap.put("regUsrIp", request.getRemoteAddr());
-			Map rtnMap = apiService.insertPostRepFileLock(paramMap);
-			
-			model.addAllAttributes(rtnMap);
-		}catch(Exception ex){
-			model.addAttribute("result", "ERROR");
-			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
-			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
-			Log.error("insertRepFileLock()", ex);
-			
-		}
-		return new ModelAndView("jsonView");
-	}
-	
-	
-	@SuppressWarnings("rawtypes")
-	@RequestMapping(value="/api/insertRepFileLock", method=RequestMethod.GET)
-	public ModelAndView insertRepFileLock(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-		try{
-			
-			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
-
-			
-			Map rtnMap = apiService.insertGetRepFileLock(paramMap);
-			if(rtnMap == null) {
-				
-				response.setStatus(500);
-				model.addAttribute("result", "FAIL");
-				model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
-				model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
-				return new ModelAndView("jsonView");
-			}
-			
-			boolean result = (boolean) rtnMap.get("result");
-			
-			String errorCode = (String) rtnMap.get("error_code");
-			
-			if(!result) {
-				response.setStatus(Integer.parseInt("9"+errorCode));
-				model.addAttribute("result", "FAIL");
-				model.addAttribute("error_code", errorCode);
-				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
-			}else {
-				response.setStatus(200);
-				model.addAttribute("result", "SUCCESS");
-				
-				model.addAttribute("msg", "정상적으로 처리되었습니다.");
-			}
-		}catch(Exception ex){
-			response.setStatus(500);
-			ex.printStackTrace();
-			model.addAttribute("result", "ERROR");
-			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
-			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
-			Log.error("insertRepFileLock()", ex);
-		}
-		return new ModelAndView("jsonView");
-	}
-	
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value="/api/insertRepFileUnLock", method=RequestMethod.POST)
-	public ModelAndView insertRepFileUnLock(@RequestBody HashMap<String, Object> paramMap, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-		try{
-			
-			paramMap.put("regUsrIp", request.getRemoteAddr());
-			Map rtnMap = apiService.insertRepFileUnLock(paramMap);
-			model.addAllAttributes(rtnMap);
-		}catch(Exception ex){
-			model.addAttribute("result", "ERROR");
-			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
-			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
-			Log.error("insertRepFileUnLock()", ex);
-		}
-		return new ModelAndView("jsonView");
-	}
-	
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value="/api/selectRepFileLockList", method=RequestMethod.POST)
-	public ModelAndView selectRepFileLockList(@RequestBody HashMap<String, Object> paramMap, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-		try{
-			
-			Map rtnMap = apiService.selectRepFileLockList(paramMap);
-			
-			model.addAllAttributes(rtnMap);
-		}catch(Exception ex){
-			model.addAttribute("result", "ERROR");
-			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
-			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
-			Log.error("selectRepFileLockList()", ex);
-		}
-		return new ModelAndView("jsonView");
-	}
-	
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value="/api/insertTempRepFileLock", method=RequestMethod.GET)
-	public ModelAndView insertTempRepFileLock(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-		try{
-			
-			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
-						
-			
-			Map rtnMap = apiService.insertTempRepFileLock(paramMap);
-			
-			model.addAllAttributes(rtnMap);
-		}catch(Exception ex){
-			model.addAttribute("result", "ERROR");
-			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
-			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
-			Log.error("insertTempRepFileLock()", ex);
-		}
-		return new ModelAndView("jsonView");
 	}
 }
