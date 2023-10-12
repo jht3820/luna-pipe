@@ -25,11 +25,8 @@ var ADD_JOB_PARAM_LIST = {};
 
 //티켓 id
 var ciId = '<c:out value="${requestScope.ciId}"/>';
-var jobType = "";
 
 $(function(){
-	jobType = $("form#jen1007Form #jobType").val();
-	
 	//jenkins 정보 호출
 	fnJenkinsGridSetting();
 	fnJenkinsSearchSetting();
@@ -46,7 +43,7 @@ $(function(){
 	var jobIdList = $("form#jen1007Form > #jobIdList").val();
 	if(!gfnIsNull(jobIdList)){
 		//사전에 등록되있던 데이터 있는 경우 해당 데이터 조회하기
-		fnStartJobDataSetting(jobIdList, jobType);
+		fnStartJobDataSetting(jobIdList);
 	}
 	
 	//가이드 상자 호출
@@ -526,7 +523,7 @@ function fnInJobGridListSet(_pageNo,ajaxParam,loadingShow){
    	}
    	
 	//ciId 추가
-   	ajaxParam += "&ciId="+ciId+"&jobType="+jobType;
+   	ajaxParam += "&ciId="+ciId;
   
    	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
@@ -686,6 +683,15 @@ function fnJenkinsSearchSetting(){
                 		}}
 					]},
 					{display:true, addClass:"", style:"", list:[
+                    						
+						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_print_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-print' aria-hidden='true'></i>&nbsp;<span>프린트</span>",
+							onclick:function(){
+								$(jenkinsGrid.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
+						}},
+						{label:"", labelWidth:"", type:"button", width:"55",style:"float:right;", key:"btn_excel_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-file-excel' aria-hidden='true'></i>&nbsp;<span>엑셀</span>",
+							onclick:function(){
+								jenkinsGrid.exportExcel("JENKINS_LIST.xls");
+						}},
 						{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_jenkins",style:"float:right;",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 							onclick:function(){
 								/* 검색 조건 설정 후 reload */
@@ -813,6 +819,15 @@ function fnJobSearchSetting(){
                 		}},
 					]},
 					{display:true, addClass:"", style:"", list:[
+                    						
+						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_print_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-print' aria-hidden='true'></i>&nbsp;<span>프린트</span>",
+							onclick:function(){
+								$(jobGrid.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
+						}},
+						{label:"", labelWidth:"", type:"button", width:"55",style:"float:right;", key:"btn_excel_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-file-excel' aria-hidden='true'></i>&nbsp;<span>엑셀</span>",
+							onclick:function(){
+								jobGrid.exportExcel("JENKINS-JOB_LIST.xls");
+						}},
 						{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_jenkins",style:"float:right;",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 							onclick:function(){
 								var item = jenkinsGrid.getList('selected')[0];
@@ -919,8 +934,7 @@ function fnSelJobSearchSetting(){
 										"jobId" : selJobList[0].jobId,
 										"jenUsrId" : selJobList[0].jenUsrId,
 										"jenUsrTok" : selJobList[0].jenUsrTok,
-										"jobTok" : selJobList[0].jobTok,
-										"jobTypeCd": selJobList[0].jobTypeCd 
+										"jobTok" : selJobList[0].jobTok
 								};
 								
 								// 빌드 파라미터 팝업 호출
@@ -1180,12 +1194,12 @@ function fnSelectJen1000JobBldLog(jobList){
 }
 
 //사전에 등록되있던 데이터 있는 경우 해당 데이터 조회하기
-function fnStartJobDataSetting(paramJobIdList, paramJobTypeList){
+function fnStartJobDataSetting(paramJobIdList){
 	
 	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
 			{"url":"<c:url value='/jen/jen1000/jen1000/selectJen1000SelJobList.do'/>"}
-			,{"jenJobList": paramJobIdList, "jobTypeList": paramJobTypeList});
+			,{"jenJobList": paramJobIdList});
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
 		var jenJobList = data.jenJobList;
@@ -1226,7 +1240,6 @@ function fnStartJobDataSetting(paramJobIdList, paramJobTypeList){
 		<input type="hidden" name="eGeneUrl" id="eGeneUrl" value="${requestScope.eGeneUrl }"/>
 		<input type="hidden" name="callbakApiId" id="callbakApiId" value="${requestScope.callbakApiId }"/>
 		<input type="hidden" name="jobIdList" id="jobIdList" value="<c:out value="${requestScope.jobIdList}"/>"/>
-		<input type="hidden" name="jobType" id="jobType" value="<c:out value="${requestScope.jobType}"/>"/>
 	</form>
 	<div class = "tab_contents menu" >
 		<div class="main_frame left">
