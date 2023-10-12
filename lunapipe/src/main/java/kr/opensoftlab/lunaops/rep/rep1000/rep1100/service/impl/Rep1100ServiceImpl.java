@@ -369,11 +369,10 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 						
 						ByteArrayOutputStream baos = new ByteArrayOutputStream( );
 			            repository.getFile(repChgFilePath, repRv, null, baos);
-			            String brancheContent = baos.toString("UTF-8");
 			    		baos.close();
 			    		
 			    		
-			    		jsonInfo.put("brancheContent", brancheContent);
+			    		jsonInfo.put("brancheContent", baos.toByteArray());
 					}
 					
 					else if("02".equals(repChgTypeCd)) {
@@ -392,11 +391,10 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 						
 						ByteArrayOutputStream baos = new ByteArrayOutputStream( );
 			            repository.getFile(repChgFilePath, repRv, null, baos);
-			            String brancheContent = baos.toString("UTF-8");
 			    		baos.close();
 			    		
 			    		
-			    		jsonInfo.put("brancheContent", brancheContent);
+			    		jsonInfo.put("brancheContent", baos.toByteArray());
 					}
 					
 					else if("03".equals(repChgTypeCd)) {
@@ -490,7 +488,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				int commitCnt = dirList.size()+fileList.size();
 				
 				
-				String commitComment = "[insert_data_no-flag]branche 변경 파일 "+commitCnt+"개 trunk에 commit";
+				String commitComment = "[insert_data_no-flag]\n [커밋 정보] \n emp_id: "+commitAuthor+"\n ticket_id: "+ticketId+" \n 파일 개수: "+commitCnt;
 				
 				
 				ISVNEditor editor = repository.getCommitEditor(commitComment, null);
@@ -636,7 +634,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 					if("01".equals(repChgTypeCd)) {
 						
 						
-			            String brancheContent = (String) fileInfo.get("brancheContent");
+			            byte[] brancheContent = (byte[]) fileInfo.get("brancheContent");
 			    		
 		    			String checksum = null;
 		    			try {
@@ -666,7 +664,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 			    			
 			    			editor.applyTextDelta( trunkPath , null );
 			    			SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator( );
-			    			checksum = deltaGenerator.sendDelta( trunkPath , new ByteArrayInputStream(brancheContent.getBytes()) , editor , true );
+			    			checksum = deltaGenerator.sendDelta( trunkPath , new ByteArrayInputStream(brancheContent) , editor , true );
 			    			
 			    			
             				editor.closeFile(fileNm, checksum);
@@ -693,7 +691,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 					
 					else if("02".equals(repChgTypeCd)) {
 						
-						String brancheContent = (String) fileInfo.get("brancheContent");
+						byte[] brancheContent = (byte[]) fileInfo.get("brancheContent");
 						
 			    		
 			    		
@@ -722,7 +720,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 			    		
 			    		editor.applyTextDelta(trunkPath , null );
 			            SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator( );
-			            String checksum = deltaGenerator.sendDelta( trunkPath , new ByteArrayInputStream(brancheContent.getBytes()) , editor , true );
+			            String checksum = deltaGenerator.sendDelta( trunkPath , new ByteArrayInputStream(brancheContent) , editor , true );
 			            
 			            
 			            editor.closeFile(fileNm, checksum);
@@ -1072,14 +1070,25 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				
 				
 				for(JSONObject fileInfo: fileList) {
-					String filePath = (String) fileInfo.get("filePath");
-					
-					
-					SVNLock svnLock = repository.getLock(filePath);
-					
-					if(svnLock != null) {
-						errorMsg.add("- Lock상태의 파일입니다. [path="+filePath+"]");
-						isLockFile = true;
+					try {
+						String filePath = (String) fileInfo.get("filePath");
+						
+						
+						SVNLock svnLock = repository.getLock(filePath);
+						
+						if(svnLock != null) {
+							errorMsg.add("- Lock상태의 파일입니다. [path="+filePath+"]");
+							isLockFile = true;
+						}
+					}catch(SVNException svnE) {
+						if(svnE.getErrorMessage().getErrorCode().getCode() == 160013) {
+							Log.debug("########### Lock 대상 파일 없음");
+						}
+						Log.debug(svnE);
+						break;
+					}catch(Exception e) {
+						Log.debug(e);
+						break;
 					}
 				}
 				
@@ -1119,7 +1128,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				int commitCnt = fileList.size();
 				
 				
-				String commitComment = "[insert_data_no-flag]source-trunk 변경 파일 "+commitCnt+"개 deploy-trunk에 commit";
+				String commitComment = "[insert_data_no-flag]\n [커밋 정보] \n emp_id: "+commitAuthor+"\n ticket_id: "+ticketId+" \n 파일 개수: "+commitCnt;
 				
 				
 				ISVNEditor editor = repository.getCommitEditor(commitComment, null);
