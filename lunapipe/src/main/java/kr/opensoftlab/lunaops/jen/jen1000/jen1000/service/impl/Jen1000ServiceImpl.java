@@ -26,7 +26,6 @@ import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1000VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.vo.Jen1100VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.web.Jen1000Controller;
-import kr.opensoftlab.lunaops.whk.whk1000.whk1000.service.Whk1000Service;
 import kr.opensoftlab.sdf.jenkins.NewJenkinsClient;
 import kr.opensoftlab.sdf.jenkins.vo.BuildVO;
 import kr.opensoftlab.sdf.jenkins.vo.JenStatusVO;
@@ -44,9 +43,6 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
     @Resource(name="dpl1000DAO")
     private Dpl1000DAO dpl1000DAO;
 
-	@Resource(name = "whk1000Service")
-	private Whk1000Service whk1000Service;
-	
 	
 	@Resource(name = "newJenkinsClient")
 	private NewJenkinsClient newJenkinsClient;
@@ -96,62 +92,26 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	
 	
 	public String insertJen1000JenkinsInfo(Map<String, String> paramMap) throws Exception {
-		String newJenId = jen1000DAO.insertJen1000JenkinsInfo(paramMap);
-		
-		
-		String empId = (String) paramMap.get("empId");
-		whk1000Service.insertWhk1000SendData("02", "01", newJenId, null, empId);
-		
-		return newJenId;
+		return jen1000DAO.insertJen1000JenkinsInfo(paramMap);
 	}
 	
 	
 	public String insertJen1100JobInfo(Map<String, String> paramMap) throws Exception {
-		
-		String jenId = (String) paramMap.get("jenId");
-		String jobId = (String) paramMap.get("jobId");
-		String empId = (String) paramMap.get("empId");
-		
-		
-		whk1000Service.insertWhk1000SendData("02", "01", jenId, jobId, empId);
-				
 		return jen1000DAO.insertJen1100JobInfo(paramMap);
 	}
 	
 	
 	public int updateJen1000JenkinsInfo(Map<String, String> paramMap) throws Exception {
-		
-		String jenId = (String) paramMap.get("jenId");
-		String empId = (String) paramMap.get("empId");
-		
-		
-		whk1000Service.insertWhk1000SendData("02", "02", jenId, null, empId);
-		
 		return jen1000DAO.updateJen1000JenkinsInfo(paramMap);
 	}
 	
 	
 	public int updateJen1100JobInfo(Map<String, String> paramMap) throws Exception {
-		
-		String jenId = (String) paramMap.get("jenId");
-		String jobId = (String) paramMap.get("jobId");
-		String empId = (String) paramMap.get("empId");
-		
-		
-		whk1000Service.insertWhk1000SendData("02", "02", jenId, jobId, empId);
-		
 		return jen1000DAO.updateJen1100JobInfo(paramMap);
 	}
 
 	
 	public void deleteJen1000JenkinsInfo(Map<String, String> paramMap)  throws Exception{
-		
-		String jenId = (String) paramMap.get("jenId");
-		String empId = (String) paramMap.get("empId");
-		
-		
-		whk1000Service.insertWhk1000SendData("02", "03", jenId, null, empId);
-		
 		jen1000DAO.deleteJen1000JenkinsInfo(paramMap);
 	}
 	
@@ -206,12 +166,6 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 				
 				
 				jen1000DAO.deleteJen1100JobInfo(newMap);
-				
-				
-				String empId = (String) paramMap.get("empId");
-				
-				
-				whk1000Service.insertWhk1000SendData("02", "03", jenId, jobId, empId);
 			}
 		}
 
@@ -235,25 +189,9 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 		
 		if("insert".equals(popupGb)){
 			insNewJenId = jen1000DAO.insertJen1000JenkinsInfo(paramMap);
-			
-			
-			String empId = (String) paramMap.get("empId");
-			
-			
-			whk1000Service.insertWhk1000SendData("02", "01", insNewJenId, null, empId);
-			
 			return insNewJenId;
 		}else if("update".equals(popupGb)){
 			result = jen1000DAO.updateJen1000JenkinsInfo(paramMap);
-			
-			if(result > 0) {
-				
-				String jenId = (String) paramMap.get("jenId");
-				String empId = (String) paramMap.get("empId");
-				
-				
-				whk1000Service.insertWhk1000SendData("02", "01", jenId, null, empId);
-			}
 			return result;
 		}
 		return null;
@@ -267,28 +205,22 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 		
 		if("insert".equals(popupGb)){
 			insNewJenId = jen1000DAO.insertJen1100JobInfo(paramMap);
-			
-			
-			String jenId = (String) paramMap.get("jenId");
-			String jobId = (String) paramMap.get("jobId");
-			String empId = (String) paramMap.get("empId");
-			
-			
-			whk1000Service.insertWhk1000SendData("02", "02", jenId, jobId, empId);
-			
 			return insNewJenId;
 		}else if("update".equals(popupGb)){
-			result = jen1000DAO.updateJen1100JobInfo(paramMap);
 			
-			if(result > 0) {
+			String beforeJobTypeCd = (String)paramMap.get("beforeJobTypeCd");
+			String jobTypeCd = (String)paramMap.get("jobTypeCd");
+			
+			
+			if("03".equals(beforeJobTypeCd)){
 				
-				String jenId = (String) paramMap.get("jenId");
-				String jobId = (String) paramMap.get("jobId");
-				String empId = (String) paramMap.get("empId");
+				if(!jobTypeCd.equals(beforeJobTypeCd)) {
+					
 				
-				
-				whk1000Service.insertWhk1000SendData("02", "02", jenId, jobId, empId);
+				}
 			}
+			
+			result = jen1000DAO.updateJen1100JobInfo(paramMap);
 			return result;
 		}
 		return null;
