@@ -158,18 +158,8 @@ span.text-rep-del {background-color: #af3022;}
 				var oldVal = "";
 				var newVal = "";
 				
-				var content = data.content;
-				//내용 없는 경우 빈칸
-				if(gfnIsNull(content)){
-					content = "";
-				}
-				var diffContent = data.diffContent;
-				//내용 없는 경우 빈칸
-				if(gfnIsNull(diffContent)){
-					diffContent = "";
-				}
-				$('#fileContentLeft').text(content);
-				$('#fileContentRight').text(diffContent);
+				$('#fileContentLeft').text(data.content);
+				$('#fileContentRight').text(data.diffContent);
 				
 				//문자열 비교
 				var dmp = new diff_match_patch();
@@ -298,7 +288,7 @@ span.text-rep-del {background-color: #af3022;}
 
 </script>
 	<div class="popup">
-		<div class="pop_title" id="sourceTitle">[ <c:out value='${param.path}'/> ] Revision File Compare
+		<div class="pop_title" id="sourceTitle">[ <c:out value='${param.fileName}'/> ] Revision File Compare
 		</div>
 		<div class="pop_sub fileMainFrame">
 			<div class="svn_mask_repList" id="repFileDiffFrameMask">
@@ -306,12 +296,12 @@ span.text-rep-del {background-color: #af3022;}
 				<img class="fixed_loading" src="/images/loading.gif" style="width: 100px;height: 100px;">
 			</div>
 			<div id="contentsFrameLeft" class="contentsFrame">
-				<div class="contentTopRevisionInfo">[Branche] Revision: <span id="rep1101Revision"></span></div>
+				<div class="contentTopRevisionInfo">Revision: <span id="rep1101Revision"></span></div>
 				<div class="codeLineFrame" id="codeLineFrameLeft"></div>
 				<pre id="preFileContentLeft"><code id="fileContentLeft"></code></pre>
 			</div>
 			<div id="contentsFrameRight" class="contentsFrame">
-				<div class="contentTopRevisionInfo">[Trunk] Revision: <span id="rep1101DiffRevision"></span></div>
+				<div class="contentTopRevisionInfo">Revision: <span id="rep1101DiffRevision"></span></div>
 				<div class="codeLineFrame" id="codeLineFrameRight"></div>
 				<pre id="preFileContentRight"><code id="fileContentRight"></code></pre>
 			</div>

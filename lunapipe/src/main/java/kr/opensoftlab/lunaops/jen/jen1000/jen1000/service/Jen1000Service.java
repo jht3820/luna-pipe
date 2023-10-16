@@ -67,7 +67,7 @@ public interface Jen1000Service {
 	Object saveJen1000JenkinsInfo(Map<String, String> paramMap)  throws Exception;
 	
 	
-	void saveJen1000JobInfo(Map<String, String> paramMap)  throws Exception;
+	Object saveJen1000JobInfo(Map<String, String> paramMap)  throws Exception;
 	
 	
 	@SuppressWarnings({"rawtypes"})
