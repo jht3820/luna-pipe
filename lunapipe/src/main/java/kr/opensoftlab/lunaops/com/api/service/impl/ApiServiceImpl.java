@@ -1307,6 +1307,13 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 					String[] comments = rvInfo.getComment().split("\n");
 					String ticketId = comments[0];
 					
+					
+					if(ticketId.indexOf("[insert_data_no-flag]") != -1) {
+						
+						rtnValue.put("result", true);
+						return rtnValue;
+					}
+					
 					 
 					
 					
@@ -1338,14 +1345,25 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 								
 								char type = chgFileInfo.getType();
 								
-								
+
+								String typeName = "";
+								if( 'A'==type ) {
+									typeName = "01";
+								}else if( 'M'==type ) {
+									typeName = "02";
+								}else if( 'D'==type ) {
+									typeName = "03";
+								}
+
 								newMap = new HashMap<>();
 								newMap.put("repId", repVo.getRepId());
 								newMap.put("ticketId", ticketId);
 								newMap.put("repRv", rvInfo.getRevision());
-								newMap.put("repChgType", String.valueOf(type));
+								newMap.put("repChgTypeCd", typeName);
 								newMap.put("repChgFilePath", path);
 								newMap.put("repChgFileNm", fileNm);
+								newMap.put("repChgFileKind", chgFileInfo.getKind());
+								newMap.put("repTargetRv", "-1");
 								
 								
 								rep1100Service.insertRep1101RvChgInfo(newMap);
@@ -1423,7 +1441,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 					
 					
 					String repId = (String)ticketRvInfo.get("rep_id");
-					String repRv = (String)ticketRvInfo.get("rep_rv");
+					String repRv = String.valueOf(ticketRvInfo.get("rep_rv"));
 					
 					
 					newMap.put("ticketId", ticketId);

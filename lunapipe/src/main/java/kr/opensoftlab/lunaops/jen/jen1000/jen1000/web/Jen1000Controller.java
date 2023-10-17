@@ -1,7 +1,6 @@
 package kr.opensoftlab.lunaops.jen.jen1000.jen1000.web;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +106,8 @@ public class Jen1000Controller {
 				try {
 					JSONArray jsonArr = new JSONArray(items);
 					
+					
+					
 					for(int i=0;i<jsonArr.length();i++) {
 						JSONObject jobIds = jsonArr.getJSONObject(i);
 						
@@ -139,13 +140,6 @@ public class Jen1000Controller {
 				eGeneUrl = eGeneUrl + "/";
 			}
 			
-			
-			String salt = EgovProperties.getProperty("Globals.data.salt");
-			
-			
-			String jsonParam = "{key: '"+salt+"', webhook_type_cd: '02', emp_id: '"+empId+"', current_date: '"+new Date().getTime()+"'}";
-			String enParam = CommonScrty.encryptedAria(jsonParam, salt);
-			
 			model.addAttribute("ciId", ciId);
 			model.addAttribute("apiId", apiId);
 			model.addAttribute("svcId", svcId);
@@ -155,7 +149,6 @@ public class Jen1000Controller {
 			model.addAttribute("callbakApiId", callbakApiId);
 			model.addAttribute("jobIdList", jobIdList);
 			model.addAttribute("addSalt", addSalt);
-			model.addAttribute("webhookDataKey", enParam);
 			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -189,9 +182,6 @@ public class Jen1000Controller {
 			
 			
 			String addSalt = EgovProperties.getProperty("Globals.data.addSalt");
-
-			
-			String jobType = OslUtil.jsonGetString(jsonObj, "job_type");
 			
 			if(items != null) {
 				try {
@@ -239,7 +229,7 @@ public class Jen1000Controller {
 			model.addAttribute("callbakApiId", callbakApiId);
 			model.addAttribute("jobIdList", jobIdList);
 			model.addAttribute("addSalt", addSalt);
-			model.addAttribute("jobType", jobType);
+			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
 			e.printStackTrace();
@@ -435,12 +425,6 @@ public class Jen1000Controller {
 	
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1005View.do")
 	public String selectJen1005View( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-		String jobParamTicketId = EgovProperties.getProperty("Globals.buildParam.ticketId");
-		String jobParamRevision = EgovProperties.getProperty("Globals.buildParam.revision");
-		String jobParamDplId = EgovProperties.getProperty("Globals.buildParam.eGeneDplId");
-		model.addAttribute("jobParamTicketId", jobParamTicketId);
-		model.addAttribute("jobParamRevision", jobParamRevision);
-		model.addAttribute("jobParamDplId", jobParamDplId);
 		return "/jen/jen1000/jen1000/jen1005";
 	}
 	
@@ -537,51 +521,10 @@ public class Jen1000Controller {
 			}
 
 			
-			if(paramMap.containsKey("useCd")) {
-				String useCd = paramMap.get("useCd");
-				jen1100VO.setUseCd(useCd);
-			}
-			
-			
 			jen1100VO.setPageIndex(_pageNo);
 			jen1100VO.setPageSize(_pageSize);
 			jen1100VO.setPageUnit(_pageSize);
 
-			
-			String jobTypeList = (String)paramMap.get("jobType");
-			if(jobTypeList != null && !"".equals(jobTypeList)) {
-				try {
-					JSONArray jobTypeJson = new JSONArray(jobTypeList);
-					String paramJobType = "";
-					
-					String regex = "[0-9]+";
-					
-					
-					for(int i=0;i<jobTypeJson.length();i++) {
-						JSONObject jsonObj = jobTypeJson.getJSONObject(i);
-						String jobType = jsonObj.getString("job_type");
-						
-						
-						if(!jobType.matches(regex)) {
-							continue;
-						}
-						
-						if(i > 0) {
-							paramJobType += ",";
-						}
-						
-						paramJobType += "'"+jobType+"'";
-					}
-					if(!"".equals(paramJobType)) {
-						jen1100VO.setParamJobType(paramJobType);
-					}
-				}catch(Exception e) {
-					
-					Log.debug(e);
-					model.addAttribute("addMsg", "JOB_TYPE 데이터를 읽는 도중 오류가 발생했습니다.");
-				}
-			}
-			
 			String ciId = (String) paramMap.get("ciId");
 			jen1100VO.setCiId(ciId);
 			
@@ -868,20 +811,104 @@ public class Jen1000Controller {
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 			
 			
+			String type = (String) paramMap.get("type");
+			
+			
+			if(!"update".equals(type)){
+				
+				int jobCheck = jen1000Service.selectJen1100JobUseCountInfo(paramMap);
+				
+				if(jobCheck > 0){
+					
+					model.addAttribute("errorYn", "Y");
+					model.addAttribute("message", "이미 추가된 JOB입니다.");
+					return new ModelAndView("jsonView");
+				}
+			}
+			
+			
+			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
+			
+			JenStatusVO jenStatusVo = null;
+			try{
+				String jenUrl=(String)paramMap.get("jenUrl");
+				String jobId=(String)paramMap.get("jobId");
+				String userId=(String)paramMap.get("jenUsrId");
+				String tokenId=(String)paramMap.get("jenUsrTok");
+				
+				
+				String jobFullPath = UrlUtils.toFullJobPath(jobId);
+				
+				
+				if(tokenId == null || "".equals(tokenId)){
+					model.addAttribute("MSG_CD", JENKINS_FAIL);
+					return new ModelAndView("jsonView");
+				}
+				
+				
+				tokenId = CommonScrty.decryptedAria(tokenId, salt);
+				
+				
+				jenStatusVo = newJenkinsClient.connect(jenUrl, userId, tokenId);
+				
+				
+				if(jenStatusVo.isErrorFlag()) {
+					newJenkinsClient.close(jenStatusVo);
+					model.addAttribute("MSG_CD", JENKINS_FAIL);
+					model.addAttribute("message", jenStatusVo.getErrorMsg());
+					return new ModelAndView("jsonView");
+				}
+				
+				
+				String jobTriggerCd = (String) paramMap.get("jobTriggerCd");
+				String jobTriggerVal = (String) paramMap.get("jobTriggerVal");
+				
+				
+				if("01".equals(jobTriggerCd)) {
+					jenStatusVo = newJenkinsClient.setJobTriggerCron(jenStatusVo, jobFullPath, jobTriggerVal);
+				}else {
+					jenStatusVo = newJenkinsClient.setJobTriggerCron(jenStatusVo, jobFullPath);
+				}
+				
+				
+				newJenkinsClient.close(jenStatusVo);
+
+				
+				if(jenStatusVo.isErrorFlag()) {
+					newJenkinsClient.close(jenStatusVo);
+					model.addAttribute("MSG_CD", jenStatusVo.getErrorCode());
+					model.addAttribute("message", jenStatusVo.getErrorMsg());
+					return new ModelAndView("jsonView");
+				}
+			}
+			catch(Exception ex){
+				
+				if(jenStatusVo != null) {
+					newJenkinsClient.close(jenStatusVo);
+				}
+				Log.error("saveJen1100JobInfoAjax()", ex);
+				if( ex instanceof HttpHostConnectException){
+					model.addAttribute("MSG_CD", JENKINS_FAIL);
+				}else if( ex instanceof ParseException){
+					model.addAttribute("MSG_CD", JENKINS_FAIL);
+				}else if( ex instanceof IllegalArgumentException){
+					model.addAttribute("MSG_CD", JENKINS_WORNING_URL);
+				}else if( ex instanceof UserDefineException){
+					model.addAttribute("MSG_CD", ex.getMessage());
+				}else{
+					model.addAttribute("MSG_CD", JENKINS_FAIL);
+				}
+				
+				return new ModelAndView("jsonView");
+			}
+			
+			
 			jen1000Service.saveJen1000JobInfo(paramMap);
 			
 			
 			model.addAttribute("errorYn", "N");
 			model.addAttribute("message", egovMessageSource.getMessage("success.common.save"));
 			
-			return new ModelAndView("jsonView");
-		}
-		catch(UserDefineException ude) {
-			Log.error("saveJen1100JobInfoAjax()", ude);
-			
-			
-			model.addAttribute("errorYn", "Y");
-			model.addAttribute("message", ude.getMessage());
 			return new ModelAndView("jsonView");
 		}
 		catch(Exception ex){
@@ -1713,40 +1740,7 @@ public class Jen1000Controller {
 			
 			List<Map> jenJobList = null;
 			
-			
-			List<String> jobTypeArr = new ArrayList<String>();
-			
-			
-			String jobTypeList = (String)paramMap.get("jobTypeList");
-			if(jobTypeList != null && !"".equals(jobTypeList)) {
-				try {
-					JSONArray jobTypeJson = new JSONArray(jobTypeList);
-					
-					String regex = "[0-9]+";
-					
-					
-					for(int i=0;i<jobTypeJson.length();i++) {
-						JSONObject jsonObj = jobTypeJson.getJSONObject(i);
-						String jobType = jsonObj.getString("job_type");
-						
-						
-						if(!jobType.matches(regex)) {
-							continue;
-						}
-						
-						jobTypeArr.add(jobType);
-					}
-				}catch(Exception e) {
-					
-					Log.debug(e);
-					model.addAttribute("errorYn", "Y");
-					model.addAttribute("message", "JOB_TYPE값 처리 중 오류가 발생했습니다.");
-					return new ModelAndView("jsonView");
-				}
-			}
-			
 			try {
-				
 				jenJobList = new ArrayList<Map>();
 				
 				String[] jenList = jenJobStrList.split(",");
@@ -1775,16 +1769,6 @@ public class Jen1000Controller {
 					
 					if(jobInfo == null) {
 						continue;
-					}
-					
-					
-					String jobTypeCd = (String) jobInfo.get("jobTypeCd");
-					
-					
-					if(jobTypeArr.size() > 0) {
-						if(jobTypeArr.indexOf(jobTypeCd) == -1) {
-							continue;
-						}
 					}
 					
 					
