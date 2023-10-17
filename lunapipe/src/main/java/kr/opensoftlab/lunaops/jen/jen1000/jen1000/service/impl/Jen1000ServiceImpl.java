@@ -207,19 +207,6 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 			insNewJenId = jen1000DAO.insertJen1100JobInfo(paramMap);
 			return insNewJenId;
 		}else if("update".equals(popupGb)){
-			
-			String beforeJobTypeCd = (String)paramMap.get("beforeJobTypeCd");
-			String jobTypeCd = (String)paramMap.get("jobTypeCd");
-			
-			
-			if("03".equals(beforeJobTypeCd)){
-				
-				if(!jobTypeCd.equals(beforeJobTypeCd)) {
-					
-				
-				}
-			}
-			
 			result = jen1000DAO.updateJen1100JobInfo(paramMap);
 			return result;
 		}
