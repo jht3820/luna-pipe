@@ -42,4 +42,8 @@ public interface Rep1100Service {
 	
 	@SuppressWarnings("rawtypes")
 	int selectRep1100TktRvFileChgListCnt(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	Map insertRep1100SelTktFileCommitAjax(Map paramMap) throws Exception;
 }
