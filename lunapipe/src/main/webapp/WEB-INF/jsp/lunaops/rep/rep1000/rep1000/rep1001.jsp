@@ -37,7 +37,7 @@ ul#repDetailTree {
     float: left;
     width: calc(100% - 10px);
     margin: 5px 5px 0 5px;
-    height: 378px;
+    height: 380px;
 	overflow: scroll;
 }
 .treeNodeUrlFrame {
@@ -64,7 +64,6 @@ var fd = new FormData();
 //현재 비밀번호 저장
 var nowSvnPw = null;
 var nowGitPw = null;
-var nowDplPw = null;
 
 //zTree
 var zTreeRep1001;
@@ -176,14 +175,6 @@ $(document).ready(function() {
 			strCheckObjArr = strCheckObjArr.concat(["svnRepUrl","svnUsrId","svnUsrPw"]);
 			sCheckObjNmArr = sCheckObjNmArr.concat(["URL" ,"USER" , "PASSWORD"]);
 		}
-		
-		//Deploy 사용여부에따라 필수 추가
-		var deployInsertChkBoxVal = document.getElementById("deployInsertChkBox").checked;
-		if(deployInsertChkBoxVal){
-			strCheckObjArr = strCheckObjArr.concat(["dplRepUrl","dplUsrId","dplUsrPw"]);
-			sCheckObjNmArr = sCheckObjNmArr.concat(["Deploy URL" ,"Deploy USER" , "Deploy PASSWORD"]);
-		}
-		
 		if(gfnRequireCheck(strFormId, strCheckObjArr, sCheckObjNmArr)){
 			return;	
 		}
@@ -295,24 +286,9 @@ $(document).ready(function() {
 	        	//git 인증 방식
 	        	fnGitUsrAuthTypeCdChg(data.repInfo.gitUsrAuthTypeCd);
         	}
-        	
-        	//Deploy 사용 여부
-        	var dplUseCd = data.repInfo.dplUseCd;
-        	//Deploy 값 있는 경우
-        	if(!gfnIsNull(dplUseCd)){
-        		//Deploy 사용 여부
-	        	var dplUseCdObj = document.getElementById("deployInsertChkBox");
-	        	if(dplUseCd == "01"){
-	        		dplUseCdObj.checked = true;
-	        	}else{
-	        		dplUseCdObj.checked = false;
-	        	}
-        		fnDeployInsertChg(dplUseCdObj);
-        	}
 
         	nowSvnPw = data.repInfo.svnUsrPw;
         	nowGitPw = data.repInfo.gitUsrPw;
-        	nowDplPw = data.repInfo.dplUsrPw;
 		});
 		
 		//AJAX 전송
@@ -327,17 +303,6 @@ $(document).ready(function() {
 		//기존 비밀번호 넘기기
 		fd.append("nowSvnPw",nowSvnPw);
 		fd.append("nowGitPw",nowGitPw);
-		fd.append("nowDplPw",nowDplPw);
-		
-		//depoy체크박스 값
-		var deployInsertChkBox = document.getElementById("deployInsertChkBox").checked;
-		var dplUseCd = "02";
-		//deploy 사용 여부 값
-		if(deployInsertChkBox){
-			dplUseCd = "01";
-		}
-		//deploy 사용 여부 넣기
-		fd.append("dplUseCd",dplUseCd);
 		
 		//AJAX 설정
 		var ajaxObj = new gfnAjaxRequestAction(
@@ -506,12 +471,12 @@ $(document).ready(function() {
 	}
 	
 	/*
-	* [+] 아이콘 클릭 또는 더블클릭하여 트리 확장시 조회된 결과에 대한 처리를 한다.
-	*
-	* @param treeId : 트리 ID
-	* @param parentNode : 트리에서 [+]아이콘 클릭 또는 더블클릭한 노드
-	* @param result : 동적조회 결과값
-	*/
+	 * [+] 아이콘 클릭 또는 더블클릭하여 트리 확장시 조회된 결과에 대한 처리를 한다.
+	 *
+	 * @param treeId : 트리 ID
+	 * @param parentNode : 트리에서 [+]아이콘 클릭 또는 더블클릭한 노드
+	 * @param result : 동적조회 결과값
+	 */
 	function fnTreeFilter(treeId, parentNode, result) {
 	 	
 		// 조회된 하위 조직 목록
@@ -519,29 +484,17 @@ $(document).ready(function() {
 		// filter에서 모든 자식 노드를 부모형(폴더 아이콛)으로 변경한다.
 		// 해당 옵션 추가해야  트리의  [+] 아이콘 클릭 시 한번에 트리가 펼쳐진다. 
 		$.each(childNodes, function(idx, node){
+			
 			// 트리 노드가 부모형이 아닐 경우
 			if(node["type"] == 0){
 				node.isParent = true;
 			}
+			
 			zTreeRep1001.updateNode(node);
+			
 		});
 		// 선택한 노드의 자식 노드를 리턴하면 자동으로 트리에 자식 노드가 추가된다.
 		return childNodes;
-	}
-	
-	//deploy 정보 입력 체크박스 제어
-	function fnDeployInsertChg(thisObj){
-		//체크 처리
-		if(thisObj.checked){
-			$("#repDplInputMask").hide();
-		}
-		//체크 해제
-		else{
-			$("#repDplInputMask").show();
-			//inputerror 있는 경우 제거 하기
-			$(".rep1001DeployFrame input.inputError").removeClass("inputError");
-		}
-		
 	}
 </script>
 
@@ -569,14 +522,12 @@ $(document).ready(function() {
 						<input type="text" title="URL" class="input_txt" name="svnRepUrl" id="svnRepUrl" value=""  maxlength="500"  />
 					</div>
 				</div>
-				<!-- 
 				<div class="pop_menu_row pop_menu_oneRow">
 					<div class="pop_menu_col1 pop_oneRow_col1"><label for="svnBrcPath">Branche 생성 경로</label></div>
 					<div class="pop_menu_col2 pop_oneRow_col2" guide="svnBrcPath" >
 						<input type="text" title="Branche 생성 경로" class="input_txt" name="svnBrcPath" id="svnBrcPath" value=""  maxlength="500"  />
 					</div>
 				</div>
-				 -->
 				<div class="pop_menu_row">
 					<div class="pop_menu_col1 menu_col1_subStyle"><label for="svnUsrId">USER</label><span class="required_info">&nbsp;*</span></div>
 					<div class="pop_menu_col2 menu_col2_subStyle" guide="svnUser" ><input type="text" title="USER" class="input_txt" name="svnUsrId" id="svnUsrId" value="" maxlength="30" /></div>
@@ -585,6 +536,7 @@ $(document).ready(function() {
 					<div class="pop_menu_col1 menu_col1_subStyle pop_menu_col1_right"><label for="svnUsrPw">PASSWORD</label><span class="required_info">&nbsp;*</span></div>
 					<div class="pop_menu_col2 menu_col2_subStyle" guide="svnPassword" ><input type="password" title="PASSWORD" class="input_txt" name="svnUsrPw" id="svnUsrPw" value="" maxlength="50" /></div>
 				</div>
+				<div class="warning_message required_info" id="svnRepoUpdateMsg">* 소스저장소의 리비전이 요구사항에 배정되어 있어 URL을 수정할 수 없습니다.</div>
 			</div>
 			<div class="rep1001GitFrame">
 				<div class="pop_menu_row pop_menu_oneRow">
@@ -622,38 +574,17 @@ $(document).ready(function() {
 			</div>
 			<div class="pop_menu_row pop_menu_oneRow">
 				<div class="pop_menu_row">
-					<div class="pop_menu_col1 menu_col1_subStyle"><label>Deploy 저장소 등록</label></div>
-					<div class="pop_menu_col2 menu_col2_subStyle">
-						<div class="rep_chk"> 
-							<input type="checkbox" name="deployInsertChkBox" id="deployInsertChkBox" onchange="fnDeployInsertChg(this)"/>
-							<label for="deployInsertChkBox"></label> 
-						</div>
-					</div>
-				</div>
-				<div class="pop_menu_row">
-					<div class="pop_menu_col1 menu_col1_subStyle pop_menu_col1_right"><label for="useCd">사용여부</label><span class="required_info">&nbsp;*</span></div>
+					<div class="pop_menu_col1 menu_col1_subStyle"><label for="useCd">사용여부</label><span class="required_info">&nbsp;*</span></div>
 					<div class="pop_menu_col2 menu_col2_subStyle">
 						<span class="search_select">
 							<select class="select_useCd" name="useCd" id="useCd" value="" style="height:100%; width:100%;"></select>
 						</span>
 					</div>
 				</div>
-			</div>
-			<div class="rep1001DeployFrame">
-				<div class="svn_mask_content" id="repDplInputMask">Deploy 저장소 등록 체크시 입력이 가능합니다.</div>
-				<div class="pop_menu_row pop_menu_oneRow">
-					<div class="pop_menu_col1 pop_oneRow_col1"><label for="dplRepUrl">Deploy URL</label><span class="required_info">&nbsp;*</span></div>
-					<div class="pop_menu_col2 pop_oneRow_col2" guide="dplUrl" >
-						<input type="text" title="URL" class="input_txt" name="dplRepUrl" id="dplRepUrl" value=""  maxlength="500"  />
+				<div class="pop_menu_row">
+					<div class="pop_menu_col2 pop_menu_col1_right" style="width:100% !important;">
+						<div class="button_normal button_col" id="btnSvnConnCheck">접속 체크</div>
 					</div>
-				</div>
-				<div class="pop_menu_row">
-					<div class="pop_menu_col1 menu_col1_subStyle"><label for="dplUsrId">USER</label><span class="required_info">&nbsp;*</span></div>
-					<div class="pop_menu_col2 menu_col2_subStyle" guide="dplUser" ><input type="text" title="USER" class="input_txt" name="dplUsrId" id="dplUsrId" value="" maxlength="30" /></div>
-				</div>
-				<div class="pop_menu_row">
-					<div class="pop_menu_col1 menu_col1_subStyle pop_menu_col1_right"><label for="dplUsrPw">PASSWORD</label><span class="required_info">&nbsp;*</span></div>
-					<div class="pop_menu_col2 menu_col2_subStyle" guide="dplPassword" ><input type="password" title="PASSWORD" class="input_txt" name="dplUsrPw" id="dplUsrPw" value="" maxlength="50" /></div>
 				</div>
 			</div>
 			<div class="pop_note" style="margin-bottom:0px;">
@@ -670,9 +601,11 @@ $(document).ready(function() {
 			<div class="treeNodeUrlFrame">
 				<input type="text" class="input_text" id="selTreeNodeUrl" name="selTreeNodeUrl" placeholder="선택한 노드의 전체 경로가 표시됩니다." readonly />
 			</div>
+			<!-- 
 			<div class="pop_menu_btn_row">
 				<div class="button_normal button_col" id="btnSvnConnCheck">접속 체크</div>
 			</div>
+			 -->
 		</div>
 		<div class="btn_div">
 			<div class="button_normal save_btn" id="btn_update_popup">등록</div>
