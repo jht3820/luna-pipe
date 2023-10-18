@@ -293,7 +293,7 @@ function fnRepGridSetting(){
              		var empId = $("form#rep1000Form > #empId").val();
              		
              		var data = {"popupGb": "update", "repId": selItem.repId, "empId": empId};
-					gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","640",'scroll');
+					gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","680",'scroll');
              	}
              	//삭제
              	else if(item.type == "repDelete"){
@@ -497,7 +497,7 @@ function fnSearchBoxControl(){
 								var empId = $("form#rep1000Form > #empId").val();
 								var data = {"popupGb": "update", "repId": chkList[0].repId, "empId": empId};
         	                	
-								gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","640",'scroll');
+								gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","680",'scroll');
 						}},
 						
 						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_insert_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-save' aria-hidden='true'></i>&nbsp;<span>등록</span>",
@@ -508,7 +508,7 @@ function fnSearchBoxControl(){
 									, "empId": empId
 								};
 								
-								gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","640",'scroll');
+								gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","680",'scroll');
 						}},
 						{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_rep",style:"float:right;", valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 							onclick:function(){
