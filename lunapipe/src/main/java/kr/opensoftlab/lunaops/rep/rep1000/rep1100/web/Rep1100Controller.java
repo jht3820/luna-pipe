@@ -1,5 +1,7 @@
 package kr.opensoftlab.lunaops.rep.rep1000.rep1100.web;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +10,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.stereotype.Controller;
@@ -96,9 +100,29 @@ public class Rep1100Controller {
 			
 			
 			String empId = OslUtil.jsonGetString(jsonObj, "emp_id");
+			
+			
+			String ciId = OslUtil.jsonGetString(jsonObj, "src_id");
+			
+			
+			if(ciId == null) {
+				response.setStatus(HttpStatus.SC_BAD_REQUEST);
+				model.put("errorMsg", "구성항목 ID가 없습니다.");
+				return "/err/error";
+			}
+			
+			
 			String ticketId = OslUtil.jsonGetString(jsonObj, "ticket_id");
 			
+			
+			if(ticketId == null) {
+				response.setStatus(HttpStatus.SC_BAD_REQUEST);
+				model.put("errorMsg", "티켓 ID가 없습니다.");
+				return "/err/error";
+			}
+			
 			model.addAttribute("empId", empId);
+			model.addAttribute("ciId", ciId);
 			model.addAttribute("ticketId", ticketId);
 		}catch(Exception e) {
 			Log.error(e);
@@ -310,6 +334,177 @@ public class Rep1100Controller {
 			
 			model.addAttribute("errorYn", "Y");
 			model.addAttribute("message", egovMessageSource.getMessage("fail.common.insert"));
+			return new ModelAndView("jsonView");
+		}
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value="/rep/rep1000/rep1100/selectRep1102RsyncResultListAjax.do")
+	public ModelAndView selectRep1102RsyncResultListAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map paramMap = RequestConvertor.requestParamToMap(request,true);
+			
+			
+			String errorYn = "N";
+			String message = egovMessageSource.getMessage("success.common.select");
+			
+			
+			String rsyncResultPathStr = EgovProperties.getProperty("Globals.rsyncResult.path");
+			
+			
+			String ciId = (String) paramMap.get("ciId");
+			String ticketId = (String) paramMap.get("ticketId");
+			String jobId = (String) paramMap.get("jobId");
+			String bldNum = String.valueOf(paramMap.get("bldNum"));
+			
+			
+			String checkPath = rsyncResultPathStr;
+			
+			
+			File checkPathFile = new File(checkPath);
+			if(checkPathFile.exists() && checkPathFile.isDirectory()) {
+				
+				if(checkPath.lastIndexOf("/") != (checkPath.length()-1)) {
+					checkPath += "/";
+				}
+				
+				checkPath += ticketId;
+				checkPathFile = new File(checkPath);
+				if(checkPathFile.exists() && checkPathFile.isDirectory()) {
+					
+					checkPath += "/";
+					
+					
+					checkPath += jobId;
+					
+					
+					checkPathFile = new File(checkPath);
+					if(checkPathFile.exists() && checkPathFile.isDirectory()) {
+						
+						checkPath += "/";
+						
+						checkPath += bldNum;
+						
+						checkPathFile = new File(checkPath);
+						if(checkPathFile.exists() && checkPathFile.isDirectory()) {
+							
+							checkPath += "/";
+							
+							
+							File pathText = new File(checkPath+"path.txt");
+							if(pathText.exists() && pathText.isFile()) {
+								
+								String[] fileNmList = checkPathFile.list();
+								
+								long fileDate = 0;
+								for(String fileNm : fileNmList) {
+									if(fileNm.contains("change_file_")) {
+										
+										String[] splitNm = fileNm.split("change_file_");
+										long cursorFileDate = Long.parseLong(splitNm[1].substring(0,splitNm[1].indexOf(".")));
+										
+										if(cursorFileDate > fileDate) {
+											fileDate = cursorFileDate;
+										}
+									}
+								}
+								
+								if(fileDate != 0) {
+									String changeFileNm = "change_file_"+String.valueOf(fileDate)+".txt"; 
+									
+									File changeFile = new File(checkPath+changeFileNm);
+									if(changeFile.exists() && changeFile.isFile()) {
+										
+										List<String> pathContents = FileUtils.readLines(pathText, "UTF-8");
+										String startPath = pathContents.get(0);
+										
+										
+										if(startPath.lastIndexOf("/") != (startPath.length()-1)) {
+											startPath += "/";
+										}
+										
+										
+										List<String> rsyncResultContents = FileUtils.readLines(changeFile, "UTF-8");
+										
+										
+										List<Map> fileChgList = new ArrayList<Map>();
+										for(int i=0;i<rsyncResultContents.size();i++) {
+											String readContent = rsyncResultContents.get(i);
+											
+											if(readContent == null || readContent.length() == 0) {
+												continue;
+											}
+											
+											char fileKind = readContent.charAt(0);
+											
+											
+											String fileChgPath = readContent.substring(1, readContent.length());
+											
+											
+											if(fileChgPath.indexOf("/") == 0) {
+												fileChgPath = fileChgPath.substring(1, fileChgPath.length());
+											}
+											
+											Map newMap = new HashMap<>();
+											newMap.put("fileRealPath", checkPath+fileChgPath);
+											newMap.put("filePath", startPath+fileChgPath);
+											newMap.put("fileKind", fileKind);
+											newMap.put("changeFilePath", fileChgPath);
+											newMap.put("ciId", ciId);
+											newMap.put("ticketId", ticketId);
+											newMap.put("jobId", jobId);
+											newMap.put("bldNum", bldNum);
+											fileChgList.add(newMap);
+										}
+										model.addAttribute("fileChgList", fileChgList);
+										
+									}else {
+										errorYn = "Y";
+										message = "변경 정보를 가진 파일을 찾을 수 없습니다. (change_file_*.txt)";
+									}
+								}else {
+									errorYn = "Y";
+									message = "변경 정보를 가진 파일을 찾을 수 없습니다. (change_file_*.txt)";
+								}
+								
+							}else {
+								errorYn = "Y";
+								message = "root경로를 가진 정보 파일을 찾을 수 없습니다. (path.txt)";
+							}
+						}else {
+							
+							errorYn = "Y";
+							message = "빌드 번호("+bldNum+")에 해당하는 경로 없음";
+						}
+					}else {
+						
+						errorYn = "Y";
+						message = "job("+jobId+")에 해당하는 경로 없음";
+					}
+				}else {
+					
+					errorYn = "Y";
+					message = "티켓 경로 없음";
+				}
+				
+			}else {
+				
+				errorYn = "Y";
+				message = "rsync결과 경로 없음";
+			}
+			
+			
+			model.addAttribute("errorYn", errorYn);
+			model.addAttribute("message", message);
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("selectRep1102RsyncResultListAjax()", ex);
+			
+			
+			model.addAttribute("errorYn", "Y");
+			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
 			return new ModelAndView("jsonView");
 		}
 	}
