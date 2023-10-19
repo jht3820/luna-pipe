@@ -162,6 +162,14 @@ function fnTktFileGridSetting(){
 			onDBLClick:function(){
 				var item = this.item;
 				
+				//변경 파일 종류
+				var repChgFileKind = item.repChgFileKind;
+				
+				//file이 아닌 경우 diff불가
+				if(repChgFileKind != "file"){
+					jAlert("대상이 파일인 경우에만 비교가 가능합니다.","알림");
+					return false;
+				}
             	//파일 내용 비교
          		var data = {
            			"repId": item.repId
@@ -174,6 +182,7 @@ function fnTktFileGridSetting(){
          		gfnLayerPopupOpen('/rep/rep1000/rep1100/selectRep1101View.do',data,"1200","780",'scroll');
         	},
 	        onDataChanged: function(){
+	        	/* 
 				//해당 데이터 체크 시 선택 배열에 넣기
 				if(this.item.__selected__){
 					//이미 세팅된 데이터 없는 경우만 추가
@@ -188,6 +197,7 @@ function fnTktFileGridSetting(){
 						selRepData.splice(repIdx, 1);
 					}
 				}
+				 */
 			}
 		},
 		contextMenu: {
@@ -204,6 +214,10 @@ function fnTktFileGridSetting(){
              	var selItem = tktFileGridObj.list[param.doindex];
              	//선택 개체 없는 경우 중지
              	if(typeof selItem == "undefined"){
+             		return false;
+             	}
+             	//파일 아닌 경우 중지
+             	if(selItem.repChgFileKind != "file"){
              		return false;
              	}
              	return true;
