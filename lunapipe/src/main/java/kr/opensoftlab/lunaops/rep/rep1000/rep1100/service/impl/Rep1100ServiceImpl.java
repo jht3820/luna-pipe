@@ -583,6 +583,8 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		    			String checksum = null;
 		    			try {
 		    				
+		    				editor.openDir(trunkPath.substring(0, trunkPath.lastIndexOf("/")), -1);
+		    				
 			    			editor.addFile(trunkPath, null, -1);
 			    			
 			    			editor.applyTextDelta( trunkPath , null );
@@ -604,7 +606,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 	            		}
 						
 						
-		    			
+		    			editor.closeDir();
 					}
 					
 					else if("02".equals(repChgTypeCd)) {
