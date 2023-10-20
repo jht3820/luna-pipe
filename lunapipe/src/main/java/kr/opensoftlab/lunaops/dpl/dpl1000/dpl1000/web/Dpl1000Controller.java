@@ -24,6 +24,7 @@ import egovframework.com.cmm.EgovMessageSource;
 import egovframework.com.cmm.service.EgovProperties;
 import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
+import kr.opensoftlab.lunaops.com.vo.PageVO;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.service.Dpl1000Service;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
@@ -588,6 +589,11 @@ public class Dpl1000Controller {
 			
 			Map jobMap = jen1000Service.selectJen1100JobInfo(paramMap);
 			
+			if(jobMap == null) {
+				model.addAttribute("errorYn", "Y");
+				model.addAttribute("message", "해당 티켓에서 실행된 JOB의 빌드 이력이 없습니다.");
+				return new ModelAndView("jsonView", model);
+			}
 			String jenUrl = (String) jobMap.get("jenUrl");
 			String jenUsrId = (String) jobMap.get("jenUsrId");
 			String jenUsrTok = (String) jobMap.get("jenUsrTok");
@@ -719,4 +725,76 @@ public class Dpl1000Controller {
 		}
 	}
 	
+	
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value="/dpl/dpl1000/dpl1100/selectDpl1102OprDplActionListAjax.do")
+	public ModelAndView selectDpl1102OprDplActionListAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			String _pageNo_str = paramMap.get("pageNo");
+			String _pageSize_str = paramMap.get("pageSize");
+			
+			int _pageNo = 1;
+			int _pageSize = OslAgileConstant.pageSize;
+			
+			if(_pageNo_str != null && !"".equals(_pageNo_str)){
+				_pageNo = Integer.parseInt(_pageNo_str)+1;  
+			}
+			if(_pageSize_str != null && !"".equals(_pageSize_str)){
+				_pageSize = Integer.parseInt(_pageSize_str);  
+			}
+			
+			
+			PageVO pageVo = new PageVO();
+			
+			
+			pageVo.setPageIndex(_pageNo);
+			pageVo.setPageSize(_pageSize);
+			pageVo.setPageUnit(_pageSize);
+			
+			
+			PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(pageVo);  
+
+			List<Map> rep1100List = null;
+
+			
+			paramMap.put("firstIndex", String.valueOf(pageVo.getFirstIndex()));
+			paramMap.put("lastIndex", String.valueOf(pageVo.getLastIndex()));
+			
+			
+			int totCnt = 0;
+			rep1100List =  dpl1000Service.selectDpl1102OprDplActionList(paramMap);
+			
+			
+			totCnt = dpl1000Service.selectDpl1102OprDplActionListCnt(paramMap);
+			paginationInfo.setTotalRecordCount(totCnt);
+			
+			model.addAttribute("list", rep1100List);
+			
+			
+			Map<String, Integer> pageMap = new HashMap<String, Integer>();
+			pageMap.put("pageNo",pageVo.getPageIndex());
+			pageMap.put("listCount", rep1100List.size());
+			pageMap.put("totalPages", paginationInfo.getTotalPageCount());
+			pageMap.put("totalElements", totCnt);
+			pageMap.put("pageSize", _pageSize);
+			
+			model.addAttribute("page", pageMap);
+			
+			
+			model.addAttribute("errorYn", 'N');
+			model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
+			
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("selectDpl1102OprDplActionListAjax()", ex);
+			
+			model.addAttribute("errorYn", 'Y');
+			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+			return new ModelAndView("jsonView");
+		}
+	}	
 }
