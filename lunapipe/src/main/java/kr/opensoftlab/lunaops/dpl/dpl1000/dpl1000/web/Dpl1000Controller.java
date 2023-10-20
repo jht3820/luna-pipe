@@ -1,15 +1,8 @@
 
 package kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.web;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -35,8 +28,6 @@ import kr.opensoftlab.lunaops.com.vo.PageVO;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.service.Dpl1000Service;
 import kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.vo.Dpl1100VO;
 import kr.opensoftlab.lunaops.jen.jen1000.jen1000.service.Jen1000Service;
-import kr.opensoftlab.lunaops.rep.rep1000.rep1000.service.Rep1000Service;
-import kr.opensoftlab.lunaops.rep.rep1000.rep1100.service.Rep1100Service;
 import kr.opensoftlab.sdf.jenkins.NewJenkinsClient;
 import kr.opensoftlab.sdf.jenkins.service.BuildService;
 import kr.opensoftlab.sdf.jenkins.vo.BuildVO;
@@ -72,14 +63,6 @@ public class Dpl1000Controller {
 	private Jen1000Service jen1000Service;
 
 	
-	@Resource(name = "rep1000Service")
-	private Rep1000Service rep1000Service;
-	
-	
-	@Resource(name = "rep1100Service")
-	private Rep1100Service rep1100Service;
-	
-	
 	@Resource(name = "newJenkinsClient")
 	private NewJenkinsClient newJenkinsClient;
 	
@@ -88,7 +71,6 @@ public class Dpl1000Controller {
 	private BuildService buildService;
     
     
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value="/dpl/dpl1000/dpl1000/selectDpl1000View.do")
     public String selectDpl1000View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		
@@ -116,6 +98,7 @@ public class Dpl1000Controller {
 			}
 			
 			
+			
 			String dplId = OslUtil.jsonGetString(jsonObj, "dpl_id");
 			
 			
@@ -131,42 +114,11 @@ public class Dpl1000Controller {
 			
 			String jobType = OslUtil.jsonGetString(jsonObj, "job_type");
 			
-			
-			String ticketList = OslUtil.jsonGetString(jsonObj, "ticket_list");
-			
-			
-			String eGeneDplId = OslUtil.jsonGetString(jsonObj, "egene_dpl_id");
-			
-			
-			Map newMap = new HashMap<>();
-			newMap.put("ticketId", ticketId);
-			Map tktLastRvMap = rep1100Service.selectRep1101TktChgFileLastRvNum(newMap);
-			
-			
-			String ticketLastRv = "HEAD";
-			
-			if(tktLastRvMap != null && tktLastRvMap.containsKey("maxRepRv")) {
-				if(tktLastRvMap.get("maxRepRv") != null) {
-					ticketLastRv = String.valueOf(tktLastRvMap.get("maxRepRv"));
-				}
-			}
-			
 			model.addAttribute("ciId", ciId);
 			model.addAttribute("ticketId", ticketId);
 			model.addAttribute("dplId", dplId);
 			model.addAttribute("empId", empId);
 			model.addAttribute("jobType", jobType);
-			model.addAttribute("ticketList", ticketList);
-			model.addAttribute("eGeneDplId", eGeneDplId);
-			model.addAttribute("ticketLastRv", ticketLastRv);
-			
-			
-			String jobParamTicketId = EgovProperties.getProperty("Globals.buildParam.ticketId");
-			String jobParamRevision = EgovProperties.getProperty("Globals.buildParam.revision");
-			String jobParamDplId = EgovProperties.getProperty("Globals.buildParam.eGeneDplId");
-			model.addAttribute("jobParamTicketId", jobParamTicketId);
-			model.addAttribute("jobParamRevision", jobParamRevision);
-			model.addAttribute("jobParamDplId", jobParamDplId);
 			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -211,39 +163,67 @@ public class Dpl1000Controller {
     	 }
      }
      
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1100BldingJobList.do")
-	public ModelAndView selectDpl1100BldingJobList(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
-		try{
-			
-			Map paramMap = RequestConvertor.requestParamToMap(request, true);
-	    		 
-			
-			paramMap.put("buildingChkFlag", "Y");
-			
-	    		 
-	    		 
-			List<Map> bldingJobList = dpl1000Service.selectDpl1100DeployJobList(paramMap);
-			model.addAttribute("bldingJobList", bldingJobList);
-				
-			
-			model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
-			model.addAttribute("errorYn", "N");
-			return new ModelAndView("jsonView", model);
-    	}
-    	catch(Exception ex){
-	    	Log.error("selectDpl1100BldingJobList()", ex);
-	    	 
-	    	
-	    	model.addAttribute("errorYn", "Y");
-	    	model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
-	    	return new ModelAndView("jsonView", model);
-    	}
+     
+     @SuppressWarnings({ "unchecked", "rawtypes" })
+     @RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1100BldingJobList.do")
+     public ModelAndView selectDpl1100BldingJobList(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+    	 try{
+    		 
+    		 
+    		 Map paramMap = RequestConvertor.requestParamToMap(request, true);
+    		 
+    		 
+    		 paramMap.put("buildingChkFlag", "Y");
+    		 
+    		 
+    		 String paramJobType = (String) paramMap.get("jobType");
+    		 if(paramJobType != null) {
+    			 try {
+    				 
+    				 JSONArray jobTypeArr = new JSONArray(paramJobType);
+    				 
+    				 String jobTypeVal = "";
+    				 
+    				 
+    				 for(int i=0;i<jobTypeArr.length();i++) {
+    					 String jobType = jobTypeArr.getString(i);
+    					 
+    					 if(i > 0) {
+    						 jobTypeVal += ",";
+    					 }
+    					 
+    					 
+    					 jobTypeVal += "'"+jobType+"'";
+    				 }
+    				 
+    				 System.out.println("#####################");
+    	    		 System.out.println(jobTypeVal);
+    			 }catch(Exception e) {
+    				 e.printStackTrace();
+    			 }
+    		 }
+    		 
+    		 
+    		 List<Map> bldingJobList = dpl1000Service.selectDpl1100DeployJobList(paramMap);
+    		 
+    		 model.addAttribute("bldingJobList", bldingJobList);
+    		 
+    		 
+    		 model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
+    		 model.addAttribute("errorYn", "N");
+    		 return new ModelAndView("jsonView", model);
+    	 }
+    	 catch(Exception ex){
+    		 Log.error("selectDpl1100BldingJobList()", ex);
+    		 
+    		 
+    		 model.addAttribute("errorYn", "Y");
+    		 model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+    		 return new ModelAndView("jsonView", model);
+    	 }
      }
     
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(method=RequestMethod.POST, value="/dpl/dpl1000/dpl1000/selectDpl1100DplJobListAjax.do")
     public ModelAndView selectDpl1100DplJobListAjax(@ModelAttribute("dpl1100VO") Dpl1100VO dpl1100VO, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
     	try{
@@ -316,9 +296,6 @@ public class Dpl1000Controller {
         	paginationInfo.setTotalRecordCount(totCnt);
         	
         	model.addAttribute("list", dpl1300List);
-        	
-        	List<Map> jobParamList = dpl1000Service.selectDpl1101JenParameterList(paramMap);
-        	model.addAttribute("jobParamList", jobParamList);
         	
 			
 			Map<String, Integer> pageMap = new HashMap<String, Integer>();
@@ -509,28 +486,10 @@ public class Dpl1000Controller {
 			String jenUsrTok= (String)paramMap.get("jenUsrTok");
 			String jobId= (String)paramMap.get("jobId");
 			String dplTypeCd= (String)paramMap.get("dplTypeCd");
-			String jobTypeCd= (String)paramMap.get("jobTypeCd");
 			String ciId= (String)paramMap.get("ciId");
 			String ticketId= (String)paramMap.get("ticketId");
 			String dplId= (String)paramMap.get("dplId");
 			String empId= (String)paramMap.get("empId");
-			String jobParamList= (String)paramMap.get("jobParamList");
-			String eGeneDplId= (String)paramMap.get("eGeneDplId");
-			
-			
-			if("05".equals(jobTypeCd) || "06".equals(jobTypeCd) || "07".equals(jobTypeCd) || "08".equals(jobTypeCd)) {
-				
-				if(eGeneDplId == null || "".equals(eGeneDplId)) {
-					model.addAttribute("errorYn", "Y");
-					model.addAttribute("message", "JOB 실행에 필요한 E-GENE 배포계획 ID가 없습니다.");
-					return new ModelAndView("jsonView", model);
-				}
-			}
-			
-			
-			String jobParamTicketId = EgovProperties.getProperty("Globals.buildParam.ticketId");
-			String jobParamRevision = EgovProperties.getProperty("Globals.buildParam.revision");
-			String jobParamDplId = EgovProperties.getProperty("Globals.buildParam.eGeneDplId");
 			
 			
 			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
@@ -570,173 +529,8 @@ public class Dpl1000Controller {
 				return new ModelAndView("jsonView", model);
 			}
 			
-			
-			List<Map> newJobParamList = new ArrayList<Map>();
-			
-			
-			if(jobParamList != null && !"".equals(jobParamList)) {
-				try {
-					
-					boolean jobRecentRvCheckFlag = false;
-					
-					JSONArray jobParamArr = new JSONArray(jobParamList);
-					
-					for(int i=0;i<jobParamArr.length();i++) {
-						Map jobParamMap = new HashMap<>();
-						JSONObject jobParamInfo = jobParamArr.getJSONObject(i);
-						
-						
-						if(!jobParamInfo.has("jobParamKey") || !jobParamInfo.has("jobParamVal")) {
-							
-							continue;
-						}
-						
-						
-						String jobParamKey = jobParamInfo.getString("jobParamKey");
-						String jobParamVal = jobParamInfo.getString("jobParamVal");
-						
-						
-						jobParamMap.put("jobParamKey", jobParamKey);
-
-						
-						if("04".equals(jobTypeCd) && jobParamRevision.equals(jobParamKey)) {
-							if(jobParamVal == null || "".equals(jobParamVal)) {
-								jobParamVal = "HEAD";
-							}
-							
-							
-							jobRecentRvCheckFlag = true;
-						}
-						
-						jobParamMap.put("jobParamVal", jobParamVal);						
-						
-						newJobParamList.add(jobParamMap);
-					}
-					
-					
-					if("04".equals(jobTypeCd)) {
-						Map jobParamMap = new HashMap<>();
-						
-						jobParamMap.put("jobParamKey", jobParamTicketId);
-						jobParamMap.put("jobParamVal", ticketId);
-						
-						newJobParamList.add(jobParamMap);
-						
-						
-						if(!jobRecentRvCheckFlag) {
-							
-							jobParamMap = new HashMap<>();
-							
-							jobParamMap.put("jobParamKey", jobParamRevision);
-							jobParamMap.put("jobParamVal", "HEAD");
-							
-							newJobParamList.add(jobParamMap);
-						}
-					}
-					
-					
-					else if("05".equals(jobTypeCd) || "06".equals(jobTypeCd) || "07".equals(jobTypeCd) || "08".equals(jobTypeCd)) {
-						Map jobParamMap = new HashMap<>();
-						
-						jobParamMap.put("jobParamKey", jobParamDplId);
-						jobParamMap.put("jobParamVal", eGeneDplId);
-						
-						newJobParamList.add(jobParamMap);
-					}
-				}catch(Exception e) {
-					e.printStackTrace();
-					
-					model.addAttribute("errorYn", "Y");
-					model.addAttribute("message", "파라미터 설정 중 오류가 발생했습니다.");
-					return new ModelAndView("jsonView", model);
-				}
-			}
+			List<Map> jobParamList = dpl1000Service.selectDpl1101JenParameterList(paramMap);
    		 
-			
-			if("05".equals(jobTypeCd) || "07".equals(jobTypeCd)) {
-				
-				String pDeployPath = EgovProperties.getProperty("Globals.p-deploy.path");
-				
-				String pDeployTicketFileNm = EgovProperties.getProperty("Globals.p-deploy.ticket.fileName");
-				
-				
-				String ticketListStr= (String)paramMap.get("ticketList");
-				List<String> ticketList = new ArrayList<String>();
-				
-				try {
-					
-					
-					JSONArray ticketArr = new JSONArray(ticketListStr);
-					
-					
-					if(ticketArr != null && ticketArr.length() > 0) {
-						for(int i=0;i<ticketArr.length();i++) {
-							JSONObject ticketInfo = ticketArr.getJSONObject(i);
-							ticketList.add(ticketInfo.getString("ticket_id"));
-						}
-					}else {
-						model.addAttribute("errorYn", "Y");
-						model.addAttribute("message", "jOB 실행에 필요한 티켓 ID가 없습니다.");
-						return new ModelAndView("jsonView", model);
-					}
-				}catch(Exception e) {
-					e.printStackTrace();
-					Log.error("파라미터 데이터 생성 중 오류 발생", e);
-				}
-				try {
-					
-					File pDeployPathCheck = new File(pDeployPath);
-					
-					if(!pDeployPathCheck.exists() || !pDeployPathCheck.isDirectory()) {
-						pDeployPathCheck.mkdirs();
-						
-					}
-					
-					
-					if(pDeployPath.lastIndexOf("/") == pDeployPath.length()) {
-						pDeployPath = pDeployPath.substring(0, pDeployPath.length()-1);
-					}
-					
-					
-					File pDeployJobPath = new File(pDeployPath+"/"+eGeneDplId+"/"+jobId);
-					
-					
-					if(!pDeployJobPath.exists() || !pDeployJobPath.isDirectory()) {
-						pDeployJobPath.mkdirs();
-					}
-
-					
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss", Locale.KOREA);
-					
-					
-					String fileNm = pDeployTicketFileNm+"_"+sdf.format(new Date())+".txt";
-					
-					
-					File ticketFile = new File(pDeployPath+"/"+eGeneDplId+"/"+jobId+"/"+fileNm);
-					
-					
-					if(!ticketFile.exists()) {
-						ticketFile.createNewFile();
-					}
-					
-					
-					FileWriter fileWriter = new FileWriter(ticketFile);
-				    PrintWriter printWriter = new PrintWriter(fileWriter);
-				    
-				    
-				    for(String targetTicketId : ticketList) {
-				    	printWriter.println(targetTicketId);
-				    }
-				    
-				    
-				    printWriter.close();
-					
-				}catch(Exception e) {
-					e.printStackTrace();
-					Log.error("배포 배포 필요 파일 생성 중 오류 발생", e);
-				}
-			}
-			
 			
 			BuildVO buildVo = new BuildVO();
 			buildVo.setJenId(jenId);
@@ -746,16 +540,16 @@ public class Dpl1000Controller {
 			buildVo.setJobId(jobId);
 			buildVo.setDplTypeCd(dplTypeCd);
 			buildVo.setJenStatusVo(jenStatusVo);
+			buildVo.setJobParamList(jobParamList);
 			buildVo.setCiId(ciId);
 			buildVo.setTicketId(ticketId);
 			buildVo.setDplId(dplId);
 			buildVo.setBldStartUsrId(empId);
 			buildVo.setBldStartUsrIp(request.getRemoteAddr());
-			buildVo.setJobParamList(newJobParamList);
-
+			
 			
 			buildVo.addBldActionLog(jobId+" JOB 빌드를 준비 중입니다.");
-
+			
 			
 			BuildVO rtnBuildVo = buildService.insertJobBuildAction(buildVo);
 			
@@ -767,7 +561,7 @@ public class Dpl1000Controller {
 			
 			model.addAttribute("bldActionLog", rtnBuildVo.getBldActionLog());
 			model.addAttribute("bldNum", rtnBuildVo.getBldNum());
-
+			
 			
 			model.addAttribute("errorYn", "N");
 			model.addAttribute("message", egovMessageSource.getMessage("success.deploy.build"));
@@ -792,72 +586,121 @@ public class Dpl1000Controller {
 			
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 			
-			String ciId = paramMap.get("ciId");
-			String ticketId = paramMap.get("ticketId");
-			
-			paramMap.remove("ciId");
-			paramMap.remove("ticketId");
-			
 			
 			Map jobMap = jen1000Service.selectJen1100JobInfo(paramMap);
 			
-			if(jobMap == null) {
+			String jenUrl = (String) jobMap.get("jenUrl");
+			String jenUsrId = (String) jobMap.get("jenUsrId");
+			String jenUsrTok = (String) jobMap.get("jenUsrTok");
+			String jobId = (String) jobMap.get("jobId");
+			String targetBldNum = (String) paramMap.get("targetBldNum");
+			
+			
+			
+			
+			
+			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
+			
+			
+			String deJenUsrTok = CommonScrty.decryptedAria(jenUsrTok, salt);
+			
+			
+			JenStatusVO jenStatusVo = newJenkinsClient.connect(jenUrl, jenUsrId, deJenUsrTok);
+			
+			
+			if(jenStatusVo.isErrorFlag()) {
 				model.addAttribute("errorYn", "Y");
-				model.addAttribute("message", "해당 티켓에서 실행된 JOB의 빌드 이력이 없습니다.");
+				model.addAttribute("message", jenStatusVo.getErrorMsg());
+			}
+			
+			
+			Map jobInfo = newJenkinsClient.getJobInfo(jenStatusVo, jobId);
+
+			
+			if(jobInfo == null) {
+				newJenkinsClient.close(jenStatusVo);
+				model.addAttribute("errorYn", "Y");
+				model.addAttribute("message", "JENKINS에서 해당 JOB을 찾을 수 없습니다.");
 				return new ModelAndView("jsonView", model);
 			}
 			
 			
+			boolean isBuilding = (boolean) jobInfo.get("isBuilding");
+			boolean isInQueue = (boolean) jobInfo.get("isInQueue");
+			
 			
 			Map bldInfo = null;
 			
-			paramMap.put("ciId", ciId);
-			paramMap.put("ticketId", ticketId);
 			
-			
-			bldInfo = jen1000Service.selectJen1200JobLastBuildInfo(paramMap);
-			
-			
-			if(bldInfo != null) {
+			if(isBuilding || isInQueue) {
+				int bldNum = 0;
 				
-				bldInfo.remove("bldConsoleLog");
-				
-				
-				String bldNum = String.valueOf(bldInfo.get("bldNum"));
-				paramMap.put("bldNum", bldNum);
-				
-				
-				List<Map> jobLastBuildChgList = jen1000Service.selectJen1201JobLastBuildChgList(paramMap);
-				
-				
-				List<Map> jobLastBuildFileChgList = jen1000Service.selectJen1202JobLastBuildFileChgList(paramMap);
-
-				
-				bldInfo.put("bldChgList", jobLastBuildChgList);
-				bldInfo.put("bldChgFileList", jobLastBuildFileChgList);
-				
-				String jenId = paramMap.get("jenId");
-				String jobId = paramMap.get("jobId");
-				
-				
-				Map newMap = new HashMap<>();
-				newMap.put("jenId", jenId);
-				newMap.put("jobId", jobId);
-				
-				
-				Map jobLastBldInfo = jen1000Service.selectJen1200JobLastBuildInfo(newMap);
-				
-				
-				String jobLastBldNum = String.valueOf(jobLastBldInfo.get("bldNum"));
-				
-				
-				if(!bldNum.equals(jobLastBldNum)) {
-					
-					model.addAttribute("jobLastBldInfo", jobLastBldInfo);
+				if(targetBldNum == null) {
+					bldNum = (int)jobInfo.get("lastBuildNum");
+				}else {
+					bldNum = Integer.parseInt(targetBldNum);
 				}
 				
+				
+				bldInfo = newJenkinsClient.getJobBldNumInfo(jenStatusVo, jobId, bldNum);
+				bldInfo.put("bldResultCd", "02");
+				bldInfo.put("bldResult", "BUILDING");
+			}else {
+				
+				
+				bldInfo = jen1000Service.selectJen1200JobLastBuildInfo(paramMap);
+				
+				
+				String bldResultCd = null;
+				String bldResult = null;
+				if(bldInfo != null) {
+					bldResultCd = (String) bldInfo.get("bldResultCd");
+					bldResult = (String) bldInfo.get("bldResult");
+				}
+				
+				
+				if(bldInfo != null && !"01".equals(bldResultCd) && !"02".equals(bldResultCd)) {
+					
+					String bldNum = String.valueOf(bldInfo.get("bldNum"));
+					paramMap.put("bldNum", bldNum);
+					
+					
+					List<Map> jobLastBuildChgList = jen1000Service.selectJen1201JobLastBuildChgList(paramMap);
+					
+					
+					List<Map> jobLastBuildFileChgList = jen1000Service.selectJen1202JobLastBuildFileChgList(paramMap);
+
+					
+					bldInfo.put("bldChgList", jobLastBuildChgList);
+					bldInfo.put("bldChgFileList", jobLastBuildFileChgList);
+				}else {
+					
+					
+					if(!jobInfo.isEmpty()) {
+						boolean hasLastBuildRun = (boolean)jobInfo.get("hasLastBuildRun"); 
+						
+						
+						if(hasLastBuildRun) {
+							int lastBuildNum = (int)jobInfo.get("lastBuildNum");
+							
+							
+							bldInfo = newJenkinsClient.getJobBldNumInfo(jenStatusVo, jobId, lastBuildNum);
+							
+							if(bldInfo != null) {
+								bldResultCd = (String) bldInfo.get("bldResultCd");
+								bldResult = (String) bldInfo.get("bldResult");
+								
+								
+								if("01".equals(bldResultCd) || "02".equals(bldResultCd)) {
+									
+									bldInfo.put("bldResultCd", bldResultCd);
+									bldInfo.put("bldResult", bldResult);
+								}
+							}
+						}
+					}
+				}
 			}
-			
 			
 			model.addAttribute("bldInfo", bldInfo);
 			
@@ -948,5 +791,5 @@ public class Dpl1000Controller {
 			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
 			return new ModelAndView("jsonView");
 		}
-	}
+	}	
 }
