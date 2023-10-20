@@ -45,6 +45,10 @@ public interface ApiService {
 	Map selectTicketRvDataList(Map paramMap) throws Exception;
 	
 	
+	@SuppressWarnings({ "rawtypes"})
+	Map selectTicketDplFileDataList(Map paramMap) throws Exception;
+	
+	
 	@SuppressWarnings({ "rawtypes" })
 	Map selectTicketCheck(Map paramMap) throws Exception;
 }
