@@ -136,7 +136,9 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		String buildBrancheNm = EgovProperties.getProperty("Globals.svn.buildBranchNm");
 		
 		
+		
 		String branchePath = "/branches/"+buildBrancheNm;
+		
 		
 		
 		if(branchePath.lastIndexOf("/") == (branchePath.length()-1)) {
@@ -144,10 +146,12 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 			branchePath = branchePath.substring(0, branchePath.length()-1);
 		}
 		
+		
 		if(jsonArr != null && jsonArr.length() > 0) {
 			
 			List<String> makePathCheck = new ArrayList<String>();
 			List<String> checkDirList = new ArrayList<String>();
+			
 			
 			for(int i=0;i<jsonArr.length();i++) {
 				JSONObject jsonInfo = jsonArr.getJSONObject(i);
@@ -159,7 +163,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 					
 					
 					String trunkPath = repChgFilePath.replace(branchePath, "/trunk");
-					
+							
 					
 					checkDirList.add(trunkPath);
 				}
@@ -277,6 +281,8 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 						for(int j=parentCnt;j>0;j--) {
 							
 							if(makePathCheck.indexOf(checkDir) != -1) {
+								
+								
 								System.out.println("dir 중복: "+checkDir);
 								break;
 							}
@@ -297,6 +303,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 								makePathList.add(checkDir);
 								System.out.println("dir 추가: "+checkDir);
 							} else {
+								
 								
 								break;
 							}
@@ -348,15 +355,14 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 					else if("02".equals(repChgTypeCd)) {
 						
 						List<RepDataVO> trunkLogList = repModule.selectRepLogList(repResultVo, 1, -1, new String[]{trunkPath});
-						if(trunkLogList == null || trunkLogList.size() == 0) {
-							errorMsg.add("- Trunk에 대상 파일이 존재하지 않습니다. [path="+trunkPath+"]");
-							continue;
-						}
 						
-						RepDataVO trunkLogInfo = trunkLogList.get(trunkLogList.size()-1);
-						if(trunkLogInfo.getRevision() > repRv) {
-							errorMsg.add("- Trunk에 있는 파일 리비전("+trunkLogInfo.getRevision()+")이 현재 대상 파일("+repRv+")보다 최신입니다. [path="+trunkPath+"]");
-							continue;
+						if(trunkLogList != null && trunkLogList.size() > 0) {
+							
+							RepDataVO trunkLogInfo = trunkLogList.get(trunkLogList.size()-1);
+							if(trunkLogInfo.getRevision() > repRv) {
+								errorMsg.add("- Trunk에 있는 파일 리비전("+trunkLogInfo.getRevision()+")이 현재 대상 파일("+repRv+")보다 최신입니다. [path="+trunkPath+"]");
+								continue;
+							}
 						}
 						
 						
@@ -426,7 +432,10 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				List<Map> rep1101InsertList = new ArrayList<Map>();
 				
 				
-				String commitComment = "[insert_data_no-flag]branche 변경 파일 "+fileList.size()+"개 trunk에 commit";
+				int commitCnt = dirList.size()+fileList.size();
+				
+				
+				String commitComment = "[insert_data_no-flag]branche 변경 파일 "+commitCnt+"개 trunk에 commit";
 				
 				
 				ISVNEditor editor = repository.getCommitEditor(commitComment, null);
@@ -454,8 +463,42 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 						String makePath = makePathArr.get(j);
 						
 						
-						System.out.println("dir생성: "+makePath);
-						editor.addDir(makePath, null, -1);
+						
+						int openDirCnt = 0;
+						
+						String[] parentPath = makePath.split("/");
+						
+						for(int l=1;l<(parentPath.length-1);l++) {
+							String path = parentPath[l];
+							editor.openDir(path, -1);
+							openDirCnt++;
+							
+						}
+						
+						
+						
+			            
+						
+						try {
+							editor.addDir(makePath.substring(makePath.lastIndexOf("/")+1, makePath.length()), null, -1);
+							
+							
+							editor.closeDir();
+						}catch(SVNException svnE) {
+	            			svnE.printStackTrace();
+	            			int errorCode = svnE.getErrorMessage().getErrorCode().getCode();
+	            			if(errorCode == 160013) {
+	            				
+		            			errorMsg.add("- 해당 파일 커밋에 필요한 상위 디렉토리 정보가 함께 선택되지 않았습니다. [path="+makePath+"]");
+	            			}else {
+	            				errorMsg.add("- 해당 파일 커밋 중 오류가 발생했습니다. [path="+makePath+", error="+svnE.getMessage()+"]");
+	            			}
+	            		}
+						
+						
+						for(int l=0;l<openDirCnt;l++) {
+							editor.closeDir();
+						}
 					}
 				}
 
@@ -513,6 +556,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 					
 					String trunkPath = repChgFilePath.replace(branchePath, "/trunk");
 					
+					
 					Long repRv = Long.parseLong(String.valueOf(fileInfo.get("repRv")));
 					
 					
@@ -535,14 +579,11 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 						
 						
 			            String brancheContent = (String) fileInfo.get("brancheContent");
-			            
-			            
-			    		
 			    		
 		    			String checksum = null;
 		    			try {
-		    				System.out.println("파일 생성: "+trunkPath);
 		    				
+		    				editor.openDir(trunkPath.substring(0, trunkPath.lastIndexOf("/")), -1);
 		    				
 			    			editor.addFile(trunkPath, null, -1);
 			    			
@@ -565,7 +606,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 	            		}
 						
 						
-		    			
+		    			editor.closeDir();
 					}
 					
 					else if("02".equals(repChgTypeCd)) {
@@ -605,8 +646,45 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 					
 				}
 				editor.closeDir();
-				editor.abortEdit();
+				
 
+				if(succCnt > 0) {
+					
+					SVNCommitInfo commitInfo = editor.closeEdit();
+					
+					Long commitRv = commitInfo.getNewRevision();
+					
+					
+					Map dataMap = new HashMap<>();
+					dataMap.put("repId", repId);
+					dataMap.put("repRv", commitRv);
+					dataMap.put("repComment", commitComment);
+					
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
+					
+					dataMap.put("repCmtDate", sdf.format(new Date()));
+					
+					
+					if(commitAuthor == null || "".equals(commitAuthor)) {
+						commitAuthor = "SYSTSEM";
+					}
+					dataMap.put("repCmtAuthor", commitAuthor);
+					dataMap.put("repChgFileCnt", fileList.size());
+					dataMap.put("ticketId", ticketId);
+					dataMap.put("repRvTypeCd", "02"); 
+					
+					rep1100DAO.insertRep1100RvInfo(dataMap);
+					
+					
+					for(Map rep1101InsertInfo : rep1101InsertList) {
+						rep1101InsertInfo.put("repRv", commitRv);
+						rep1100DAO.insertRep1101RvChgInfo(rep1101InsertInfo);
+					}
+				}else {
+					
+					editor.abortEdit();
+				}
+				
 			}
 			
 			if(errorMsg.size() == 0) {
@@ -621,7 +699,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		rtnMap.put("succCnt", succCnt);
 		
 		rtnMap.put("errorMsg", errorMsg);
-		
+
 		return rtnMap;
 	}
 }
