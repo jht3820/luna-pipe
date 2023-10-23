@@ -133,12 +133,61 @@ public class Rep1100Controller {
 	}
 	
 	
+	@RequestMapping(value="/rep/rep1000/rep1100/selectRep1103View.do")
+	public String selectRep1103View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try {
+			
+			JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
+			
+			
+			String empId = OslUtil.jsonGetString(jsonObj, "emp_id");
+			
+			
+			String ciId = OslUtil.jsonGetString(jsonObj, "src_id");
+			
+			
+			if(ciId == null) {
+				response.setStatus(HttpStatus.SC_BAD_REQUEST);
+				model.put("errorMsg", "구성항목 ID가 없습니다.");
+				return "/err/error";
+			}
+			
+			
+			String ticketId = OslUtil.jsonGetString(jsonObj, "ticket_id");
+			
+			
+			if(ticketId == null) {
+				response.setStatus(HttpStatus.SC_BAD_REQUEST);
+				model.put("errorMsg", "티켓 ID가 없습니다.");
+				return "/err/error";
+			}
+			
+			model.addAttribute("empId", empId);
+			model.addAttribute("ciId", ciId);
+			model.addAttribute("ticketId", ticketId);
+		}catch(Exception e) {
+			Log.error(e);
+			e.printStackTrace();
+		}
+		
+		return "/rep/rep1000/rep1100/rep1103";
+	}
+	
+	
 	@SuppressWarnings("rawtypes")
 	@RequestMapping(value="/rep/rep1000/rep1100/selectRep1100TktRvFileChgListAjax.do")
 	public ModelAndView selectRep1100TktRvFileChgListAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try{
 			
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			
+			Object typeObj = paramMap.get("type");
+			String type = null;
+			if(typeObj != null) {
+				type = (String) paramMap.get("type");
+			}
+			
 			
 			String _pageNo_str = paramMap.get("pageNo");
 			String _pageSize_str = paramMap.get("pageSize");
@@ -168,14 +217,21 @@ public class Rep1100Controller {
 
 			
 			paramMap.put("firstIndex", String.valueOf(pageVo.getFirstIndex()));
-			paramMap.put("lastIndex", String.valueOf(pageVo.getLastIndex()));
 			
 			
-			int totCnt = 0;
+			int totCnt = rep1100Service.selectRep1100TktRvFileChgListCnt(paramMap);
+
+			
+			if(type != null && "all".equals(type)) {
+				paramMap.put("lastIndex", String.valueOf(totCnt));
+			}else {
+				paramMap.put("lastIndex", String.valueOf(pageVo.getLastIndex()));
+			}
+			
+			
+			
 			rep1100List =  rep1100Service.selectRep1100TktRvFileChgList(paramMap);
 			
-			
-			totCnt = rep1100Service.selectRep1100TktRvFileChgListCnt(paramMap);
 			paginationInfo.setTotalRecordCount(totCnt);
 			
 			model.addAttribute("list", rep1100List);
@@ -338,6 +394,7 @@ public class Rep1100Controller {
 		}
 	}
 	
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value="/rep/rep1000/rep1100/selectRep1102RsyncResultListAjax.do")
 	public ModelAndView selectRep1102RsyncResultListAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
@@ -392,82 +449,122 @@ public class Rep1100Controller {
 							checkPath += "/";
 							
 							
-							File pathText = new File(checkPath+"path.txt");
-							if(pathText.exists() && pathText.isFile()) {
+							File uuidText = new File(checkPath+"uuid.txt");
+							if(uuidText.exists() && uuidText.isFile()) {
+								List<String> repUuidArr = FileUtils.readLines(uuidText, "UTF-8");
 								
-								String[] fileNmList = checkPathFile.list();
+								Map newParamMap = new HashMap<>();
+								newParamMap.put("repDplUuid", repUuidArr.get(0));
 								
-								long fileDate = 0;
-								for(String fileNm : fileNmList) {
-									if(fileNm.contains("change_file_")) {
+								RepVO repInfo = rep1000Service.selectRep1000Info(newParamMap);
+								
+								
+								if(repInfo == null) {
+									errorYn = "Y";
+									message = "소스저장소 정보를 불러오는 도중 오류가 발생했습니다. (SVN_UUID 값 오류)";
+								}else {
+									
+									String repId = repInfo.getRepId();
+									
+									
+									newParamMap.put("ciId", ciId);
+									newParamMap.put("ticketId", ticketId);
+									newParamMap.put("jobId", jobId);
+									newParamMap.put("bldNum", bldNum);
+									newParamMap.put("repId", repId);
+									
+									
+									List<Map> dplFileChgList = rep1100Service.selectRep1102DplChgFileList(newParamMap);
+									
+									List<String> dupleCheckPath = new ArrayList<String>();
+									
+									
+									for(Map dplFileChgInfo : dplFileChgList) {
 										
-										String[] splitNm = fileNm.split("change_file_");
-										long cursorFileDate = Long.parseLong(splitNm[1].substring(0,splitNm[1].indexOf(".")));
+										String repChgFilePath = (String) dplFileChgInfo.get("rep_chg_file_path");
 										
-										if(cursorFileDate > fileDate) {
-											fileDate = cursorFileDate;
+										
+										if(dupleCheckPath.indexOf(repChgFilePath) != -1) {
+											continue;
+										}
+										
+										dupleCheckPath.add(repChgFilePath);
+										System.out.println(repChgFilePath);
+									}
+									
+									model.addAttribute("dplFileChgList", dplFileChgList);
+									
+									
+									String[] fileNmList = checkPathFile.list();
+									
+									long fileDate = 0;
+									for(String fileNm : fileNmList) {
+										if(fileNm.contains("change_file_")) {
+											
+											String[] splitNm = fileNm.split("change_file_");
+											long cursorFileDate = Long.parseLong(splitNm[1].substring(0,splitNm[1].indexOf(".")));
+											
+											if(cursorFileDate > fileDate) {
+												fileDate = cursorFileDate;
+											}
 										}
 									}
-								}
-								
-								if(fileDate != 0) {
-									String changeFileNm = "change_file_"+String.valueOf(fileDate)+".txt"; 
 									
-									File changeFile = new File(checkPath+changeFileNm);
-									if(changeFile.exists() && changeFile.isFile()) {
+									if(fileDate != 0) {
+										String changeFileNm = "change_file_"+String.valueOf(fileDate)+".txt"; 
 										
-										List<String> pathContents = FileUtils.readLines(pathText, "UTF-8");
-										String startPath = pathContents.get(0);
-										
-										
-										if(startPath.lastIndexOf("/") != (startPath.length()-1)) {
-											startPath += "/";
-										}
-										
-										
-										List<String> rsyncResultContents = FileUtils.readLines(changeFile, "UTF-8");
-										
-										
-										List<Map> fileChgList = new ArrayList<Map>();
-										for(int i=0;i<rsyncResultContents.size();i++) {
-											String readContent = rsyncResultContents.get(i);
+										File changeFile = new File(checkPath+changeFileNm);
+										if(changeFile.exists() && changeFile.isFile()) {
 											
-											if(readContent == null || readContent.length() == 0) {
-												continue;
+											List<String> rsyncResultContents = FileUtils.readLines(changeFile, "UTF-8");
+											
+											
+											List<Map> fileChgList = new ArrayList<Map>();
+											for(int i=0;i<rsyncResultContents.size();i++) {
+												String readContent = rsyncResultContents.get(i);
+												
+												if(readContent == null || readContent.length() == 0) {
+													continue;
+												}
+												
+												char fileTypeNm = readContent.charAt(0);
+												
+												
+												String fileChgPath = readContent.substring(1, readContent.length());
+												
+												
+												if(fileChgPath.indexOf("/") != 0) {
+													fileChgPath += "/";
+												}
+												
+												
+												if(dupleCheckPath.indexOf(fileChgPath) != -1) {
+													continue;
+												}
+												
+												Map newMap = new HashMap<>();
+												newMap.put("fileRealPath", checkPath+fileChgPath);
+												newMap.put("filePath", fileChgPath);
+												newMap.put("fileTypeNm", fileTypeNm);
+												newMap.put("changeFilePath", fileChgPath);
+												newMap.put("ciId", ciId);
+												newMap.put("ticketId", ticketId);
+												newMap.put("repId", repId);
+												newMap.put("jobId", jobId);
+												newMap.put("bldNum", bldNum);
+												fileChgList.add(newMap);
 											}
+											model.addAttribute("fileChgList", fileChgList);
 											
-											char fileKind = readContent.charAt(0);
-											
-											
-											String fileChgPath = readContent.substring(1, readContent.length());
-											
-											
-											if(fileChgPath.indexOf("/") == 0) {
-												fileChgPath = fileChgPath.substring(1, fileChgPath.length());
-											}
-											
-											Map newMap = new HashMap<>();
-											newMap.put("fileRealPath", checkPath+fileChgPath);
-											newMap.put("filePath", startPath+fileChgPath);
-											newMap.put("fileKind", fileKind);
-											newMap.put("changeFilePath", fileChgPath);
-											newMap.put("ciId", ciId);
-											newMap.put("ticketId", ticketId);
-											newMap.put("jobId", jobId);
-											newMap.put("bldNum", bldNum);
-											fileChgList.add(newMap);
+										}else {
+											errorYn = "Y";
+											message = "변경 정보를 가진 파일을 찾을 수 없습니다. (change_file_*.txt)";
 										}
-										model.addAttribute("fileChgList", fileChgList);
-										
 									}else {
 										errorYn = "Y";
 										message = "변경 정보를 가진 파일을 찾을 수 없습니다. (change_file_*.txt)";
 									}
-								}else {
-									errorYn = "Y";
-									message = "변경 정보를 가진 파일을 찾을 수 없습니다. (change_file_*.txt)";
 								}
-								
 							}else {
 								errorYn = "Y";
 								message = "root경로를 가진 정보 파일을 찾을 수 없습니다. (path.txt)";
@@ -505,6 +602,125 @@ public class Rep1100Controller {
 			
 			model.addAttribute("errorYn", "Y");
 			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+			return new ModelAndView("jsonView");
+		}
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value="/rep/rep1000/rep1100/insertRep1102TargetDataDeployCommitAjax.do")
+	public ModelAndView insertRep1102TargetDataDeployCommitAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map paramMap = RequestConvertor.requestParamToMap(request,true);
+			
+			
+			Map rtnMap = rep1100Service.insertRep1102TargetDataDeployCommitAjax(paramMap);
+			
+			
+			boolean result = (boolean)rtnMap.get("result");
+			
+			int succCnt = (int)rtnMap.get("succCnt");
+			
+			List<String> errorMsgList = (List<String>) rtnMap.get("errorMsg");
+			
+			model.addAttribute("succCnt", succCnt);
+			model.addAttribute("errorMsgList", errorMsgList);
+			
+			if(result) {
+				
+				model.addAttribute("errorYn", "N");
+				model.addAttribute("message", egovMessageSource.getMessage("success.common.insert"));
+			}else {
+				
+				model.addAttribute("errorYn", "Y");
+				model.addAttribute("message", egovMessageSource.getMessage("fail.common.insert"));
+			}
+			
+			
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			ex.printStackTrace();
+			Log.error("insertRep1102TargetDataDeployCommitAjax()", ex);
+			
+			
+			model.addAttribute("errorYn", "Y");
+			model.addAttribute("message", egovMessageSource.getMessage("fail.common.insert"));
+			return new ModelAndView("jsonView");
+		}
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value="/rep/rep1000/rep1100/selectRep1103TktDplFileChgListAjax.do")
+	public ModelAndView selectRep1103TktDplFileChgListAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			
+			paramMap.put("notDelete", "Y");
+			
+			List<Map> rep1103List =  rep1100Service.selectRep1102TktDplFileChgList(paramMap);
+			
+			model.addAttribute("list", rep1103List);
+			
+			
+			model.addAttribute("errorYn", 'N');
+			model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
+			
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("selectRep1103TktDplFileChgListAjax()", ex);
+			
+			model.addAttribute("errorYn", 'Y');
+			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+			return new ModelAndView("jsonView");
+		}
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value="/rep/rep1000/rep1100/insertRep1103TktDplFileSelectAjax.do")
+	public ModelAndView insertRep1103TktDplFileSelectAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map paramMap = RequestConvertor.requestParamToMap(request,true);
+			
+			
+			Map rtnMap = rep1100Service.insertRep1103TktDplFileSelectAjax(paramMap);
+			
+			
+			boolean result = (boolean)rtnMap.get("result");
+			
+			int succCnt = (int)rtnMap.get("succCnt");
+			
+			List<String> errorMsgList = (List<String>) rtnMap.get("errorMsg");
+			
+			model.addAttribute("succCnt", succCnt);
+			model.addAttribute("errorMsgList", errorMsgList);
+			
+			if(result) {
+				
+				model.addAttribute("errorYn", "N");
+				model.addAttribute("message", egovMessageSource.getMessage("success.common.insert"));
+			}else {
+				
+				model.addAttribute("errorYn", "Y");
+				model.addAttribute("message", egovMessageSource.getMessage("fail.common.insert"));
+			}
+			
+			
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("insertRep1103TktDplFileSelectAjax()", ex);
+			
+			
+			model.addAttribute("errorYn", "Y");
+			model.addAttribute("message", egovMessageSource.getMessage("fail.common.insert"));
 			return new ModelAndView("jsonView");
 		}
 	}

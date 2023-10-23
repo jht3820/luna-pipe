@@ -17,7 +17,11 @@ public interface Rep1100Service {
 	
 	
 	@SuppressWarnings({ "rawtypes" })
-	List<Map> selectRep1100RvChgFileList(Map paramMap) throws Exception;
+	List<Map> selectRep1101RvChgFileList(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings({ "rawtypes"})
+	List<Map> selectRep1102DplChgFileList(Map paramMap) throws Exception;
 	
 	
 	@SuppressWarnings("rawtypes")
@@ -30,6 +34,10 @@ public interface Rep1100Service {
 	
 	@SuppressWarnings("rawtypes")
 	String insertRep1101RvChgInfo(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	String insertRep1102RvChgInfo(Map paramMap) throws Exception;
 
 	
 	@SuppressWarnings("rawtypes")
@@ -46,4 +54,28 @@ public interface Rep1100Service {
 	
 	@SuppressWarnings("rawtypes")
 	Map insertRep1100SelTktFileCommitAjax(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	Map insertRep1102TargetDataDeployCommitAjax(Map paramMap) throws Exception;
+
+	
+	@SuppressWarnings({ "rawtypes"})
+	List<Map> selectRep1102TktDplFileChgList(Map paramMap) throws Exception;
+
+	
+	@SuppressWarnings({ "rawtypes"})
+	List<Map> selectRep1102TktDplSelFileChgList(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	Map selectRep1102TktFileRecentBldNumList(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	Map insertRep1103TktDplFileSelectAjax(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	int updateRep1102TktDplFileSelInfo(Map paramMap) throws Exception;
 }
