@@ -293,7 +293,7 @@ function fnRepGridSetting(){
              		var empId = $("form#rep1000Form > #empId").val();
              		
              		var data = {"popupGb": "update", "repId": selItem.repId, "empId": empId};
-					gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","680",'scroll');
+					gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","635",'scroll');
              	}
              	//삭제
              	else if(item.type == "repDelete"){
@@ -450,16 +450,6 @@ function fnSearchBoxControl(){
 						{label:"", labelWidth:"", type:"selectBox", width:"100", key:"searchCd", addClass:"selectBox", valueBoxStyle:"padding-left:0px;", value:"01",
 							options:[]
 						},
-						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_print_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-print' aria-hidden='true'></i>&nbsp;<span>프린트</span>",
-							onclick:function(){
-								$(repGridObj.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
-						}},
-						
-						{label:"", labelWidth:"", type:"button", width:"55",style:"float:right;", key:"btn_excel_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-file-excel' aria-hidden='true'></i>&nbsp;<span>엑셀</span>",
-							onclick:function(){
-								repGridObj.exportExcel("저장소 목록.xls");
-						}},
-						
 						{label : "",labelWidth : "",type : "button",width : "55",key : "btn_delete_svn",style : "float:right;",valueBoxStyle : "padding:5px;",value : "<i class='fa fa-trash-alt' aria-hidden='true'></i>&nbsp;<span>삭제</span>",
 							onclick : function() {
 								var chkList = repGridObj.getList('selected');
@@ -497,7 +487,7 @@ function fnSearchBoxControl(){
 								var empId = $("form#rep1000Form > #empId").val();
 								var data = {"popupGb": "update", "repId": chkList[0].repId, "empId": empId};
         	                	
-								gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","680",'scroll');
+								gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","635",'scroll');
 						}},
 						
 						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_insert_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-save' aria-hidden='true'></i>&nbsp;<span>등록</span>",
@@ -508,7 +498,7 @@ function fnSearchBoxControl(){
 									, "empId": empId
 								};
 								
-								gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","680",'scroll');
+								gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","635",'scroll');
 						}},
 						{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_rep",style:"float:right;", valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 							onclick:function(){
