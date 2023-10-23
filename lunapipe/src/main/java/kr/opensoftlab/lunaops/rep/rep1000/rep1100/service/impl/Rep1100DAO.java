@@ -26,8 +26,14 @@ public class Rep1100DAO extends ComOslitsAbstractDAO {
 	
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public List<Map> selectRep1100RvChgFileList(Map paramMap) throws Exception{
-		return (List<Map>) list("rep1100DAO.selectRep1100RvChgFileList", paramMap);
+	public List<Map> selectRep1101RvChgFileList(Map paramMap) throws Exception{
+		return (List<Map>) list("rep1100DAO.selectRep1101RvChgFileList", paramMap);
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public List<Map> selectRep1102DplChgFileList(Map paramMap) throws Exception{
+		return (List<Map>) list("rep1100DAO.selectRep1102DplChgFileList", paramMap);
 	}
 	
 	
@@ -47,6 +53,12 @@ public class Rep1100DAO extends ComOslitsAbstractDAO {
 	public String insertRep1101RvChgInfo(Map paramMap) throws Exception{
 		return (String) insert("rep1100DAO.insertRep1101RvChgInfo", paramMap);
 	}
+
+	
+	@SuppressWarnings("rawtypes")
+	public String insertRep1102RvChgInfo(Map paramMap) throws Exception{
+		return (String) insert("rep1100DAO.insertRep1102RvChgInfo", paramMap);
+	}
 	
 	
 	@SuppressWarnings("rawtypes")
@@ -64,5 +76,29 @@ public class Rep1100DAO extends ComOslitsAbstractDAO {
 	@SuppressWarnings("rawtypes")
 	public int selectRep1100TktRvFileChgListCnt(Map paramMap) throws Exception{
 		return (Integer) select("rep1100DAO.selectRep1100TktRvFileChgListCnt", paramMap);
+	}
+
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public List<Map> selectRep1102TktDplFileChgList(Map paramMap) throws Exception{
+		return (List) list("rep1100DAO.selectRep1102TktDplFileChgList", paramMap);
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public List<Map> selectRep1102TktDplSelFileChgList(Map paramMap) throws Exception{
+		return (List) list("rep1100DAO.selectRep1102TktDplSelFileChgList", paramMap);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	public Map selectRep1102TktFileRecentBldNumList(Map paramMap) throws Exception{
+		return (Map) select("rep1100DAO.selectRep1102TktFileRecentBldNumList", paramMap);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	public int updateRep1102TktDplFileSelInfo(Map paramMap) throws Exception{
+		return update("rep1100DAO.updateRep1102TktDplFileSelInfo", paramMap);
 	}
 }
