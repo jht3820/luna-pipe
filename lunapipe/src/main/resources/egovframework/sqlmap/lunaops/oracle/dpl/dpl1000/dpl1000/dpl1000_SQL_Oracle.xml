@@ -208,14 +208,12 @@
 			, F.BLD_RESULT_CD
 			, F.BLD_DURATION_TM
 			, F.BLD_START_DTM
-			, G.BLD_NUM AS LAST_BLD_NUM
-     		, G.BLD_RESULT_CD AS LAST_BLD_RESULT_CD
 			, A.REG_DTM 
             , A.REG_USR_ID 
             , A.REG_USR_IP 
             , A.MODIFY_DTM 
             , A.MODIFY_USR_ID 
-            , A.MODIFY_USR_IP
+            , A.MODIFY_USR_IP   
 		FROM DPL1000 A
 		INNER JOIN DPL1100 B ON (A.CI_ID = B.CI_ID AND A.TICKET_ID = B.TICKET_ID AND A.DPL_ID = B.DPL_ID AND A.DPL_DEL_CD = '02' AND B.USE_CD = '01')
 		INNER JOIN JEN1000 C ON (B.JEN_ID = C.JEN_ID AND C.USE_CD = '01' AND C.DEL_CD = '02')
@@ -229,30 +227,13 @@
 		</isEmpty>
 		(
 			SELECT Z.* FROM JEN1200 Z
-			INNER JOIN
-			(
-				SELECT JEN_ID, JOB_ID, MAX(BLD_NUM) AS BLD_NUM
-				FROM JEN1200
-				WHERE 1=1
-				AND CI_ID = #ciId#
-				AND TICKET_ID = #ticketId#
-				AND DPL_ID = #dplId#
-				GROUP BY JEN_ID, JOB_ID
-			) Y
+			INNER JOIN (SELECT JEN_ID, JOB_ID, MAX(BLD_NUM) AS BLD_NUM FROM JEN1200 GROUP BY JEN_ID, JOB_ID) Y
+			<!-- 
+			 - jen1000에서 JOB동기화시 배포ID가 없기때문에 이력이 꼬일수있음 
+			INNER JOIN (SELECT CI_ID, TICKET_ID, JEN_ID, JOB_ID, DPL_ID, MAX(BLD_NUM) AS BLD_NUM FROM DPL1102 GROUP BY CI_ID, TICKET_ID, JEN_ID, JOB_ID, DPL_ID) Y
+			 -->
 			ON (Z.JEN_ID = Y.JEN_ID AND Z.JOB_ID = Y.JOB_ID AND Z.BLD_NUM = Y.BLD_NUM)
 		) F ON (B.JEN_ID = F.JEN_ID AND B.JOB_ID = F.JOB_ID)
-		LEFT JOIN
-		(
-			SELECT Z.* FROM JEN1200 Z
-			INNER JOIN
-			(
-				SELECT JEN_ID, JOB_ID, MAX(BLD_NUM) AS BLD_NUM
-				FROM JEN1200
-				WHERE 1=1
-				GROUP BY JEN_ID, JOB_ID
-			) Y
-			ON (Z.JEN_ID = Y.JEN_ID AND Z.JOB_ID = Y.JOB_ID AND Z.BLD_NUM = Y.BLD_NUM)
-		) G ON (B.JEN_ID = G.JEN_ID AND B.JOB_ID = G.JOB_ID)
 		WHERE 1=1
 		AND A.CI_ID = #ciId#
 		AND A.TICKET_ID = #ticketId#
@@ -304,12 +285,8 @@
 		    AND A.CI_ID = #ciId#
 		    AND A.TICKET_ID = #ticketId#
 		    AND A.DPL_ID = #dplId#
-		    <isNotEmpty property="jenId">
-			    AND A.JEN_ID = #jenId#
-		    </isNotEmpty>
-		    <isNotEmpty property="jobId">
-			    AND A.JOB_ID = #jobId#
-		    </isNotEmpty>
+		    AND A.JEN_ID = #jenId#
+		    AND A.JOB_ID = #jobId#
 	</sql>
 	
 	<sql id="selectDpl1102List">
@@ -332,7 +309,7 @@
 			INNER JOIN JEN1100 C
 			ON (A.JEN_ID = C.JEN_ID AND A.JOB_ID = C.JOB_ID AND C.USE_CD = '01' AND C.JOB_TYPE_CD = '04')
 			INNER JOIN DPL1000 D
-			ON (A.DPL_ID = D.DPL_ID AND D.DPL_DEL_CD = '02' AND A.CI_ID = D.CI_ID AND A.TICKET_ID = D.TICKET_ID)
+			ON (A.DPL_ID = D.DPL_ID AND D.DPL_DEL_CD = '02')
 			INNER JOIN JEN1200 E
 			ON (A.JEN_ID = E.JEN_ID AND A.JOB_ID = E.JOB_ID AND A.CI_ID = E.CI_ID AND A.TICKET_ID = E.TICKET_ID AND A.DPL_ID = E.DPL_ID AND A.BLD_NUM = E.BLD_NUM AND BLD_RESULT_CD = '03')
 		WHERE 1=1

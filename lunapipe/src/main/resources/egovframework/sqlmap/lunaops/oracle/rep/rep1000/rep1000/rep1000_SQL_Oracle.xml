@@ -154,22 +154,17 @@
 			FROM
 			            REP1000
 			WHERE       1=1
-			<isEmpty property="likeSvnRepUrl">
-				<isNotEmpty property="repUuid">
-					AND		REP_UUID = #repUuid#			
-				</isNotEmpty>
-				<isNotEmpty property="repDplUuid">
-					AND		REP_DPL_UUID = #repDplUuid#			
-				</isNotEmpty>
-				<isEmpty property="repUuid">
-					<isEmpty property="repDplUuid">
-						AND       REP_ID = #repId# 
-					</isEmpty>
+			<isNotEmpty property="repUuid">
+				AND		REP_UUID = #repUuid#			
+			</isNotEmpty>
+			<isNotEmpty property="repDplUuid">
+				AND		REP_DPL_UUID = #repDplUuid#			
+			</isNotEmpty>
+			<isEmpty property="repUuid">
+				<isEmpty property="repDplUuid">
+					AND       REP_ID = #repId# 
 				</isEmpty>
 			</isEmpty>
-			<isNotEmpty property="likeSvnRepUrl">
-				AND SVN_REP_URL LIKE '%' || #likeSvnRepUrl#
-			</isNotEmpty>
 	</select>
 
 
@@ -358,9 +353,6 @@
 		DELETE FROM	REP1001
 		WHERE 1=1
 		AND CI_ID = #ciId#
-		<isNotEmpty property="repId">
-			AND REP_ID = #repId#
-		</isNotEmpty>
 	</delete>
 	
 	

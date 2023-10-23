@@ -1448,7 +1448,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 					newMap.put("repId", repId);
 					newMap.put("repRv", repRv);
 					
-					List<Map> ticketRvChgList = rep1100Service.selectRep1100RvChgFileList(newMap);
+					List<Map> ticketRvChgList = rep1100Service.selectRep1101RvChgFileList(newMap);
 					
 					
 					ticketRvInfo.put("rep_chg_file_list", ticketRvChgList);
@@ -1463,6 +1463,67 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			rtnValue.put("result", false);
 			rtnValue.put("error_code", OslErrorCode.DATA_DECODE_FAIL);
 			return rtnValue;
+		}
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Map selectTicketDplFileDataList(Map paramMap) throws Exception {
+		Map rtnMap = new HashMap<>();
+		
+		
+		String data = (String) paramMap.get("data");
+		
+		
+		Object checkParam = checkParamDataKey(data);
+		
+		
+		if(!(checkParam instanceof String)) {
+			
+			JSONObject jsonObj = (JSONObject) checkParam;
+			
+			
+			
+			String ticketId = OslUtil.jsonGetString(jsonObj, "ticket_id");
+			
+			
+			if(ticketId == null) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.PARAM_TICKET_ID_NULL);
+				return rtnMap;
+			}
+			
+			
+			paramMap.put("ticketId", ticketId);
+			
+			
+			String ciId = OslUtil.jsonGetString(jsonObj, "ci_id");
+			if(ciId != null) {
+				
+				
+				String repId = OslUtil.jsonGetString(jsonObj, "rep_id");
+				if(repId != null) {
+					
+					paramMap.put("ciId", ciId);
+					paramMap.put("repId", repId);
+				}
+			}
+			
+			
+			paramMap.put("repChgSelCd", "01");
+			
+			
+			List<Map> ticketDplSelFileList = rep1100Service.selectRep1102DplChgFileList(paramMap);
+			
+			rtnMap.put("result", true);
+			rtnMap.put("ticketDplSelFileList", ticketDplSelFileList);
+			
+			return rtnMap;
+			
+		}else {
+			rtnMap.put("result", false);
+			rtnMap.put("error_code", OslErrorCode.DATA_DECODE_FAIL);
+			return rtnMap;
 		}
 	}
 	
