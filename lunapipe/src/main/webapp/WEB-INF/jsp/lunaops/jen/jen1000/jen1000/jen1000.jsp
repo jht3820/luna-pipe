@@ -658,15 +658,6 @@ function fnJenkinsSearchSetting(){
                 		}}
 					]},
 					{display:true, addClass:"", style:"", list:[
-                    						
-						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_print_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-print' aria-hidden='true'></i>&nbsp;<span>프린트</span>",
-							onclick:function(){
-								$(jenkinsGrid.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
-						}},
-						{label:"", labelWidth:"", type:"button", width:"55",style:"float:right;", key:"btn_excel_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-file-excel' aria-hidden='true'></i>&nbsp;<span>엑셀</span>",
-							onclick:function(){
-								jenkinsGrid.exportExcel("JENKINS_LIST.xls");
-						}},
 						{label : "",labelWidth : "",type : "button",width : "55",key : "btn_delete_jenkins",style : "float:right;",valueBoxStyle : "padding:5px;",value : "<i class='fa fa-trash-alt' aria-hidden='true'></i>&nbsp;<span>삭제</span>",
 							onclick : function() {
 								var item = jenkinsGrid.getList('selected')[0];
@@ -852,15 +843,6 @@ function fnJobSearchSetting(){
                 		}}
 					]},
 					{display:true, addClass:"", style:"", list:[
-                    						
-						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_print_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-print' aria-hidden='true'></i>&nbsp;<span>프린트</span>",
-							onclick:function(){
-								$(jobGrid.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
-						}},
-						{label:"", labelWidth:"", type:"button", width:"55",style:"float:right;", key:"btn_excel_jenkins",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-file-excel' aria-hidden='true'></i>&nbsp;<span>엑셀</span>",
-							onclick:function(){
-								jobGrid.exportExcel("JENKINS-JOB_LIST.xls");
-						}},
 						{label : "",labelWidth : "",type : "button",width : "55",key : "btn_delete_jenkins",style : "float:right;",valueBoxStyle : "padding:5px;",value : "<i class='fa fa-trash-alt' aria-hidden='true'></i>&nbsp;<span>삭제</span>",
 							onclick : function() {
 								var chkList = jobGrid.getList('selected');
