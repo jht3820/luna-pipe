@@ -276,7 +276,10 @@ function fnInGridListSet(_pageNo,ajaxParam){
    	}else if(typeof tktFileGridObj.page.currentPage != "undefined"){
    		ajaxParam += "&pageNo="+tktFileGridObj.page.currentPage;
    	}
-    	
+    
+   	//조회 typeCd 넘기기
+   	ajaxParam += "&repRvTypeCd=01";
+   	
    	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
 			{"url":"<c:url value='/rep/rep1000/rep1100/selectRep1100TktRvFileChgListAjax.do'/>","loadingShow":true}
@@ -425,7 +428,7 @@ function fnRep1100GuideShow(){
 	</form>
 	<div class="tab_contents menu">
 		<div class="sub_title">
-			소스저장소 관리
+			티켓 변경 파일 목록
 		</div>
 		<div id="tktFileSearchTarget" guide="rep1100button" ></div>
 		<div data-ax5grid="tktFileGridTarget" data-ax5grid-config="{}" style="height: 600px;"></div>

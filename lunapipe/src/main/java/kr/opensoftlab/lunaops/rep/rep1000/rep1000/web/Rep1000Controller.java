@@ -529,6 +529,7 @@ public class Rep1000Controller {
 			
 			
 			paramMap.put("repUuid", repResultVO.getUuid());
+			paramMap.put("repDplUuid", repResultVO.getDplUuid());
 			
 			
 			Object insertKey = rep1000Service.saveRep1000Info(paramMap);

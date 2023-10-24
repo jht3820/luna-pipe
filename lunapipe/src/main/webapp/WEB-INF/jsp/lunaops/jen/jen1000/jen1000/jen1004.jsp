@@ -75,15 +75,6 @@ var jen1004BldListGrid;
 var jen1004BldSearchObj;
 globals_guideChkFn = fnJen1004GuideShow;
 $(document).ready(function() {
-	var jobTypeCd = '<c:out value="${param.jobTypeCd}"/>';
-	if(jobTypeCd == "05" || jobTypeCd == "05" || jobTypeCd == "06" || jobTypeCd == "07" || jobTypeCd == "08"){
-		$("form#jen1004JobInfoForm > .descMainFrame.dplInfo-ciTktId").hide();
-		$("form#jen1004JobInfoForm > .descMainFrame.dplInfo-eGeneDplId").show();
-	}else{
-		$("form#jen1004JobInfoForm > .descMainFrame.dplInfo-ciTktId").show();
-		$("form#jen1004JobInfoForm > .descMainFrame.dplInfo-eGeneDplId").hide();
-	}
-	
 	//그리드 선언
 	fnJobBldListGridSetting();
 	
@@ -261,7 +252,6 @@ function fnJobBldListGridDataSet(_pageNo){
    	//jenId, jobId
    	var jenId = '<c:out value="${param.jenId}"/>';
    	var jobId = '<c:out value="${param.jobId}"/>';
-   	
    	ajaxParam += "&jenId="+jenId+"&jobId="+jobId;
    	
    	
@@ -324,11 +314,10 @@ function fnSelJobBuildInfo(paramBldItem){
 		var buildResult = "-";
 		var buildDurationStr = "-";
 		var buildEstimatedDurationStr = "-";
-		var buildChgLog = '<div class="buildChgMainFrame">빌드 내역 없음.</div>';
+		var buildChgLog = '<div class="buildChgMainFrame">-</div>';
 		var buildConsoleLog = "-";
 		var jobClass = "-";
 		var bldActionLog = "-";
-		var bldStartUsrId = "-";
 		
 		if(data.errorYn == "Y"){
 			jAlert(data.message,"알림창");
@@ -388,7 +377,6 @@ function fnSelJobBuildInfo(paramBldItem){
 					buildEstimatedDurationStr = gfnHourCalc(jobBuildInfo["bldEtmDurationTm"]/1000);
 					buildConsoleLog = jobBuildInfo["bldConsoleLog"];
 					bldActionLog = jobBuildInfo["bldActionLog"];
-					bldStartUsrId = (gfnIsNull(jobBuildInfo["regUsrId"]))?"-":jobBuildInfo["regUsrId"];
 					
 					//actionlog 줄바꿈
 					if(!gfnIsNull(bldActionLog)){
@@ -473,7 +461,6 @@ function fnSelJobBuildInfo(paramBldItem){
 		//job Id 정보 세팅
 		$("form#jen1004JobInfoForm #ciId").text(ciIdStr);
 		$("form#jen1004JobInfoForm #ticketId").text(ticketIdStr);
-		$("form#jen1004JobInfoForm #eGeneDplId").text(ticketIdStr);
 		$("form#jen1004JobInfoForm #dplId").text(dplIdStr);
 		
 		//job 빌드 정보 세팅
@@ -485,7 +472,6 @@ function fnSelJobBuildInfo(paramBldItem){
 		$("form#jen1004JobInfoForm #buildResult").text(buildResult);
 		$("form#jen1004JobInfoForm #buildDurationStr").text(buildDurationStr);
 		$("form#jen1004JobInfoForm #buildEstimatedDurationStr").text(buildEstimatedDurationStr);
-		$("form#jen1004JobInfoForm #bldStartUsrId").text(bldStartUsrId);
 		$("form#jen1004JobInfoForm #buildChgLog").html(buildChgLog);
 		//$("form#jen1004JobInfoForm #bldActionLog").html(bldActionLog);
 		
@@ -541,13 +527,7 @@ function fnJen1004GuideShow(){
 			</div>
 			<div class="jen1004JobDetailInfoFrame">
 				<form name="jen1004JobInfoForm" id="jen1004JobInfoForm" onsubmit="return false;">
-				<div class="descMainFrame dplInfo-eGeneDplId">
-					<div class="descLabelFrame"><label>배포 ID</label></div>
-					<div class="descValueFrame">
-						<span id="eGeneDplId"></span>
-					</div>
-				</div>
-				<div class="descMainFrame dplInfo-ciTktId">
+				<div class="descMainFrame">
 					<div class="descSubFrame">
 						<div class="descLabelFrame"><label>CI ID</label></div>
 						<div class="descValueFrame">
@@ -607,9 +587,9 @@ function fnJen1004GuideShow(){
 						</div>
 					</div>
 					<div class="descSubFrame">
-						<div class="descLabelFrame"><label>빌드 실행자</label></div>
+						<div class="descLabelFrame"><label></label></div>
 						<div class="descValueFrame">
-							<span id="bldStartUsrId"></span>
+							<span></span>
 						</div>
 					</div>
 				</div>
@@ -657,7 +637,7 @@ function fnJen1004GuideShow(){
 				</div>
 				<div class="descMainFrame">
 					<div class="descHeaderLabelFrame"><label>변경 내용</label></div>
-					<div class="descBodyValueFrame" id="buildChgLog"><div class="buildChgMainFrame">빌드 내역 없음.</div></div>
+					<div class="descBodyValueFrame" id="buildChgLog"><div class="buildChgMainFrame">-</div></div>
 				</div>
 				<!-- 
 				<div class="descMainFrame descFullFrame">

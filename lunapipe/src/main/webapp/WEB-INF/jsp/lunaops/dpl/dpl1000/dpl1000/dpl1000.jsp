@@ -336,7 +336,7 @@ function fnJobBuildResultStatus(targetJobInfo){
 	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
 			{"url":"<c:url value='/dpl/dpl1000/dpl1000/selectDpl1000JobConsoleLogAjax.do'/>","loadingShow":false}
-			,{jenId: targetJobInfo.jenId, jobId: targetJobId, targetBldNum: targetBldNum});
+			,{jenUrl: targetJobInfo.jenUrl, jenId: targetJobInfo.jenId, jobId: targetJobId, targetBldNum: targetBldNum, ciId: ciId, ticketId: ticketId});
 	
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
@@ -728,16 +728,6 @@ function fnDplJobSearchSetting() {
 									}
 								},
 								{label : "",labelWidth : "",type : "selectBox",width : "100",key : "searchCd",addClass : "selectBox",valueBoxStyle : "padding-left:0px;",value : "01",options : []},
-								{label : "",labelWidth : "",type : "button",width : "70",key : "btn_print_newReqDemand",style : "float:right;",valueBoxStyle : "padding:5px;",value : "<i class='fa fa-print' aria-hidden='true'></i>&nbsp;<span>프린트</span>",
-									onclick : function() {
-										$(dplJobGrid.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
-									}
-								},									
-								{label : "",labelWidth : "",type : "button",width : "55",key : "btn_excel_newReqDemand",style : "float:right;",valueBoxStyle : "padding:5px;",value : "<i class='fa fa-file-excel' aria-hidden='true'></i>&nbsp;<span>엑셀</span>",
-									onclick : function() {
-										dplJobGrid.exportExcel("<c:out value='${sessionScope.selMenuNm }'/>.xls");
-									}
-								},
 								{label : "",labelWidth : "",type : "button",width : "55",key : "btn_search_dlp",style : "float:right;",valueBoxStyle : "padding:5px;",value : "<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 									onclick : function() {
 										/* 검색 조건 설정 후 reload */
