@@ -464,6 +464,45 @@ public class ApiController {
 	
 	
 	@SuppressWarnings("rawtypes")
+	@RequestMapping(value="/api/selectTicketDplFileDataList", method=RequestMethod.POST)
+	public ModelAndView selectTicketDplFileDataList(@RequestBody HashMap<String, Object> paramMap, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map rtnMap = apiService.selectTicketDplFileDataList(paramMap);
+			
+			if(rtnMap == null) {
+				model.addAttribute("result", "FAIL");
+				model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+				model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+				return new ModelAndView("jsonView");
+			}
+			
+			boolean result = (boolean) rtnMap.get("result");
+			
+			String errorCode = (String) rtnMap.get("error_code");
+			
+			if(!result) {
+				model.addAttribute("result", "FAIL");
+				model.addAttribute("error_code", errorCode);
+				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
+			}else {
+				model.addAttribute("result", "SUCCESS");
+				model.addAttribute("ticket_deploy_file_list", rtnMap.get("ticketDplSelFileList"));
+				model.addAttribute("msg", "정상적으로 조회되었습니다.");
+			}
+			
+		}catch(Exception ex){
+			ex.printStackTrace();
+			model.addAttribute("result", "ERROR");
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+			Log.error("selectTicketRvDataList()", ex);
+		}
+		return new ModelAndView("jsonView");
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
 	@RequestMapping(value="/api/selectTicketCheck", method=RequestMethod.GET)
 	public ModelAndView selectTicketCheck(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try{
@@ -614,12 +653,7 @@ public class ApiController {
 	@RequestMapping(value="/api/test/receiver.do")
 	public String selectTestReceiver(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		try {
-			
 			/*
-			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
-						
-			String data = (String) paramMap.get("data");
-			
 			
 			String salt = EgovProperties.getProperty("Globals.data.salt");
 
