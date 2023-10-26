@@ -697,4 +697,60 @@ public class ApiController {
 		
 		return "/top/lunaReceiver_test";
 	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value="/api/deleteCIRepJenJob", method=RequestMethod.POST)
+	public ModelAndView deleteCIRepJenJob(@RequestBody HashMap<String, Object> paramMap, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map rtnMap = apiService.deleteCIRepJenJob(paramMap);
+			
+			
+			boolean result = (boolean) rtnMap.get("result"); 
+			
+			
+			int total = (int) rtnMap.get("total");
+			int executed = (int) rtnMap.get("executed");
+			
+			
+			List etcMsg = (List) rtnMap.get("etcMsg");
+			
+			
+			if(executed == 0) {
+				model.addAttribute("result", "FAIL");
+				model.addAttribute("total", total);
+				model.addAttribute("executed", executed);
+				model.addAttribute("error_code", OslErrorCode.DATA_DELETE_COUNT_NULL);
+				model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.DATA_DELETE_COUNT_NULL));
+				model.addAttribute("etc_msg", String.join("\n", etcMsg));
+			}
+			
+			else if(result) {
+				
+				if(executed < total) {
+					model.addAttribute("etc_msg", String.join("\n", etcMsg));
+				}
+				
+				model.addAttribute("result", "SUCCESS");
+				model.addAttribute("total", total);
+				model.addAttribute("executed", executed);
+				model.addAttribute("msg", "삭제에 성공했습니다.");
+			}else {
+				
+				String errorCode = (String) rtnMap.get("error_code");
+				
+				model.addAttribute("result", "FAIL");
+				model.addAttribute("error_code", errorCode);
+				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
+			}
+		}catch(Exception ex){
+			model.addAttribute("result", "ERROR");
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+			Log.error("deleteCIRepJenJob()", ex);
+			
+		}
+		return new ModelAndView("jsonView");
+	}
 }

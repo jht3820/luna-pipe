@@ -1568,4 +1568,10 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 	public int updateRep1102TktDplFileSelInfo(Map paramMap) throws Exception{
 		return rep1100DAO.updateRep1102TktDplFileSelInfo(paramMap);
 	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	public int selectRep1100TktChgMaxRv(Map paramMap) throws Exception{
+		return rep1100DAO.selectRep1100TktChgMaxRv(paramMap);
+	}
 }
