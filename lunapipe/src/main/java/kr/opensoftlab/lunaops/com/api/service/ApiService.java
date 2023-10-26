@@ -51,4 +51,8 @@ public interface ApiService {
 	
 	@SuppressWarnings({ "rawtypes" })
 	Map selectTicketCheck(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings({ "rawtypes"})
+	Map deleteCIRepJenJob(Map paramMap) throws Exception;
 }
