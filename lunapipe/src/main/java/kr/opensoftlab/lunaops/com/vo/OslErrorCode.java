@@ -20,6 +20,7 @@ public class OslErrorCode {
 		put("010", "JEN_ID, JOB_ID에 해당하는 JENKINS&JOB 정보가 없음");
 		put("011", "등록된 데이터 없음");
 		put("012", "데이터 체크 실패");
+		put("013", "삭제된 데이터 없음");
 		
 		
 		put("100", "구성항목 저장 중 오류");
@@ -87,6 +88,9 @@ public class OslErrorCode {
 	
 	
 	public final static String DATA_CHECK_FAIL = "012";
+
+	
+	public final static String DATA_DELETE_COUNT_NULL = "013";
 	
 	
 	public final static String CI_INSERT_FAIL = "100";
