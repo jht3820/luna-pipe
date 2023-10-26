@@ -78,4 +78,8 @@ public interface Rep1100Service {
 	
 	@SuppressWarnings("rawtypes")
 	int updateRep1102TktDplFileSelInfo(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings("rawtypes")
+	int selectRep1100TktChgMaxRv(Map paramMap) throws Exception;
 }
