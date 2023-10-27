@@ -75,7 +75,6 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 		var jenUsrTok = '<c:out value="${param.jenUsrTok}" />';
 		var jobTok = 	'<c:out value="${param.jobTok}" />';
 		var jobTypeCd = 	'<c:out value="${param.jobTypeCd}" />';
-		var ticketLastRv = 	'<c:out value="${param.ticketLastRv}" />';
 		
 		//jenId 있는지 체크
 		if(!ADD_JOB_PARAM_LIST.hasOwnProperty(jenId)){
@@ -112,9 +111,6 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 					//항목 개수
 					var paramDivCnt = 0;
 					
-					//운영빌드 리비전 값 있는지 체크
-					var isRvParamCheck = false;
-					
 					//이전 데이터가 있으면 값 채우기
 					$.each(jobParamList,function(idx, map){
 						var paramDivNum = 1;
@@ -122,10 +118,6 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 						if(!gfnIsNull(jen1005ParamList)){
 							$.each(jen1005ParamList,function(idx, map2){
 								if(map.jobParamKey == map2.jobParamKey){
-									//운영빌드일때 최종 리비전 값
-									if(jobTypeCd == "04" && map.jobParamKey == '<c:out value="${requestScope.jobParamRevision}"/>' && !gfnIsNull(map2.jobParamVal)){
-										isRvParamCheck = true;
-									}
 									map["jobParamVal"] = map2.jobParamVal;
 									return false;
 								}
@@ -134,9 +126,6 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 						
 						//추가되는 height
 						var addHeight = 0;
-						if(idx == 0){
-							addHeight = 48;
-						}
 						
 						//height 추가
 						if((idx%2) == 0){
@@ -192,16 +181,14 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 											+'</div>';
 						}
 						else if(map.jobParamType == "text"){
-							paramDivNum = 2;
-							
 							//text 추가하는데 홀수인경우 빈영역 추가
 							if(paramDivCnt > 0 && (paramDivCnt % 2) != 0){
 								paramHtml += 	 '<div class="pop_menu_row">'
 												+'	<div class="pop_menu_col1"></div>'
 												+'	<div class="pop_menu_col2 pop_oneRow_col2"></div>'
 												+'</div>';
-								paramDivNum = 3;
 							}
+							paramDivNum = 2;
 							addHeight = 120;
 							
 							//문자열
@@ -214,22 +201,10 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 							var readonlyStr = "";
 							//job이 운영 빌드일 때
 							if(!gfnIsNull(jobTypeCd) && jobTypeCd == "04"){
-								//key값이 ticket_id,input skip
+								//key값이 ticket_id, recent_rv이면 input skip
 								if(map.jobParamKey == '<c:out value="${requestScope.jobParamTicketId}"/>'){
 									return true;
 									//readonlyStr = "readonly=\"readonly\"";
-								}
-								
-								//key값이 recent_rv이고 리비전 값이 없는 경우
-								if(!isRvParamCheck && map.jobParamKey == '<c:out value="${requestScope.jobParamRevision}"/>'){
-									paramValue = ticketLastRv;
-								}
-							}
-							//job이 운영 배포,원복일때
-							else if(!gfnIsNull(jobTypeCd) && (jobTypeCd == "05" || jobTypeCd == "06" || jobTypeCd == "07" || jobTypeCd == "08")){
-								//key값이 e-Egene 배포계획 ID skip
-								if(map.jobParamKey == '<c:out value="${requestScope.jobParamDplId}"/>'){
-									return true;
 								}
 							}
 							//문자열
@@ -250,14 +225,12 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 					//팝업사이즈 조절
 					var listLength = jobParamList.length;
 					var targetHeight;
-					
 
-					$('.layer_popup_box[layerurl="/jen/jen1000/jen1000/selectJen1005View.do"]').height(popupHeight + 206);
+					$('.layer_popup_box[layerurl="/jen/jen1000/jen1000/selectJen1005View.do"]').height(popupHeight + 158);
 					
 					if(popupHeight > 780){
 						$('.layer_popup_box[layerurl="/jen/jen1000/jen1000/selectJen1005View.do"]').height(780);
 					}
-					
 					if( (paramDivCnt % 2) != 0){
 						paramHtml += 	 '<div class="pop_menu_row">'
 										+'	<div class="pop_menu_col1"></div>'
@@ -293,9 +266,6 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 		
 		//선택 버튼 클릭
 		$('#btnPopJen1005Select').click(function() {
-			//오류 여부
-			var isError = false;
-			
 			if(!gfnIsNull(jen1005ParamList)){
 				$.each(jen1005ParamList,function(idx, map){
 					if(map.jobParamType == "boolean"){
@@ -305,29 +275,13 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 							map["jobParamVal"] = "false";
 						}
 					}else{
-						var paramValue = $("#"+map.jobParamKey).val();
-						//운영빌드일때 최종 리비전 값 검증
-						if(jobTypeCd == "04" && map.jobParamKey == '<c:out value="${requestScope.jobParamRevision}"/>'){
-							//정규식 숫자 or 'HEAD'
-							var regex = new RegExp(/^[0-9]+$|^\bHEAD\b/);
-							
-							//값 체크
-							if(!regex.test(paramValue)){
-								jAlert("리비전 값은 숫자 또는 'HEAD'만 입력 가능합니다.");
-								isError = true;
-								return false;
-							}
-							
-						}
-						map["jobParamVal"] = paramValue;
+						map["jobParamVal"] = $("#"+map.jobParamKey).val();
 					}
 				});
 				ADD_JOB_PARAM_LIST[jenId][jobId] = jen1005ParamList;
 			}
-			if(!isError){
-				//팝업 창 닫기
-				gfnLayerPopupClose();
-			}
+			//팝업 창 닫기
+			gfnLayerPopupClose();
 		});
 		
 		/* 취소 */

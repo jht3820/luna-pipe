@@ -193,6 +193,21 @@ div.svn_mask_content#repDplInputMask {
     height: 100px;
     border: 1px solid #ccc;
 }
+/* rep1007 */
+.rep1007FrameBox{
+	width: 100%;
+	display: inline-block;
+}
+.rep1007SearchFrame {
+    height: 42px;
+    line-height: 42px;
+    text-align: left;
+    font-size: 13px;
+}
+.rep1007CommitLogFrame {
+    height: 180px;
+    border: 1px solid #ccc;
+}
 
 /* rep1102 */
 .rep1102MainTopFrame {
