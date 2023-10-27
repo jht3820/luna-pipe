@@ -1575,4 +1575,217 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 		}
 		return rtnValue;
 	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Map deleteCIRepJenJob(Map paramMap) throws Exception {
+		
+		Map rtnMap = new HashMap<>();
+		
+		
+		int total = 0;
+		
+		int executed = 0;
+		
+		
+		List<String> etcMsg = new ArrayList<String>();
+		
+		
+		rtnMap.put("total", total);
+		rtnMap.put("executed", executed);
+		
+		
+		String data = (String) paramMap.get("data");
+		
+		
+		Object checkParam = checkParamDataKey(data);
+		
+		
+		if(checkParam instanceof String) {
+			rtnMap.put("result", false);
+			rtnMap.put("error_code", checkParam.toString());
+			return rtnMap;
+		}else {
+			
+			JSONObject jsonObj = (JSONObject) checkParam;
+			
+			
+			
+			String ciId = OslUtil.jsonGetString(jsonObj, "ci_id");
+			
+			
+			if(ciId == null) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.PARAM_CI_ID_NULL);
+				return rtnMap;
+			}
+			
+			
+			String repIds = OslUtil.jsonGetString(jsonObj, "rep_ids");
+			
+			
+			String jenJobIds = OslUtil.jsonGetString(jsonObj, "jen_job_ids");
+			
+			
+			boolean paramIsFlag = false;
+			
+			
+			if(repIds != null) {
+				
+				paramIsFlag = true;
+				
+				try {
+					
+					JSONArray jsonArr = new JSONArray(repIds);
+
+					
+					if(jsonArr.length() > 0) {
+						Map newMap = new HashMap<>();
+						newMap.put("ciId", ciId);
+						
+						
+						total += jsonArr.length();
+						
+						for(int i=0;i<jsonArr.length();i++) {
+							try {
+								newMap = new HashMap<>();
+								
+								newMap.put("regUsrId", paramMap.get("regUsrId"));
+								newMap.put("regUsrIp", paramMap.get("regUsrIp"));
+								
+								JSONObject inJsonObj = jsonArr.getJSONObject(i);
+								
+								
+								String repId = OslUtil.jsonGetString(inJsonObj, "rep_id");
+								
+								
+								if(repId == null) {
+									rtnMap.put("result", false);
+									rtnMap.put("error_code", OslErrorCode.CI_REP_PARAM_PARSE_FAIL);
+									etcMsg.add("파라미터 값에 소스저장소 REP_ID가 없음");
+									continue;
+								}
+								
+								
+								newMap.put("ciId", ciId);
+								newMap.put("repId", repId);
+								
+								
+								RepVO repInfo = rep1000Service.selectRep1000Info(newMap);
+								
+								
+								if(repInfo == null) {
+									rtnMap.put("result", false);
+									rtnMap.put("error_code", OslErrorCode.REP_ID_INFO_NULL);
+									etcMsg.add("소스저장소 {REP_ID="+repId+"}에 대한 정보 없음");
+									continue;
+								}
+								
+								
+								rep1000Service.deleteRep1001CIRepInfo(newMap);
+								
+								
+								executed++;
+							} catch(Exception e) {
+								
+								continue;
+							}
+						}
+					}
+				}catch(JSONException je) {
+					rtnMap.put("result", false);
+					rtnMap.put("error_code", OslErrorCode.CI_REP_PARAM_PARSE_FAIL);
+					return rtnMap;
+				}
+			}
+			
+			
+			if(jenJobIds != null) {
+				
+				paramIsFlag = true;
+				try {
+					
+					JSONArray jsonArr = new JSONArray(jenJobIds);
+					
+					
+					if(jsonArr.length() > 0) {
+						
+						total += jsonArr.length();
+						
+						Map newMap = new HashMap<>();
+						newMap.put("ciId", ciId);
+						
+						for(int i=0;i<jsonArr.length();i++) {
+							try {
+								newMap = new HashMap<>();
+								
+								newMap.put("regUsrId", paramMap.get("regUsrId"));
+								newMap.put("regUsrIp", paramMap.get("regUsrIp"));
+								
+								JSONObject inJsonObj = jsonArr.getJSONObject(i);
+								
+								
+								String jenId = OslUtil.jsonGetString(inJsonObj, "jen_id");
+								
+								
+								String jobId = OslUtil.jsonGetString(inJsonObj, "job_id");
+								
+								
+								if(jenId == null || jobId == null) {
+									rtnMap.put("result", false);
+									rtnMap.put("error_code", OslErrorCode.CI_REP_PARAM_PARSE_FAIL);
+									return rtnMap;
+								}
+								
+								
+								newMap.put("jenId", jenId);
+								newMap.put("jobId", jobId);
+
+								
+								Map jobInfo = jen1000Service.selectJen1100JobInfo(newMap);
+								
+								newMap.put("ciId", ciId);
+								
+								
+								if(jobInfo == null) {
+									rtnMap.put("result", false);
+									rtnMap.put("error_code", OslErrorCode.JEN_JOB_ID_INFO_NULL);
+									etcMsg.add("JENKINS&JOB {JEN_ID="+jenId+", JOB_ID="+jobId+"}에 대한 정보 없음");
+									continue;
+								}
+								
+								
+								jen1000Service.deleteJen1101CIJobInfo(newMap);
+								
+								
+								jen1000Service.deleteJen1102ParameterInfo(newMap);
+								
+								
+								executed++;
+							}catch(Exception e) {
+								continue;
+							}
+						}
+					}
+				}catch(JSONException je) {
+					rtnMap.put("result", false);
+					rtnMap.put("error_code", OslErrorCode.CI_REP_PARAM_PARSE_FAIL);
+					return rtnMap;
+				}
+			}
+			
+			
+			if(!paramIsFlag) {
+				rtnMap.put("result", false);
+				rtnMap.put("error_code", OslErrorCode.CI_DATA_NULL);
+				return rtnMap;
+			}
+		}
+		
+		rtnMap.put("result", true);
+		rtnMap.put("total", total);
+		rtnMap.put("executed", executed);
+		rtnMap.put("etcMsg", etcMsg);
+		return rtnMap;
+    }
 }
