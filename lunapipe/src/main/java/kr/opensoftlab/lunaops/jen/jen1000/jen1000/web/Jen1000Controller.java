@@ -1,6 +1,7 @@
 package kr.opensoftlab.lunaops.jen.jen1000.jen1000.web;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,8 +107,6 @@ public class Jen1000Controller {
 				try {
 					JSONArray jsonArr = new JSONArray(items);
 					
-					
-					
 					for(int i=0;i<jsonArr.length();i++) {
 						JSONObject jobIds = jsonArr.getJSONObject(i);
 						
@@ -140,6 +139,13 @@ public class Jen1000Controller {
 				eGeneUrl = eGeneUrl + "/";
 			}
 			
+			
+			String salt = EgovProperties.getProperty("Globals.data.salt");
+			
+			
+			String jsonParam = "{key: '"+salt+"', webhook_type_cd: '02', emp_id: '"+empId+"', current_date: '"+new Date().getTime()+"'}";
+			String enParam = CommonScrty.encryptedAria(jsonParam, salt);
+			
 			model.addAttribute("ciId", ciId);
 			model.addAttribute("apiId", apiId);
 			model.addAttribute("svcId", svcId);
@@ -149,6 +155,7 @@ public class Jen1000Controller {
 			model.addAttribute("callbakApiId", callbakApiId);
 			model.addAttribute("jobIdList", jobIdList);
 			model.addAttribute("addSalt", addSalt);
+			model.addAttribute("webhookDataKey", enParam);
 			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -182,6 +189,9 @@ public class Jen1000Controller {
 			
 			
 			String addSalt = EgovProperties.getProperty("Globals.data.addSalt");
+
+			
+			String jobType = OslUtil.jsonGetString(jsonObj, "job_type");
 			
 			if(items != null) {
 				try {
@@ -229,7 +239,7 @@ public class Jen1000Controller {
 			model.addAttribute("callbakApiId", callbakApiId);
 			model.addAttribute("jobIdList", jobIdList);
 			model.addAttribute("addSalt", addSalt);
-			
+			model.addAttribute("jobType", jobType);
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
 			e.printStackTrace();
@@ -425,6 +435,10 @@ public class Jen1000Controller {
 	
 	@RequestMapping(value="/jen/jen1000/jen1000/selectJen1005View.do")
 	public String selectJen1005View( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		String jobParamTicketId = EgovProperties.getProperty("Globals.buildParam.ticketId");
+		String jobParamRevision = EgovProperties.getProperty("Globals.buildParam.revision");
+		model.addAttribute("jobParamTicketId", jobParamTicketId);
+		model.addAttribute("jobParamRevision", jobParamRevision);
 		return "/jen/jen1000/jen1000/jen1005";
 	}
 	
@@ -525,6 +539,41 @@ public class Jen1000Controller {
 			jen1100VO.setPageSize(_pageSize);
 			jen1100VO.setPageUnit(_pageSize);
 
+			
+			String jobTypeList = (String)paramMap.get("jobType");
+			if(jobTypeList != null && !"".equals(jobTypeList)) {
+				try {
+					JSONArray jobTypeJson = new JSONArray(jobTypeList);
+					String paramJobType = "";
+					
+					String regex = "[0-9]+";
+					
+					
+					for(int i=0;i<jobTypeJson.length();i++) {
+						JSONObject jsonObj = jobTypeJson.getJSONObject(i);
+						String jobType = jsonObj.getString("job_type");
+						
+						
+						if(!jobType.matches(regex)) {
+							continue;
+						}
+						
+						if(i > 0) {
+							paramJobType += ",";
+						}
+						
+						paramJobType += "'"+jobType+"'";
+					}
+					if(!"".equals(paramJobType)) {
+						jen1100VO.setParamJobType(paramJobType);
+					}
+				}catch(Exception e) {
+					
+					Log.debug(e);
+					model.addAttribute("addMsg", "JOB_TYPE 데이터를 읽는 도중 오류가 발생했습니다.");
+				}
+			}
+			
 			String ciId = (String) paramMap.get("ciId");
 			jen1100VO.setCiId(ciId);
 			
@@ -1740,7 +1789,40 @@ public class Jen1000Controller {
 			
 			List<Map> jenJobList = null;
 			
+			
+			List<String> jobTypeArr = new ArrayList<String>();
+			
+			
+			String jobTypeList = (String)paramMap.get("jobTypeList");
+			if(jobTypeList != null && !"".equals(jobTypeList)) {
+				try {
+					JSONArray jobTypeJson = new JSONArray(jobTypeList);
+					
+					String regex = "[0-9]+";
+					
+					
+					for(int i=0;i<jobTypeJson.length();i++) {
+						JSONObject jsonObj = jobTypeJson.getJSONObject(i);
+						String jobType = jsonObj.getString("job_type");
+						
+						
+						if(!jobType.matches(regex)) {
+							continue;
+						}
+						
+						jobTypeArr.add(jobType);
+					}
+				}catch(Exception e) {
+					
+					Log.debug(e);
+					model.addAttribute("errorYn", "Y");
+					model.addAttribute("message", "JOB_TYPE값 처리 중 오류가 발생했습니다.");
+					return new ModelAndView("jsonView");
+				}
+			}
+			
 			try {
+				
 				jenJobList = new ArrayList<Map>();
 				
 				String[] jenList = jenJobStrList.split(",");
@@ -1769,6 +1851,16 @@ public class Jen1000Controller {
 					
 					if(jobInfo == null) {
 						continue;
+					}
+					
+					
+					String jobTypeCd = (String) jobInfo.get("jobTypeCd");
+					
+					
+					if(jobTypeArr.size() > 0) {
+						if(jobTypeArr.indexOf(jobTypeCd) == -1) {
+							continue;
+						}
 					}
 					
 					
