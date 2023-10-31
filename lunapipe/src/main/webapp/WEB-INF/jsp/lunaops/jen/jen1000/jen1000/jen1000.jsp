@@ -131,6 +131,19 @@ $(function(){
 		selJobGrid.repaint();
 	});
 	
+	//웹훅 버튼
+	$("#jenDataWebhookBtn").click(function(){
+		//팝업 암호화 키
+		var webhookDataKey = $("form#jen1000Form > #webhookDataKey").val();
+		
+		if(gfnIsNull(webhookDataKey)){
+			jAlert("웹훅 등록을 위한 암호화 키가 없습니다.","알림");
+			return;
+		}else{
+			window.open("/whk/whk1000/whk1000/selectWhk1000View.do?data="+encodeURIComponent(webhookDataKey), "webhookPopup", "width=1020, height=700, status=no, menubar=no");
+		}
+	});
+	
 	//전송 버튼
 	$("#jenDataSendBtn").click(function(){
 		//callback function 값
@@ -548,10 +561,13 @@ function fnInJobGridListSet(_pageNo,ajaxParam,loadingShow){
  * jenkins 삭제
  */
 function fnDeleteJen1000JenkinsInfo(jenId){
+	//등록,수정자 ID
+	var empId = $("form#jen1000Form > #empId").val();
+	
 	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
 			{"url":"<c:url value='/jen/jen1000/jen1000/deleteJen1000JenkinsInfoAjax.do'/>"}
-			,{ "jenId" : jenId });
+			,{ "jenId" : jenId, "empId": empId });
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
 		jAlert(data.message, "알림창");
@@ -861,6 +877,9 @@ function fnJobSearchSetting(){
 										//파라미터 세팅
 										var jobIdListStr = "jenId="+chkList[0].jenId;
 										
+										//등록,수정자 ID
+										var empId = $("form#jen1000Form > #empId").val();
+										jobIdListStr += "&empId="+empId;
 										
 										$.each(chkList, function(idx, map){
 											jobIdListStr += "&jobId="+map.jobId;
@@ -1006,7 +1025,8 @@ function fnSelJobSearchSetting(){
 										"jobId" : selJobList[0].jobId,
 										"jenUsrId" : selJobList[0].jenUsrId,
 										"jenUsrTok" : selJobList[0].jenUsrTok,
-										"jobTok" : selJobList[0].jobTok
+										"jobTok" : selJobList[0].jobTok,
+										"jobTypeCd": selJobList[0].jobTypeCd 
 								};
 								
 								// 빌드 파라미터 팝업 호출
@@ -1250,6 +1270,7 @@ function fnStartJobDataSetting(paramJobIdList){
 		<input type="hidden" name="eGeneUrl" id="eGeneUrl" value="${requestScope.eGeneUrl }"/>
 		<input type="hidden" name="callbakApiId" id="callbakApiId" value="${requestScope.callbakApiId }"/>
 		<input type="hidden" name="jobIdList" id="jobIdList" value="<c:out value="${requestScope.jobIdList}"/>"/>
+		<input type="hidden" name="webhookDataKey" id="webhookDataKey" value="<c:out value="${requestScope.webhookDataKey}"/>"/>
 	</form>
 	<div class = "tab_contents menu" >
 		<div class="main_frame left">
@@ -1289,6 +1310,7 @@ function fnStartJobDataSetting(paramJobIdList){
 			</div>
 		</div>
 		<div class="btnFrame">
+			<!-- <div class="mainPopupBtn" id="jenDataWebhookBtn"><i class="fas fa-bookmark"></i>&nbsp;JENKINS 웹훅 관리</div> -->
 			<div class="mainPopupBtn" id="jenDataSendBtn"><i class="fas fa-paperclip"></i>&nbsp;JENKINS&JOB 연결</div>
 			<div class="mainPopupBtn" id="jenCloseBtn"><i class="fas fa-times-circle"></i>&nbsp;닫기</div>
 		</div>

@@ -21,13 +21,30 @@
 		<result property="ticket_id"		column="TICKET_ID" />
 		<result property="rep_id" 			column="REP_ID" />
 		<result property="rep_rv" 			column="REP_RV" />
+		<result property="rep_chg_id" 		column="REP_CHG_ID" />
 		<result property="rep_target_rv"	column="REP_TARGET_RV" />
 		<result property="rep_target_file_path"	column="REP_TARGET_FILE_PATH" />
-		<result property="rep_chg_id" 		column="REP_CHG_ID" />
 		<result property="rep_chg_type_cd" 	column="REP_CHG_TYPE_CD" />
 		<result property="rep_chg_file_path" column="REP_CHG_FILE_PATH" />
 		<result property="rep_chg_file_nm"	column="REP_CHG_FILE_NM" />
 		<result property="rep_chg_file_kind" column="REP_CHG_FILE_KIND" />
+		<result property="commitEmpId" column="COMMIT_EMP_ID" />
+	</resultMap>
+	
+	
+    <resultMap id="resultDplChgFileListExt" class="HashMap">
+		<result property="ticket_id"		column="TICKET_ID" />
+		<result property="rep_id" 			column="REP_ID" />
+		<result property="rep_rv" 			column="REP_RV" />
+		<result property="rep_chg_id" 		column="REP_CHG_ID" />
+		<result property="ciId" 			column="CI_ID" />
+		<result property="jobId" 			column="JOB_ID" />
+		<result property="bld_num"	 		column="BLD_NUM" />
+		<result property="rep_chg_type_cd" 	column="REP_CHG_TYPE_CD" />
+		<result property="rep_chg_file_path" column="REP_CHG_FILE_PATH" />
+		<result property="rep_chg_file_nm"	column="REP_CHG_FILE_NM" />
+		<result property="rep_chg_file_kind" column="REP_CHG_FILE_KIND" />
+		<result property="commit_emp_id" column="COMMIT_EMP_ID" />
 	</resultMap>
 	
 	 
@@ -109,6 +126,104 @@
 	</sql>
 	
 	 
+	<sql id="selectRep1102List">
+		SELECT
+			A.TICKET_ID
+			, A.REP_ID
+			, A.REP_RV
+			, A.REP_CHG_ID
+			, A.CI_ID
+			, A.JOB_ID
+			, A.BLD_NUM
+			, A.REP_CHG_TYPE_CD
+			, A.REP_CHG_FILE_PATH
+			, A.REP_CHG_FILE_NM
+			, A.REP_CHG_FILE_KIND
+			, A.REP_CHG_SEL_CD
+			, A.COMMIT_EMP_ID
+			, C.REP_COMMENT
+			, C.REP_CMT_DATE
+			, C.REP_CMT_AUTHOR
+			, D.REP_NM
+			, D.DPL_REP_URL
+			, D.REP_TYPE_CD
+		FROM REP1102 A
+		INNER JOIN
+		(
+			SELECT TICKET_ID, CI_ID, REP_ID, JOB_ID, MAX(BLD_NUM) AS MAX_BLD_NUM, REP_CHG_FILE_PATH, REP_CHG_FILE_NM
+			FROM REP1102
+			WHERE 1=1
+			AND TICKET_ID = #ticketId#
+			GROUP BY TICKET_ID, CI_ID, REP_ID, JOB_ID, REP_CHG_FILE_PATH, REP_CHG_FILE_NM
+		) B ON (
+			A.TICKET_ID = B.TICKET_ID
+			AND A.CI_ID = B.CI_ID
+			AND A.REP_ID = B.REP_ID
+			AND A.JOB_ID = B.JOB_ID
+			AND A.BLD_NUM = B.MAX_BLD_NUM
+			AND A.REP_CHG_FILE_PATH = B.REP_CHG_FILE_PATH
+			AND A.REP_CHG_FILE_NM = B.REP_CHG_FILE_NM
+		)
+		INNER JOIN REP1100 C ON (A.REP_ID = C.REP_ID AND A.REP_RV = C.REP_RV AND C.TICKET_ID = A.TICKET_ID AND C.REP_RV_TYPE_CD = '03')
+		INNER JOIN REP1000 D ON (A.REP_ID = D.REP_ID AND D.DPL_USE_CD = '01')
+		WHERE 1=1
+		<isNotEmpty property="notDelete">
+			<isEqual property="notDelete" compareValue="Y">
+				AND A.REP_CHG_TYPE_CD != '03'
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty property="repChgSelCd">
+			AND A.REP_CHG_SEL_CD = #repChgSelCd# 
+		</isNotEmpty>
+		<isNotEmpty property="searchSelect">
+			<isNotEmpty property="searchTxt">
+			<isEqual property="searchSelect" compareValue="repNm"> 
+				AND		UPPER( D.REP_NM ) like '%'|| UPPER( #searchTxt#  )  ||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="repRv"> 
+				AND		UPPER( A.REP_RV )  like '%'|| UPPER( #searchTxt#  )  ||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="repChgFileNm"> 
+				AND		UPPER( A.REP_CHG_FILE_NM )  like '%'|| UPPER( #searchTxt#  )  ||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="repChgFilePath"> 
+				AND		UPPER( A.REP_CHG_FILE_PATH )  like '%'|| UPPER( #searchTxt#  )  ||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="repCmtAuthor"> 
+				AND		UPPER( C.REP_CMT_AUTHOR )  like '%'|| UPPER( #searchTxt#  )  ||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="bldNum"> 
+				AND		UPPER( A.BLD_NUM )  like '%'|| UPPER( #searchTxt#  )  ||'%'
+			</isEqual>
+			</isNotEmpty>
+		</isNotEmpty>
+		ORDER BY A.CI_ID, A.REP_ID, A.REP_RV, A.REP_CHG_FILE_PATH
+	</sql>
+	
+	 
+	<sql id="selectRep1102SelList">
+		SELECT
+			A.TICKET_ID
+			, A.REP_ID
+			, A.REP_RV
+			, A.REP_CHG_ID
+			, A.CI_ID
+			, A.JOB_ID
+			, A.BLD_NUM
+			, A.REP_CHG_TYPE_CD
+			, A.REP_CHG_FILE_PATH
+			, A.REP_CHG_FILE_NM
+			, A.REP_CHG_FILE_KIND
+			, A.COMMIT_EMP_ID
+		FROM REP1102 A
+		WHERE 1=1
+		AND A.TICKET_ID = #ticketId#
+		AND A.CI_ID = #ciId#
+		AND A.REP_ID = #repId#
+		AND A.REP_CHG_SEL_CD = '01'
+	</sql>
+	
+	 
 	<select id="rep1100DAO.selectRep1100RvInfo" parameterClass="java.util.Map" resultMap="resultRvListExt">
 		
 		SELECT
@@ -132,7 +247,7 @@
 	</select>
 	
 	 
-	<select id="rep1100DAO.selectRep1100RvChgFileList" parameterClass="java.util.Map" resultMap="resultRvChgFileListExt">
+	<select id="rep1100DAO.selectRep1101RvChgFileList" parameterClass="java.util.Map" resultMap="resultRvChgFileListExt">
 		
 		SELECT
 			A.TICKET_ID
@@ -145,6 +260,7 @@
 			, A.REP_CHG_FILE_KIND
 			, A.REP_TARGET_RV
 			, A.REP_TARGET_FILE_PATH
+			, A.COMMIT_EMP_ID
 		FROM REP1101 A
 		WHERE 1=1
 		AND A.TICKET_ID = #ticketId#
@@ -153,6 +269,45 @@
 		</isNotEmpty>
 		<isNotEmpty property="repRv">
 			AND A.REP_RV = #repRv#
+		</isNotEmpty>
+	</select>
+	
+	 
+	<select id="rep1100DAO.selectRep1102DplChgFileList" parameterClass="java.util.Map" resultMap="resultDplChgFileListExt">
+		
+		SELECT
+			A.TICKET_ID
+			, A.REP_ID
+			, A.REP_RV
+			, A.REP_CHG_ID
+			, A.CI_ID
+			, A.JOB_ID
+			, A.BLD_NUM
+			, A.REP_CHG_TYPE_CD
+			, A.REP_CHG_FILE_PATH
+			, A.REP_CHG_FILE_NM
+			, A.REP_CHG_FILE_KIND
+			, A.COMMIT_EMP_ID
+		FROM REP1102 A
+		WHERE 1=1
+		AND A.TICKET_ID = #ticketId#
+		<isNotEmpty property="ciId">
+			<isNotEmpty property="repId">
+				AND A.CI_ID = #ciId#
+				AND A.REP_ID = #repId#
+			</isNotEmpty>
+		</isNotEmpty>
+		<isNotEmpty property="jobId">
+			AND A.JOB_ID = #jobId#
+		</isNotEmpty>
+		<isNotEmpty property="bldNum">
+			AND A.BLD_NUM = #bldNum#
+		</isNotEmpty>
+		<isNotEmpty property="repRv">
+			AND A.REP_RV = #repRv#
+		</isNotEmpty>
+		<isNotEmpty property="repChgSelCd">
+			AND A.REP_CHG_SEL_CD = #repChgSelCd#
 		</isNotEmpty>
 	</select>
 
@@ -229,6 +384,7 @@
 			, REP_CHG_FILE_KIND
 			, REP_TARGET_RV
 			, REP_TARGET_FILE_PATH
+			, COMMIT_EMP_ID
 		)
 		VALUES
 		(
@@ -242,6 +398,63 @@
 			, #repChgFileKind#
 			, #repTargetRv#
 			, #repTargetFilePath#
+			, #commitEmpId#
+		)
+	</insert>
+	
+	
+	<insert id="rep1100DAO.insertRep1102RvChgInfo" parameterClass="java.util.Map">
+		<selectKey resultClass="java.lang.String" keyProperty="newRepChgId">
+		<![CDATA[
+			 
+			SELECT	NVL( 
+							SUBSTR(NEW_REP_CHG_ID, 1, 11) || LPAD( (TO_NUMBER(SUBSTR(NEW_REP_CHG_ID, 12, 5)) + 1) , 5, '0')
+						,	'CHG' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '00001'
+            		) AS NEW_REP_CHG_ID 
+			FROM	(
+			            SELECT	MAX(REP_CHG_ID)  AS NEW_REP_CHG_ID
+			            FROM	REP1102 A
+			            WHERE	1=1
+			            AND		TICKET_ID = #ticketId#
+			            AND		CI_ID = #ciId#
+			          	AND		REP_ID = #repId#
+			          	AND		REP_RV = #repRv#
+			            AND		REP_CHG_ID LIKE 'CHG' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '%'
+					)
+		]]>
+		</selectKey>
+		 
+		INSERT INTO REP1102
+		(
+			TICKET_ID
+			, REP_ID
+			, REP_RV
+			, REP_CHG_ID
+			, CI_ID
+			, JOB_ID
+			, BLD_NUM
+			, REP_CHG_TYPE_CD
+			, REP_CHG_FILE_PATH
+			, REP_CHG_FILE_NM
+			, REP_CHG_FILE_KIND
+			, REP_CHG_SEL_CD
+			, COMMIT_EMP_ID
+		)
+		VALUES
+		(
+			#ticketId#
+			, #repId#
+			, #repRv#
+			, #newRepChgId#
+			, #ciId#
+			, #jobId#
+			, #bldNum#
+			, #repChgTypeCd#
+			, #repChgFilePath#
+			, #repChgFileNm#
+			, #repChgFileKind#
+			, #repChgSelCd#
+			, #commitEmpId#
 		)
 	</insert>
 	
@@ -283,6 +496,74 @@
 			FROM
 			(
 				<include refid="selectRep1100List"/>
+			) T1
+    </select>
+    
+    
+    <select id="rep1100DAO.selectRep1102TktDplFileChgList" parameterClass="java.util.Map"  resultClass="egovMap">
+	    
+		SELECT *
+		FROM
+		(
+	   		<include refid="selectRep1102List"/>
+    	) T1
+    </select>
+    
+    
+    <select id="rep1100DAO.selectRep1102TktDplSelFileChgList" parameterClass="java.util.Map"  resultClass="egovMap">
+	    
+		SELECT *
+		FROM
+		(
+	   		<include refid="selectRep1102SelList"/>
+    	) T1
+    </select>
+    
+    
+    <select id="rep1100DAO.selectRep1102TktFileRecentBldNumList" parameterClass="java.util.Map"  resultClass="egovMap">
+	    
+		SELECT *
+		FROM
+		(
+	   		SELECT CI_ID, TICKET_ID, REP_ID, JOB_ID, MAX(BLD_NUM) AS MAX_BLD_NUM, REP_CHG_FILE_PATH
+			FROM REP1102
+			WHERE 1=1
+			AND CI_ID = #ciId#
+			AND TICKET_ID = #ticketId#
+			AND REP_ID = #repId#
+			AND JOB_ID = #jobId#
+			AND REP_CHG_FILE_PATH = #repChgFilePath#
+			GROUP BY CI_ID, TICKET_ID, REP_ID, JOB_ID, REP_CHG_FILE_PATH
+    	) T1
+    </select>
+    
+    
+	<update id="rep1100DAO.updateRep1102TktDplFileSelInfo" parameterClass="java.util.Map">
+		 
+		UPDATE REP1102 SET
+			REP_CHG_SEL_CD = #repChgSelCd#
+			, COMMIT_EMP_ID = #commitEmpId#
+		WHERE 1=1
+		AND TICKET_ID = #ticketId#
+		AND CI_ID = #ciId#
+		AND REP_ID = #repId#
+		AND REP_RV = #repRv#
+		AND REP_CHG_ID = #repChgId#
+	</update>
+	    
+    
+    <select id="rep1100DAO.selectRep1100TktChgMaxRv" parameterClass="java.util.Map"  resultClass="java.lang.Integer">
+	    
+	    	SELECT T1.*
+			FROM
+			(
+				SELECT MAX(A.REP_RV) AS MAX_REP_RV
+				FROM REP1101 A
+				INNER JOIN REP1100 B ON (A.REP_ID = B.REP_ID AND A.TICKET_ID = B.TICKET_ID AND A.REP_RV = B.REP_RV)
+				WHERE 1=1
+				AND A.TICKET_ID = #ticketId#
+				AND A.REP_ID = #repId#
+				AND B.REP_RV_TYPE_CD = '02'
 			) T1
     </select>
 </sqlMap>

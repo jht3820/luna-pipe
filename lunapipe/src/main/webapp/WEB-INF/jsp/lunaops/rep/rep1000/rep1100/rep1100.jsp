@@ -357,15 +357,6 @@ function fnSearchBoxControl(){
 						{label:"", labelWidth:"", type:"selectBox", width:"100", key:"searchCd", addClass:"selectBox", valueBoxStyle:"padding-left:0px;", value:"01",
 							options:[]
 						},
-						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_print_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-print' aria-hidden='true'></i>&nbsp;<span>프린트</span>",
-							onclick:function(){
-								$(tktFileGridObj.exportExcel()).printThis({importCSS: false,importStyle: false,loadCSS: "/css/common/printThis.css"});
-						}},
-						
-						{label:"", labelWidth:"", type:"button", width:"55",style:"float:right;", key:"btn_excel_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-file-excel' aria-hidden='true'></i>&nbsp;<span>엑셀</span>",
-							onclick:function(){
-								tktFileGridObj.exportExcel("저장소 목록.xls");
-						}},
 						{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_rep",style:"float:right;", valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 							onclick:function(){
 								/* 검색 조건 설정 후 reload */
@@ -428,10 +419,10 @@ function fnRep1100GuideShow(){
 	</form>
 	<div class="tab_contents menu">
 		<div class="sub_title">
-			티켓 변경 파일 목록
+			[<c:out value="${requestScope.ticketId}"/>] 티켓 변경 파일 목록
 		</div>
 		<div id="tktFileSearchTarget" guide="rep1100button" ></div>
-		<div data-ax5grid="tktFileGridTarget" data-ax5grid-config="{}" style="height: 600px;"></div>
+		<div data-ax5grid="tktFileGridTarget" data-ax5grid-config="{}" style="height: 600px;" guide="tktFileGridTarget"></div>
 		<div class="btnFrame">
 			<div class="mainPopupBtn" id="repDataCommitBtn"><i class="fas fa-paperclip"></i>&nbsp;Commit</div>
 			<div class="mainPopupBtn" id="repCloseBtn"><i class="fas fa-times-circle"></i>&nbsp;닫기</div>
