@@ -51,4 +51,24 @@ public interface ApiService {
 	
 	@SuppressWarnings({ "rawtypes" })
 	Map selectTicketCheck(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings({ "rawtypes"})
+	Map deleteCIRepJenJob(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings({ "rawtypes"})
+	Map insertPostRepFileLock(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings({ "rawtypes"})
+	Map insertGetRepFileLock(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings({ "rawtypes"})
+	Map insertRepFileUnLock(Map paramMap) throws Exception;
+	
+	
+	@SuppressWarnings({ "rawtypes"})
+	Map selectRepFileLockList(Map paramMap) throws Exception;
 }
