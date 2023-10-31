@@ -107,4 +107,10 @@ public class Rep1100DAO extends ComOslitsAbstractDAO {
 	public int selectRep1100TktChgMaxRv(Map paramMap) throws Exception{
 		return (Integer) select("rep1100DAO.selectRep1100TktChgMaxRv", paramMap);
 	}
+
+	
+	@SuppressWarnings("rawtypes")
+	public Map selectRep1101TktChgFileLastRvNum(Map paramMap) throws Exception{
+		return (Map) select("rep1100DAO.selectRep1101TktChgFileLastRvNum", paramMap);
+	}
 }
