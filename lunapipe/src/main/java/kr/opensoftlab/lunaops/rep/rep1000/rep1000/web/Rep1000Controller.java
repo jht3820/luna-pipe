@@ -1,5 +1,6 @@
 package kr.opensoftlab.lunaops.rep.rep1000.rep1000.web;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,6 +141,13 @@ public class Rep1000Controller {
 				eGeneUrl = eGeneUrl + "/";
 			}
 			
+			
+			String salt = EgovProperties.getProperty("Globals.data.salt");
+			
+			
+			String jsonParam = "{key: '"+salt+"', webhook_type_cd: '01', emp_id: '"+empId+"', current_date: '"+new Date().getTime()+"'}";
+			String enParam = CommonScrty.encryptedAria(jsonParam, salt);
+			
 			model.addAttribute("ciId", ciId);
 			model.addAttribute("apiId", apiId);
 			model.addAttribute("svcId", svcId);
@@ -148,6 +156,8 @@ public class Rep1000Controller {
 			model.addAttribute("eGeneUrl", eGeneUrl);
 			model.addAttribute("callbakApiId", callbakApiId);
 			model.addAttribute("repIdList", repIdList);
+			model.addAttribute("webhookDataKey", enParam);
+			
 		}catch(Exception e) {
 			Log.error(e);
 			e.printStackTrace();
@@ -332,6 +342,75 @@ public class Rep1000Controller {
 	@RequestMapping(value="/rep/rep1000/rep1000/selectRep1006View.do")
 	public String selectRep1006View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		return "/rep/rep1000/rep1000/rep1006";
+	}
+	
+	
+	@RequestMapping(value="/rep/rep1000/rep1000/selectRep1007View.do")
+	public String selectRep1007View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try {
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			
+			JSONObject jsonObj = (JSONObject) request.getAttribute("decodeJsonData");
+			
+			
+			String repId = OslUtil.jsonGetString(jsonObj, "rep_id");
+			String selRevision = OslUtil.jsonGetString(jsonObj, "revision");
+			String filePath = OslUtil.jsonGetString(jsonObj, "file_path");
+			
+			
+			if(repId == null) {
+				response.setStatus(HttpStatus.SC_BAD_REQUEST);
+				model.put("errorMsg", "소스저장소 ID가 없습니다.");
+				return "/err/error";
+			}
+			if(selRevision == null) {
+				response.setStatus(HttpStatus.SC_BAD_REQUEST);
+				model.put("errorMsg", "리비전 번호가 없습니다.");
+				return "/err/error";
+			}
+			if(filePath == null) {
+				response.setStatus(HttpStatus.SC_BAD_REQUEST);
+				model.put("errorMsg", "파일 경로가 없습니다.");
+				return "/err/error";
+			}
+			paramMap.put("repId", repId);
+			
+			RepVO repInfo = rep1000Service.selectRep1000Info(paramMap);
+			
+			if(repInfo == null) {
+				response.setStatus(HttpStatus.SC_BAD_REQUEST);
+				model.put("errorMsg", "소스저장소 정보를 찾을 수 없습니다.");
+				return "/err/error";
+			}
+			
+			String repTypeCd = "02";
+			String fileName = filePath.substring(filePath.lastIndexOf("/")+1, filePath.length());
+			
+			
+			long lastRevision = Long.parseLong(selRevision);
+			long startRevision = lastRevision-100;
+			
+			
+			if(startRevision <= 0) {
+				startRevision = 1;
+			}
+			
+			model.addAttribute("repId", repId);
+			model.addAttribute("selRevision", selRevision);
+			model.addAttribute("filePath", filePath);
+			model.addAttribute("repTypeCd", repTypeCd);
+			model.addAttribute("fileName", fileName);
+			model.addAttribute("startRevision", startRevision);
+			model.addAttribute("lastRevision", selRevision);
+		}catch(Exception e) {
+			response.setStatus(HttpStatus.SC_BAD_REQUEST);
+			e.printStackTrace();
+			throw new Exception(e.getMessage());
+		}
+		
+		return "/rep/rep1000/rep1000/rep1007";
 	}
 	
 	
