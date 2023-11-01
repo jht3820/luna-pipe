@@ -75,7 +75,8 @@ var jen1004BldListGrid;
 var jen1004BldSearchObj;
 globals_guideChkFn = fnJen1004GuideShow;
 $(document).ready(function() {
-	if('<c:out value="${param.jobTypeCd}"/>' == "05"){
+	var jobTypeCd = '<c:out value="${param.jobTypeCd}"/>';
+	if(jobTypeCd == "05" || jobTypeCd == "05" || jobTypeCd == "06" || jobTypeCd == "07" || jobTypeCd == "08"){
 		$("form#jen1004JobInfoForm > .descMainFrame.dplInfo-ciTktId").hide();
 		$("form#jen1004JobInfoForm > .descMainFrame.dplInfo-eGeneDplId").show();
 	}else{
