@@ -110,26 +110,30 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 		String salt = EgovProperties.getProperty("Globals.data.salt");
 		
 		
-		String da = "";
+		String decryptedData;
 		
 		try {
 			
-			Log.debug("paramData: "+data);
-			
-			
 			if(data.indexOf("%") != -1) {
 				
-				data = URLDecoder.decode(data,"utf-8");
+				data = java.net.URLDecoder.decode(data,"utf-8");
 			}
 			
-			da = CommonScrty.decryptedAria(data, salt);
+			
+			decryptedData = CommonScrty.decryptedAria(data, salt);
 		}catch(ArithmeticException ae) {
 			ae.printStackTrace();
 			return OslErrorCode.DATA_DECODE_FAIL;
 		}
 		
 		
-		JSONObject jsonObj = new JSONObject(da);
+		JSONObject jsonObj;
+	    try {
+	        jsonObj = new JSONObject(decryptedData);
+	    } catch (JSONException je) {
+	    	je.printStackTrace();
+	    	return OslErrorCode.DATA_DECODE_FAIL;
+	    }
 		
 		
 		String dataKey = OslUtil.jsonGetString(jsonObj, "key");
