@@ -9,16 +9,22 @@
 	
 </style>
 <script>
+//grid
 var tktChgDataGridObj;
 var buildDataGridObj;
 var rsyncDataGridObj;
 var commitTargetDataGridObj;
+//search
+var rsyncDataSearchObj;
 
 //선택 변경파일 중복 체크
 var overlapFileChg = {};
 
 //선택된 소스저장소 데이터 목록
 var selRepData = [];
+
+//rsync 결과 데이터
+var rsyncResultDataMap = {};
 
 $(function(){
 	//티켓 변경 파일 목록 조회
@@ -29,6 +35,8 @@ $(function(){
 	fnRsyncDataGridSetting();
 	//커밋대상 파일목록 조회
 	fnCommitTargetDataGridSetting();
+	//티켓 변경 파일 목록 검색 세팅
+	fnRsyncDataSearchSetting();
 	
 	//가이드 상자 호출
 	gfnGuideStack("add",fnRep1102GuideShow);
@@ -286,7 +294,6 @@ function fnBuildDataGridSetting(){
 		showRowSelector: false,
 		header: {align:"center",columnHeight: 30},
 		columns: [
-			{key: "dplNm", label: "운영빌드 명", width: 150, align: "center"},
 			{key: "jobId", label: "JOB ID", width: 150, align: "center"} ,
 			{key: "bldNum", label: "빌드 번호", width: 80, align: "center"} ,
 			{key: "regUsrId", label: "빌드 실행자", width: 100, align: "center"} ,
@@ -304,6 +311,9 @@ function fnBuildDataGridSetting(){
 				// 클릭 이벤트
    				buildDataGridObj.select(this.doindex, {selected: !this.item.__selected__});
 				
+				//검색 초기화
+   				axdom("#"+ rsyncDataSearchObj.getItemId("searchSelect")).val('all').change();
+   				
 				//rsync 결과 값 조회
 				fuRsyncResultList(this.item);
 			}
@@ -387,7 +397,7 @@ function fnRsyncDataGridSetting(){
 					return fileKindStr;
 				}
 			},
-			{key: "filePath", label: "파일 경로", width: 676, align: "left"},
+			{key: "filePath", label: "파일 경로", width: 840, align: "left"},
 		],
 		body: {
 	  		align: "center",
@@ -400,24 +410,77 @@ function fnRsyncDataGridSetting(){
 	});
 }
 //rsync 결과 값 조회
-function fuRsyncResultList(paramItem){
-	//AJAX 설정
-	var ajaxObj = new gfnAjaxRequestAction(
-			{"url":"<c:url value='/rep/rep1000/rep1100/selectRep1102RsyncResultListAjax.do'/>","loadingShow":true}
-			,{"ciId": paramItem.ciId, "ticketId": paramItem.ticketId, "jobId": paramItem.jobId, "bldNum": paramItem.bldNum});
-	//AJAX 전송 성공 함수
-	ajaxObj.setFnSuccess(function(data){
-		//오류 발생 여부
-		if(data.errorYn == "Y"){
-			jAlert(data.message,"알림");
-		}else{
-			var fileChgList = data.fileChgList;
-			rsyncDataGridObj.setData(fileChgList);
+function fuRsyncResultList(paramItem, paramSearchData){
+	//결과 데이터 key조합
+	var key =  paramItem.ciId+"_"+paramItem.ticketId+"_"+paramItem.jobId+"_"+paramItem.bldNum;
+		
+	//결과 데이터 있는지 체크
+	if(rsyncResultDataMap[key]){
+		var data = rsyncResultDataMap[key];
+		//검색 조건 있는지 체크
+		if(paramSearchData){
+			// 검색 데이터 구분
+			var searchArgs = paramSearchData.split("&");
+			if(searchArgs && searchArgs.length){
+				var searchData = {};
+				$.each(searchArgs, function(idx, map){
+					//key value 구분
+					var mapSplit = map.split("=");
+					var key = mapSplit[0];
+					var value = decodeURIComponent(mapSplit[1]);
+					
+					searchData[key] = value;
+				});
+				
+				//검색 조건 분기
+				if(searchData["searchSelect"] && searchData["searchSelect"] != "all"){
+					var chgData = [];
+					$.each(data, function(idx, map){
+						//파일 변경 타입
+						if(searchData["searchSelect"] == "fileTypeCd" && searchData["searchCd"]){
+							if(map["fileTypeCd"] == searchData["searchCd"]){
+								chgData.push(map);
+							}
+						}
+						//파일 경로
+						else if(searchData["searchSelect"] == "filePath" && searchData["searchTxt"] && searchData["searchTxt"].length){
+							if(map["filePath"] && map["filePath"].indexOf(searchData["searchTxt"]) != -1){
+								chgData.push(map);
+							}
+						}
+					});
+					data = chgData;
+				}
+			}
 		}
-	});
+		
+		//데이터 반환
+		rsyncDataGridObj.setData(data);
+	}else{
+		//AJAX 설정
+		var ajaxObj = new gfnAjaxRequestAction(
+				{"url":"<c:url value='/rep/rep1000/rep1100/selectRep1102RsyncResultListAjax.do'/>","loadingShow":true}
+				,{"ciId": paramItem.ciId, "ticketId": paramItem.ticketId, "jobId": paramItem.jobId, "bldNum": paramItem.bldNum});
+		//AJAX 전송 성공 함수
+		ajaxObj.setFnSuccess(function(data){
+			//오류 발생 여부
+			if(data.errorYn == "Y"){
+				jAlert(data.message,"알림");
+				//데이터 초기화
+				rsyncDataGridObj.setData([]);
+			}else{
+				var fileChgList = data.fileChgList;
+				rsyncDataGridObj.setData(fileChgList);
+				
+				//결과 데이터 넣기
+				rsyncResultDataMap[key] = fileChgList;
+			}
+		});
+		
+		//AJAX 전송
+		ajaxObj.send();
+	}
 	
-	//AJAX 전송
-	ajaxObj.send();
 }
 //axisj5 그리드
 function fnCommitTargetDataGridSetting(){
@@ -475,6 +538,82 @@ function fnRep1102GuideShow(){
 	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
 }
 
+//검색 상자
+function fnRsyncDataSearchSetting() {
+	rsyncDataSearchObj = new AXSearch();
+
+	var fnObjSearch = {
+		pageStart : function() {
+			//검색도구 설정 01 ---------------------------------------------------------
+			rsyncDataSearchObj.setConfig({
+				targetID : "rsyncDataSearchTarget",
+				theme : "AXSearch",
+				rows : [ {
+					display : true,
+					addClass : "",
+					style : "",
+					list : [{label : "<i class='fa fa-search'></i>&nbsp;",labelWidth : "50",type : "selectBox",width : "",key : "searchSelect",addClass : "",valueBoxStyle : "",value : "all",
+						options : [
+							{optionValue : "all",optionText : "전체 보기",optionAll : true}, 
+							{optionValue : "fileTypeCd",optionText : '파일 변경 타입', optionCommonCode:"REP00004"}, 
+							{optionValue : "filePath",optionText : '파일 경로'}, 
+						],
+							onChange : function(selectedObject,value) {
+									//선택 값이 전체목록인지 확인 후 입력 상자를 readonly처리
+									if (!gfnIsNull(selectedObject.optionAll) && selectedObject.optionAll == true) {
+										axdom("#"+ rsyncDataSearchObj.getItemId("searchTxt")).attr("readonly","readonly");
+										axdom("#"+ rsyncDataSearchObj.getItemId("searchTxt")).val('');
+									} else {
+										axdom("#"+ rsyncDataSearchObj.getItemId("searchTxt")).removeAttr("readonly");
+									}
+	
+									//공통코드 처리 후 select box 세팅이 필요한 경우 사용
+									if (!gfnIsNull(selectedObject.optionCommonCode)) {
+										gfnCommonSetting(rsyncDataSearchObj, selectedObject.optionCommonCode,"searchCd","searchTxt");
+									}  else {
+										//공통코드 처리(추가 selectbox 작업이 아닌 경우 type=text를 나타낸다.)
+										axdom("#"+ rsyncDataSearchObj.getItemId("searchTxt")).show();
+										axdom("#"+ rsyncDataSearchObj.getItemId("searchCd")).hide();
+									}
+								}
+								},
+								{label : "",labelWidth : "",type : "inputText",width : "225",key : "searchTxt",addClass : "secondItem sendBtn",valueBoxStyle : "padding-left:0px;",value : "",
+									onkeyup:function(e){
+										if(e.keyCode == '13' ){
+											axdom("#" + rsyncDataSearchObj.getItemId("btn_search_rsyncData")).click();
+										}
+									}
+								},
+								{label : "",labelWidth : "",type : "selectBox",width : "100",key : "searchCd",addClass : "selectBox",valueBoxStyle : "padding-left:0px;",value : "01",options : []},
+								{label : "",labelWidth : "",type : "button",width : "55",key : "btn_search_rsyncData",style : "float:right;",valueBoxStyle : "padding:5px;",value : "<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
+									onclick : function() {
+										//선택 빌드 데이터
+										var selData = buildDataGridObj.getList("selected");
+										if(selData && selData.length){
+											
+											/* 검색 조건 설정 후 reload */
+								            fuRsyncResultList(selData[0], rsyncDataSearchObj.getParam());
+										}else{
+											jAlert("운영 빌드를 선택해주세요.");
+										}
+									}
+								}
+						]}]
+					});
+		}
+	};
+
+	jQuery(document.body).ready(
+			function() {
+				fnObjSearch.pageStart();
+				//검색 상자 로드 후 텍스트 입력 폼 readonly 처리
+				axdom("#" + rsyncDataSearchObj.getItemId("searchTxt")).attr("readonly", "readonly");
+
+				//공통코드 selectBox hide 처리
+				axdom("#" + rsyncDataSearchObj.getItemId("searchCd")).hide();
+
+			});
+	}
 </script>
 
 
@@ -485,18 +624,19 @@ function fnRep1102GuideShow(){
 		<input type="hidden" name="empId" id="empId" value="${requestScope.empId }"/>
 	</form>
 	<div class="tab_contents menu">
-		<div class="rep1102MainMiddleFrame">
+		<div class="rep1102MainMiddleFrame top">
 			<div class="rep1102MiddleLeftFrame">
 				<div class="sub_title">
 					운영빌드 목록
 				</div>
-				<div data-ax5grid="buildDataGridTarget" data-ax5grid-config="{}" style="height: 250px;" guide="buildDataGridTarget"></div>
+				<div data-ax5grid="buildDataGridTarget" data-ax5grid-config="{}" style="height: 350px;" guide="buildDataGridTarget"></div>
 			</div>
 			<div class="rep1102MiddleRightFrame">
 				<div class="sub_title">
 					Source-Deploy 비교 결과 변경 파일
 				</div>
-				<div data-ax5grid="rsyncDataGridTarget" data-ax5grid-config="{}" style="height: 250px;" guide="rsyncDataGridTarget"></div>
+				<div id="rsyncDataSearchTarget"></div>
+				<div data-ax5grid="rsyncDataGridTarget" data-ax5grid-config="{}" style="height: 310px;" guide="rsyncDataGridTarget"></div>
 			</div>
 		</div>
 		<div class="rep1102DataTransferBtnFrame" guide="rep1102DataTransferBtnFrame">
@@ -508,13 +648,13 @@ function fnRep1102GuideShow(){
 				<div class="sub_title">
 					[<c:out value="${requestScope.ticketId}"/>] 티켓 소스저장소별 Trunk 변경 파일 목록
 				</div>
-				<div data-ax5grid="tktChgDataGridTarget" data-ax5grid-config="{}" style="height: 450px;" guide="tktChgDataGridTarget"></div>
+				<div data-ax5grid="tktChgDataGridTarget" data-ax5grid-config="{}" style="height: 350px;" guide="tktChgDataGridTarget"></div>
 			</div>
 			<div class="rep1102MiddleRightFrame">
 				<div class="sub_title">
 					선택 변경 파일
 				</div>
-				<div data-ax5grid="selCommitDataGridTarget" data-ax5grid-config="{}" style="height: 450px;" guide="selCommitDataGridTarget"></div>
+				<div data-ax5grid="selCommitDataGridTarget" data-ax5grid-config="{}" style="height: 350px;" guide="selCommitDataGridTarget"></div>
 			</div>
 		</div>
 		<div class="btnFrame">
