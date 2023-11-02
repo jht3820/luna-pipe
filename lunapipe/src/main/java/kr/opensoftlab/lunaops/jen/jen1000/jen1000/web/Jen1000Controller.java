@@ -437,8 +437,10 @@ public class Jen1000Controller {
 	public String selectJen1005View( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		String jobParamTicketId = EgovProperties.getProperty("Globals.buildParam.ticketId");
 		String jobParamRevision = EgovProperties.getProperty("Globals.buildParam.revision");
+		String jobParamDplId = EgovProperties.getProperty("Globals.buildParam.eGeneDplId");
 		model.addAttribute("jobParamTicketId", jobParamTicketId);
 		model.addAttribute("jobParamRevision", jobParamRevision);
+		model.addAttribute("jobParamDplId", jobParamDplId);
 		return "/jen/jen1000/jen1000/jen1005";
 	}
 	

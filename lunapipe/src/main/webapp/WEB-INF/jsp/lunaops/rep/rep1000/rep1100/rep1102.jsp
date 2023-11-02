@@ -490,16 +490,16 @@ function fnRep1102GuideShow(){
 				<div class="sub_title">
 					운영빌드 목록
 				</div>
-				<div data-ax5grid="buildDataGridTarget" data-ax5grid-config="{}" style="height: 250px;"></div>
+				<div data-ax5grid="buildDataGridTarget" data-ax5grid-config="{}" style="height: 250px;" guide="buildDataGridTarget"></div>
 			</div>
 			<div class="rep1102MiddleRightFrame">
 				<div class="sub_title">
 					Source-Deploy 비교 결과 변경 파일
 				</div>
-				<div data-ax5grid="rsyncDataGridTarget" data-ax5grid-config="{}" style="height: 250px;"></div>
+				<div data-ax5grid="rsyncDataGridTarget" data-ax5grid-config="{}" style="height: 250px;" guide="rsyncDataGridTarget"></div>
 			</div>
 		</div>
-		<div class="rep1102DataTransferBtnFrame">
+		<div class="rep1102DataTransferBtnFrame" guide="rep1102DataTransferBtnFrame">
 			<button type="button" class="AXButton" id="selFileChgAddBtn"><i class="fa fa-arrow-alt-circle-down"></i>&nbsp;추가</button>
 			<button type="button" class="AXButton" id="selFileChgDelBtn"><i class="fa fa-arrow-alt-circle-up"></i>&nbsp;제거</button>
 		</div>
@@ -508,13 +508,13 @@ function fnRep1102GuideShow(){
 				<div class="sub_title">
 					[<c:out value="${requestScope.ticketId}"/>] 티켓 소스저장소별 Trunk 변경 파일 목록
 				</div>
-				<div data-ax5grid="tktChgDataGridTarget" data-ax5grid-config="{}" style="height: 450px;"></div>
+				<div data-ax5grid="tktChgDataGridTarget" data-ax5grid-config="{}" style="height: 450px;" guide="tktChgDataGridTarget"></div>
 			</div>
 			<div class="rep1102MiddleRightFrame">
 				<div class="sub_title">
 					선택 변경 파일
 				</div>
-				<div data-ax5grid="selCommitDataGridTarget" data-ax5grid-config="{}" style="height: 450px;"></div>
+				<div data-ax5grid="selCommitDataGridTarget" data-ax5grid-config="{}" style="height: 450px;" guide="selCommitDataGridTarget"></div>
 			</div>
 		</div>
 		<div class="btnFrame">
