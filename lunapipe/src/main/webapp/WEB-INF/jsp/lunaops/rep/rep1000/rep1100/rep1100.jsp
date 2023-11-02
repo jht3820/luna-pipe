@@ -422,7 +422,7 @@ function fnRep1100GuideShow(){
 			[<c:out value="${requestScope.ticketId}"/>] 티켓 변경 파일 목록
 		</div>
 		<div id="tktFileSearchTarget" guide="rep1100button" ></div>
-		<div data-ax5grid="tktFileGridTarget" data-ax5grid-config="{}" style="height: 600px;"></div>
+		<div data-ax5grid="tktFileGridTarget" data-ax5grid-config="{}" style="height: 600px;" guide="tktFileGridTarget"></div>
 		<div class="btnFrame">
 			<div class="mainPopupBtn" id="repDataCommitBtn"><i class="fas fa-paperclip"></i>&nbsp;Commit</div>
 			<div class="mainPopupBtn" id="repCloseBtn"><i class="fas fa-times-circle"></i>&nbsp;닫기</div>
