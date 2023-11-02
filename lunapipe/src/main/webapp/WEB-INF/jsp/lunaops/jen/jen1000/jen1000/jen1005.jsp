@@ -225,6 +225,13 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 									paramValue = ticketLastRv;
 								}
 							}
+							//job이 운영 배포,원복일때
+							else if(!gfnIsNull(jobTypeCd) && (jobTypeCd == "05" || jobTypeCd == "06" || jobTypeCd == "07" || jobTypeCd == "08")){
+								//key값이 e-Egene 배포계획 ID skip
+								if(map.jobParamKey == '<c:out value="${requestScope.jobParamDplId}"/>'){
+									return true;
+								}
+							}
 							//문자열
 							paramHtml += 	 '<div class="pop_menu_row">'
 											+'	<div class="pop_menu_col1" title="'+map.jobParamKey+'"><label for="'+map.jobParamKey+'">'+map.jobParamKey+'</label></div>'
