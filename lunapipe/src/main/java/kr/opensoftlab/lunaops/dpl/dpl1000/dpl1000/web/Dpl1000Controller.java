@@ -163,8 +163,10 @@ public class Dpl1000Controller {
 			
 			String jobParamTicketId = EgovProperties.getProperty("Globals.buildParam.ticketId");
 			String jobParamRevision = EgovProperties.getProperty("Globals.buildParam.revision");
+			String jobParamDplId = EgovProperties.getProperty("Globals.buildParam.eGeneDplId");
 			model.addAttribute("jobParamTicketId", jobParamTicketId);
 			model.addAttribute("jobParamRevision", jobParamRevision);
+			model.addAttribute("jobParamDplId", jobParamDplId);
 			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -515,10 +517,22 @@ public class Dpl1000Controller {
 			String dplId= (String)paramMap.get("dplId");
 			String empId= (String)paramMap.get("empId");
 			String jobParamList= (String)paramMap.get("jobParamList");
+			String eGeneDplId= (String)paramMap.get("eGeneDplId");
+			
+			
+			if("05".equals(jobTypeCd) || "06".equals(jobTypeCd) || "07".equals(jobTypeCd) || "08".equals(jobTypeCd)) {
+				
+				if(eGeneDplId == null || "".equals(eGeneDplId)) {
+					model.addAttribute("errorYn", "Y");
+					model.addAttribute("message", "JOB 실행에 필요한 E-GENE 배포계획 ID가 없습니다.");
+					return new ModelAndView("jsonView", model);
+				}
+			}
 			
 			
 			String jobParamTicketId = EgovProperties.getProperty("Globals.buildParam.ticketId");
 			String jobParamRevision = EgovProperties.getProperty("Globals.buildParam.revision");
+			String jobParamDplId = EgovProperties.getProperty("Globals.buildParam.eGeneDplId");
 			
 			
 			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
@@ -621,6 +635,16 @@ public class Dpl1000Controller {
 							newJobParamList.add(jobParamMap);
 						}
 					}
+					
+					
+					else if("05".equals(jobTypeCd) || "06".equals(jobTypeCd) || "07".equals(jobTypeCd) || "08".equals(jobTypeCd)) {
+						Map jobParamMap = new HashMap<>();
+						
+						jobParamMap.put("jobParamKey", jobParamDplId);
+						jobParamMap.put("jobParamVal", eGeneDplId);
+						
+						newJobParamList.add(jobParamMap);
+					}
 				}catch(Exception e) {
 					e.printStackTrace();
 					
@@ -631,7 +655,7 @@ public class Dpl1000Controller {
 			}
    		 
 			
-			if("05".equals(jobTypeCd)) {
+			if("05".equals(jobTypeCd) || "07".equals(jobTypeCd)) {
 				
 				String pDeployPath = EgovProperties.getProperty("Globals.p-deploy.path");
 				
@@ -639,16 +663,9 @@ public class Dpl1000Controller {
 				
 				
 				String ticketListStr= (String)paramMap.get("ticketList");
-				String eGeneDplId= (String)paramMap.get("eGeneDplId");
 				List<String> ticketList = new ArrayList<String>();
 				
 				try {
-					
-					if(eGeneDplId == null || "".equals(eGeneDplId)) {
-						model.addAttribute("errorYn", "Y");
-						model.addAttribute("message", "운영배포에 필요한 E-GENE 배포계획 ID가 없습니다.");
-						return new ModelAndView("jsonView", model);
-					}
 					
 					
 					JSONArray ticketArr = new JSONArray(ticketListStr);
@@ -661,12 +678,12 @@ public class Dpl1000Controller {
 						}
 					}else {
 						model.addAttribute("errorYn", "Y");
-						model.addAttribute("message", "운영배포에 필요한 티켓 ID가 없습니다.");
+						model.addAttribute("message", "jOB 실행에 필요한 티켓 ID가 없습니다.");
 						return new ModelAndView("jsonView", model);
 					}
 				}catch(Exception e) {
 					e.printStackTrace();
-					Log.error("운영배포 파라미터 데이터 생성 중 오류 발생", e);
+					Log.error("파라미터 데이터 생성 중 오류 발생", e);
 				}
 				try {
 					
@@ -718,7 +735,7 @@ public class Dpl1000Controller {
 					
 				}catch(Exception e) {
 					e.printStackTrace();
-					Log.error("운영배포 필요 파일 생성 중 오류 발생", e);
+					Log.error("배포 배포 필요 파일 생성 중 오류 발생", e);
 				}
 			}
 			
