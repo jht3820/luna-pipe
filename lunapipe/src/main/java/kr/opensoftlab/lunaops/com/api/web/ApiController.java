@@ -839,14 +839,12 @@ public class ApiController {
 			
 			paramMap.put("regUsrIp", request.getRemoteAddr());
 			Map rtnMap = apiService.insertRepFileUnLock(paramMap);
-			
 			model.addAllAttributes(rtnMap);
 		}catch(Exception ex){
 			model.addAttribute("result", "ERROR");
 			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
 			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
 			Log.error("insertRepFileUnLock()", ex);
-			
 		}
 		return new ModelAndView("jsonView");
 	}
@@ -865,6 +863,27 @@ public class ApiController {
 			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
 			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
 			Log.error("selectRepFileLockList()", ex);
+		}
+		return new ModelAndView("jsonView");
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value="/api/insertTempRepFileLock", method=RequestMethod.GET)
+	public ModelAndView insertTempRepFileLock(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+						
+			
+			Map rtnMap = apiService.insertTempRepFileLock(paramMap);
+			
+			model.addAllAttributes(rtnMap);
+		}catch(Exception ex){
+			model.addAttribute("result", "ERROR");
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+			Log.error("insertTempRepFileLock()", ex);
 		}
 		return new ModelAndView("jsonView");
 	}
