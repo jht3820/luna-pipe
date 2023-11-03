@@ -1,9 +1,15 @@
 
 package kr.opensoftlab.lunaops.dpl.dpl1000.dpl1000.web;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -82,6 +88,7 @@ public class Dpl1000Controller {
 	private BuildService buildService;
     
     
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value="/dpl/dpl1000/dpl1000/selectDpl1000View.do")
     public String selectDpl1000View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		
@@ -109,7 +116,6 @@ public class Dpl1000Controller {
 			}
 			
 			
-			
 			String dplId = OslUtil.jsonGetString(jsonObj, "dpl_id");
 			
 			
@@ -131,6 +137,20 @@ public class Dpl1000Controller {
 			
 			String eGeneDplId = OslUtil.jsonGetString(jsonObj, "egene_dpl_id");
 			
+			
+			Map newMap = new HashMap<>();
+			newMap.put("ticketId", ticketId);
+			Map tktLastRvMap = rep1100Service.selectRep1101TktChgFileLastRvNum(newMap);
+			
+			
+			String ticketLastRv = "HEAD";
+			
+			if(tktLastRvMap != null && tktLastRvMap.containsKey("maxRepRv")) {
+				if(tktLastRvMap.get("maxRepRv") != null) {
+					ticketLastRv = String.valueOf(tktLastRvMap.get("maxRepRv"));
+				}
+			}
+			
 			model.addAttribute("ciId", ciId);
 			model.addAttribute("ticketId", ticketId);
 			model.addAttribute("dplId", dplId);
@@ -138,12 +158,15 @@ public class Dpl1000Controller {
 			model.addAttribute("jobType", jobType);
 			model.addAttribute("ticketList", ticketList);
 			model.addAttribute("eGeneDplId", eGeneDplId);
+			model.addAttribute("ticketLastRv", ticketLastRv);
 			
 			
 			String jobParamTicketId = EgovProperties.getProperty("Globals.buildParam.ticketId");
 			String jobParamRevision = EgovProperties.getProperty("Globals.buildParam.revision");
+			String jobParamDplId = EgovProperties.getProperty("Globals.buildParam.eGeneDplId");
 			model.addAttribute("jobParamTicketId", jobParamTicketId);
 			model.addAttribute("jobParamRevision", jobParamRevision);
+			model.addAttribute("jobParamDplId", jobParamDplId);
 			
 		}catch(Exception e) {
 			response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -494,10 +517,22 @@ public class Dpl1000Controller {
 			String dplId= (String)paramMap.get("dplId");
 			String empId= (String)paramMap.get("empId");
 			String jobParamList= (String)paramMap.get("jobParamList");
+			String eGeneDplId= (String)paramMap.get("eGeneDplId");
+			
+			
+			if("05".equals(jobTypeCd) || "06".equals(jobTypeCd) || "07".equals(jobTypeCd) || "08".equals(jobTypeCd)) {
+				
+				if(eGeneDplId == null || "".equals(eGeneDplId)) {
+					model.addAttribute("errorYn", "Y");
+					model.addAttribute("message", "JOB 실행에 필요한 E-GENE 배포계획 ID가 없습니다.");
+					return new ModelAndView("jsonView", model);
+				}
+			}
 			
 			
 			String jobParamTicketId = EgovProperties.getProperty("Globals.buildParam.ticketId");
 			String jobParamRevision = EgovProperties.getProperty("Globals.buildParam.revision");
+			String jobParamDplId = EgovProperties.getProperty("Globals.buildParam.eGeneDplId");
 			
 			
 			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
@@ -568,7 +603,7 @@ public class Dpl1000Controller {
 						
 						if("04".equals(jobTypeCd) && jobParamRevision.equals(jobParamKey)) {
 							if(jobParamVal == null || "".equals(jobParamVal)) {
-								jobParamVal = "-1";
+								jobParamVal = "HEAD";
 							}
 							
 							
@@ -595,10 +630,20 @@ public class Dpl1000Controller {
 							jobParamMap = new HashMap<>();
 							
 							jobParamMap.put("jobParamKey", jobParamRevision);
-							jobParamMap.put("jobParamVal", "-1");
+							jobParamMap.put("jobParamVal", "HEAD");
 							
 							newJobParamList.add(jobParamMap);
 						}
+					}
+					
+					
+					else if("05".equals(jobTypeCd) || "06".equals(jobTypeCd) || "07".equals(jobTypeCd) || "08".equals(jobTypeCd)) {
+						Map jobParamMap = new HashMap<>();
+						
+						jobParamMap.put("jobParamKey", jobParamDplId);
+						jobParamMap.put("jobParamVal", eGeneDplId);
+						
+						newJobParamList.add(jobParamMap);
 					}
 				}catch(Exception e) {
 					e.printStackTrace();
@@ -610,6 +655,89 @@ public class Dpl1000Controller {
 			}
    		 
 			
+			if("05".equals(jobTypeCd) || "07".equals(jobTypeCd)) {
+				
+				String pDeployPath = EgovProperties.getProperty("Globals.p-deploy.path");
+				
+				String pDeployTicketFileNm = EgovProperties.getProperty("Globals.p-deploy.ticket.fileName");
+				
+				
+				String ticketListStr= (String)paramMap.get("ticketList");
+				List<String> ticketList = new ArrayList<String>();
+				
+				try {
+					
+					
+					JSONArray ticketArr = new JSONArray(ticketListStr);
+					
+					
+					if(ticketArr != null && ticketArr.length() > 0) {
+						for(int i=0;i<ticketArr.length();i++) {
+							JSONObject ticketInfo = ticketArr.getJSONObject(i);
+							ticketList.add(ticketInfo.getString("ticket_id"));
+						}
+					}else {
+						model.addAttribute("errorYn", "Y");
+						model.addAttribute("message", "jOB 실행에 필요한 티켓 ID가 없습니다.");
+						return new ModelAndView("jsonView", model);
+					}
+				}catch(Exception e) {
+					e.printStackTrace();
+					Log.error("파라미터 데이터 생성 중 오류 발생", e);
+				}
+				try {
+					
+					File pDeployPathCheck = new File(pDeployPath);
+					
+					if(!pDeployPathCheck.exists() || !pDeployPathCheck.isDirectory()) {
+						pDeployPathCheck.mkdirs();
+						
+					}
+					
+					
+					if(pDeployPath.lastIndexOf("/") == pDeployPath.length()) {
+						pDeployPath = pDeployPath.substring(0, pDeployPath.length()-1);
+					}
+					
+					
+					File pDeployJobPath = new File(pDeployPath+"/"+eGeneDplId+"/"+jobId);
+					
+					
+					if(!pDeployJobPath.exists() || !pDeployJobPath.isDirectory()) {
+						pDeployJobPath.mkdirs();
+					}
+
+					
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss", Locale.KOREA);
+					
+					
+					String fileNm = pDeployTicketFileNm+"_"+sdf.format(new Date())+".txt";
+					
+					
+					File ticketFile = new File(pDeployPath+"/"+eGeneDplId+"/"+jobId+"/"+fileNm);
+					
+					
+					if(!ticketFile.exists()) {
+						ticketFile.createNewFile();
+					}
+					
+					
+					FileWriter fileWriter = new FileWriter(ticketFile);
+				    PrintWriter printWriter = new PrintWriter(fileWriter);
+				    
+				    
+				    for(String targetTicketId : ticketList) {
+				    	printWriter.println(targetTicketId);
+				    }
+				    
+				    
+				    printWriter.close();
+					
+				}catch(Exception e) {
+					e.printStackTrace();
+					Log.error("배포 배포 필요 파일 생성 중 오류 발생", e);
+				}
+			}
 			
 			
 			BuildVO buildVo = new BuildVO();
@@ -626,7 +754,7 @@ public class Dpl1000Controller {
 			buildVo.setBldStartUsrId(empId);
 			buildVo.setBldStartUsrIp(request.getRemoteAddr());
 			buildVo.setJobParamList(newJobParamList);
-			
+
 			
 			buildVo.addBldActionLog(jobId+" JOB 빌드를 준비 중입니다.");
 
@@ -880,5 +1008,5 @@ public class Dpl1000Controller {
 			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
 			return new ModelAndView("jsonView");
 		}
-	}	
+	}
 }
