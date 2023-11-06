@@ -63,6 +63,7 @@ LUNA PIPE에서 소스저장소(SVN, GIT) 및 Jenkine 연결을 통해 소스저
  
 ### 📌 2.4 LUNA™ PIPE 검증 코드
  - 호출에 사용되는 파라미터 기본 값은 JSON형태의 암호화된 문자열입니다.
+ - encryption 폴더의 lunaDplScrty.jar 파일을  사용하여 암호화를 진행합니다.
  - `Globals.data.salt`에 설정된 값에 따라 검증 코드가 동작됩니다.
    - 암호화 Salt 값이 변경되면 `globals.properties`, `LunaDplScrty.jar` 내부 값을 변경해야 합니다. 
  - 암호화 방법
@@ -78,15 +79,13 @@ LUNA PIPE에서 소스저장소(SVN, GIT) 및 Jenkine 연결을 통해 소스저
 
 ### 🛠 3.1 Oracle에 LUNA™ PIPE DB 세팅
  - DB_install_script 디렉토리에 설치 스크립트들을 1번부터 순서대로 설치 진행합니다.
-   - [01. LUNAOPSDPLDB_INSTALL(sys계정).sql]
-       - 테이블 스페이스 경로 변경 필요
-         - TS_LUNA_OPS_DPL_DAT01.DBF
-         - TS_LUNA_OPS_DPL_IDX01.DBF
-   - [02. LUNAOPSDPLDB_테이블_생성.sql]
-   - [03. 기초데이터_생성(LUNAOPSDPLDB계정).sql]
-   - [04. INDEX.sql]
-   - [05. DB_SF_SP\1. SF_CMM1000_MST_CD_NM.sql]
-   - [05. DB_SF_SP\2. SF_CMM1001_COM_CD_INFO.sql]
+   - [01_DB_INSTALL_SYS계정.sql]
+       - 사용하는 환경에 맞게 테이블 스페이스 경로 변경
+   - [02_관련테이블_생성.sql]
+   - [03_기초데이터_생성.sql]
+   - [04_INDEX_생성.sql]
+   - [05_SF_CMM1000_MST_CD_NM_Function생성.sql]
+   - [06_SF_CMM1001_COM_CD_INFO_Function생성.sql]
   
 ### 🛠 3.2 LUNA™ PIPE DB 접속 주소 및 환경설정
    ```
