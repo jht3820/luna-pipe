@@ -17,656 +17,655 @@
 <br/>
 
 
-# 🙂 1. LUNA™ PIPE 소개
+# 🙂 1. Introduction to LUNA™ PIPE
 
-기존 파편화된 오픈소스 형상관리 도구를 연계하여 통합한 오픈소스 기반 통합 형상관리 도구입니다.
-파편화된 형상 관리 도구로 인해 낮은 효율성, 높은 활용 난이도로 쉽게 구축 및 사용이 어려운
-CI/CD 파이프라인 구성을 도와줄 수 있는 도구입니다.
+It is an open source-based integrated configuration management tool that links and integrates existing fragmented open source configuration management tools. 
+It is a tool that can help configure CI/CD pipelines that are difficult to build and use due to low efficiency and high difficulty in utilization due to fragmented configuration management tools.
 
-LUNA PIPE에서 소스저장소(SVN, GIT) 및 Jenkine 연결을 통해 소스저장소의 소스 내역 확인 및 배포를 진행할 수 있습니다.
+In LUNA PIPE, you can check the source details of the source repository and distribute it by connecting to the source repository (SVN, GIT) and Jenkine.
 
-# 🌈 2. LUNA™ PIPE 설치 준비
+# 🌈 2. Preparing for LUNA™ PIPE installation
 
-### 📌 2.1 설치 환경
+### 📌 2.1 Installation environment
  - OS
    ```
      - Linux
    ```
  - Server
    ```
-     - JDK 1.8 이상
-     - Tomcat 7.0 이상
-     - Oracle 11g 이상
-	 - Tomcat 8 이상
+     - JDK 1.8 or higher
+     - Tomcat 7.0 or higher
+     - Oracle 11g or higher
+	 - Tomcat 8 or higher
    ```
  - Client 
    ```
-     - Chrome 103 이상
-     - MS edge 103 이상
+     - Chrome 103 or higher
+     - MS edge 103 or higher
    ```
    
    
-### 📦 2.2 JENKINS, SVN 설치
- - 설치 가이드 링크
-	 - [JENKINS 설치(Red Hat/Fedora/Alma/Rocky/CentOS)](https://pkg.jenkins.io/redhat/)
-	 - [JENKINS 설치(Ubuntu/Debian)](https://pkg.jenkins.io/debian/)
-	 - [JENKINS 설치(Docker)](https://hub.docker.com/r/jenkins/jenkins/)
-     - [SVN 설치](https://subversion.apache.org/packages.html)
-	 - [톰캣 설치](https://tomcat.apache.org/download-80.cgi)
+### 📦 2.2 JENKINS, SVN installation
+ - Installation Guide Link
+	 - [JENKINS Installation(Red Hat/Fedora/Alma/Rocky/CentOS)](https://pkg.jenkins.io/redhat/)
+	 - [JENKINS Installation(Ubuntu/Debian)](https://pkg.jenkins.io/debian/)
+	 - [JENKINS Installation(Docker)](https://hub.docker.com/r/jenkins/jenkins/)
+     - [SVN Installation](https://subversion.apache.org/packages.html)
+	 - [Tomcat Installation](https://tomcat.apache.org/download-80.cgi)
 
-### 📌 2.3 LUNA™ PIPE 설치 준비 사항
- - LUNA™ PIPE 설치와 실행을 위하여 DB 설치 및 property 설정이 필요합니다.
+### 📌 Preparation for LUNA™ PIPE installation
+ - To install and run LUNA™ PIPE, DB installation and property settings are required.
  
- - DB설치 이후 환경파일 설정 순으로 세팅이 필요합니다.
+ - After DB installation, settings are required in the order of environment file settings.
  
- - 이하 전자정부프레임워크(eGovFramework) 표준에 준하여 구동됩니다.
+ - It is operated in accordance with the eGovFramework standards below.
  
-### 📌 2.4 LUNA™ PIPE 검증 코드
- - 호출에 사용되는 파라미터 기본 값은 JSON형태의 암호화된 문자열입니다.
- - encryption 폴더의 lunaDplScrty.jar 파일을  사용하여 암호화를 진행합니다.
- - `Globals.data.salt`에 설정된 값에 따라 검증 코드가 동작됩니다.
-   - 암호화 Salt 값이 변경되면 `globals.properties`, `LunaDplScrty.jar` 내부 값을 변경해야 합니다. 
- - 암호화 방법
+### 📌 2.4 LUNA™ PIPE Verification Code
+ - The default value of the parameter used in the call is an encrypted string in JSON format.
+ - Proceed with encryption using the lunaDplScrty.jar file in the encryption folder.
+ - The verification code operates according to the value set in `Globals.data.salt`.
+   - If the encryption Salt value changes, the values inside `globals.properties` and `LunaDplScrty.jar` must be changed.
+ - Encryption method
    ```
      java -jar lunaDplScrty.jar etc 1
 	   [output]
-	   key setting: {"key":"암호화 처리되는 추가 부여 값"}
-       암호화된 key 값
+	   key setting: {"key":"Additional grant value to be encrypted"}
+       Encrypted key value
    ```
  
  
-# ⚙️ 3. LUNA™ PIPE 설치
+# ⚙️ 3. LUNA™ PIPE INSTALLATION
 
-### 🛠 3.1 Oracle에 LUNA™ PIPE DB 세팅
- - DB_install_script 디렉토리에 설치 스크립트들을 1번부터 순서대로 설치 진행합니다.
+### 🛠 3.1 Setting up LUNA™ PIPE DB in Oracle
+ - DB_install_script Install the installation scripts in the directory in order, starting from number 1.
    - [01_DB_INSTALL_SYS계정.sql]
-       - 사용하는 환경에 맞게 테이블 스페이스 경로 변경
+       - Change the table space path to suit your environment.
    - [02_관련테이블_생성.sql]
    - [03_기초데이터_생성.sql]
    - [04_INDEX_생성.sql]
    - [05_SF_CMM1000_MST_CD_NM_Function생성.sql]
    - [06_SF_CMM1001_COM_CD_INFO_Function생성.sql]
   
-### 🛠 3.2 LUNA™ PIPE DB 접속 주소 및 환경설정
+### 🛠 3.2 LUNA™ PIPE DB connection address and environment settings
    ```
-		/lunapipe/src/main/resources/egovframework/egovProps/globals.properties 아래와 같이 설정을 변경합니다.
+		/lunapipe/src/main/resources/egovframework/egovProps/globals.properties Change the settings as shown below.
     
-		- 공통
+		- common
 		Globals.lunaops.oracle.driver= Your oracle Driver
 		Globals.lunaops.oracle.url= Your oracle URL
 		Globals.lunaops.oracle.username= Your DB username
 		Globals.lunaops.oracle.password= Your DB password
 
-		- git api 주소
+		- git api address
 		Globals.github.endpoint=GITHUB api URL
 		Globals.gitlab.endpoint=GITLAB api URL
 		
-		- 암호화 salt 값
-		Globals.data.salt=암호화 처리되는 추가 부여 값
+		- Encryption salt value
+		Globals.data.salt=Additional grant values that are encrypted
    ```
    
-### 🛠 3.3 소스저장소 설정
+### 🛠 3.3 Source repository settings
 
    
 # 📖 4. Document
 
-## 4.1 화면
+## 4.1 View
 > window.open으로 호출되는 팝업 서비스에 암호화 데이터를 적용\
-> 암호화된 데이터는 get 파라미터 'data'로 전달\
+> Encrypted data is passed to the get parameter ‘data’\
 > 'data'로 전달되는 암포화 문자열은 encodeURIComponent 처리된 상태로 전달
 
-🖥소스저장소 관리 화면
+🖥Source repository management screen
   - URL: /rep/rep1000/rep1000/selectRep1000RepositoryView.do
   - PARAM: 
-    - **key**: API 통신 암호화 키
-    - **current_date**: API 요청 시간 값
-    - **api_id**: LUNA 화면 ID
+    - **key**: API communication encryption key
+    - **current_date**: API request time value
+    - **api_id**: LUNA VIEW ID
     - **svc_id**: Service ID
-    - **src_id**: 구성항목 ID
-    - **emp_id**: 사용자 ID
-    - **f_id**: 릴레이션 fid
+    - **src_id**: Configuration item ID
+    - **emp_id**: user ID
+    - **f_id**: relation fid
     - **callback_api_id**: Callback API ID
   - Callback
-    - **svcid**: 화면 오픈 시 전달 받은 서비스 ID
-    - **urows**([]): 전달 소스저장소 데이터 Array
-        - **key**: 소스저장소 ID
-        - **svn_name**: 소스저장소명
-        - **svn_src_id**: 구성관리 CI ID
+    - **svcid**: Service ID received when opening the screen
+    - **urows**([]): Delivery source storage data Array
+        - **key**: Source repository ID
+        - **svn_name**: Source repository name
+        - **svn_src_id**: Configuration item CI ID
         - **svn_url**: SVN URL
-        - **svn_descr**: SVN 설명
-        - **svn_used**: 1: 사용, 2: 미사용
+        - **svn_descr**: SVN description
+        - **svn_used**: 1: used, 2: not used
 
-🖥JENKINS & JOB 관리 화면
+🖥JENKINS & JOB management screen
   - URL: /jen/jen1000/jen1000/selectJen1000View.do
   - PARAM: 
-    - **key**: API 통신 암호화 키
-    - **current_date**: API 요청 시간 값
-    - **api_id**: LUNA 화면 ID
+    - **key**: API communication encryption key
+    - **current_date**: API request time value
+    - **api_id**: LUNA screen ID
     - **svc_id**: Service ID
-    - **emp_id**: 사용자 ID
-    - **f_id**: 릴레이션 fid
+    - **emp_id**: User ID
+    - **f_id**:relation fid
     - **callback_api_id**: Callback API ID
   - Callback
-    - **svcid**: 화면 오픈 시 전달 받은 서비스 ID
-    - **urows**([]): 전달 JOB 데이터 Array
+    - **svcid**: Service ID received when opening the screen
+    - **urows**([]): Delivery JOB data Array
         - **key**: JENKINS ID
-        - **jks_name**: JENKINS명
-        - **jks_src_id**: 구성관리 CI ID
-        - **jks_descr**: JENKINS 설명
-        - **jks_used**: 1: 사용, 2: 미사용
-        - **jks_order**: JOB 순서
+        - **jks_name**: JENKINS name
+        - **jks_src_id**: Configuration management CI ID
+        - **jks_descr**: JENKINS description
+        - **jks_used**: 1: used, 2: not used
+        - **jks_order**: JOB order
         - **jks_job_id**: JOB ID
         - **jks_job_type**: JOB TYPE
-        - **jks_var**: JOB 파라미터 값
+        - **jks_var**: JOB parameter value
 
-🖥소스저장소 상세정보 화면
+🖥Source repository details screen
   - URL: /rep/rep1000/rep1000/selectRep1002View.do
   - PARAM: 
-    - **key**: API 통신 암호화 키
-    - **current_date**: API 요청 시간 값
-    - **api_id**: LUNA 화면 ID
+    - **key**: API communication encryption key
+    - **current_date**: API request time value
+    - **api_id**: LUNA screen ID
     - **svc_id**: Service ID
-    - **rep_id**: 소스저장소 ID
-    - **ticket_id**: 티켓 ID
-    - **f_id**: 릴레이션 fid
+    - **rep_id**: Source repository ID
+    - **ticket_id**: Ticket ID
+    - **f_id**: relation fid
     - **callback_api_id**: Callback API ID
   - Callback
-    - **svcid**: 화면 오픈 시 전달 받은 서비스 ID
-    - **urows**([]): 전달 리비전 데이터 Array
-        - **rep_id**: 소스저장소 ID
-        - **revision**: 리비전 ID
-        - **comment**: 커밋 코멘트
-        - **author**: 커밋 발생자
-        - **log_date**: 커밋 일시(timestamp)
-        - **s_date**: 커밋 일시(String)
-        - **svn_file_list**([]): 변경 파일 Array
-            - **kind**: 파일 타입(dir, file)
-            - **path**: 경로
-            - **type**: 변경 타입(A: Added, M: Modified, D: Deleted)
-            - **file_name**: 파일명
+    - **svcid**: Service ID received when opening the screen
+    - **urows**([]): Array of forwarded revision data
+        - **rep_id**: Source repository ID
+        - **revision**: Revision ID
+        - **comment**: commit comment
+        - **author**: commit originator
+        - **log_date**: Commit date (timestamp)
+        - **s_date**: Commit date (String)
+        - **svn_file_list**([]): Array of changed files
+            - **kind**: File type (dir, file)
+            - **path**: path
+            - **type**: Change type (A: Added, M: Modified, D: Deleted)
+            - **file_name**: File name
 
-🖥티켓 JENKINS & JOB 등록 화면
+🖥Ticket JENKINS & JOB registration screen
   - URL: /jen/jen1000/jen1000/selectJen1000CIJobView.do
   - PARAM: 
-    - **key**: API 통신 암호화 키
-    - **current_date**: API 요청 시간 값
-    - **api_id**: LUNA 화면 ID
+    - **key**: API communication encryption key
+    - **current_date**:API request time value
+    - **api_id**: LUNA screen ID
     - **svc_id**: Service ID
-    - **src_id**: 구성항목 ID
-    - **f_id**: 릴레이션 fid
+    - **src_id**: Configuration item ID
+    - **f_id**: relation fid
     - **callback_api_id**: Callback API ID
-    - **job_type**([]): 화면 출력 조건 JOB TYPE
-  - Callback
-    - **svc_id**: 화면 오픈 시 전달 받은 서비스 ID
-    - **urows**([]): 전달 JOB 데이터 Array
-        - **key**: JENKINS ID
-        - **tkt_name**: JENKINS명
-        - **tkt_src_id**: 구성관리 CI ID
-        - **tkt_descr**: JENKINS 설명
-        - **tkt_used**: 1:사용, 2 미사용
-        - **tkt_order**: JOB 순서
-        - **tkt_job_id**: JOB ID
-        - **tkt_job_type**: JOB TYPE
-        - **tkt_var**: JOB 파라미터 값
+    - **job_type**([]): Screen output condition JOB TYPE
+   - Callback
+     - **svc_id**: Service ID received when opening the screen
+     - **urows**([]): Delivery JOB data Array
+     - **key**: JENKINS ID
+     - **tkt_name**: JENKINS name
+     - **tkt_src_id**: Configuration management CI ID
+     - **tkt_descr**: JENKINS description
+     - **tkt_used**: 1: used, 2 not used
+     - **tkt_order**: JOB order
+     - **tkt_job_id**: JOB ID
+     - **tkt_job_type**: JOB TYPE
+     - **tkt_var**: JOB parameter value
 
-🖥빌드 실행 화면
+🖥Build execution screen
   - URL: /dpl/dpl1000/dpl1000/selectDpl1000View.do
-  - PARAM: 
-    - **key**: API 통신 암호화 키
-    - **current_date**: API 요청 시간 값
-    - **ticket_id**: 티켓 ID
-    - **dpl_id**: 배포계획 ID
-    - **emp_id**: 배포 실행자 ID(사용자 ID)
-    - **job_type**([]): 화면 출력 조건 JOB TYPE
-    - **ticket_list**([]): 운영 배포시 필요한 티켓 ID 파라미터 Array([{ticket_id: 'TICKET_ID'}])
-    - **egene_dpl_id**: E-GENE에서 사용되는 배포계획 ID(티켓 묶음 ID)
+  -PARAM:
+   - **key**: API communication encryption key
+   - **current_date**: API request time value
+   - **ticket_id**: Ticket ID
+   - **dpl_id**: Distribution plan ID
+   - **emp_id**: Deployment executor ID (user ID)
+   - **job_type**([]): Screen output condition JOB TYPE
+   - **ticket_list**([]): Ticket ID parameter required for operational distribution Array([{ticket_id: 'TICKET_ID'}])
+   - **egene_dpl_id**: Distribution plan ID (ticket bundle ID) used in E-GENE
 
-🖥Branch → Trunk Commit 처리 화면
+🖥Branch → Trunk Commit processing screen
   - URL: /rep/rep1000/rep1100/selectRep1100View.do
   - PARAM: 
-    - **key**: API 통신 암호화 키
-    - **current_date**: API 요청 시간 값
-    - **ticket_id**: 티켓 ID
-    - **emp_id**: 커밋 실행자 ID(사용자 ID)
+    - **key**: API communication encryption key
+    - **current_date**: API request time value
+    - **ticket_id**: Ticket ID
+    - **emp_id**: commit executor ID (user ID)
 
-🖥소스저장소 → 배포저장소 Commit 처리 화면
+🖥Source repository → Distribution repository Commit processing screen
   - URL: /rep/rep1000/rep1100/selectRep1102View.do
   - PARAM: 
-    - **key**: API 통신 암호화 키
-    - **current_date**: API 요청 시간 값
-    - **src_id**: 구성항목 ID 
-    - **ticket_id**: 티켓 ID
-    - **emp_id**: 커밋 실행자 ID(사용자 ID)
+    - **key**: API communication encryption key
+    - **current_date**: API request time value
+    - **src_id**: Configuration item ID
+    - **ticket_id**: Ticket ID
+    - **emp_id**: commit executor ID (user ID)
 
-🖥배포저장소 빌드 대상 선택 화면
+🖥Distribution repository build target selection screen
   - URL: /rep/rep1000/rep1100/selectRep1103View.do
   - PARAM: 
-    - **key**: API 통신 암호화 키
-    - **current_date**: API 요청 시간 값
-    - **src_id**: 구성항목 ID 
-    - **ticket_id**: 티켓 ID
-    - **emp_id**: 커밋 실행자 ID(사용자 ID)
+    - **key**: API communication encryption key
+    - **current_date**: API request time value
+    - **src_id**: Configuration item ID
+    - **ticket_id**: Ticket ID
+    - **emp_id**: commit executor ID (user ID)
 
 ## 4.2 API
-✔연결 데이터 저장(소스저장소, JENKINS)
+✔Save connection data (source repository, JENKINS)
   - URL: /api/insertCIRepJenJob
   - Content-Type: application/json
   - PARAM:
-    - **REP_IDS**([]): 소스저장소 ID Array
-      - **rep_id**: 소스저장소 ID
-    - **JEN_JOB_IDS**([]): JENKINS JOB Array
-      - **jen_id**: JENKINS ID
-      - **job_id**: JOB ID
-      - **job_param_list**([]): JOB 파라미터 목록
-          - **job_param_key**: 파라미터 key
-          - **job_param_val**: 파라미터 값
-    - **Payloads**(암호화 전):
-        - **key**: API 통신 암호화 키
-        - **current_date**: API 요청 시간 값
-        - **ci_id**: 구성항목 ID
-        - **rep_ids**([]): 소스저장소 ID Array
+     - **REP_IDS**([]): Source repository ID Array
+       - **rep_id**: Source repository ID
+     - **JEN_JOB_IDS**([]): JENKINS JOB Array
+       - **jen_id**: JENKINS ID
+       - **job_id**: JOB ID
+       - **job_param_list**([]): JOB parameter list
+           - **job_param_key**: Parameter key
+           - **job_param_val**: Parameter value
+     - **Payloads** (before encryption):
+        - **key**: API communication encryption key
+        - **current_date**: API request time value
+        - **ci_id**: Configuration item ID
+        - **rep_ids**([]): Source repository ID Array
         - **jen_job_ids**([]): JOB ID Array
   - Response Definition:
-    - **result**:
-        - SUCCESS: 성공
-        - FAIL: Request 정보 정확하지 않음(파라미터 정보 처리 중 실패)
-        - ERROR: API 처리 작업 중 오류 발생
-    - **msg**: 결과 메시지 내용
-    - **error_code**: 오류 발생 시 전달 속성 (오류코드 3장 참조)
-    - **executed**: 저장에 성공한 건 수
-    - **total**: 전체 데이터 수
-    - **etc_msg**: 실패 처리된 데이터 상세 오류 메시지(개행 구분: \n)
+     -**result**:
+         - SUCCESS: success
+         - FAIL: Request information is incorrect (failure while processing parameter information)
+         - ERROR: An error occurred during API processing.
+     - **msg**: Result message content
+     - **error_code**: Forwarding property when an error occurs (see Error Code Chapter 3)
+     - **executed**: Number of successful saves
+     - **total**: Total number of data
+     - **etc_msg**: Detailed error message for failed data (newline separator: \n)
 
-✔연결 데이터 제거(소스저장소, JENKINS)
+✔ Remove connection data (source repository, JENKINS)
   - URL: /api/deleteCIRepJenJob
   - Http Method: POST
   - Content-Type: application/json;charset=UTF-8
   - PARAM:
-    - **REP_IDS**([]): 소스저장소 ID Array
-      - **rep_id**: 소스저장소 ID
+    - **REP_IDS**([]): Source repository ID Array
+       - **rep_id**: Source repository ID
     - **JEN_JOB_IDS**([]): JENKINS JOB Array
-      - **jen_id**: JENKINS ID
-      - **job_id**: JOB ID
-    - **Payloads**(암호화 전):
-        - **key**: API 통신 암호화 키
-        - **current_date**: API 요청 시간 값
-        - **ci_id**: 구성항목 ID
-        - **rep_ids**([]): 소스저장소 ID Array
-        - **jen_job_ids**([]): JOB ID Array
+       - **jen_id**: JENKINS ID
+       - **job_id**: JOB ID
+    - **Payloads** (before encryption):
+         - **key**: API communication encryption key
+         - **current_date**: API request time value
+         - **ci_id**: Configuration item ID
+         - **rep_ids**([]): Source repository ID Array
+         - **jen_job_ids**([]): JOB ID Array
   - Response Definition:
-    - **result**:
-        - SUCCESS: 성공
-        - FAIL: Request 정보 정확하지 않음(파라미터 정보 처리 중 실패)
-        - ERROR: API 처리 작업 중 오류 발생
-    - **msg**: 결과 메시지 내용
-    - **error_code**: 오류 발생 시 전달 속성 (오류코드 3장 참조)
-    - **executed**: 삭제에 성공한 건 수
-    - **total**: 전체 데이터 수
-    - **etc_msg**: 실패 처리된 데이터 상세 오류 메시지(개행 구분: \n)
+     -**result**:
+         - SUCCESS: success
+         - FAIL: Request information is incorrect (failure while processing parameter information)
+         - ERROR: An error occurred during API processing.
+     - **msg**: Result message content
+     - **error_code**: Forwarding property when an error occurs (see Error Code Chapter 3)
+     - **executed**: Number of successful deletions
+     - **total**: Total number of data
+     - **etc_msg**: Detailed error message for failed data (newline separator: \n)
 
-✔CI_ID 로 연결 데이터 조회(소스저장소, JENKINS)
+✔Search connection data by CI_ID (source repository, JENKINS)
   - URL: /api/selectCIRepList
   - Http Method: POST
   - Content-Type: application/json;charset=UTF-8
   - PARAM:
-    - **Payloads**(암호화 전):
-        - **key**: API 통신 암호화 키
-        - **current_date**: API 요청 시간 값
-        - **ci_id**: 구성항목 ID
-  - Response Definition:
-    - **result**:
-        - SUCCESS: 성공
-        - FAIL: Request 정보 정확하지 않음(파라미터 정보 처리 중 실패)
-        - ERROR: API 처리 작업 중 오류 발생
-    - **msg**: 결과 메시지 내용
-    - **error_code**: 오류 발생 시 전달 속성 (오류코드 3장 참조)
-    - **data**([]): 소스저장소, JENKINS 정보 Array
-       - **rep_ids**([]): 소스저장소 정보 Array
-            - **ci_id**: 구성항목 아이디
-            - **rep_id**: 소스저장소 ID
-            - **rep_nm**: 소스저장소명
-            - **rep_txt**: 소스저장소 설명
-            - **svn_rep_url**: SVN 소스저장소 URL
-        - **jen_job_ids**([]): JENKINS 정보 Array
-            - **ci_id**: 구성항목 ID
-            - **jen_id**: JENKINS ID
-            - **jen_nm**: JENKINS명
-            - **jen_url**: JENKINS URL
-            - **jen_desc**: JENKINS 설명
-            - **job_id**: JOB ID
-            - **job_desc**: JOB 설명
-            - **job_url**: JOB URL
-            - **job_param_list**([]): JOB 빌드 파라미터 Array
-                - **ci_id**: 구성항목 ID
-                - **jen_id**: JENKINS ID
-                - **job_id** : JOB ID
-                - **job_param_key**: JOB 파라미터 Key
-                - **job_param_val**: JOB 입력 파라미터 값
+    - **Payloads** (before encryption):
+         - **key**: API communication encryption key
+         - **current_date**: API request time value
+         - **ci_id**: Configuration item ID
+    - Response Definition:
+     -**result**:
+         - SUCCESS: success
+         - FAIL: Request information is incorrect (failure while processing parameter information)
+         - ERROR: An error occurred during API processing.
+     - **msg**: Result message content
+     - **error_code**: Forwarding property when an error occurs (see Error Code Chapter 3)
+     - **data**([]): Source repository, JENKINS information Array
+        - **rep_ids**([]): Source repository information Array
+             - **ci_id**: Configuration item ID
+             - **rep_id**: Source repository ID
+             - **rep_nm**: Source repository name
+             - **rep_txt**: Source repository description
+             - **svn_rep_url**: SVN source repository URL
+        - **jen_job_ids**([]): JENKINS Information Array
+             - **ci_id**: Configuration item ID
+             - **jen_id**: JENKINS ID
+             - **jen_nm**: JENKINS name
+             - **jen_url**: JENKINS URL
+             - **jen_desc**: JENKINS description
+             - **job_id**: JOB ID
+             - **job_desc**: JOB description
+             - **job_url**: JOB URL
+             - **job_param_list**([]): JOB build parameter Array
+                 - **ci_id**: Configuration item ID
+                 - **jen_id**: JENKINS ID
+                 - **job_id**: JOB ID
+                 - **job_param_key**: JOB parameter key
+                 - **job_param_val**: JOB input parameter value
 
-✔티켓에 JENKINS 등록
+✔REGISTER JENKINS ON TICKET
   - URL: /api/insertCITicketJobList
   - Http Method: POST
   - Content-Type: application/json;charset=UTF-8
   - PARAM:
     - **JEN_JOB_IDS**([]): JENKINS JOB Array
-      - **jen_id**: JENKINS ID
-      - **job_id**: JOB ID
-      - **job_start_ord**: JOB 순서
-      - **job_param_list**([]): JOB 빌드 파라미터 Array
-          - **ci_id**: 구성항목 ID
-          - **jen_id**: JENKINS ID
-          - **job_id**: JOB ID
-          - **job_param_key**: JOB 파라미터 key
-          - **job_param_val**: JOB 입력 파라미터 값
-    - **Payloads**(암호화 전):
-        - **key**: API 통신 암호화 키
-        - **current_date**: API 요청 시간 값
-        - **ci_id**: 구성항목 ID
-        - **ticket_id**: 티켓 ID
-        - **jen_job_ids**([]): JOB ID Array
-  - Response Definition:
-    - **result**:
-        - SUCCESS: 성공
-        - FAIL: Request 정보 정확하지 않음(파라미터 정보 처리 중 실패)
-        - ERROR: API 처리 작업 중 오류 발생
-    - **msg**: 결과 메시지 내용
-    - **error_code**: 오류 발생 시 전달 속성 (오류코드 3장 참조)
-    - **executed**: 저장에 성공한 건 수
-    - **total**: 전체 데이터 수
-    - **dpl_id**: 배포계획 ID
-    - **ticket_id**: 티켓 ID
+       - **jen_id**: JENKINS ID
+       - **job_id**: JOB ID
+       - **job_start_ord**: JOB order
+       - **job_param_list**([]): JOB build parameter Array
+           - **ci_id**: Configuration item ID
+           - **jen_id**: JENKINS ID
+           - **job_id**: JOB ID
+           - **job_param_key**: JOB parameter key
+           - **job_param_val**: JOB input parameter value
+     - **Payloads** (before encryption):
+         - **key**: API communication encryption key
+         - **current_date**: API request time value
+         - **ci_id**: Configuration item ID
+         - **ticket_id**: Ticket ID
+         - **jen_job_ids**([]): JOB ID Array
+   - Response Definition:
+     -**result**:
+         - SUCCESS: success
+         - FAIL: Request information is incorrect (failure while processing parameter information)
+         - ERROR: An error occurred during API processing.
+     - **msg**: Result message content
+     - **error_code**: Forwarding property when an error occurs (see Error Code Chapter 3)
+     - **executed**: Number of successful saves
+     - **total**: Total number of data
+     - **dpl_id**: Distribution plan ID
+     - **ticket_id**: Ticket ID
 
-✔티켓에 배정된 JOB의 빌드 현황 데이터 조회
+✔Check build status data of JOB assigned to ticket
   - URL: /api/selectTicketJobInfo
   - Http Method: POST
   - Content-Type: application/json;charset=UTF-8
   - PARAM:
-    - **Payloads**(암호화 전):
-        - **key**: API 통신 암호화 키
-        - **current_date**: API 요청 시간 값
-        - **ci_id**: 구성항목 ID
-        - **ticket_id**: 티켓 ID
-        - **dpl_id**: 배포계획 ID
-  - Response Definition:
-    - **result**:
-        - SUCCESS: 성공
-        - FAIL: Request 정보 정확하지 않음(파라미터 정보 처리 중 실패)
-        - ERROR: API 처리 작업 중 오류 발생
-    - **msg**: 결과 메시지 내용
-    - **error_code**: 오류 발생 시 전달 속성 (오류코드 3장 참조)
-    - **data**([]): JENKINS 빌드 정보 Array
-        - **ci_id**: 구성항목 ID
-        - **ticket_id**: 티켓 ID
-        - **dpl_id**: 배포계획 ID
-        - **jen_id**: JENKINS ID
-        - **jen_nm**: JENKINS명
-        - **jen_url**([]): JOB Array
-        - **jen_desc**: JENKINS 설명
-        - **job_id**: JOB명
-        - **job_ord**: JOB 순서
-        - **job_type_nm**: JOB 타입명
-        - **bld_num**: 마지막 빌드 번호
-        - **bld_result**: 마지막 빌드 결과
-        - **bld_duration_tm**: 마지막 빌드 소요 시간
-        - **bld_start_dtm**: 빌드 시작 시간
+    - **Payloads** (before encryption):
+         - **key**: API communication encryption key
+         - **current_date**: API request time value
+         - **ci_id**: Configuration item ID
+         - **ticket_id**: Ticket ID
+         - **dpl_id**: Distribution plan ID
+   - Response Definition:
+     -**result**:
+         - SUCCESS: success
+         - FAIL: Request information is incorrect (failure while processing parameter information)
+         - ERROR: An error occurred during API processing.
+     - **msg**: Result message content
+     - **error_code**: Forwarding property when an error occurs (see Error Code Chapter 3)
+     - **data**([]): JENKINS build information Array
+         - **ci_id**: Configuration item ID
+         - **ticket_id**: Ticket ID
+         - **dpl_id**: Distribution plan ID
+         - **jen_id**: JENKINS ID
+         - **jen_nm**: JENKINS name
+         - **jen_url**([]): JOB Array
+         - **jen_desc**: JENKINS description
+         - **job_id**: JOB name
+         - **job_ord**: JOB order
+         - **job_type_nm**: JOB type name
+         - **bld_num**: Last build number
+         - **bld_result**: Last build result
+         - **bld_duration_tm**: Last build time
+         - **bld_start_dtm**: Build start time
 
-✔소스저장소 브랜치 생성
-> 소스 저장소 URL/{BRANCH PATH}/{설정 접두어}_{티켓 ID}\
-> Branch Path는 소스저장소 관리 화면에서 등록/수정 가능 
+✔Create a source repository branch
+> Source repository URL/{BRANCH PATH}/{config prefix}_{ticket ID}\
+> Branch Path can be registered/edited in the source repository management screen 
   - URL: /api/insertRepTicketBranchInfo
   - Http Method: POST
   - Content-Type: application/json;charset=UTF-8
   - PARAM:
-    - **Payloads**(암호화 전):
-        - **key**: API 통신 암호화 키
-        - **current_date**: API 요청 시간 값
-        - **ticket_id**: 티켓 ID
-        - **rep_id**: 소스저장소 ID
-  - Response Definition:
-    - **result**:
-        - SUCCESS: 성공
-        - FAIL: Request 정보 정확하지 않음(파라미터 정보 처리 중 실패)
-        - ERROR: API 처리 작업 중 오류 발생
-    - **msg**: 결과 메시지 내용
-    - **error_code**: 오류 발생 시 전달 속성 (오류코드 3장 참조)
-    - **branch_nm**: 생성된 브랜치명
-    - **branch_path**: 생성된 브랜치 경로
+    - **Payloads** (before encryption):
+         - **key**: API communication encryption key
+         - **current_date**: API request time value
+         - **ticket_id**: Ticket ID
+         - **rep_id**: Source repository ID
+   - Response Definition:
+     -**result**:
+         - SUCCESS: success
+         - FAIL: Request information is incorrect (failure while processing parameter information)
+         - ERROR: An error occurred during API processing.
+     - **msg**: Result message content
+     - **error_code**: Forwarding property when an error occurs (see Error Code Chapter 3)
+     - **branch_nm**: Created branch name
+     - **branch_path**: Created branch path
 
-✔빌드 실행
-> 운영배포되는 티켓 대상 파일 목록 조회\
-> 파라미터 중 ci_id, rep_id 미 포함 조회 가능(ticket_id로 조회)
+✔Run build
+> View the list of files for operationally distributed tickets\
+> Can be searched without including ci_id and rep_id among parameters (search by ticket_id)
   - URL: /api/actionJobBuild
   - Http Method: GET
   - Content-Type: application/json
   - PARAM:
-    - **Payloads**(암호화 전):
-        - **key**: API 통신 암호화 키
-        - **job_key**: JENKINS ID, JOB ID로 이루어진 암호화 KEY 값
-            1. JENKINS 등록, 수정 관리 화면 진입(/jen/jen1000/jen1000/selectJen1000View.do)
-            2. JENKINS 데이터 선택
-            3. JOB 관리 목록에서 JOB 데이터 마우스 우클릭
-            4. 'JOB 암호화 코드 조회' 메뉴 선택하여 확인
-        - **rv**: 리비전 값
-  - Response Definition:
-    - **result**:
-        - SUCCESS: 성공
-        - FAIL: Request 정보 정확하지 않음(파라미터 정보 처리 중 실패)
-        - ERROR: API 처리 작업 중 오류 발생
-    - **msg**: 결과 메시지 내용
-    - **error_code**: 오류 발생 시 전달 속성 (오류코드 3장 참조)
+    - **Payloads** (before encryption):
+         - **key**: API communication encryption key
+         - **job_key**: Encrypted KEY value consisting of JENKINS ID and JOB ID
+             1. Enter JENKINS registration and modification management screen (/jen/jen1000/jen1000/selectJen1000View.do)
+             2. JENKINS data selection
+             3. Right-click on JOB data in the JOB management list.
+             4. Select the ‘JOB Encryption Code Inquiry’ menu to check.
+         - **rv**: revision value
+   - Response Definition:
+     -**result**:
+         - SUCCESS: success
+         - FAIL: Request information is incorrect (failure while processing parameter information)
+         - ERROR: An error occurred during API processing.
+     - **msg**: Result message content
+     - **error_code**: Forwarding property when an error occurs (see Error Code Chapter 3)
 
-✔티켓에 저장된 리비전 데이터 조회
+✔View revision data saved in a ticket
   - URL: /api/selectTicketRvDataList
   - Http Method: POST
   - Content-Type: application/json;charset=UTF-8
   - PARAM:
-    - **Payloads**(암호화 전):
-        - **key**: API 통신 암호화 키
-        - **current_date**: API 요청 시간 값
-        - **ticket_id**: 티켓 ID
-  - Response Definition:
-    - **result**:
-        - SUCCESS: 성공
-        - FAIL: Request 정보 정확하지 않음(파라미터 정보 처리 중 실패)
-        - ERROR: API 처리 작업 중 오류 발생
-    - **msg**: 결과 메시지 내용
-    - **error_code**: 오류 발생 시 전달 속성 (오류코드 3장 참조)
-    - **ticket_rv_list**([]): 리비전 정보 Array
-        - **ticket_id**: 티켓 ID
-        - **rep_id**: 소스저장소 ID
-        - **rep_cmt_date**: 커밋 일시
-        - **rep_cmt_author**: 커밋 대상자
-        - **rep_rv**: 리비전 번호(ID)
-        - **rep_comment**: 커밋 코멘트
-        - **rep_chg_file_cnt**: 변경 파일 개수
-        - **rep_chg_file_list**([]): 변경 파일 Array
-            - **ticket_id**: 티켓 ID
-            - **rep_id**: 소스저장소 ID
-            - **rep_rv**: 리비전 번호(ID)
-            - **rep_chg_id**: 변경 파일 ID
-            - **rep_chg_type**: 변경 타입(A: Added, M: Modified, D: Deleted)
-            - **rep_chg_file_path**: 변경 파일 경로
-            - **rep_chg_file_nm**: 변경 파일명
+    - **Payloads** (before encryption):
+         - **key**: API communication encryption key
+         - **current_date**: API request time value
+         - **ticket_id**: Ticket ID
+    - Response Definition:
+     -**result**:
+         - SUCCESS: success
+         - FAIL: Request information is incorrect (failure while processing parameter information)
+         - ERROR: An error occurred during API processing.
+     - **msg**: Result message content
+     - **error_code**: Forwarding property when an error occurs (see Error Code Chapter 3)
+     - **ticket_rv_list**([]): Revision information Array
+         - **ticket_id**: Ticket ID
+         - **rep_id**: Source repository ID
+         - **rep_cmt_date**: Commit date and time
+         - **rep_cmt_author**: Commit author
+         - **rep_rv**: Revision number (ID)
+         - **rep_comment**: commit comment
+         - **rep_chg_file_cnt**: Number of changed files
+         - **rep_chg_file_list**([]): Change file Array
+             - **ticket_id**: Ticket ID
+             - **rep_id**: Source repository ID
+             - **rep_rv**: Revision number (ID)
+             - **rep_chg_id**: Change file ID
+             - **rep_chg_type**: Change type (A: Added, M: Modified, D: Deleted)
+             - **rep_chg_file_path**: Change file path
+             - **rep_chg_file_nm**: Change file name
 
-✔티켓에 등록된 배포 저장소 빌드 대상 파일 조회
+✔View the distribution repository build target file registered in the ticket
   - URL: /api/selectTicketDplFileDataList
   - Http Method: POST
   - Content-Type: application/json;charset=UTF-8
   - PARAM:
-    - **Payloads**(암호화 전):
-        - **key**: API 통신 암호화 키
-        - **current_date**: API 요청 시간 값
-        - **ci_id**: 구성항목 ID
-        - **rep_id**: 소스저장소 ID
-        - **ticket_id**: 티켓 ID
-  - Response Definition:
-    - **result**:
-        - SUCCESS: 성공
-        - FAIL: Request 정보 정확하지 않음(파라미터 정보 처리 중 실패)
-        - ERROR: API 처리 작업 중 오류 발생
-    - **msg**: 결과 메시지 내용
-    - **error_code**: 오류 발생 시 전달 속성 (오류코드 3장 참조)
-    - **ticket_deploy_file_list**([]): 배포 대상 선택 파일 Array
-        - **ticket_id**: 티켓 ID
-        - **ci_id**: 구성항목 ID
-        - **rep_id**: 소스저장소 ID
-        - **rep_rv**: 리비전 번호(ID)
-        - **rep_chg_id**: 배포 변경 파일 ID
-        - **job_id**: 운영 JOB ID
-        - **bld_num**: 운영 빌드 번호
-        - **rep_chg_type_cd**: 파일 변경 타입(01: 추가, 02 수정, 03 삭제)
-        - **rep_chg_file_path**: 변경 파일 경로
-        - **rep_chg_file_nm**: 변경 파일명
-        - **rep_chg_file_kind**: 대상 파일 종류(dir, file)
-        - **commit_emp_id**: 커밋 사용자
+    - **Payloads** (before encryption):
+         - **key**: API communication encryption key
+         - **current_date**: API request time value
+         - **ci_id**: Configuration item ID
+         - **rep_id**: Source repository ID
+         - **ticket_id**: Ticket ID
+   - Response Definition:
+     -**result**:
+         - SUCCESS: success
+         - FAIL: Request information is incorrect (failure while processing parameter information)
+         - ERROR: An error occurred during API processing.
+     - **msg**: Result message content
+     - **error_code**: Forwarding property when an error occurs (see Error Code Chapter 3)
+     - **ticket_deploy_file_list**([]): Array of files to select deployment target
+         - **ticket_id**: Ticket ID
+         - **ci_id**: Configuration item ID
+         - **rep_id**: Source repository ID
+         - **rep_rv**: Revision number (ID)
+         - **rep_chg_id**: Deployment change file ID
+         - **job_id**: Operation JOB ID
+         - **bld_num**: Operational build number
+         - **rep_chg_type_cd**: File change type (01: Add, 02 Modify, 03 Delete)
+         - **rep_chg_file_path**: Change file path
+         - **rep_chg_file_nm**: Change file name
+         - **rep_chg_file_kind**: Target file type (dir, file)
+         - **commit_emp_id**: commit user
 
-✔SVN 소스저장소 대상 경로 파일 Lock 설정
+✔SVN source repository target path file lock setting
   - URL: /api/insertRepFileLock
   - Http Method: POST
   - Content-Type: application/json;charset=UTF-8
   - PARAM:
-    - **Payloads**(암호화 전):
-        - **key**: API 통신 암호화 키
-        - **current_date**: API 요청 시간 값
-        - **emp_id**: lock 설정자 ID
-        - **rep_id**: 소스저장소 ID
-        - **ticket_id**: 티켓 ID
-        - **force**: 강제 lock 여부(String true, false)
-        - **path_list**([]): lock 대상 경로 Array
-            - **path**: lock 대상 경로
-  - Response Definition:
-    - **result**:
-        - SUCCESS: 성공
-        - FAIL: Request 정보 정확하지 않음(파라미터 정보 처리 중 실패)
-        - ERROR: API 처리 작업 중 오류 발생
-    - **msg**: 결과 메시지 내용
-    - **error_code**: 오류 발생 시 전달 속성 (오류코드 3장 참조)
-    - **total**: lock 대상 경로 전체 개수
-    - **executed**: lock 설정 완료 개수
-    - **data**([]): lock 설정 결과 데이터 Array
-        - **ticket_id**: 티켓 ID
-        - **rep_id**: 소스저장소 ID
-        - **lockPath**: LOCK 대상 경로
-        - **lockUsrId**: LOCK 설정 사용자 ID
-        - **lockComment**: LOCK 커밋 내용
-        - **lockStateCd**: LOCK 상태 값(01: LOCK, 02: UNLOCK)
-        - **lockForce**: LOCK 강제 설정 여부(String true, false)
-        - **lockTargetRv**: LOCK 대상 리비전
-        - **result**: LOCK 설정 결과(true, false)
-        - **resultMsg**: LOCK 설정 결과 메시지
-        - **regDtm**: LOCK 설정 일시
-        - **regUsrId**: LOCK 설정 사용자 ID
-        - **regUsrIp**: LOCK 설정 사용자 IP
+    - **Payloads** (before encryption):
+         - **key**: API communication encryption key
+         - **current_date**: API request time value
+         - **emp_id**: lock setter ID
+         - **rep_id**: Source repository ID
+         - **ticket_id**: Ticket ID
+         - **force**: Whether to force lock (String true, false)
+         - **path_list**([]): lock target path Array
+             - **path**: lock target path
+   - Response Definition:
+     -**result**:
+         - SUCCESS: success
+         - FAIL: Request information is incorrect (failure while processing parameter information)
+         - ERROR: An error occurred during API processing.
+     - **msg**: Result message content
+     - **error_code**: Forwarding property when an error occurs (see Error Code Chapter 3)
+     - **total**: Total number of lock target paths
+     - **executed**: Number of lock settings completed
+     - **data**([]): Lock setting result data Array
+         - **ticket_id**: Ticket ID
+         - **rep_id**: Source repository ID
+         - **lockPath**: LOCK target path
+         - **lockUsrId**: LOCK setting user ID
+         - **lockComment**: LOCK commit content
+         - **lockStateCd**: LOCK state value (01: LOCK, 02: UNLOCK)
+         - **lockForce**: Whether to force LOCK (String true, false)
+         - **lockTargetRv**: LOCK target revision
+         - **result**: LOCK setting result (true, false)
+         - **resultMsg**: LOCK setting result message
+         - **regDtm**: LOCK setting date and time
+         - **regUsrId**: LOCK setting user ID
+         - **regUsrIp**: LOCK setting user IP
 
-✔SVN 소스저장소 대상 경로 파일 UnLock 설정
+✔SVN source repository destination path file UnLock settings
   - URL: /api/insertRepFileUnLock
   - Http Method: POST
   - Content-Type: application/json;charset=UTF-8
   - PARAM:
-    - **Payloads**(암호화 전):
-        - **key**: API 통신 암호화 키
-        - **current_date**: API 요청 시간 값
-        - **emp_id**: lock 설정자 ID
-        - **rep_id**: 소스저장소 ID
-        - **ticket_id**: 티켓 ID
-        - **force**: 강제 lock 여부(String true, false)
-        - **path_list**([]): lock 대상 경로 Array
-            - **path**: lock 대상 경로
-            - **lock_id**: lock ID (lock token)
-  - Response Definition:
-    - **result**:
-        - SUCCESS: 성공
-        - FAIL: Request 정보 정확하지 않음(파라미터 정보 처리 중 실패)
-        - ERROR: API 처리 작업 중 오류 발생
-    - **msg**: 결과 메시지 내용
-    - **error_code**: 오류 발생 시 전달 속성 (오류코드 3장 참조)
-    - **total**: un lock 대상 경로 전체 개수
-    - **executed**: un lock 설정 완료 개수
-    - **data**([]): un lock 설정 결과 데이터 Array
-        - **ticket_id**: 티켓 ID
-        - **rep_id**: 소스저장소 ID
-        - **lockPath**: UNLOCK 대상 경로
-        - **lockUsrId**: UNLOCK 설정 사용자 ID
-        - **lockStateCd**: UNLOCK 상태 값(01: LOCK, 02: UNLOCK)
-        - **lockForce**: UNLOCK 강제 설정 여부(String true, false)
-        - **lockTargetRv**: UNLOCK 대상 리비전
-        - **result**: UNLOCK 설정 결과(true, false)
-        - **resultMsg**: UNLOCK 설정 결과 메시지
-        - **regDtm**: UNLOCK 설정 일시
-        - **regUsrId**: UNLOCK 설정 사용자 ID
-        - **regUsrIp**: UNLOCK 설정 사용자 IP
+    - **Payloads** (before encryption):
+         - **key**: API communication encryption key
+         - **current_date**: API request time value
+         - **emp_id**: lock setter ID
+         - **rep_id**: Source repository ID
+         - **ticket_id**: Ticket ID
+         - **force**: Whether to force lock (String true, false)
+         - **path_list**([]): lock target path Array
+             - **path**: lock target path
+             - **lock_id**: lock ID (lock token)
+   - Response Definition:
+     -**result**:
+         - SUCCESS: success
+         - FAIL: Request information is incorrect (failure while processing parameter information)
+         - ERROR: An error occurred during API processing.
+     - **msg**: Result message content
+     - **error_code**: Forwarding property when an error occurs (see Error Code Chapter 3)
+     - **total**: Total number of unlock target paths
+     - **executed**: Number of unlock settings completed
+     - **data**([]): Unlock setting result data Array
+         - **ticket_id**: Ticket ID
+         - **rep_id**: Source repository ID
+         - **lockPath**: UNLOCK target path
+         - **lockUsrId**: UNLOCK setting user ID
+         - **lockStateCd**: UNLOCK state value (01: LOCK, 02: UNLOCK)
+         - **lockForce**: Whether to force UNLOCK (String true, false)
+         - **lockTargetRv**: UNLOCK target revision
+         - **result**: UNLOCK setting result (true, false)
+         - **resultMsg**: UNLOCK setting result message
+         - **regDtm**: UNLOCK setting date and time
+         - **regUsrId**: UNLOCK setting user ID
+         - **regUsrIp**: UNLOCK setting user IP
 
-✔티켓 ID로 LOCK 설정된 경로 목록 조회
-> 파라미터 조건에 'lock_target_rv' 또는 'lock_state_cd'값이 있으면 모든 데이터에서 해당 조건을 적용\
-> 파라미터 조건에 위 2개 파라미터가 없으면, 현재 LOCK 설정되어 있는 데이터만 조회 
+✔View list of routes set to LOCK by ticket ID
+> If there is a value of 'lock_target_rv' or 'lock_state_cd' in the parameter condition, the condition is applied to all data\
+> If the above two parameters are not present in the parameter conditions, only the data currently set to LOCK is searched.
   - URL: /api/insertRepFileUnLock
   - Http Method: POST
   - Content-Type: application/json;charset=UTF-8
   - PARAM:
-    - **Payloads**(암호화 전):
-        - **key**: API 통신 암호화 키
-        - **current_date**: API 요청 시간 값
-        - **ticket_id**: 티켓 ID
-        - **lock_target_rv**: 대상 리비전 조건(없으면 전체)
-        - **lock_state_cd**: lock 상태 값(01: lock, 02: unlock, 없으면 전체)
-  - Response Definition:
-    - **result**:
-        - SUCCESS: 성공
-        - FAIL: Request 정보 정확하지 않음(파라미터 정보 처리 중 실패)
-        - ERROR: API 처리 작업 중 오류 발생
-    - **error_code**: 오류 발생 시 전달 속성 (오류코드 3장 참조)
-    - **data**([]): lock 데이터 Array
-        - **ticket_id**: 티켓 ID
-        - **rep_id**: 소스저장소 ID
-        - **rep_nm**: 소스저장소명
-        - **lock_id**: LOCK ID (LOCK TOKEN)
-        - **lock_path**: LOCK 대상 경로
-        - **lock_usr_id**: LOCK 설정 사용자 ID
-        - **lock_comment**: LOCK 커밋 코멘트
-        - **lock_state_cd**: LOCK 상태 값(01: LOCK, 02: UNLOCK)
-        - **lock_state_nm**: LOCK 상태명
-        - **lock_force**: LOCK 강제 설정 여부(String true, false)
-        - **lock_target_rv**: LOCK 대상 리비전 번호
-        - **reg_dtm**: LOCK 설정 일시
-        - **reg_usr_id**: LOCK 설정 사용자 ID
-        - **reg_usr_ip**: LOCK 설정 사용자 IP
+    - **Payloads** (before encryption):
+         - **key**: API communication encryption key
+         - **current_date**: API request time value
+         - **ticket_id**: Ticket ID
+         - **lock_target_rv**: Target revision condition (all if none)
+         - **lock_state_cd**: lock state value (01: lock, 02: unlock, if not present, all)
+   - Response Definition:
+     -**result**:
+         - SUCCESS: success
+         - FAIL: Request information is incorrect (failure while processing parameter information)
+         - ERROR: An error occurred during API processing.
+     - **error_code**: Forwarding property when an error occurs (see Error Code Chapter 3)
+     - **data**([]): lock data Array
+         - **ticket_id**: Ticket ID
+         - **rep_id**: Source repository ID
+         - **rep_nm**: Source repository name
+         - **lock_id**: LOCK ID (LOCK TOKEN)
+         - **lock_path**: LOCK target path
+         - **lock_usr_id**: LOCK setting user ID
+         - **lock_comment**: LOCK commit comment
+         - **lock_state_cd**: LOCK state value (01: LOCK, 02: UNLOCK)
+         - **lock_state_nm**: LOCK state name
+         - **lock_force**: Whether to force LOCK (String true, false)
+         - **lock_target_rv**: LOCK target revision number
+         - **reg_dtm**: LOCK setting date and time
+         - **reg_usr_id**: LOCK setting user ID
+         - **reg_usr_ip**: LOCK setting user IP
 
 ## 4.3 Error Code
 | Error Code | Description |
 | --- | --- |
-| 001 | 파라미터 DATA 값 없음 |
-| 002 | 인증 KEY 오류 (잘못된 KEY) |
-| 003 | 파라미터 ‘CI_ID’값 없음 |
-| 004 | 데이터 복호화 오류 |
-| 005 | 파라미터 ‘TICKET_ID’값 없음 |
-| 006 | 파라미터 ‘REP_ID’값 없음 |
-| 007 | 파라미터 'DPL_ID'값 없음 |
-| 008 | JOB_ID 정보 찾을 수 없음 |
-| 009 | REP_ID 에 해당하는 소스저장소 정보가 없음 |
-| 010 | JEN_ID, JOB_ID 에 해당하는 JENKINS&JOB 정보가 없음 |
-| 011 | 등록된 데이터 없음 |
-| 012 | 데이터 체크 실패 |
-| 013 | 삭제된 데이터 없음 |
-| 014 | 파라미터 'PATH_LIST'값 없음 |
-| 100 | 구성항목 저장 중 오류 |
-| 101 | 구성항목 저장 데이터 없음(소스저장소, JENKINS) |
-| 102 | 구성항목 `소스저장소` 파라미터 추출 중 오류 |
-| 103 | 구성항목 `JENKINS&JOB` 파라미터 추출 중 오류 |
-| 200 | Branch명 중복 |
-| 201 | 소스저장소 고유 식별 ID 'UUID' 값 없음 |
-| 202 | 소스저장소 리비전 'rv' 값 없음 |
-| 203 | Trunk 경로에 복사 대상이 없음 |
-| 204 | 파일 LOCK 중 오류 발생 |
-| 205 | 소스저장소 UUID 로 REP_ID 값 조회 중 오류 발생 |
-| 300 | JENKINS 연결 실패 |
-| 301 | 해당 JOB 이 이미 실행 중 |
-| 302 | 빌드 번호 정보가 없음 |
-| 400 | 티켓 검증 오류 |
-| 999 | 서버 내 처리 중 오류 |
+| 001 | Parameter DATA No value |
+| 002 | Authentication KEY error (invalid KEY) |
+| 003 | Parameter ‘CI_ID’ has no value |
+| 004 | Data decryption error |
+| 005 | Parameter ‘TICKET_ID’ has no value |
+| 006 | Parameter ‘REP_ID’ has no value |
+| 007 | Parameter 'DPL_ID' has no value |
+| 008 | JOB_ID information not found |
+| 009 | There is no source repository information corresponding to REP_ID |
+| 010 | There is no JENKINS&JOB information corresponding to JEN_ID and JOB_ID |
+| 011 | No registered data |
+| 012 | Data check failed |
+| 013 | No data deleted |
+| 014 | Parameter 'PATH_LIST' has no value |
+| 100 | Error saving configuration items |
+| 101 | No configuration item storage data (source repository, JENKINS) |
+| 102 | Error extracting configuration item `source repository` parameters |
+| 103 | Error extracting configuration item `JENKINS&JOB` parameters |
+| 200 | Branch name duplicate |
+| 201 | Source repository unique identification ID 'UUID' has no value |
+| 202 | Source repository revision 'rv' has no value |
+| 203 | No copy destination in trunk path |
+| 204 | Error occurred while LOCKing file |
+| 205 | An error occurred while searching the REP_ID value using the source repository UUID |
+| 300 | JENKINS connection failure |
+| 301 | The corresponding JOB is already running |
+| 302 | No build number information |
+| 400 | Ticket validation error |
+| 999 | Error processing within server |
 
 
 
 
-# 📜 5. 라이선스 정보
+# 📜 5. License information
 
-- LUNA™ PIPE는 GPL3.0 라이선스에 따라 라이선스가 부여됩니다. 전체 라이센스 텍스트는 ([GPL3.0 라이센스 정보](https://www.olis.or.kr/license/Detailselect.do?lId=1072)) 를 참조하세요.
+- LUNA™ PIPE is licensed under the GPL3.0 License. For the full license text, see ([GPL3.0 License Information](https://www.olis.or.kr/license/Detailselect.do?lId=1072)).
