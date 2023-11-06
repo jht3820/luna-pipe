@@ -542,10 +542,22 @@ public class Rep1100Controller {
 													continue;
 												}
 												
+												String fileTypeCd = "02";
+												if(fileTypeNm == 'A') {
+													fileTypeCd = "01";
+												}
+												else if(fileTypeNm == 'M') {
+													fileTypeCd = "02";
+												}
+												else if(fileTypeNm == 'D') {
+													fileTypeCd = "03";
+												}
+												
 												Map newMap = new HashMap<>();
 												newMap.put("fileRealPath", checkPath+fileChgPath);
 												newMap.put("filePath", fileChgPath);
 												newMap.put("fileTypeNm", fileTypeNm);
+												newMap.put("fileTypeCd", fileTypeCd);
 												newMap.put("changeFilePath", fileChgPath);
 												newMap.put("ciId", ciId);
 												newMap.put("ticketId", ticketId);
