@@ -24,6 +24,8 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.stereotype.Service;
+import org.tmatesoft.svn.core.SVNLock;
+import org.tmatesoft.svn.core.io.SVNRepository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.offbytwo.jenkins.JenkinsServer;
@@ -110,26 +112,30 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 		String salt = EgovProperties.getProperty("Globals.data.salt");
 		
 		
-		String da = "";
+		String decryptedData;
 		
 		try {
 			
-			Log.debug("paramData: "+data);
-			
-			
 			if(data.indexOf("%") != -1) {
 				
-				data = URLDecoder.decode(data,"utf-8");
+				data = java.net.URLDecoder.decode(data,"utf-8");
 			}
 			
-			da = CommonScrty.decryptedAria(data, salt);
+			
+			decryptedData = CommonScrty.decryptedAria(data, salt);
 		}catch(ArithmeticException ae) {
 			ae.printStackTrace();
 			return OslErrorCode.DATA_DECODE_FAIL;
 		}
 		
 		
-		JSONObject jsonObj = new JSONObject(da);
+		JSONObject jsonObj;
+	    try {
+	        jsonObj = new JSONObject(decryptedData);
+	    } catch (JSONException je) {
+	    	je.printStackTrace();
+	    	return OslErrorCode.DATA_DECODE_FAIL;
+	    }
 		
 		
 		String dataKey = OslUtil.jsonGetString(jsonObj, "key");
@@ -1941,6 +1947,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 					repLockVo.setRegUsrId(empId);
 					repLockVo.setLockTargetRv("HEAD");
 					repLockVo.setTicketId(ticketId);
+					repLockVo.setRepType("01");
 					
 					
 					if(repLockVo.isResult()) {
@@ -2109,6 +2116,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 								repLockVo.setRegUsrId(author);
 								repLockVo.setTicketId(ticketId);
 								repLockVo.setLockTargetRv(paramRv);
+								repLockVo.setRepType("01");
 								
 								
 								if(repLockVo.isResult()) {
@@ -2179,8 +2187,11 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 		int executed = 0;
 		
 		
+		String result = "FAIL";
+		
+		
 		if(checkParam instanceof String) {
-			rtnMap.put("result", false);
+			rtnMap.put("result", result);
 			rtnMap.put("error_code", checkParam.toString());
 			return rtnMap;
 		}else {
@@ -2192,7 +2203,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			
 			
 			if(pathListStr == null) {
-				rtnMap.put("result", false);
+				rtnMap.put("result", result);
 				rtnMap.put("error_code", OslErrorCode.PARAM_PATH_LIST_NULL);
 				return rtnMap;
 			}
@@ -2210,7 +2221,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			
 			
 			if(repId == null) {
-				rtnMap.put("result", false);
+				rtnMap.put("result", result);
 				rtnMap.put("error_code", OslErrorCode.PARAM_REP_ID_NULL);
 				return rtnMap;
 			}
@@ -2222,7 +2233,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			
 			
 			if(repVo == null) {
-				rtnMap.put("result", false);
+				rtnMap.put("result", result);
 				rtnMap.put("error_code", OslErrorCode.REP_ID_INFO_NULL);
 				rtnMap.put("etcMsg", "소스저장소 {REP_ID="+repId+"}에 대한 정보 없음");
 				return rtnMap;
@@ -2234,7 +2245,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			
 			if(!repAuthCheck) {
 				
-				rtnMap.put("result", false);
+				rtnMap.put("result", result);
 				
 				String resultCode = repResultVO.getResultCode();
 				rtnMap.put("error_code", OslErrorCode.REP_ID_INFO_NULL);
@@ -2304,6 +2315,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 					
 					String lockId = null;
 					String lockTargetRv = "HEAD";
+					String repType = "01";
 					
 					if(!force) {
 						lockId = pathObj.getString("lock_id");
@@ -2320,7 +2332,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 						
 						if(lckInfo == null) {
 							Map resultMap = new HashMap<>();
-							resultMap.put("result", false);
+							resultMap.put("result", result);
 							resultMap.put("lockPath", filePath);
 							resultMap.put("lockUsrId", empId);
 							resultMap.put("etcMsg", "해당하는 데이터를 찾을 수 없습니다.");
@@ -2335,7 +2347,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 						
 						if(!lockUsrId.equals(empId)) {
 							Map resultMap = new HashMap<>();
-							resultMap.put("result", false);
+							resultMap.put("result", result);
 							resultMap.put("lockPath", filePath);
 							resultMap.put("lockUsrId", empId);
 							resultMap.put("etcMsg", "Lock 설정한 사용자가 아닙니다.");
@@ -2346,7 +2358,15 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 						
 						
 						lockTargetRv = (String) lckInfo.get("lockTargetRv");
+						
+						
+						String infoRepType = (String)lckInfo.get("repType");
+						if(infoRepType != null && "02".equals(infoRepType)) {
+							repType = "02";
+						}
 					}
+					
+					repVo.setSvnRepoType(repType);
 					
 					
 					String comment = "[사용자 ID="+empId+", path="+filePath+"] 파일을 락 해제 했습니다.";
@@ -2378,6 +2398,12 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 				}
 				
 				rtnMap.put("data", resultDataMap);
+				
+				if(executed > 0) {
+					result = "SUCCESS";
+				}
+				
+				rtnMap.put("result", result);
 				
 			}catch(JSONException jsonE) {
 				Log.debug(jsonE);
@@ -2440,6 +2466,123 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			rtnMap.put("data", lckList);
 			rtnMap.put("result", true);
 		}
+		return rtnMap;
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked"})
+	public Map insertTempRepFileLock(Map paramMap) throws Exception {
+		Map rtnMap = new HashMap<>();
+		
+		boolean result = false;
+		
+		
+		List<String> etcMsg = new ArrayList<String>();
+
+		
+		Map<String, RepResultVO> repInfoMap = new HashMap<String, RepResultVO>();
+		
+		
+		int total = 0;
+		
+		int execute = 0;
+		
+		List<Map> tempList = rep1100Service.selectTempDataList(paramMap);
+		
+		if(tempList != null && tempList.size() > 0) {
+			
+			total = tempList.size();
+			
+			for(Map tempInfo : tempList) {
+				String repId = (String) tempInfo.get("repId");
+				String path = (String) tempInfo.get("path");
+				String empId = (String) tempInfo.get("empId");
+				
+				RepResultVO repResultVo = null;
+				
+				if(!repInfoMap.containsKey(repId)) {
+					
+					Map newMap = new HashMap<>();
+					newMap.put("repId", repId);
+					
+					
+					RepVO repVo = rep1000Service.selectRep1000Info(newMap);
+					
+					
+					repVo.setSvnRepoType("02");
+					
+					
+					repResultVo = repModule.repAuthCheck(repVo);
+					repResultVo.setEmpId(empId);
+					
+					
+					repInfoMap.put(repId, repResultVo);
+				}
+				
+				repResultVo = repInfoMap.get(repId);
+				
+				
+				if(!repResultVo.isReturnValue()) {
+					etcMsg.add("- 배포저장소 연결 실패 [repNm="+repResultVo.getRepVo().getRepNm()+"]");
+					continue;
+				}
+
+				
+				SVNRepository repository = repResultVo.getDplRepo();
+				
+				if(repository == null) {
+					etcMsg.add("- 배포저장소 연결 실패 [repNm="+repResultVo.getRepVo().getRepNm()+"]");
+					continue;
+				}
+				
+				
+				SVNLock svnLock = repository.getLock(path);
+				
+				if(svnLock != null) {
+					etcMsg.add("- 이미 lock 상태의 파일입니다. [path="+path+"]");
+					continue;
+				}
+				
+				
+				String comment = "[사용자 ID="+empId+", path="+path+"] 파일을 락 설정 했습니다.";
+				
+
+				
+				RepLockVO repLockVo = repModule.fileLockHandle(repResultVo.getRepVo(), path, -1l, comment, false);
+				repLockVo.setLockUsrId(empId);
+				repLockVo.setRegDtm(String.valueOf(new Date().getTime()));
+				repLockVo.setRegUsrIp(String.valueOf(paramMap.get("regUsrIp")));
+				repLockVo.setLockForce("true");
+				repLockVo.setRegUsrId(empId);
+				repLockVo.setLockTargetRv("HEAD");
+				repLockVo.setRepType("02");
+				
+				
+				if(repLockVo.isResult()) {
+					
+					Map newMap = new HashMap<>();
+					newMap.put("repId", repId);
+					newMap.put("path", path);
+					rep1100Service.updateTempDataInfo(newMap);
+					
+					
+					lck1000Service.insertLck1000LockInfo(repLockVo);
+					
+					
+					execute++;
+				}
+				if(execute > 0) {
+					result = true;
+				}
+			}
+			
+		}else {
+			etcMsg.add("조회된 데이터가 없습니다.");
+		}
+		
+		rtnMap.put("result", result);
+		rtnMap.put("total", total);
+		rtnMap.put("execute", execute);
+		rtnMap.put("etcMsg", etcMsg);
 		return rtnMap;
 	}
 }

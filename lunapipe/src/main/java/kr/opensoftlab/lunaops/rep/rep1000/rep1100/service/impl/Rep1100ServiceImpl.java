@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.io.ISVNEditor;
@@ -37,6 +38,7 @@ import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
 import egovframework.com.cmm.service.EgovProperties;
 import egovframework.rte.fdl.cmmn.EgovAbstractServiceImpl;
+import jline.internal.Log;
 import kr.opensoftlab.lunaops.rep.rep1000.rep1000.service.Rep1000Service;
 import kr.opensoftlab.lunaops.rep.rep1000.rep1100.service.Rep1100Service;
 import kr.opensoftlab.sdf.rep.com.RepModule;
@@ -440,6 +442,46 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				
 				
 				List<JSONObject> fileList = repFileMap.get(repId);
+				
+				
+				boolean isLockFile = false;
+				
+				
+				for(JSONObject fileInfo: fileList) {
+					try {
+						
+						String repChgFilePath = (String) fileInfo.get("repChgFilePath");
+						
+						String trunkPath = repChgFilePath.replace(branchePath, "/trunk");
+						
+						String filePath = String.valueOf(trunkPath);
+						
+						
+						SVNLock svnLock = repository.getLock(filePath);
+						
+						if(svnLock != null) {
+							errorMsg.add("- Lock상태의 파일입니다. [path="+filePath+"]");
+							isLockFile = true;
+						}
+					}catch(Exception e) {
+						Log.debug(e);
+						break;
+					}
+				}
+				
+				
+				if(isLockFile) {
+					errorMsg.add("- 커밋 대상 파일 중 Lock 상태의 파일이 발견되어 커밋을 전체 중지했습니다.");
+					
+					
+					rtnMap.put("result", result);
+					
+					rtnMap.put("succCnt", 0);
+					
+					rtnMap.put("errorMsg", errorMsg);
+					
+					return rtnMap;
+				}
 				
 				
 				List<Map> rep1101InsertList = new ArrayList<Map>();
@@ -1026,6 +1068,36 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				List<JSONObject> fileList = repFilePathMap.get(repId);
 				
 				
+				boolean isLockFile = false;
+				
+				
+				for(JSONObject fileInfo: fileList) {
+					String filePath = (String) fileInfo.get("filePath");
+					
+					
+					SVNLock svnLock = repository.getLock(filePath);
+					
+					if(svnLock != null) {
+						errorMsg.add("- Lock상태의 파일입니다. [path="+filePath+"]");
+						isLockFile = true;
+					}
+				}
+				
+				
+				if(isLockFile) {
+					errorMsg.add("- 커밋 대상 파일 중 Lock 상태의 파일이 발견되어 커밋을 전체 중지했습니다.");
+					
+					
+					rtnMap.put("result", result);
+					
+					rtnMap.put("succCnt", 0);
+					
+					rtnMap.put("errorMsg", errorMsg);
+					
+					return rtnMap;
+				}
+				
+				
 				List<String> makePathList = repMakePathMap.get(repId);
 				
 				
@@ -1579,5 +1651,16 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 	@SuppressWarnings("rawtypes")
 	public Map selectRep1101TktChgFileLastRvNum(Map paramMap) throws Exception{
 		return rep1100DAO.selectRep1101TktChgFileLastRvNum(paramMap);
+	}
+	
+	@SuppressWarnings({ "rawtypes"})
+	public List<Map> selectTempDataList(Map paramMap) throws Exception{
+		return rep1100DAO.selectTempDataList(paramMap);
+	}
+
+	
+	@SuppressWarnings("rawtypes")
+	public int updateTempDataInfo(Map paramMap) throws Exception{
+		return rep1100DAO.updateTempDataInfo(paramMap);
 	}
 }
