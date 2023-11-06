@@ -110,9 +110,9 @@ In LUNA PIPE, you can check the source details of the source repository and dist
 # 📖 4. Document
 
 ## 4.1 View
-> window.open으로 호출되는 팝업 서비스에 암호화 데이터를 적용\
+> Apply encryption data to pop-up services called with window.open\
 > Encrypted data is passed to the get parameter ‘data’\
-> 'data'로 전달되는 암포화 문자열은 encodeURIComponent 처리된 상태로 전달
+> The saturated string passed as 'data' is delivered as encodeURIComponent processed.
 
 🖥Source repository management screen
   - URL: /rep/rep1000/rep1000/selectRep1000RepositoryView.do
