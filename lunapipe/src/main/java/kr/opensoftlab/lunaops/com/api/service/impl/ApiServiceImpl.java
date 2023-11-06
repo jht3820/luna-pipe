@@ -1558,36 +1558,87 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			
 			eGeneUrl = eGeneUrl + "/";
 		}
-				
-		
-		HttpGet methodGet = new HttpGet();
-		URI uri = new URI(eGeneUrl+"plugins/jsp/isTicket.jsp?data="+URLEncoder.encode(data,"UTF-8"));
-		methodGet.setURI(uri);
-		
-		HttpClient client = OslConnHttpClient.getHttpClient();
 		
 		
-		HttpResponse responseResult = client.execute(methodGet);
+		Object checkParam = checkParamDataKey(data);
 		
 		
-		if(responseResult.getStatusLine() != null && responseResult.getStatusLine().getStatusCode() == 200) {
-			
-    		String returnContent = EntityUtils.toString(responseResult.getEntity());
-    		returnContent = returnContent.replaceAll("\\s", "");
-    		
-    		
-    		if(!"true".equals(returnContent)) {
-    			
-				rtnValue.put("result", false);
-				rtnValue.put("error_code", OslErrorCode.DATA_INSERT_COUNT_NULL);
-    		}else {
-    			rtnValue.put("result", true);
-    		}
-		}else {
+		if(checkParam instanceof String) {
 			
 			rtnValue.put("result", false);
-			rtnValue.put("error_code", OslErrorCode.DATA_CHECK_FAIL);
+			rtnValue.put("error_code", OslErrorCode.DATA_DECODE_FAIL);
+			return rtnValue;
+		}else {
+			try {
+				
+				JSONObject jsonObj = (JSONObject) checkParam;
+				
+				
+				String ent_id = OslUtil.jsonGetString(jsonObj, "ent_id");
+				
+				
+				String repUuid = OslUtil.jsonGetString(jsonObj, ent_id.toLowerCase()+"_svn_url");
+				
+				
+				paramMap.put("repUuid", repUuid);
+				
+				
+				RepVO repVo = rep1000Service.selectRep1000Info(paramMap);
+				
+				
+				String repId = repVo.getRepId();
+				jsonObj.put(ent_id.toLowerCase()+"_svn_url", repId);
+				
+				
+				String salt = EgovProperties.getProperty("Globals.data.salt");
+				
+				
+				data = URLEncoder.encode(CommonScrty.encryptedAria(jsonObj.toString(), salt),"UTF-8");
+				
+				Log.debug("#### 요청 파라미터 복호화 값: "+jsonObj.toString());
+			}catch(Exception e) {
+				e.printStackTrace();
+				
+				rtnValue.put("result", false);
+				rtnValue.put("error_code", OslErrorCode.UUID_TO_REP_ID_FAIL);
+				return rtnValue;
+			}
+
+			
+			HttpGet methodGet = new HttpGet();
+			URI uri = new URI(eGeneUrl+"plugins/jsp/isTicket.jsp?data="+URLEncoder.encode(data,"UTF-8"));
+			methodGet.setURI(uri);
+			
+			Log.debug("#### 티켓 검증 요청");
+			Log.debug(eGeneUrl+"plugins/jsp/isTicket.jsp?data="+URLEncoder.encode(data,"UTF-8"));
+			
+			HttpClient client = OslConnHttpClient.getHttpClient();
+			
+			
+			HttpResponse responseResult = client.execute(methodGet);
+			
+			
+			if(responseResult.getStatusLine() != null && responseResult.getStatusLine().getStatusCode() == 200) {
+				
+	    		String returnContent = EntityUtils.toString(responseResult.getEntity());
+	    		returnContent = returnContent.replaceAll("\\s", "");
+	    		
+	    		Log.debug("#### 티켓 검증 결과 값: "+returnContent);
+	    		
+	    		if(!"true".equals(returnContent)) {
+	    			
+					rtnValue.put("result", false);
+					rtnValue.put("error_code", OslErrorCode.IS_TICKET_FAIL);
+	    		}else {
+	    			rtnValue.put("result", true);
+	    		}
+			}else {
+				
+				rtnValue.put("result", false);
+				rtnValue.put("error_code", OslErrorCode.DATA_CHECK_FAIL);
+			}
 		}
+		
 		return rtnValue;
 	}
 	
@@ -2470,6 +2521,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 		}
 		return rtnMap;
 	}
+	
 	
 	@SuppressWarnings({ "rawtypes", "unchecked"})
 	public Map insertTempRepFileLock(Map paramMap) throws Exception {
