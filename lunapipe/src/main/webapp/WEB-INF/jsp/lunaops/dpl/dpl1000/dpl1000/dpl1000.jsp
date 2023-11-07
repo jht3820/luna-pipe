@@ -42,7 +42,7 @@ var buildResultWaitTime = 3000;
 //선택 JOB 있는 경우
 var selJobStatusFlag = true;
 //사용자 모니터링 중지 flag
-var userJobStatusFlag = true;
+var userJobStatusFlag = false;
 
 //콘솔 로그
 var jobConsoleLog = {};
@@ -58,6 +58,8 @@ var dplId = '<c:out value="${requestScope.dplId}"/>';
 //운영빌드에 사용되는 파라미터 key값
 var jobParamTicketId = '<c:out value="${requestScope.jobParamTicketId}"/>';
 var jobParamRevision = '<c:out value="${requestScope.jobParamRevision}"/>';
+//운영배포에 사용되는 파라미터 key값
+var jobParamDplId = '<c:out value="${requestScope.jobParamDplId}"/>';
 
 //job type 조건
 var jobType = "";
@@ -152,7 +154,21 @@ $(document).ready(function() {
 			
 			//운영빌드 파라미터 있는지 체크
 			if(!ADD_JOB_PARAM_LIST.hasOwnProperty(item.jenId) || !ADD_JOB_PARAM_LIST[item.jenId].hasOwnProperty(item.jobId)){
-				addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br>";
+				//파라미터 정보 없는데 최종 리비전 값이 있는 경우
+				var ticketLastRv = $("form#dpl1000Form > #ticketLastRv").val();
+				if(!gfnIsNull(ticketLastRv)){
+					//파라미터 자동 세팅
+					if(!ADD_JOB_PARAM_LIST.hasOwnProperty(item.jenId)){
+						ADD_JOB_PARAM_LIST[item.jenId] = {};
+					}
+					ADD_JOB_PARAM_LIST[item.jenId][item.jobId].push({
+		   				"jobParamKey": jobParamRevision,
+		   				"jobParamVal": ticketLastRv
+		   			});
+				}else{
+					addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br>";
+				}
+				
 			}else{
 				//JOB 파라미터에 리비전 값 입력됬는지 체크
 				var targetJobParam = ADD_JOB_PARAM_LIST[item.jenId][item.jobId];
@@ -175,9 +191,16 @@ $(document).ready(function() {
 			
 		}
 		//JOB이 운영 배포인경우 배포계획ID, 티켓목록 체크
-		else if(item.jobTypeCd == "05"){
+		else if(item.jobTypeCd == "05" || item.jobTypeCd == "07"){
 			if(gfnIsNull(ticketList) || gfnIsNull(eGeneDplId)){
-				jAlert("운영배포 실행에 필요한 정보가 없습니다.(필요 데이터: 배포계획ID, 티켓 목록)", "알림");
+				jAlert("배포 실행에 필요한 정보가 없습니다.(필요 데이터: 배포계획ID, 티켓 목록)", "알림");
+				return true;
+			}
+		}
+		//JOB이 원상 복구인경우 배포계획ID 체크
+		else if(item.jobTypeCd == "06" || item.jobTypeCd == "08"){
+			if(gfnIsNull(eGeneDplId)){
+				jAlert("JOB 실행에 필요한 정보가 없습니다.(필요 데이터: 배포계획ID)", "알림");
 				return true;
 			}
 		}
@@ -923,8 +946,12 @@ function fnDplStart(item){
 	item["jobParamList"] = JSON.stringify(jobParamList);
 	
 	//운영 배포인경우 배포계획 ID, 티켓 목록 세팅
-	if(item.jobTypeCd == "05"){
+	if(item.jobTypeCd == "05" || item.jobTypeCd == "07"){
 		item["ticketList"] = ticketList;
+		item["eGeneDplId"] = eGeneDplId;
+	}
+	//원상복구
+	else if(item.jobTypeCd == "06" || item.jobTypeCd == "08"){
 		item["eGeneDplId"] = eGeneDplId;
 	}
 	
@@ -1053,7 +1080,7 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 	
 	//job type에 따라 frame 분기
 	//운영배포인경우
-	if(jobTypeCd == "05"){
+	if(jobTypeCd == "05" || jobTypeCd == "06" || jobTypeCd == "07" || jobTypeCd == "08"){
 		$("form#dpl1000JobInfoForm > .descMainFrame.dplInfo-ciTktId").hide();
 		$("form#dpl1000JobInfoForm > .descMainFrame.dplInfo-eGeneDplId").show();
 	}else{

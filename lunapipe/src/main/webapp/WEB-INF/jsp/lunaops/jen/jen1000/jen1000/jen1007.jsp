@@ -919,7 +919,8 @@ function fnSelJobSearchSetting(){
 										"jobId" : selJobList[0].jobId,
 										"jenUsrId" : selJobList[0].jenUsrId,
 										"jenUsrTok" : selJobList[0].jenUsrTok,
-										"jobTok" : selJobList[0].jobTok
+										"jobTok" : selJobList[0].jobTok,
+										"jobTypeCd": selJobList[0].jobTypeCd 
 								};
 								
 								// 빌드 파라미터 팝업 호출
