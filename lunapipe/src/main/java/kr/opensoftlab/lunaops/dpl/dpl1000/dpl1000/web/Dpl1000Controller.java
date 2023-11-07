@@ -873,6 +873,9 @@ public class Dpl1000Controller {
 				if(bldInfo != null) {
 					bldResultCd = (String) bldInfo.get("bldResultCd");
 					bldResult = (String) bldInfo.get("bldResult");
+					
+					
+					bldInfo.remove("bldConsoleLog");
 				}
 				
 				
