@@ -526,7 +526,7 @@ public class ApiController {
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
-				response.setStatus(500);
+				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
