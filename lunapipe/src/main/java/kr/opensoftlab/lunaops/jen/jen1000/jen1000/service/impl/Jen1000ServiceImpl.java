@@ -8,6 +8,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.offbytwo.jenkins.JenkinsServer;
@@ -260,23 +262,50 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 	}
 	
 	
-	public Object saveJen1000JobInfo(Map<String, String> paramMap)  throws Exception{
-		String insNewJenId ="";
+	public void saveJen1000JobInfo(Map<String, String> paramMap)  throws Exception{
 		int result = 0;
 		String popupGb = (String)paramMap.get("popupGb");
 		
 		if("insert".equals(popupGb)){
-			insNewJenId = jen1000DAO.insertJen1100JobInfo(paramMap);
-			
-			
 			String jenId = (String) paramMap.get("jenId");
-			String jobId = (String) paramMap.get("jobId");
+			String jobString = (String) paramMap.get("addJobList");
+			
+			
 			String empId = (String) paramMap.get("empId");
 			
-			
-			whk1000Service.insertWhk1000SendData("02", "02", jenId, jobId, empId);
-			
-			return insNewJenId;
+			String currentJobId = "";
+			try {
+				JSONArray jobArr = new JSONArray(jobString);
+				for(int i=0;i<jobArr.length();i++) {
+					JSONObject jobObj = jobArr.getJSONObject(i);
+					String jobId = jobObj.getString("jobId");
+					
+					
+					currentJobId = jobId;
+					paramMap.put("jobId", jobId);
+					
+					
+					int jobCheck = jen1000DAO.selectJen1100JobUseCountInfo(paramMap);
+					
+					if(jobCheck > 0){
+						throw new UserDefineException("[job_id="+jobId+"] 이미 추가된 JOB입니다.");
+					}
+					
+					
+					jen1000DAO.insertJen1100JobInfo(paramMap);
+					
+					
+					whk1000Service.insertWhk1000SendData("02", "02", jenId, jobId, empId);
+					
+				}
+			}
+			catch(UserDefineException ude) {
+				throw new UserDefineException(ude.getMessage());
+			}
+			catch(Exception e) {
+				throw new UserDefineException("[job_id="+currentJobId+"] JOB 등록 중 오류가 발생했습니다.");
+			}
+
 		}else if("update".equals(popupGb)){
 			result = jen1000DAO.updateJen1100JobInfo(paramMap);
 			
@@ -288,10 +317,10 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 				
 				
 				whk1000Service.insertWhk1000SendData("02", "02", jenId, jobId, empId);
+			}else {
+				throw new UserDefineException("JOB 수정에 실패했습니다.");
 			}
-			return result;
 		}
-		return null;
 	}
 	
 	
