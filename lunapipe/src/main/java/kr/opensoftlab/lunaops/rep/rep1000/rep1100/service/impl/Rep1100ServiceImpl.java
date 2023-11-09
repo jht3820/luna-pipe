@@ -488,7 +488,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				int commitCnt = dirList.size()+fileList.size();
 				
 				
-				String commitComment = "[insert_data_no-flag]branche 변경 파일 "+commitCnt+"개 trunk에 commit";
+				String commitComment = "[insert_data_no-flag]\n [커밋 정보] \n emp_id: "+commitAuthor+"\n ticket_id: "+ticketId+" \n 파일 개수: "+commitCnt;
 				
 				
 				ISVNEditor editor = repository.getCommitEditor(commitComment, null);
@@ -1128,7 +1128,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				int commitCnt = fileList.size();
 				
 				
-				String commitComment = "[insert_data_no-flag]source-trunk 변경 파일 "+commitCnt+"개 deploy-trunk에 commit";
+				String commitComment = "[insert_data_no-flag]\n [커밋 정보] \n emp_id: "+commitAuthor+"\n ticket_id: "+ticketId+" \n 파일 개수: "+commitCnt;
 				
 				
 				ISVNEditor editor = repository.getCommitEditor(commitComment, null);
