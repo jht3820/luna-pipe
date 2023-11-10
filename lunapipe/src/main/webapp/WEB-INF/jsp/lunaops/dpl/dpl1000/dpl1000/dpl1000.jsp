@@ -186,8 +186,11 @@ $(document).ready(function() {
 				var ticketLastRv = $("form#dpl1000Form > #ticketLastRv").val();
 				if(!gfnIsNull(ticketLastRv)){
 					//파라미터 자동 세팅
-					if(!ADD_JOB_PARAM_LIST.hasOwnProperty(item.jenId)){
+					if(!ADD_JOB_PARAM_LIST[item.jenId]){
 						ADD_JOB_PARAM_LIST[item.jenId] = {};
+					}
+					if(!ADD_JOB_PARAM_LIST[item.jenId][item.jobId]){
+						ADD_JOB_PARAM_LIST[item.jenId][item.jobId] = [];
 					}
 					ADD_JOB_PARAM_LIST[item.jenId][item.jobId].push({
 		   				"jobParamKey": jobParamRevision,
