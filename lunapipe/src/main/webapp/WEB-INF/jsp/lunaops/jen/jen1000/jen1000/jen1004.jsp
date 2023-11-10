@@ -328,6 +328,7 @@ function fnSelJobBuildInfo(paramBldItem){
 		var buildConsoleLog = "-";
 		var jobClass = "-";
 		var bldActionLog = "-";
+		var bldStartUsrId = "-";
 		
 		if(data.errorYn == "Y"){
 			jAlert(data.message,"알림창");
@@ -387,6 +388,7 @@ function fnSelJobBuildInfo(paramBldItem){
 					buildEstimatedDurationStr = gfnHourCalc(jobBuildInfo["bldEtmDurationTm"]/1000);
 					buildConsoleLog = jobBuildInfo["bldConsoleLog"];
 					bldActionLog = jobBuildInfo["bldActionLog"];
+					bldStartUsrId = (gfnIsNull(jobBuildInfo["regUsrId"]))?"-":jobBuildInfo["regUsrId"];
 					
 					//actionlog 줄바꿈
 					if(!gfnIsNull(bldActionLog)){
@@ -483,6 +485,7 @@ function fnSelJobBuildInfo(paramBldItem){
 		$("form#jen1004JobInfoForm #buildResult").text(buildResult);
 		$("form#jen1004JobInfoForm #buildDurationStr").text(buildDurationStr);
 		$("form#jen1004JobInfoForm #buildEstimatedDurationStr").text(buildEstimatedDurationStr);
+		$("form#jen1004JobInfoForm #bldStartUsrId").text(bldStartUsrId);
 		$("form#jen1004JobInfoForm #buildChgLog").html(buildChgLog);
 		//$("form#jen1004JobInfoForm #bldActionLog").html(bldActionLog);
 		
@@ -604,9 +607,9 @@ function fnJen1004GuideShow(){
 						</div>
 					</div>
 					<div class="descSubFrame">
-						<div class="descLabelFrame"><label></label></div>
+						<div class="descLabelFrame"><label>빌드 실행자</label></div>
 						<div class="descValueFrame">
-							<span></span>
+							<span id="bldStartUsrId"></span>
 						</div>
 					</div>
 				</div>
