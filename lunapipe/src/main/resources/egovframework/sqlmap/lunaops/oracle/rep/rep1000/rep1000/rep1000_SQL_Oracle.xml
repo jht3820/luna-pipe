@@ -134,7 +134,7 @@
 			            SVN_REP_URL,              
 			            SVN_USR_ID,               
 			            SVN_USR_PW,               
-			            SVN_BRC_PATH,
+			            SVN_BRC_PATH,			
 			            GIT_USR_AUTH_TYPE_CD,	
 			            GIT_REP_URL,              
 			            GIT_USR_ID,               
@@ -236,7 +236,15 @@
 					             #repNm#    	, 
 					             #repTypeCd#    , 
 					             #repTxt#		, 
-					             #repUuid#		,
+					             <isEqual property="repTypeCd" compareValue="01">
+						             'https://github.com/'||#gitRepUrl#		,
+					             </isEqual>
+					             <isEqual property="repTypeCd" compareValue="02">
+						             #repUuid#		,
+					             </isEqual>
+					             <isEqual property="repTypeCd" compareValue="03">
+						             #repUuid#		,
+					             </isEqual>
 					             #repDplUuid#	,
 					             <isEqual property="repTypeCd" compareValue="02">
 						             #svnRepUrl#	, 
