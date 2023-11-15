@@ -266,9 +266,7 @@ function fnTktFileGridSetting(){
 function fnInGridListSet(_pageNo,ajaxParam){
 	/* 그리드 데이터 가져오기 */
    	//파라미터 세팅
-   	if(gfnIsNull(ajaxParam)){
-		ajaxParam = $('form#rep1100Form').serialize();
-	}
+	ajaxParam = $('form#rep1100Form').serialize();
    	
    	//페이지 세팅
    	if(!gfnIsNull(_pageNo)){

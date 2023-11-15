@@ -526,7 +526,7 @@ function fnInJobGridListSet(_pageNo,ajaxParam,loadingShow){
    	}
    	
 	//ciId 추가
-   	ajaxParam += "&ciId="+ciId+"&jobType="+jobType;
+   	ajaxParam += "&ciId="+ciId+"&jobType="+jobType+"&useCd=01";
   
    	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
