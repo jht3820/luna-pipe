@@ -75,7 +75,8 @@ var jen1004BldListGrid;
 var jen1004BldSearchObj;
 globals_guideChkFn = fnJen1004GuideShow;
 $(document).ready(function() {
-	if('<c:out value="${param.jobTypeCd}"/>' == "05"){
+	var jobTypeCd = '<c:out value="${param.jobTypeCd}"/>';
+	if(jobTypeCd == "05" || jobTypeCd == "05" || jobTypeCd == "06" || jobTypeCd == "07" || jobTypeCd == "08"){
 		$("form#jen1004JobInfoForm > .descMainFrame.dplInfo-ciTktId").hide();
 		$("form#jen1004JobInfoForm > .descMainFrame.dplInfo-eGeneDplId").show();
 	}else{
@@ -323,10 +324,11 @@ function fnSelJobBuildInfo(paramBldItem){
 		var buildResult = "-";
 		var buildDurationStr = "-";
 		var buildEstimatedDurationStr = "-";
-		var buildChgLog = '<div class="buildChgMainFrame">-</div>';
+		var buildChgLog = '<div class="buildChgMainFrame">빌드 내역 없음.</div>';
 		var buildConsoleLog = "-";
 		var jobClass = "-";
 		var bldActionLog = "-";
+		var bldStartUsrId = "-";
 		
 		if(data.errorYn == "Y"){
 			jAlert(data.message,"알림창");
@@ -386,6 +388,7 @@ function fnSelJobBuildInfo(paramBldItem){
 					buildEstimatedDurationStr = gfnHourCalc(jobBuildInfo["bldEtmDurationTm"]/1000);
 					buildConsoleLog = jobBuildInfo["bldConsoleLog"];
 					bldActionLog = jobBuildInfo["bldActionLog"];
+					bldStartUsrId = (gfnIsNull(jobBuildInfo["regUsrId"]))?"-":jobBuildInfo["regUsrId"];
 					
 					//actionlog 줄바꿈
 					if(!gfnIsNull(bldActionLog)){
@@ -482,6 +485,7 @@ function fnSelJobBuildInfo(paramBldItem){
 		$("form#jen1004JobInfoForm #buildResult").text(buildResult);
 		$("form#jen1004JobInfoForm #buildDurationStr").text(buildDurationStr);
 		$("form#jen1004JobInfoForm #buildEstimatedDurationStr").text(buildEstimatedDurationStr);
+		$("form#jen1004JobInfoForm #bldStartUsrId").text(bldStartUsrId);
 		$("form#jen1004JobInfoForm #buildChgLog").html(buildChgLog);
 		//$("form#jen1004JobInfoForm #bldActionLog").html(bldActionLog);
 		
@@ -603,9 +607,9 @@ function fnJen1004GuideShow(){
 						</div>
 					</div>
 					<div class="descSubFrame">
-						<div class="descLabelFrame"><label></label></div>
+						<div class="descLabelFrame"><label>빌드 실행자</label></div>
 						<div class="descValueFrame">
-							<span></span>
+							<span id="bldStartUsrId"></span>
 						</div>
 					</div>
 				</div>
@@ -653,7 +657,7 @@ function fnJen1004GuideShow(){
 				</div>
 				<div class="descMainFrame">
 					<div class="descHeaderLabelFrame"><label>변경 내용</label></div>
-					<div class="descBodyValueFrame" id="buildChgLog"><div class="buildChgMainFrame">-</div></div>
+					<div class="descBodyValueFrame" id="buildChgLog"><div class="buildChgMainFrame">빌드 내역 없음.</div></div>
 				</div>
 				<!-- 
 				<div class="descMainFrame descFullFrame">

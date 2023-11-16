@@ -248,8 +248,8 @@ public class ApiController {
 				model.addAttribute("result", "SUCCESS");
 				model.addAttribute("msg", "정상적으로 생성되었습니다.");
 			}else {
-				response.setStatus(500);
 				String errorCode = (String) rtnMap.get("error_code");
+				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -294,7 +294,7 @@ public class ApiController {
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
-				response.setStatus(500);
+				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -402,7 +402,7 @@ public class ApiController {
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
-				response.setStatus(500);
+				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -526,7 +526,7 @@ public class ApiController {
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
-				response.setStatus(500);
+				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -810,7 +810,7 @@ public class ApiController {
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
-				response.setStatus(500);
+				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -839,14 +839,12 @@ public class ApiController {
 			
 			paramMap.put("regUsrIp", request.getRemoteAddr());
 			Map rtnMap = apiService.insertRepFileUnLock(paramMap);
-			
 			model.addAllAttributes(rtnMap);
 		}catch(Exception ex){
 			model.addAttribute("result", "ERROR");
 			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
 			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
 			Log.error("insertRepFileUnLock()", ex);
-			
 		}
 		return new ModelAndView("jsonView");
 	}
@@ -865,6 +863,27 @@ public class ApiController {
 			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
 			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
 			Log.error("selectRepFileLockList()", ex);
+		}
+		return new ModelAndView("jsonView");
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value="/api/insertTempRepFileLock", method=RequestMethod.GET)
+	public ModelAndView insertTempRepFileLock(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+						
+			
+			Map rtnMap = apiService.insertTempRepFileLock(paramMap);
+			
+			model.addAllAttributes(rtnMap);
+		}catch(Exception ex){
+			model.addAttribute("result", "ERROR");
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+			Log.error("insertTempRepFileLock()", ex);
 		}
 		return new ModelAndView("jsonView");
 	}

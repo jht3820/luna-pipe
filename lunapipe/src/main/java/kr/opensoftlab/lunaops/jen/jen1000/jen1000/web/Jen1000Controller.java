@@ -437,8 +437,10 @@ public class Jen1000Controller {
 	public String selectJen1005View( HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 		String jobParamTicketId = EgovProperties.getProperty("Globals.buildParam.ticketId");
 		String jobParamRevision = EgovProperties.getProperty("Globals.buildParam.revision");
+		String jobParamDplId = EgovProperties.getProperty("Globals.buildParam.eGeneDplId");
 		model.addAttribute("jobParamTicketId", jobParamTicketId);
 		model.addAttribute("jobParamRevision", jobParamRevision);
+		model.addAttribute("jobParamDplId", jobParamDplId);
 		return "/jen/jen1000/jen1000/jen1005";
 	}
 	
@@ -534,6 +536,12 @@ public class Jen1000Controller {
 				_pageSize = Integer.parseInt(_pageSize_str);  
 			}
 
+			
+			if(paramMap.containsKey("useCd")) {
+				String useCd = paramMap.get("useCd");
+				jen1100VO.setUseCd(useCd);
+			}
+			
 			
 			jen1100VO.setPageIndex(_pageNo);
 			jen1100VO.setPageSize(_pageSize);
@@ -860,104 +868,20 @@ public class Jen1000Controller {
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 			
 			
-			String type = (String) paramMap.get("type");
-			
-			
-			if(!"update".equals(type)){
-				
-				int jobCheck = jen1000Service.selectJen1100JobUseCountInfo(paramMap);
-				
-				if(jobCheck > 0){
-					
-					model.addAttribute("errorYn", "Y");
-					model.addAttribute("message", "이미 추가된 JOB입니다.");
-					return new ModelAndView("jsonView");
-				}
-			}
-			
-			
-			String salt = EgovProperties.getProperty("Globals.lunaops.salt");
-			
-			JenStatusVO jenStatusVo = null;
-			try{
-				String jenUrl=(String)paramMap.get("jenUrl");
-				String jobId=(String)paramMap.get("jobId");
-				String userId=(String)paramMap.get("jenUsrId");
-				String tokenId=(String)paramMap.get("jenUsrTok");
-				
-				
-				String jobFullPath = UrlUtils.toFullJobPath(jobId);
-				
-				
-				if(tokenId == null || "".equals(tokenId)){
-					model.addAttribute("MSG_CD", JENKINS_FAIL);
-					return new ModelAndView("jsonView");
-				}
-				
-				
-				tokenId = CommonScrty.decryptedAria(tokenId, salt);
-				
-				
-				jenStatusVo = newJenkinsClient.connect(jenUrl, userId, tokenId);
-				
-				
-				if(jenStatusVo.isErrorFlag()) {
-					newJenkinsClient.close(jenStatusVo);
-					model.addAttribute("MSG_CD", JENKINS_FAIL);
-					model.addAttribute("message", jenStatusVo.getErrorMsg());
-					return new ModelAndView("jsonView");
-				}
-				
-				
-				String jobTriggerCd = (String) paramMap.get("jobTriggerCd");
-				String jobTriggerVal = (String) paramMap.get("jobTriggerVal");
-				
-				
-				if("01".equals(jobTriggerCd)) {
-					jenStatusVo = newJenkinsClient.setJobTriggerCron(jenStatusVo, jobFullPath, jobTriggerVal);
-				}else {
-					jenStatusVo = newJenkinsClient.setJobTriggerCron(jenStatusVo, jobFullPath);
-				}
-				
-				
-				newJenkinsClient.close(jenStatusVo);
-
-				
-				if(jenStatusVo.isErrorFlag()) {
-					newJenkinsClient.close(jenStatusVo);
-					model.addAttribute("MSG_CD", jenStatusVo.getErrorCode());
-					model.addAttribute("message", jenStatusVo.getErrorMsg());
-					return new ModelAndView("jsonView");
-				}
-			}
-			catch(Exception ex){
-				
-				if(jenStatusVo != null) {
-					newJenkinsClient.close(jenStatusVo);
-				}
-				Log.error("saveJen1100JobInfoAjax()", ex);
-				if( ex instanceof HttpHostConnectException){
-					model.addAttribute("MSG_CD", JENKINS_FAIL);
-				}else if( ex instanceof ParseException){
-					model.addAttribute("MSG_CD", JENKINS_FAIL);
-				}else if( ex instanceof IllegalArgumentException){
-					model.addAttribute("MSG_CD", JENKINS_WORNING_URL);
-				}else if( ex instanceof UserDefineException){
-					model.addAttribute("MSG_CD", ex.getMessage());
-				}else{
-					model.addAttribute("MSG_CD", JENKINS_FAIL);
-				}
-				
-				return new ModelAndView("jsonView");
-			}
-			
-			
 			jen1000Service.saveJen1000JobInfo(paramMap);
 			
 			
 			model.addAttribute("errorYn", "N");
 			model.addAttribute("message", egovMessageSource.getMessage("success.common.save"));
 			
+			return new ModelAndView("jsonView");
+		}
+		catch(UserDefineException ude) {
+			Log.error("saveJen1100JobInfoAjax()", ude);
+			
+			
+			model.addAttribute("errorYn", "Y");
+			model.addAttribute("message", ude.getMessage());
 			return new ModelAndView("jsonView");
 		}
 		catch(Exception ex){
