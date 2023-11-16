@@ -265,6 +265,8 @@
 		var svnRepUrl = $("form#rep1002PopupFrm > #svnRepUrl").val();
 		var svnUsrId = $("form#rep1002PopupFrm > #svnUsrId").val();
 		var svnUsrPw = $("form#rep1002PopupFrm > #svnUsrPw").val();
+		var gitRepUrl = $("form#rep1002PopupFrm > #gitRepUrl").val();
+		var gitUsrTk = $("form#rep1002PopupFrm > #gitUsrTk").val();
 		var repTypeCd = $("form#rep1002PopupFrm > #repTypeCd").val();
 		
 		//파라미터
@@ -272,9 +274,20 @@
 			"svnRepUrl": svnRepUrl,
 			"svnUsrId": svnUsrId,
 			"svnUsrPw": svnUsrPw,
+			"gitRepUrl" : gitRepUrl,
+			"gitUsrTk" : gitUsrTk,
 			"repTypeCd": repTypeCd
 		};
 		
+		var repositoryUrl = "";
+		//github, gitlab
+		if(repTypeCd == "01" || repTypeCd == "03"){
+			repositoryUrl = gitRepUrl;
+		}
+		//svn
+		else if(repTypeCd == "02"){
+			repositoryUrl = svnRepUrl;
+		}
 		//AJAX 설정
 		var ajaxObj = new gfnAjaxRequestAction(
 				{"url":"<c:url value='/rep/rep1000/rep1000/selectRep1001RepTreeListAjax.do'/>","loadingShow":true}
@@ -286,6 +299,9 @@
 				return false;
 			}else if(data.MSG_CD =="SVN_AUTHENTICATION_EXCEPTION"){
 				jAlert("소스저장소에 접근이 불가능한 사용자 정보입니다.","알림");
+				return false;
+			}else if(data.errorYn != "N"){
+				jAlert(data.message);
 				return false;
 			}
 			
@@ -316,7 +332,7 @@
 					onAsyncError: fnAsyncError,
 					onClick: function(event, treeId, treeNode){
 						var treeNodePath = treeNode.path;
-						
+						debugger;
 						//path가 있는 경우
 						if(!gfnIsNull(treeNodePath)){
 							//path변경
@@ -324,6 +340,7 @@
 						}else{
 							$("form#rep1002PopupFrm > #selRepPath").val("/");
 						}
+						
 						//그리드 데이터 불러오기
 						fnRepPopupGridListSet();
 					}
@@ -338,13 +355,13 @@
 				"name": repNm
 				, "id": repId
 				, "path": ""
-				, "urlStr": svnRepUrl
+				, "urlStr": repositoryUrl
 				, "isParent": true
 				, "open": true
 			});
 			
 		    $.each(data.list, function(idx, obj){
-		    	if(obj["type"] == 0){
+		    	if(obj["type"] == 0 || obj["type"] == "dir"){
 					obj.isParent = true;
 					
 					if(gfnIsNull(obj["pId"])){
@@ -381,7 +398,7 @@
 		// 해당 옵션 추가해야  트리의  [+] 아이콘 클릭 시 한번에 트리가 펼쳐진다. 
 		$.each(childNodes, function(idx, node){
 			// 트리 노드가 부모형이 아닐 경우
-			if(node["type"] == 0){
+			if(node["type"] == 0 || node["type"] == "dir"){
 				node.isParent = true;
 			}
 			zTreeRep1002.updateNode(node);
@@ -405,7 +422,7 @@
 		//git
 		if(repTypeCd == "01"){
 			columns = [
-				{key: "revision", label: "Revision", width: 80, align: "right"},
+				{key: "revisionNum", label: "Revision", width: 80, align: "right"},
 				{key: "author", label: "Author", width: 120, align: "center"},
 				{key: "sDate", label: "Date", width: 200, align: "center"},
 				{key: "comment", label: "Comment", width: 500, align: "left"}
@@ -424,7 +441,7 @@
 		//gitlab
 		else if(repTypeCd == "03"){
 			columns = [
-				{key: "commitId", label: "Commit ID", width: 80, align: "right"},
+				{key: "revisionNum", label: "Commit ID", width: 80, align: "right"},
 				{key: "author", label: "Author", width: 120, align: "center"},
 				{key: "sDate", label: "Date", width: 200, align: "center"},
 				{key: "comment", label: "Comment", width: 500, align: "left"}
@@ -455,7 +472,7 @@
 				columnHeight: 30,
 	            onClick:function(){
 	            	// 클릭 이벤트
-	   				this.self.select(this.doindex, {selected: !this.item.__selected__});	
+	   				this.self.select(this.doindex, {selected: !this.item.__selected__});
 	            	
 	            	//커밋로그
 					$("#svnCommitLogDetail").val(this.item.comment);
@@ -479,6 +496,7 @@
 					var data = {
                			 "repId": repId
                			, "revision": this.item.revision
+               			, "revisionNum": this.item.revisionNum
                			, "commitId": this.item.commitId
                			, "selRepPath": selRepPath
                 	};
@@ -520,8 +538,8 @@
 		/* 그리드 데이터 가져오기 */
 	   	//파라미터 세팅
 	   	if(gfnIsNull(ajaxParam)){
-	 			ajaxParam = $('form#rep1002PopupFrm').serialize();
-	 		}
+ 			ajaxParam = $('form#rep1002PopupFrm').serialize();
+ 		}
 	   	
 	   	//페이지 세팅
 	   	if(!gfnIsNull(_pageNo)){
@@ -536,6 +554,7 @@
 				,ajaxParam);
 		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
+			
 			//마지막 리비전 번호
 			lastRevision = data.lastRevision;
 
@@ -544,6 +563,21 @@
 			axdom("#" + svnSearchObj.getItemId("endRevisionVal")).val(data.lastRevision);
 			
 			var list = data.list;
+
+			if(!gfnIsNull(list)){
+				$.each(list, function(idx, map){
+					map["revision"]=map["rep_rv"];
+					map["revisionNum"]=map["rep_rvn"];
+					map["comment"]=map["rep_comment"];
+					map["sDate"]=map["rep_cmt_date"];
+					map["author"]=map["rep_cmt_author"];
+					map["pathCnt"]=map["rep_chg_file_cnt"];
+					map["commitId"]=map["git_cmt_sha"];
+					map["branchNm"]=map["git_brc_nm"];
+					
+					list[idx] = map;
+				});
+			}
 			var page = data.page;
 			
 		   	repPopupGrid.setData({
@@ -581,7 +615,6 @@
 		if(repTypeCd != '03'){
 			searchItem1 = {label:"리비전 범위", labelWidth:"", type:"inputText", width:"60", key:"startRevisionVal", addClass:"secondItem sendBtn", value:"",};
 			searchItem2 = {label:"~", labelWidth:"20", type:"inputText", width:"60", key:"endRevisionVal", addClass:"secondItem sendBtn labelBorderNone", valueBoxStyle:"", value:"",};
-			
 		}
 		
 		var fnObjSearch = {
@@ -720,7 +753,7 @@
 		//git
 		if(repTypeCd == "01"){
 			columns = [
-				{key: "revision", label: "Revision", width: 80, align: "right"},
+				{key: "commitId", label: "Revision", width: 80, align: "right"},
 				{key: "author", label: "Author", width: 120, align: "center"},
 				{key: "sDate", label: "Date", width: 200, align: "center"},
 				{key: "comment", label: "Comment", width: 500, align: "left"}
@@ -784,6 +817,7 @@
 					var data = {
                			 "repId": repId
                			, "revision": this.item.revision
+               			, "revisionNum": this.item.revisionNum
                			, "commitId": this.item.commitId
                			, "selRepPath": selRepPath
                 	};
@@ -813,6 +847,10 @@
 			<input type="hidden" name="svnRepUrl" id="svnRepUrl" value="${repInfo.svnRepUrl}" />
 			<input type="hidden" name="svnUsrId" id="svnUsrId" value="${repInfo.svnUsrId}" />
 			<input type="hidden" name="svnUsrPw" id="svnUsrPw" value="${repInfo.svnUsrPw}" />
+
+			<input type="hidden" name="gitRepUrl" id="gitRepUrl" value="${repInfo.gitRepUrl}" />
+			<input type="hidden" name="gitUsrTk" id="gitUsrTk" value="${repInfo.gitUsrTk}" />
+			
 			<input type="hidden" name="repTypeCd" id="repTypeCd" value="${repInfo.repTypeCd}" />
 			<input type="hidden" name="selRepPath" id="selRepPath" value="/" />
 			<input type="hidden" name="ciId" id="ciId" value="${requestScope.ciId }"/>
