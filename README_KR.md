@@ -70,6 +70,7 @@ LUNA PIPE에서 소스저장소(SVN, GIT) 및 Jenkine 연결을 통해 소스저
  
 ### 📌 2.5 LUNA™ PIPE 검증 코드
  - 호출에 사용되는 파라미터 기본 값은 JSON형태의 암호화된 문자열입니다.
+ - encryption 폴더의 lunaDplScrty.jar 파일을  사용하여 암호화를 진행합니다.
  - `Globals.data.salt`에 설정된 값에 따라 검증 코드가 동작됩니다.
    - 암호화 Salt 값이 변경되면 `globals.properties`, `LunaDplScrty.jar` 내부 값을 변경해야 합니다. 
  - 암호화 방법
@@ -642,7 +643,6 @@ LUNA PIPE에서 소스저장소(SVN, GIT) 및 Jenkine 연결을 통해 소스저
         - **reg_dtm**: LOCK 설정 일시
         - **reg_usr_id**: LOCK 설정 사용자 ID
         - **reg_usr_ip**: LOCK 설정 사용자 IP
-
 
 ## 4.3 Error Code
 | Error Code | Description |

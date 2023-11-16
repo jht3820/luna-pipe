@@ -1,0 +1,33 @@
+
+CREATE OR REPLACE FUNCTION SF_CMM1000_MST_CD_NM
+(
+		I_MST_CD		IN	VARCHAR2
+)
+
+
+RETURN VARCHAR2 IS
+
+ 	RTN_MST_CD_NM		VARCHAR2(1000);
+
+BEGIN
+
+	BEGIN
+
+    	SELECT	MST_CD_NM
+        INTO	RTN_MST_CD_NM
+        FROM	CMM1000 A
+        WHERE	1=1
+        AND		A.MST_CD = I_MST_CD
+        ;
+
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+           RTN_MST_CD_NM :=  '';
+        WHEN OTHERS THEN
+           RTN_MST_CD_NM :=  '';
+    END;
+
+ 	RETURN RTN_MST_CD_NM;
+END;
+
+
