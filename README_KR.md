@@ -54,14 +54,21 @@ LUNA PIPE에서 소스저장소(SVN, GIT) 및 Jenkine 연결을 통해 소스저
      - [SVN 설치](https://subversion.apache.org/packages.html)
 	 - [톰캣 설치](https://tomcat.apache.org/download-80.cgi)
 
-### 📌 2.3 LUNA™ PIPE 설치 준비 사항
+### 📌 2.3 GITHUB 소스 저장소 사용할 경우 사전 세팅
+- repository > settings > webhooks\
+	 - Playload URL : {서비스 URL}/api/gitHookPostPush\
+	 - Content type : application/json\
+	 - Webhook Trigger : Just the push event\
+	 - Active : true 
+
+### 📌 2.4 LUNA™ PIPE 설치 준비 사항
  - LUNA™ PIPE 설치와 실행을 위하여 DB 설치 및 property 설정이 필요합니다.
  
  - DB설치 이후 환경파일 설정 순으로 세팅이 필요합니다.
  
  - 이하 전자정부프레임워크(eGovFramework) 표준에 준하여 구동됩니다.
  
-### 📌 2.4 LUNA™ PIPE 검증 코드
+### 📌 2.5 LUNA™ PIPE 검증 코드
  - 호출에 사용되는 파라미터 기본 값은 JSON형태의 암호화된 문자열입니다.
  - encryption 폴더의 lunaDplScrty.jar 파일을  사용하여 암호화를 진행합니다.
  - `Globals.data.salt`에 설정된 값에 따라 검증 코드가 동작됩니다.
@@ -79,13 +86,15 @@ LUNA PIPE에서 소스저장소(SVN, GIT) 및 Jenkine 연결을 통해 소스저
 
 ### 🛠 3.1 Oracle에 LUNA™ PIPE DB 세팅
  - DB_install_script 디렉토리에 설치 스크립트들을 1번부터 순서대로 설치 진행합니다.
-   - [01_DB_INSTALL_SYS계정.sql]
-       - 사용하는 환경에 맞게 테이블 스페이스 경로 변경
-   - [02_관련테이블_생성.sql]
-   - [03_기초데이터_생성.sql]
-   - [04_INDEX_생성.sql]
-   - [05_SF_CMM1000_MST_CD_NM_Function생성.sql]
-   - [06_SF_CMM1001_COM_CD_INFO_Function생성.sql]
+   - [01. LUNAOPSDPLDB_INSTALL(sys계정).sql]
+       - 테이블 스페이스 경로 변경 필요
+         - TS_LUNA_OPS_DPL_DAT01.DBF
+         - TS_LUNA_OPS_DPL_IDX01.DBF
+   - [02. LUNAOPSDPLDB_테이블_생성.sql]
+   - [03. 기초데이터_생성(LUNAOPSDPLDB계정).sql]
+   - [04. INDEX.sql]
+   - [05. DB_SF_SP\1. SF_CMM1000_MST_CD_NM.sql]
+   - [05. DB_SF_SP\2. SF_CMM1001_COM_CD_INFO.sql]
   
 ### 🛠 3.2 LUNA™ PIPE DB 접속 주소 및 환경설정
    ```
@@ -195,7 +204,7 @@ LUNA PIPE에서 소스저장소(SVN, GIT) 및 Jenkine 연결을 통해 소스저
     - **src_id**: 구성항목 ID
     - **f_id**: 릴레이션 fid
     - **callback_api_id**: Callback API ID
-    - **job_type**([]): 화면 출력 조건 JOB TYPE
+    - **job_type**([]): 화면 출력 조건 JOB TYPE Array
   - Callback
     - **svc_id**: 화면 오픈 시 전달 받은 서비스 ID
     - **urows**([]): 전달 JOB 데이터 Array
@@ -217,7 +226,7 @@ LUNA PIPE에서 소스저장소(SVN, GIT) 및 Jenkine 연결을 통해 소스저
     - **ticket_id**: 티켓 ID
     - **dpl_id**: 배포계획 ID
     - **emp_id**: 배포 실행자 ID(사용자 ID)
-    - **job_type**([]): 화면 출력 조건 JOB TYPE
+    - **job_type**([]): 화면 출력 조건 JOB TYPE Array
     - **ticket_list**([]): 운영 배포시 필요한 티켓 ID 파라미터 Array([{ticket_id: 'TICKET_ID'}])
     - **egene_dpl_id**: E-GENE에서 사용되는 배포계획 ID(티켓 묶음 ID)
 
@@ -250,14 +259,15 @@ LUNA PIPE에서 소스저장소(SVN, GIT) 및 Jenkine 연결을 통해 소스저
 ## 4.2 API
 ✔연결 데이터 저장(소스저장소, JENKINS)
   - URL: /api/insertCIRepJenJob
-  - Content-Type: application/json
+  - Http Method: POST
+  - Content-Type: application/json;charset=UTF-8
   - PARAM:
     - **REP_IDS**([]): 소스저장소 ID Array
       - **rep_id**: 소스저장소 ID
     - **JEN_JOB_IDS**([]): JENKINS JOB Array
       - **jen_id**: JENKINS ID
       - **job_id**: JOB ID
-      - **job_param_list**([]): JOB 파라미터 목록
+      - **job_param_list**([]): JOB 파라미터 Array
           - **job_param_key**: 파라미터 key
           - **job_param_val**: 파라미터 값
     - **Payloads**(암호화 전):
@@ -305,7 +315,7 @@ LUNA PIPE에서 소스저장소(SVN, GIT) 및 Jenkine 연결을 통해 소스저
     - **etc_msg**: 실패 처리된 데이터 상세 오류 메시지(개행 구분: \n)
 
 ✔CI_ID 로 연결 데이터 조회(소스저장소, JENKINS)
-  - URL: /api/selectCIRepList
+  - URL: /api/selectCIRepJenList
   - Http Method: POST
   - Content-Type: application/json;charset=UTF-8
   - PARAM:
@@ -487,6 +497,8 @@ LUNA PIPE에서 소스저장소(SVN, GIT) 및 Jenkine 연결을 통해 소스저
             - **rep_chg_type**: 변경 타입(A: Added, M: Modified, D: Deleted)
             - **rep_chg_file_path**: 변경 파일 경로
             - **rep_chg_file_nm**: 변경 파일명
+            - **git_cmt_sha**: git 커밋 해시
+            - **git_brc_nm**: git 커밋 브랜치명
 
 ✔티켓에 등록된 배포 저장소 빌드 대상 파일 조회
   - URL: /api/selectTicketDplFileDataList
@@ -511,6 +523,7 @@ LUNA PIPE에서 소스저장소(SVN, GIT) 및 Jenkine 연결을 통해 소스저
         - **ci_id**: 구성항목 ID
         - **rep_id**: 소스저장소 ID
         - **rep_rv**: 리비전 번호(ID)
+        - **rep_rvn**: 리비전 번호
         - **rep_chg_id**: 배포 변경 파일 ID
         - **job_id**: 운영 JOB ID
         - **bld_num**: 운영 빌드 번호
@@ -596,7 +609,7 @@ LUNA PIPE에서 소스저장소(SVN, GIT) 및 Jenkine 연결을 통해 소스저
         - **regUsrId**: UNLOCK 설정 사용자 ID
         - **regUsrIp**: UNLOCK 설정 사용자 IP
 
-✔티켓 ID로 LOCK 설정된 경로 목록 조회
+✔티켓 ID로 SVN LOCK 설정된 경로 목록 조회
 > 파라미터 조건에 'lock_target_rv' 또는 'lock_state_cd'값이 있으면 모든 데이터에서 해당 조건을 적용\
 > 파라미터 조건에 위 2개 파라미터가 없으면, 현재 LOCK 설정되어 있는 데이터만 조회 
   - URL: /api/insertRepFileUnLock

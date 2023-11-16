@@ -53,14 +53,23 @@ In LUNA PIPE, you can check the source details of the source repository and dist
      - [SVN Installation](https://subversion.apache.org/packages.html)
 	 - [Tomcat Installation](https://tomcat.apache.org/download-80.cgi)
 
-### 📌 Preparation for LUNA™ PIPE installation
+
+### 📌 2.3 Preliminary Settings for Using GITHUB Source Repository
+- repository > settings > webhooks\
+	 - Playload URL : {Service URL}/api/gitHookPostPush\
+	 - Content type : application/json\
+	 - Webhook Trigger : Just the push event\
+	 - Active : true
+
+### 📌 2.4 Preparation for LUNA™ PIPE installation
  - To install and run LUNA™ PIPE, DB installation and property settings are required.
  
  - After DB installation, settings are required in the order of environment file settings.
  
  - It is operated in accordance with the eGovFramework standards below.
  
-### 📌 2.4 LUNA™ PIPE Verification Code
+
+### 📌 2.5 LUNA™ PIPE Verification Code
  - The default value of the parameter used in the call is an encrypted string in JSON format.
  - Proceed with encryption using the lunaDplScrty.jar file in the encryption folder.
  - The verification code operates according to the value set in `Globals.data.salt`.
@@ -304,7 +313,7 @@ In LUNA PIPE, you can check the source details of the source repository and dist
      - **etc_msg**: Detailed error message for failed data (newline separator: \n)
 
 ✔Search connection data by CI_ID (source repository, JENKINS)
-  - URL: /api/selectCIRepList
+  - URL: /api/selectCIRepJenList
   - Http Method: POST
   - Content-Type: application/json;charset=UTF-8
   - PARAM:
@@ -486,6 +495,8 @@ In LUNA PIPE, you can check the source details of the source repository and dist
              - **rep_chg_type**: Change type (A: Added, M: Modified, D: Deleted)
              - **rep_chg_file_path**: Change file path
              - **rep_chg_file_nm**: Change file name
+             - **git_cmt_sha**: git commit sha
+             - **git_brc_nm**: git commit branch name
 
 ✔View the distribution repository build target file registered in the ticket
   - URL: /api/selectTicketDplFileDataList
@@ -510,6 +521,7 @@ In LUNA PIPE, you can check the source details of the source repository and dist
          - **ci_id**: Configuration item ID
          - **rep_id**: Source repository ID
          - **rep_rv**: Revision number (ID)
+         - **rep_rvn**: revision number
          - **rep_chg_id**: Deployment change file ID
          - **job_id**: Operation JOB ID
          - **bld_num**: Operational build number
