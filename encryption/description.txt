@@ -1,0 +1,11 @@
+
+
+API 호출 시 사용되는 파라미터 기본 값은 JSON형태의 암호화된 문자열을 사용합니다.
+
+lunaDplScrty.jar 파일을 실행하여 암호화 처리를 합니다.
+  
+  
+java -jar lunaDplScrty.jar etc 1
+    [output]
+    key setting: {"key":"암호화 처리되는 추가 부여 값"}
+    암호화된 key 값
