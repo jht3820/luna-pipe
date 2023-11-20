@@ -136,7 +136,6 @@ span.text-rep-del {background-color: #af3022;}
 		ajaxObj.setFnSuccess(function(data){
 			
 			
-
 			//SVN 접속 실패
 			if(data.MSG_CD =="REP_OK"){
 				//로딩바 로드
@@ -144,15 +143,24 @@ span.text-rep-del {background-color: #af3022;}
 
 				var repTypeCd = '${param.repTypeCd}';
 				
-				if(repTypeCd != '03'){
+				//github
+				if(repTypeCd == "01"){
+					//리비전 정보 넣기
+					$("span#rep1006Revision").text('${param.revisionNum}'+"("+data.revision+")");
+					$("span#rep1006DiffRevision").text('${param.diffRevisionNum}'+"("+data.diffRevision+")");
+				}
+				//svn
+				else if(repTypeCd == "02"){
 					//리비전 정보 넣기
 					$("span#rep1006Revision").text(data.revision);
 					$("span#rep1006DiffRevision").text(data.diffRevision);
-				}else{
-					$("span#rep1006Revision").text(data.commitId);
-					$("span#rep1006DiffRevision").text(data.diffCommitId);
 				}
-				
+				//gitlab
+				else if(repTypeCd == "03"){
+					//리비전 정보 넣기
+					$("span#rep1006Revision").text('${param.revisionNum}'+"("+data.revision+")");
+					$("span#rep1006DiffRevision").text('${param.diffRevisionNum}'+"("+data.diffRevision+")");
+				}
 
 				//비교 후 결과 값
 				var oldVal = "";
