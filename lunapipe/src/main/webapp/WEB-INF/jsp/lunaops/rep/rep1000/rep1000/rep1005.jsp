@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html lang="ko">
@@ -39,14 +39,24 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 	//비교 대상 리비전 선택
 	function fnRevisionSelect(){
 		var item = (!gfnIsNull(Object.keys(rep1005PathGrid.focusedColumn)))? rep1005PathGrid.list[rep1005PathGrid.focusedColumn[Object.keys(rep1005PathGrid.focusedColumn)].doindex]:null;
-		
+		debugger;
 		if(gfnIsNull(item)){
 			toast.push('비교 대상 리비전을 선택해주세요.');
 			return;
 		}
-		
 		//파일 내용 비교
-		var data = {"repId": "${param.repId}", "repTypeCd": "${param.repTypeCd}", "revision": "${param.selRevision}", "diffRevision": item.revision, "commitId": "${param.selCommitId}", "diffCommitId": item.commitId, "path": "<c:out value='${param.filePath}'/>", "fileName": "<c:out value='${param.fileName}'/>"};
+		var data = {
+				"repId": "${param.repId}"
+				, "repTypeCd": "${param.repTypeCd}"
+				, "revision": "${param.selRevision}"
+				, "revisionNum": "${param.selRevisionNum}"
+				, "diffRevision": item.revision
+				, "diffRevisionNum": item.revisionNum
+				, "commitId": "${param.selCommitId}"
+				, "diffCommitId": item.commitId
+				, "path": "<c:out value='${param.filePath}'/>"
+				, "fileName": "<c:out value='${param.fileName}'/>"
+				};
 		gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1006View.do',data,"1200","780",'scroll');	
 	}
 
@@ -55,19 +65,31 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 		rep1005PathGrid = new ax5.ui.grid();
 	 	var columns = [];
 	 	var repTypeCd = "${param.repTypeCd}";
-	 	if(repTypeCd == "03"){
+	 	//git
+		if(repTypeCd == "01"){
 			columns = [
-				{key: "commitId", label: "Commit ID", width: 80, align: "right"},
+				{key: "revisionNum", label: "Revision", width: 80, align: "right"},
 				{key: "author", label: "Author", width: 120, align: "center"},
 				{key: "sDate", label: "Date", width: 250, align: "center"},
-				{key: "comment", label: "Comment", width: 610, align: "left"}
+				{key: "comment", label: "Comment", width: 610,  align: "left"}
 	         ];
-		}else{
+		}
+		//svn
+		else if(repTypeCd == "02"){
 			columns = [
 				{key: "revision", label: "Revision", width: 80, align: "right"},
 				{key: "author", label: "Author", width: 120, align: "center"},
 				{key: "sDate", label: "Date", width: 250, align: "center"},
 				{key: "comment", label: "Comment", width: 610,  align: "left"}
+	         ];
+		}
+		//gitlab
+		else if(repTypeCd == "03"){
+			columns = [
+				{key: "revisionNum", label: "Commit ID", width: 80, align: "right"},
+				{key: "author", label: "Author", width: 120, align: "center"},
+				{key: "sDate", label: "Date", width: 250, align: "center"},
+				{key: "comment", label: "Comment", width: 610, align: "left"}
 	         ];
 		}
 	 	
@@ -77,18 +99,75 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 			header: {align:"center",columnHeight: 30},
 			frozenColumnIndex: 4,
 			columns: columns,
-	         body: {
+			 body: {
 				align: "center",
 				columnHeight: 30,
-	            onClick:function(){
-	            	//커밋로그
+				onClick:function(){
+					//커밋로그
 					$("#svnCommitLogDetailRep1005").val(this.item.comment);
-	            },
-	            onDBLClick:function(){
-	            	fnRevisionSelect();
-                }
+				},
+				onDBLClick:function(){
+					fnRevisionSelect();
+				}
 			},
-	        page: {
+			contextMenu : {
+				iconWidth: 20,
+				acceleratorWidth: 100,
+				itemClickAndClose: false,
+				icons: {
+					'arrow': '<i class="fa fa-caret-right"></i>'
+				},
+				items: [
+					{type: "revisionFileDiff", label: "대상 파일 Diff", icon:"<i class='fa fa-code' aria-hidden='true'></i>"},
+					{type: "revisionFileImprove", label: "Chat GPT", icon:"<i class='fa fa-info-circle' aria-hidden='true'></i>"},
+				],
+				popupFilter: function (item, param) {
+					var selItem = rep1005PathGrid.list[param.doindex];
+					//선택 개체 없는 경우 중지
+					if(typeof selItem == "undefined"){
+						return false;
+					}
+					return true;
+				},
+				onClick: function (item, param) {
+					var selItem = rep1005PathGrid.list[param.doindex];
+					debugger;
+					//diff
+					if(item.type == "revisionFileDiff"){
+						//파일 내용 비교
+						var data = {
+								"repId": "${param.repId}"
+								, "repTypeCd": "${param.repTypeCd}"
+								, "revision": "${param.selRevision}"
+								, "revisionNum": "${param.selRevisionNum}"
+								, "diffRevision": selItem.revision
+								, "diffRevisionNum": selItem.revisionNum
+								, "commitId": "${param.selCommitId}"
+								, "diffCommitId": selItem.commitId
+								, "path": "<c:out value='${param.filePath}'/>"
+								, "fileName": "<c:out value='${param.fileName}'/>"
+						};
+						gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1006View.do',data,"1200","780",'scroll');
+					}
+					//chat gpt
+					else if(item.type == "revisionFileImprove"){
+						 var data = {
+								"repId" : "${param.repId}",
+								"revision" : selItem.revision,
+								"commitId": selItem.commitId,
+								"path": "<c:out value='${param.filePath}'/>",
+								"fileName": "<c:out value='${param.fileName}'/>",
+								"repTypeCd": selItem.repTypeCd,
+								"gitBrcNm": selItem.gitBrcNm
+						 }
+						 
+						 gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1008View.do',data,"1200","780",'scroll');
+					}
+					
+					rep1005PathGrid.contextMenu.close();
+				}
+			},
+			page: {
 				navigationItemCount: 9,
 				height: 30,
 				display: true,
@@ -106,7 +185,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 					}
 					fnRep1005PopSearchListSet(this.page.selectPage, ajaxParam);
 				}
-	        } 
+			} 
 		});
 	}
 	
@@ -124,7 +203,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 	   	}else if(typeof rep1005PathGrid.page.currentPage != "undefined"){
 	   		ajaxParam += "&pageNo="+rep1005PathGrid.page.currentPage;
 	   	}
-	    
+		
 	   	//mask show
 	   	$("#repPathGridList").show();
 	   	//AJAX 설정
@@ -140,17 +219,32 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 			axdom("#" + filePathSearchObj.getItemId("endRevisionVal")).val(data.lastRevision);
 			
 			var list = data.list;
+			if(!gfnIsNull(list)){
+				$.each(list, function(idx, map){
+					map["revision"]=map["rep_rv"];
+					map["comment"]=map["rep_comment"];
+					map["sDate"]=map["rep_cmt_date"];
+					map["author"]=map["rep_cmt_author"];
+					map["pathCnt"]=map["rep_chg_file_cnt"];
+					map["revisionNum"]=map["rep_rvn"];
+					map["commitId"]=map["git_cmt_sha"];
+					map["gitBrcNm"]=map["git_brc_nm"];
+					
+					
+					list[idx] = map;
+				});
+			}
 			var page = data.page;
 			
 		   	rep1005PathGrid.setData({
-             	list:list,
-             	page: {
+			 	list:list,
+			 	page: {
 					currentPage: _pageNo || 0,
 					pageSize: page.pageSize,
 					totalElements: page.totalElements,
 					totalPages: page.totalPages
-	    		}
-		    });
+				}
+			});
 		   	
 		   	$("#repPathGridList").hide();
 		});
@@ -187,27 +281,27 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 						{display:true, addClass:"", style:"", list:[
 							{label:"<i class='fas fa-list-ol'></i>&nbsp;목록 수&nbsp;", labelWidth:"75", type:"selectBox", width:"", key:"pageSize", addClass:"secondItem", valueBoxStyle:"", value:"30",
 								options:[
-								         	{optionValue:15, optionText:"15"},
-			                                {optionValue:30, optionText:"30"},
-			                                {optionValue:50, optionText:"50"},
-			                                {optionValue:100, optionText:"100"},
-			                                {optionValue:300, optionText:"300"},
-			                                {optionValue:600, optionText:"600"},
-			                                {optionValue:1000, optionText:"1000"},
-			                                {optionValue:5000, optionText:"5000"},
-			                                {optionValue:10000, optionText:"10000"},
-			                                
-			                            ],onChange: function(selectedObject, value){
-			                            	/* 검색 조건 설정 후 reload */
-				 							var pars = filePathSearchObj.getParam();
-										    var ajaxParam = $('form#rep1005PopupFrm').serialize();
-
-										    if(!gfnIsNull(pars)){
-										    	ajaxParam += "&"+pars;
-										    }
+										 	{optionValue:15, optionText:"15"},
+											{optionValue:30, optionText:"30"},
+											{optionValue:50, optionText:"50"},
+											{optionValue:100, optionText:"100"},
+											{optionValue:300, optionText:"300"},
+											{optionValue:600, optionText:"600"},
+											{optionValue:1000, optionText:"1000"},
+											{optionValue:5000, optionText:"5000"},
+											{optionValue:10000, optionText:"10000"},
 											
-								            fnRep1005PopSearchListSet(0,ajaxParam);
-			    						}
+										],onChange: function(selectedObject, value){
+											/* 검색 조건 설정 후 reload */
+				 							var pars = filePathSearchObj.getParam();
+											var ajaxParam = $('form#rep1005PopupFrm').serialize();
+
+											if(!gfnIsNull(pars)){
+												ajaxParam += "&"+pars;
+											}
+											
+											fnRep1005PopSearchListSet(0,ajaxParam);
+										}
 							},
 							searchItem1,
 							searchItem2,
@@ -215,13 +309,13 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 								onclick:function(){
 									/* 검색 조건 설정 후 reload */
 		 							var pars = filePathSearchObj.getParam();
-								    var ajaxParam = $('form#rep1005PopupFrm').serialize();
+									var ajaxParam = $('form#rep1005PopupFrm').serialize();
 
-								    if(!gfnIsNull(pars)){
-								    	ajaxParam += "&"+pars;
-								    }
+									if(!gfnIsNull(pars)){
+										ajaxParam += "&"+pars;
+									}
 									
-						            fnRep1005PopSearchListSet(0,ajaxParam);
+									fnRep1005PopSearchListSet(0,ajaxParam);
 							}}
 						]}
 					]
