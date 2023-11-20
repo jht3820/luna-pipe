@@ -24,9 +24,10 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 		//소스저장소 id , 리비전 id, 커밋 id
     	var paramRevision = $("form#rep1004PopupFrm > #revision").val();
     	var paramCommitId = $("form#rep1004PopupFrm > #commitId").val();
+    	var paramRevisionNum = $("form#rep1004PopupFrm > #revisionNum").val();
     	
 		//리비전 파일목록 세팅
-		fnSearchFileDirTree(paramRevision, paramCommitId);
+		fnSearchFileDirTree(paramRevisionNum, paramCommitId);
     	
     	//리비전 그리드 목록 세팅
     	fnFileGridView();
@@ -59,8 +60,9 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
                 	var paramRepId = $("form#rep1004PopupFrm > #repId").val();
                 	var paramRevision = $("form#rep1004PopupFrm > #revision").val();
                 	var paramCommitId = $("form#rep1004PopupFrm > #commitId").val();
+                	var paramRevisionNum = $("form#rep1004PopupFrm > #revisionNum").val();
                 	
-                	var data = {"revision" : paramRevision, "commitId" : paramCommitId ,"path": this.item.path, "name": this.item.name, "repId" : paramRepId}; 
+                	var data = {"revision" : paramRevision, "revisionNum": paramRevisionNum, "commitId" : paramCommitId ,"path": this.item.path, "name": this.item.name, "repId" : paramRepId}; 
 					gfnLayerPopupOpen("/rep/rep1000/rep1000/selectRep1003View.do", data, "1200", "780",'auto');
                 }
             },
@@ -73,6 +75,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
                 },
                 items: [
                     {type: "revisionFileList", label: "대상 파일 리비전 목록", icon:"<i class='fa fa-info-circle' aria-hidden='true'></i>"},
+                    {type: "revisionFileImprove", label: "Chat GPT", icon:"<i class='fa fa-info-circle' aria-hidden='true'></i>"},
                 ],
                 popupFilter: function (item, param) {
                 	var selItem = filePathGrid.list[param.doindex];
@@ -85,6 +88,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
                 onClick: function (item, param) {
                 	var selItem = filePathGrid.list[param.doindex];
 
+					//대상 파일 리비전 목록
                     if(item.type == "revisionFileList"){
             			//리비전 최소 범위
             			var startRevision = (lastRevision-100);
@@ -97,11 +101,11 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
                     	var paramRevision = $("form#rep1004PopupFrm > #revision").val();
                     	var paramCommitId = $("form#rep1004PopupFrm > #commitId").val();
                     	var paramSelRepPath =  $("form#rep1002PopupFrm > #selRepPath").val();
-                    	
+                    	var paramRevisionNum = $("form#rep1004PopupFrm > #revisionNum").val();
+
                     	//배정된 요구사항 팝업
     					var data = {
                     			 "repId": paramRepId
-                    			, "revisionNum": paramRevision
                     			, "commitId": paramCommitId
                     			, "filePath": selItem.path
                     			, "startRevision": startRevision
@@ -111,9 +115,27 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
                     			, "fileName": selItem.name
                     			, "repTypeCd": repTypeCd
                     			, "selRepPath": paramSelRepPath
+                    			, "selRevisionNum": paramRevisionNum
                     			};
     	 				gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1005View.do',data,"1100","690",'scroll');	
                     }
+                  //chat gpt
+					else if(item.type == "revisionFileImprove"){
+						//소스저장소 id , 리비전 id, 커밋 id
+                    	var paramRepId = $("form#rep1004PopupFrm > #repId").val();
+						var data = {
+								"repId" : paramRepId,
+								"revisionNum" : selItem.revisionNum,
+								"commitId": selItem.commitId,
+								"path": selItem.path,
+								"fileName": selItem.name,
+								"repTypeCd": repTypeCd,
+								"gitBrcNm": selItem.gitBrcNm
+						 };
+						
+						 gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1008View.do',data,"1200","780",'scroll');
+					}
+					
                     filePathGrid.contextMenu.close();
                 }
             },
@@ -154,7 +176,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 				$("#revisionFileList").show();
 			}else{
 		    	toast.push(data.message);
-		    	
+
 		    	// zTree 설정 
 			    var setting = {
 			        data: {
@@ -205,7 +227,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 		ajaxObj.send();
 	}
 	
-	//리비전 파일 목록 불러오기	
+	//리비전 파일 목록 불러오기
 	function getRepRevisionFileList(node, dataList, _pageNo){
 		var returnList = [];
 		var tmpList = [];
@@ -224,7 +246,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 		//node값이 null인경우 전체 file 출력
 		if(node == null){
 			tmpList = dataList;
-		}else{	//노드 정해져있는 경우 (좌측 디렉토리 선택)
+		}else{//노드 정해져있는 경우 (좌측 디렉토리 선택)
 			var selectKey = node.currentKey;
 			$(dataList).each(function(index, item){
 				//키 값이 같은 경우만 출력
@@ -264,13 +286,14 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 	<form id="rep1004PopupFrm" name="rep1004PopupFrm" method="post">
 		<input type="hidden" name="repId" id="repId" value="${param.repId}" />
 		<input type="hidden" name="revision" id="revision" value="${param.revision}" />
+		<input type="hidden" name="revisionNum" id="revisionNum" value="${param.revisionNum}" />
 		<input type="hidden" name="commitId" id="commitId" value="${param.commitId}" />
 		<input type="hidden" name="selRepPath" id="selRepPath" value="${param.selRepPath}" />
 	</form>
 	<div class="pop_title">리비전 변경 파일 목록</div>
 	<div class="rep1004Pop_sub" guide="rep1004RepChgLog">
 		<div class="sub_title">
-			[ <c:out value="${param.revision}"/> ] 선택 리비전 변경 파일 목록
+			[ <c:out value="${param.revisionNum}"/> ] 선택 리비전 변경 파일 목록
 		</div>
 		<div class="rep1004FileTreeFrame rep1004FrameBox">
 			<ul id="rep1004FileTree" class="ztree"></ul>
