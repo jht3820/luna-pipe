@@ -9,6 +9,7 @@
 	.rejectFont{color:#eb4b6a !important;text-shadow: none !important;}
 	.defaultFont{color:#000 !important;}
 	.tab_contents.menu{width:1500px;}
+	
 </style>
 <script>
 var repGridObj;
@@ -74,6 +75,7 @@ $(function(){
 				
 				//선택 저장소 값 loop
 				$.each(selRepList, function(idx, map){
+					//ITSM에서 요구한 대로 전달
 					var repInfo = {
 						"key": map.repId+"_"+srcId
 						, "svn_name": map.repNm
@@ -306,7 +308,7 @@ function fnRepGridSetting(){
              		var empId = $("form#rep1000Form > #empId").val();
              		
              		var data = {"popupGb": "update", "repId": selItem.repId, "empId": empId};
-					gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","635",'scroll');
+					gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","735",'scroll');
              	}
              	//삭제
              	else if(item.type == "repDelete"){
@@ -502,7 +504,7 @@ function fnSearchBoxControl(){
 								var empId = $("form#rep1000Form > #empId").val();
 								var data = {"popupGb": "update", "repId": chkList[0].repId, "empId": empId};
         	                	
-								gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","635",'scroll');
+								gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","735",'scroll');
 						}},
 						
 						{label:"", labelWidth:"", type:"button", width:"60",style:"float:right;", key:"btn_insert_svn",valueBoxStyle:"padding:5px;", value:"<i class='fa fa-save' aria-hidden='true'></i>&nbsp;<span>등록</span>",
@@ -513,7 +515,7 @@ function fnSearchBoxControl(){
 									, "empId": empId
 								};
 								
-								gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","635",'scroll');
+								gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1001RepositoryDetailView.do',data,"1060","735",'scroll');
 						}},
 						{label:"", labelWidth:"", type:"button", width:"55", key:"btn_search_rep",style:"float:right;", valueBoxStyle:"padding:5px;", value:"<i class='fa fa-list' aria-hidden='true'></i>&nbsp;<span>조회</span>",
 							onclick:function(){
@@ -715,6 +717,13 @@ function fnRep1000GuideShow(){
 	var guideBoxInfo = globals_guideContents["rep1000"];
 	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
 }
+
+function fnRep1100View(type){
+	var data = {
+			"baseTarget" : type
+	};
+	gfnLayerPopupOpen('/rep/rep1000/rep1100/selectRep1100View.do',data,"1440","800",'scroll');
+};
 </script>
 
 
@@ -742,7 +751,6 @@ function fnRep1000GuideShow(){
 			<div class="mainPopupBtn" id="repDataSendBtn"><i class="fas fa-paperclip"></i>&nbsp;소스저장소 연결</div>
 			<div class="mainPopupBtn" id="repCloseBtn"><i class="fas fa-times-circle"></i>&nbsp;닫기</div>
 		</div>
-			
 	</div>
 </div>
 		

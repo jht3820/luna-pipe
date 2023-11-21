@@ -29,12 +29,17 @@ import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 import kr.opensoftlab.lunaops.com.api.service.ApiService;
 import kr.opensoftlab.lunaops.com.exception.UserDefineException;
+import kr.opensoftlab.lunaops.com.vo.PageVO;
 import kr.opensoftlab.lunaops.rep.rep1000.rep1000.service.Rep1000Service;
 import kr.opensoftlab.lunaops.rep.rep1000.rep1000.vo.Rep1000VO;
+import kr.opensoftlab.lunaops.rep.rep1000.rep1100.service.Rep1100Service;
+import kr.opensoftlab.sdf.rep.com.RepGetLogModule;
 import kr.opensoftlab.sdf.rep.com.RepModule;
 import kr.opensoftlab.sdf.rep.com.vo.RepDirVO;
 import kr.opensoftlab.sdf.rep.com.vo.RepResultVO;
 import kr.opensoftlab.sdf.rep.com.vo.RepVO;
+import kr.opensoftlab.sdf.rep.git.GithubConnector;
+import kr.opensoftlab.sdf.rep.git.GitlabConnector;
 import kr.opensoftlab.sdf.rep.svn.SVNConnector;
 import kr.opensoftlab.sdf.util.CommonScrty;
 import kr.opensoftlab.sdf.util.OslAgileConstant;
@@ -73,10 +78,20 @@ public class Rep1000Controller {
 	
 	@Resource(name = "rep1000Service")
 	private Rep1000Service rep1000Service;
+
+	
+	@Resource(name = "rep1100Service")
+	private Rep1100Service rep1100Service;
 	
 	
 	@Resource(name = "svnConnector")
 	private SVNConnector svnConnector;
+	
+	@Resource(name = "githubConnector")
+	private GithubConnector githubConnector;
+	
+	@Resource(name = "gitlabConnector")
+	private GitlabConnector gitlabConnector;
 	
 	
 	@Resource(name = "repModule")
@@ -85,7 +100,7 @@ public class Rep1000Controller {
 	
 	@Resource(name = "apiService")
 	private ApiService apiService;
-	
+
 	
 	@RequestMapping(value="/rep/rep1000/rep1000/selectRep1000RepositoryView.do")
 	public String selectRep1000RepositoryView(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
@@ -414,6 +429,12 @@ public class Rep1000Controller {
 	}
 	
 	
+	@RequestMapping(value="/rep/rep1000/rep1000/selectRep1008View.do")
+	public String selectRep1008View(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		return "/rep/rep1000/rep1000/rep1008";
+	}
+	
+	
 	@RequestMapping(value="/rep/rep1000/rep1000/selectRep1000InfoAjax.do")
 	public ModelAndView selectRep1000Info(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 
@@ -473,24 +494,49 @@ public class Rep1000Controller {
 			String dplUseCd = (String) paramMap.get("dplUseCd");
 			
 			
+			
 			if("insert".equals(popupGb)){
 				
 				if(repTypeCd != null && "01".equals(repTypeCd)) {
 					
 					String gitUsrAuthTypeCd = (String) paramMap.get("gitUsrAuthTypeCd");
 					
+					String gitUsrPw = null;
+					String newEnPw = null;
+					
 					
 					if(gitUsrAuthTypeCd != null && "02".equals(gitUsrAuthTypeCd)) {
 						
-						String gitUsrPw = (String)paramMap.get("gitUsrPw");
+						gitUsrPw = (String)paramMap.get("gitUsrPw");
+					}
+					
+					else {
 						
-						
-						String newEnPw = CommonScrty.encryptedAria(gitUsrPw, salt);
-						
-						
+						gitUsrPw = (String)paramMap.get("gitUsrTk");
+					}
+					
+					
+					newEnPw = CommonScrty.encryptedAria(gitUsrPw, salt);
+					
+					
+					
+					if(gitUsrAuthTypeCd != null && "02".equals(gitUsrAuthTypeCd)) {
 						paramMap.put("gitUsrPw", newEnPw);
 						repVo.setGitUsrPw(newEnPw);
 					}
+					else {
+						paramMap.put("gitUsrTk", newEnPw);
+						repVo.setGitUsrTk(newEnPw);
+					}
+					
+					
+					
+					String dplUsrId = (String) paramMap.get("gitUsrId");
+					paramMap.put("dplUsrId", dplUsrId);
+					repVo.setDplUsrId(dplUsrId);
+					
+					paramMap.put("dplUsrPw", newEnPw);
+					repVo.setDplUsrPw(newEnPw);
 					
 				}
 				
@@ -510,17 +556,32 @@ public class Rep1000Controller {
 					
 					String gitUsrAuthTypeCd = (String) paramMap.get("gitUsrAuthTypeCd");
 					
+					String gitUsrPw = null;
+					String newEnPw = null;
+					
 					
 					if(gitUsrAuthTypeCd != null && "02".equals(gitUsrAuthTypeCd)) {
 						
-						String gitUsrPw = (String)paramMap.get("gitUsrPw");
+						gitUsrPw = (String)paramMap.get("gitUsrPw");
+					}
+					
+					else {
 						
-						
-						String newEnPw = CommonScrty.encryptedAria(gitUsrPw, salt);
-						
-						
+						gitUsrPw = (String)paramMap.get("gitUsrTk");
+					}
+					
+					
+					newEnPw = CommonScrty.encryptedAria(gitUsrPw, salt);
+					
+					
+					
+					if(gitUsrAuthTypeCd != null && "02".equals(gitUsrAuthTypeCd)) {
 						paramMap.put("gitUsrPw", newEnPw);
 						repVo.setGitUsrPw(newEnPw);
+					}
+					else {
+						paramMap.put("gitUsrTk", newEnPw);
+						repVo.setGitUsrTk(newEnPw);
 					}
 				}
 				
@@ -539,19 +600,119 @@ public class Rep1000Controller {
 			
 			else if("update".equals(popupGb)){
 				
-				String nowSvnPw = (String)paramMap.get("nowSvnPw");
-				
-				
-				String svnUsrPw = (String)paramMap.get("svnUsrPw");
-				
-				
-				if(!nowSvnPw.equals(svnUsrPw)) {
+				if(repTypeCd != null && "01".equals(repTypeCd)) {
 					
-					String newEnPw = CommonScrty.encryptedAria(svnUsrPw, salt);
+					String gitUsrAuthTypeCd = (String) paramMap.get("gitUsrAuthTypeCd");
 					
 					
-					paramMap.put("svnUsrPw", newEnPw);
-					repVo.setSvnUsrPw(newEnPw);
+					String gitUsrPw = (String)paramMap.get("gitUsrPw");
+					String newEnPw = "";
+					
+					
+					String nowGitPw = (String)paramMap.get("nowGitPw");
+					
+					
+					if(gitUsrAuthTypeCd != null && "02".equals(gitUsrAuthTypeCd)) {
+						
+						gitUsrPw = (String)paramMap.get("gitUsrPw");
+					}
+					
+					else {
+						
+						gitUsrPw = (String)paramMap.get("gitUsrTk");
+						
+						
+						nowGitPw = (String)paramMap.get("nowGitTk");
+					}
+					
+					
+					newEnPw = CommonScrty.encryptedAria(gitUsrPw, salt);
+					
+					
+					
+					if(!gitUsrPw.equals(nowGitPw) && !nowGitPw.equals(newEnPw)) {
+						
+						
+						if(gitUsrAuthTypeCd != null && "02".equals(gitUsrAuthTypeCd)) {
+							paramMap.put("gitUsrPw", newEnPw);
+							repVo.setGitUsrPw(newEnPw);
+						}
+						else {
+							paramMap.put("gitUsrTk", newEnPw);
+							repVo.setGitUsrTk(newEnPw);
+						}
+					}
+					
+					
+					
+					String dplUsrId = (String) paramMap.get("gitUsrId");
+					paramMap.put("dplUsrId", dplUsrId);
+					repVo.setDplUsrId(dplUsrId);
+					
+					paramMap.put("dplUsrPw", newEnPw);
+					repVo.setDplUsrPw(newEnPw);
+				}
+				
+				else if(repTypeCd != null && "02".equals(repTypeCd)) {
+					
+					String nowSvnPw = (String)paramMap.get("nowSvnPw");
+					
+					
+					String svnUsrPw = (String)paramMap.get("svnUsrPw");
+					
+					
+					if(!nowSvnPw.equals(svnUsrPw)) {
+						
+						String newEnPw = CommonScrty.encryptedAria(svnUsrPw, salt);
+						
+						
+						paramMap.put("svnUsrPw", newEnPw);
+						repVo.setSvnUsrPw(newEnPw);
+					}
+				}
+				
+				else if(repTypeCd != null && "03".equals(repTypeCd)) {
+					
+					String gitUsrAuthTypeCd = (String) paramMap.get("gitUsrAuthTypeCd");
+					
+					
+					String gitUsrPw = (String)paramMap.get("gitUsrPw");
+					String newEnPw = "";
+					
+					
+					String nowGitPw = (String)paramMap.get("nowGitPw");
+					
+					
+					if(gitUsrAuthTypeCd != null && "02".equals(gitUsrAuthTypeCd)) {
+						
+						gitUsrPw = (String)paramMap.get("gitUsrPw");
+					}
+					
+					else {
+						
+						gitUsrPw = (String)paramMap.get("gitUsrTk");
+						
+						
+						nowGitPw = (String)paramMap.get("nowGitTk");
+					}
+					
+					
+					newEnPw = CommonScrty.encryptedAria(gitUsrPw, salt);
+					
+					
+					
+					if(!gitUsrPw.equals(nowGitPw) && !nowGitPw.equals(newEnPw)) {
+						
+						
+						if(gitUsrAuthTypeCd != null && "02".equals(gitUsrAuthTypeCd)) {
+							paramMap.put("gitUsrPw", newEnPw);
+							repVo.setGitUsrPw(newEnPw);
+						}
+						else {
+							paramMap.put("gitUsrTk", newEnPw);
+							repVo.setGitUsrTk(newEnPw);
+						}
+					}
 				}
 				
 				
@@ -611,7 +772,40 @@ public class Rep1000Controller {
 			paramMap.put("repDplUuid", repResultVO.getDplUuid());
 			
 			
+			if(repTypeCd != null && !"02".equals(repTypeCd)) {
+				paramMap.put("repDplUuid", repResultVO.getUuid());
+				
+				
+				dplUseCd =  "01";
+				paramMap.put("dplUseCd", dplUseCd);
+			}
+			
+			
 			Object insertKey = rep1000Service.saveRep1000Info(paramMap);
+			
+			
+			if("insert".equals(popupGb)) {
+				repVo.setRepId((String) insertKey);
+			}
+			
+			else {
+				
+			}
+				
+			try {
+				
+				RepGetLogModule repGetLogModule = new RepGetLogModule();
+				repGetLogModule.setTicketId("SYSTEM");
+				repGetLogModule.setRepVO(repVo);
+				repGetLogModule.setRepModule(repModule);
+				repGetLogModule.setSvnConnector(svnConnector);
+				repGetLogModule.setGithubConnector(githubConnector);
+				repGetLogModule.setGitlabConnector(gitlabConnector);
+				repGetLogModule.setRep1100Service(rep1100Service);
+				repGetLogModule.start();
+			}catch (Exception e) {
+				Log.error("saveRep1000InfoAjax() - thread fail", e);
+			}
 	
 			
 			model.addAttribute("message", egovMessageSource.getMessage("success.common.save"));
@@ -627,6 +821,7 @@ public class Rep1000Controller {
 			return new ModelAndView("jsonView");
 		}
 	}
+	
 	
 	
 	@SuppressWarnings("rawtypes")
@@ -734,7 +929,7 @@ public class Rep1000Controller {
 	}
 	
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("rawtypes")
 	@RequestMapping(value="/rep/rep1000/rep1000/selectRep1002RepositoryPageListAjaxView.do")
 	public ModelAndView selectRep1002RepositoryPageListAjaxView(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
 
@@ -755,6 +950,9 @@ public class Rep1000Controller {
 				model.addAttribute("MSG_CD", REP_AUTHENTICATION_EXCEPTION);
 				model.addAttribute("saveYN", "N");
 				model.addAttribute("message", repResultVO.getResultMsg());
+				
+				
+				model.addAttribute("errorYn", 'Y');
 				return new ModelAndView("jsonView");
 			}
 
@@ -767,29 +965,26 @@ public class Rep1000Controller {
 			String _pageNo_str = paramMap.get("pageNo");
 			String _pageSize_str = paramMap.get("pageSize");
 			
-			int _pageNo = 0;
+			int _pageNo = 1;
 			int _pageSize = OslAgileConstant.pageSize;
 			
 			if(_pageNo_str != null && !"".equals(_pageNo_str)){
-				_pageNo = Integer.parseInt(_pageNo_str);  
+				_pageNo = Integer.parseInt(_pageNo_str)+1;
 			}
 			if(_pageSize_str != null && !"".equals(_pageSize_str)){
 				_pageSize = Integer.parseInt(_pageSize_str);  
 			}
 			
 			
-			String searchFilePath = (String)paramMap.get("filePath");
+			PageVO pageVO = new PageVO();
+			pageVO.setPageIndex(_pageNo);
+			pageVO.setPageSize(_pageSize);
+			pageVO.setPageUnit(_pageSize);
+			PaginationInfo paginationInfo = PagingUtil.getPaginationInfo(pageVO);  
 			
 			
-			Map searchMap = null;
-			
-			
-			String searchSelect = (String)paramMap.get("searchSelect");
-			
-			
-			String searchTxt = (String)paramMap.get("searchTxt");
-			String searchStDate = (String)paramMap.get("searchStDate");
-			String searchEdDate = (String)paramMap.get("searchEdDate");
+			paramMap.put("firstIndex", String.valueOf(pageVO.getFirstIndex()));
+			paramMap.put("lastIndex", String.valueOf(pageVO.getLastIndex()));
 			
 			
 			String startRevisionVal = (String)paramMap.get("startRevisionVal");
@@ -798,6 +993,7 @@ public class Rep1000Controller {
 			
 			long lastRevision = lastRevisionNum;
 			long startRevision = lastRevisionNum - 100;
+			
 			
 			
 			if(startRevisionVal != null && endRevisionVal != null && !"".equals(startRevisionVal) && !"".equals(endRevisionVal)) {
@@ -826,7 +1022,6 @@ public class Rep1000Controller {
 			}
 			
 			
-			
 			if(startRevision < 0) {
 				startRevision = 0;
 			}
@@ -836,15 +1031,8 @@ public class Rep1000Controller {
 				lastRevision = 0;
 			}
 			
-			
-			if(searchSelect != null && !"".equals(searchSelect)) {
-				searchMap = new HashMap<>();
-				searchMap.put("searchSelect", searchSelect);
-				searchMap.put("searchTxt", searchTxt);
-				searchMap.put("searchStDate", searchStDate);
-				searchMap.put("searchEdDate", searchEdDate);
-			}
-			
+			paramMap.put("startRevisionVal", Long.toString(startRevision));
+			paramMap.put("endRevisionVal", Long.toString(lastRevision));
 			
 			
 			String selRepPath = (String) paramMap.get("selRepPath");
@@ -855,28 +1043,23 @@ public class Rep1000Controller {
 			}
 			
 			
-			String[] filePath = new String[] {selRepPath};
+			paramMap.put("selRepPath", selRepPath);
 			
 			
-			if(searchFilePath != null && !"".equals(searchFilePath)) {
-				filePath = new String[] {searchFilePath};
-			}
-			Map repDataMap = repModule.selectRepLogPageList(repResultVO, filePath, startRevision, lastRevision, _pageNo, _pageSize, searchMap);
+			int totCnt =  rep1100Service.selectRep1100RvListCnt(paramMap);
+			paginationInfo.setTotalRecordCount(totCnt);
 			
 			
-			int totCnt = Integer.valueOf(String.valueOf(repDataMap.get("repDataAllSize")));
-			List repDataList = (List)repDataMap.get("repDataList");
+			List repDataList = (List) rep1100Service.selectRep1100RvList(paramMap);
 			
 			model.addAttribute("list", repDataList);
 			
 			
-			int totalPageCount = ((totCnt - 1) / _pageSize) + 1;
-			
 			
 			Map<String, Integer> pageMap = new HashMap<String, Integer>();
-			pageMap.put("pageNo",(_pageNo+1));
+			pageMap.put("pageNo",pageVO.getPageIndex());
 			pageMap.put("listCount", repDataList.size());
-			pageMap.put("totalPages", totalPageCount);
+			pageMap.put("totalPages", paginationInfo.getTotalPageCount());
 			pageMap.put("totalElements", totCnt);
 			pageMap.put("pageSize", _pageSize);
 			
@@ -901,7 +1084,7 @@ public class Rep1000Controller {
 			return new ModelAndView("jsonView");
 		}
 		catch(Exception ex){
-			Log.error("selectRep1000RepositoryListAjaxView()", ex);
+			Log.error("selectRep1002RepositoryPageListAjaxView()", ex);
 			if(ex instanceof SVNAuthenticationException ){
 				model.addAttribute("MSG_CD", REP_AUTHENTICATION_EXCEPTION);
 			}else if(ex instanceof SVNException ){
@@ -930,14 +1113,18 @@ public class Rep1000Controller {
 			
 			if(paramMap.get("revision")!=null){
 				
-				revision = Long.parseLong((String) paramMap.get("revision"));	
+				try {
+					revision = Long.parseLong((String) paramMap.get("revision"));
+				}catch(NumberFormatException ne) {
+					
+				}
 			}
 			
 			String commitId = "";
 			
 			if(paramMap.get("commitId")!=null){
 				
-				commitId = (String) paramMap.get("commitId");	
+				commitId = (String) paramMap.get("commitId");
 			}
 
 			
@@ -994,14 +1181,18 @@ public class Rep1000Controller {
 			Long revision =0l;
 			
 			if(paramMap.get("revision")!=null){
-				revision = Long.parseLong((String) paramMap.get("revision"));	
+				try {
+					revision = Long.parseLong((String) paramMap.get("revision"));
+				}catch(NumberFormatException ne) {
+					
+				}
 			}
 			
 			String commitId = "";
 			
 			if(paramMap.get("commitId")!=null){
 				
-				commitId = (String) paramMap.get("commitId");	
+				commitId = (String) paramMap.get("commitId");
 			}
 
 			String path = (String) paramMap.get("path");
@@ -1009,7 +1200,20 @@ public class Rep1000Controller {
 			
 			RepVO repVo = rep1000Service.selectRep1000Info(paramMap);
 			
-			String content = repModule.getFileContent(repVo, path, revision, commitId);
+			String repTypeCd = repVo.getRepTypeCd();
+			String content = null;
+			
+			if("01".equals(repTypeCd)) {
+				
+				content =  repModule.getFileContent(repVo, path, commitId, null);
+			}
+			
+			else if("02".equals(repTypeCd)) {
+				content =  repModule.getFileContent(repVo, path, revision);
+			}
+			
+			else if("03".equals(repTypeCd)) {
+			}
 			
 			model.addAttribute("content", content);
 
@@ -1051,27 +1255,66 @@ public class Rep1000Controller {
 			paramMap.put("authGrpId", ss.getAttribute("selAuthGrpId"));
 			
 			
-			Long revision = Long.parseLong((String) paramMap.get("revision"));
+			Long revision = 0l;
+			if(paramMap.get("revision")!=null){
+				try {
+					revision = Long.parseLong((String) paramMap.get("revision"));
+				}catch(NumberFormatException ne) {
+					
+				}
+			}
 			
 			
-			Long diffRevision = Long.parseLong((String) paramMap.get("diffRevision"));	
+			Long diffRevision = 0l;
+			try {
+				diffRevision = Long.parseLong((String) paramMap.get("diffRevision"));
+			}catch(NumberFormatException ne) {
+				
+			}
 			
 			
 			String commitId = (String) paramMap.get("commitId");
 			
 			
-			String diffCommitId = (String) paramMap.get("diffCommitId");	
-
+			String diffCommitId = (String) paramMap.get("diffCommitId");
+			
 			String path = (String) paramMap.get("path");
 
 			
 			RepVO repVo = rep1000Service.selectRep1000Info(paramMap);
 			
 			
-			String content = repModule.getFileContent(repVo, path, revision, commitId);
+			String repTypeCd = repVo.getRepTypeCd();
+			
+			String content = null;
+			
+			if("01".equals(repTypeCd)) {
+				
+				content =  repModule.getFileContent(repVo, path, commitId, null);
+			}
+			
+			else if("02".equals(repTypeCd)) {
+				content =  repModule.getFileContent(repVo, path, revision);
+			}
+			
+			else if("03".equals(repTypeCd)) {
+			}
 			
 			
-			String diffContent = repModule.getFileContent(repVo, path, diffRevision, diffCommitId);
+			String diffContent = null;
+			
+			if("01".equals(repTypeCd)) {
+				
+				diffContent =  repModule.getFileContent(repVo, path, diffCommitId, null);
+			}
+			
+			else if("02".equals(repTypeCd)) {
+				diffContent =  repModule.getFileContent(repVo, path, diffRevision);
+			}
+			
+			else if("03".equals(repTypeCd)) {
+			}
+			
 
 			model.addAttribute("content", content);
 			model.addAttribute("diffContent", diffContent);
@@ -1106,7 +1349,6 @@ public class Rep1000Controller {
 
 		try{
 			
-			
 			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
 			
 			
@@ -1117,6 +1359,9 @@ public class Rep1000Controller {
 			String svnUsrId = (String) paramMap.get("svnUsrId");
 			String svnUsrPw = (String) paramMap.get("svnUsrPw");
 			String nowSvnPw = (String) paramMap.get("nowSvnPw");
+			String gitRepUrl = (String) paramMap.get("gitRepUrl");
+			String gitUsrTk = (String) paramMap.get("gitUsrTk");
+			String nowGitTk = (String) paramMap.get("nowGitTk");
 			String repTypeCd = (String) paramMap.get("repTypeCd");
 			
 			
@@ -1128,22 +1373,77 @@ public class Rep1000Controller {
 			
 			if(type != null && "insert".equals(type)) {
 				
+				if("01".equals(repTypeCd)) {
+					
+					
+					
+					gitUsrTk = CommonScrty.encryptedAria(gitUsrTk, salt);
+				}
 				
-				svnUsrPw = CommonScrty.encryptedAria(svnUsrPw, salt);
+				else if("02".equals(repTypeCd)) {
+					
+					
+					svnUsrPw = CommonScrty.encryptedAria(svnUsrPw, salt);
+				}
+				
+				else {
+					
+				}
 			}
 			
-			else if("update".equals(type) && !nowSvnPw.equals(svnUsrPw)) {
-				
-				svnUsrPw = CommonScrty.encryptedAria(svnUsrPw, salt);
+			else if("update".equals(type)) {
+				if(!nowSvnPw.equals(svnUsrPw) || !nowGitTk.equals(gitUsrTk)) {
+					
+					if("01".equals(repTypeCd)) {
+						
+						
+						
+						gitUsrTk = CommonScrty.encryptedAria(gitUsrTk, salt);
+					}
+					
+					else if("02".equals(repTypeCd)){
+						
+						svnUsrPw = CommonScrty.encryptedAria(svnUsrPw, salt);
+					}
+					
+					else {
+						
+					}
+				}
 			}
 			
-			repVo.setSvnRepUrl(svnRepUrl);
-			repVo.setSvnUsrId(svnUsrId);
-			repVo.setSvnUsrPw(svnUsrPw);
+			
+			
+			if("01".equals(repTypeCd)) {
+				repVo.setGitRepUrl(gitRepUrl);
+				repVo.setGitUsrTk(gitUsrTk);
+			}
+			
+			else if("02".equals(repTypeCd)){
+				repVo.setSvnRepUrl(svnRepUrl);
+				repVo.setSvnUsrId(svnUsrId);
+				repVo.setSvnUsrPw(svnUsrPw);
+			}
+			
+			else {
+				
+			}
 			repVo.setRepTypeCd(repTypeCd);
 			
 			
 			repVo.setGitRepUrlCheckCd(true);
+			
+			
+			RepResultVO repResultVO = repModule.repAuthCheck(repVo);
+			boolean repAuthCheck = repResultVO.isReturnValue();
+			
+			
+			if(!repAuthCheck) {
+				model.addAttribute("MSG_CD", REP_AUTHENTICATION_EXCEPTION);
+				model.addAttribute("errorYN", "Y");
+				model.addAttribute("message", repResultVO.getResultMsg());
+				return new ModelAndView("jsonView");
+			}
 
 			
 			String path = (String) paramMap.get("path");
@@ -1152,6 +1452,7 @@ public class Rep1000Controller {
 			model.addAttribute("list", list);
 			
 			
+			model.addAttribute("errorYn", 'N');
 			model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
 			return new ModelAndView("jsonView");
 		}
@@ -1165,6 +1466,106 @@ public class Rep1000Controller {
 			} else{
 				model.addAttribute("MSG_CD", Rep1000Controller.REP_EXCEPTION);
 			}
+			
+			
+			model.addAttribute("errorYn", 'Y');
+			
+			
+			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+			return new ModelAndView("jsonView");
+		}
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value="/rep/rep1000/rep1000/selectRep1008CodeImprovementAjax.do")
+	public ModelAndView selectRep1008CodeImprovementAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map paramMap = RequestConvertor.requestParamToMap(request,true);
+
+			
+			HttpSession ss = request.getSession();
+			paramMap.put("prjId", ss.getAttribute("selPrjId"));
+			paramMap.put("authGrpId", ss.getAttribute("selAuthGrpId"));
+			
+			Long revision = 0l;
+			if(paramMap.get("revision")!=null){
+				try {
+					revision = Long.parseLong((String) paramMap.get("revision"));
+				}catch(NumberFormatException ne) {
+					
+				}
+			}
+			
+			String commitId = "";
+			
+			if(paramMap.get("commitId")!=null){
+				
+				commitId = (String) paramMap.get("commitId");
+			}
+			
+			String path = (String) paramMap.get("path");
+			
+			
+			RepVO repVo = rep1000Service.selectRep1000Info(paramMap);
+			
+			String repTypeCd = repVo.getRepTypeCd();
+			
+			String content = null;
+			
+			if("01".equals(repTypeCd)) {
+				
+				content =  repModule.getFileContent(repVo, path, commitId, null);
+			}
+			
+			else if("02".equals(repTypeCd)) {
+				content =  repModule.getFileContent(repVo, path, revision);
+			}
+			
+			else if("03".equals(repTypeCd)) {
+			}
+			
+			
+			paramMap.put("content", content);
+			
+			
+			model.addAttribute("revision", revision);
+			model.addAttribute("commitId", commitId);
+			model.addAttribute("path", path);
+			model.addAttribute("content", content);
+			
+			
+			
+			model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("selectRep1008CodeImprovementAjax()", ex);
+			
+			
+			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+			return new ModelAndView("jsonView");
+		}
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value="/rep/rep1000/rep1000/selectRep1008CallChatGPTAjax.do")
+	public ModelAndView selectRep1008CallChatGPTAjax(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map paramMap = RequestConvertor.requestParamToMap(request,true);
+			
+			Map answerContent = repModule.getAnswerByChatGPT(paramMap);
+			model.addAttribute("answerContent", answerContent);
+			
+			
+			model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
+			return new ModelAndView("jsonView");
+		}
+		catch(Exception ex){
+			Log.error("selectRep1008CallChatGPTAjax()", ex);
 			
 			
 			model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
