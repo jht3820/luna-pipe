@@ -16,6 +16,7 @@
 	.req_right_box {border-radius: 5px;}
 	.req_left_table_wrap {width: 73%;}
 	.bg-blue {background: #3498DB !important;color: #fff; }
+	.bg-orange {background: #fba450 !important;color: #fff; }
 	.sub_progress {
 	    float: right;
 	    display: inline-block;
@@ -34,15 +35,15 @@ var dplJobGrid;
 var dplJobSearchObj;
 
 //JOB 상태 체크 대기 초 (1/1000 s)
-var jobStatusWaitTime = 5000;
+var jobStatusWaitTime = 10000;
 
 //JOB 결과 대기(+콘솔 로그) 초 (1/1000 s)
-var buildResultWaitTime = 3000;
+var buildResultWaitTime = 10000;
 
 //선택 JOB 있는 경우
 var selJobStatusFlag = true;
 //사용자 모니터링 중지 flag
-var userJobStatusFlag = false;
+var userJobStatusFlag = true;
 
 //콘솔 로그
 var jobConsoleLog = {};
@@ -74,6 +75,9 @@ var consoleTimer;
 //JOB 빌드 파라미터
 var ADD_JOB_PARAM_LIST = {};
 
+//빌드중 JOB 정보
+var jobBldingInfo = {ticketId: "", regUsrId: "", regDtm: 0, modifyDtm:0, bldEtmDurationTm: 0};
+
 $(document).ready(function() {
 	jobType = $("form#dpl1000Form #jobType").val();
 	ticketList = $("form#dpl1000Form #ticketList").val();
@@ -94,6 +98,30 @@ $(document).ready(function() {
 	// 배포 계획 실행 가이드 상자 호출
 	gfnGuideStack("add",fnDpl1000GuideShow);
 	
+	//jenkins consolelog popup
+	$("#jenkinsLogPopupBtn").click(function(){
+		var selDplInfo = dplJobGrid.getList('selected');
+		if(selDplInfo && selDplInfo.length){
+			try{
+				selDplInfo = selDplInfo[0];
+				
+				//console url 조합
+				var jobUrl = selDplInfo["jobUrl"];
+				
+				//끝에 '/' 있는지 체크
+				if(jobUrl.lastIndexOf("/") != (jobUrl.length-1)){
+					jobUrl += "/";
+				}
+				
+				window.open(jobUrl+selDplInfo["bldNum"]+"/console", "jenkinsLogPopup", "width=1280, height=860, status=no, menubar=no");
+			}catch(e){
+				console.error(e);
+			}
+		}else{
+			jAlert("로그 확인을 위해 JOB을 선택해주세요.","알림");
+		}
+	});
+	/* 
 	//log button
 	$(".bldLogBtn").click(function(){
 		var logType = $(this).attr("logtype");
@@ -137,7 +165,7 @@ $(document).ready(function() {
 		//메인 로그 active
 		$(this).addClass("logBtnActive");
 	});
-	
+	 */
 	//수동배포 시작
 	$("#btn_update_dplAction").click(function(){
 		var item = dplJobGrid.getList('selected')[0];
@@ -158,8 +186,11 @@ $(document).ready(function() {
 				var ticketLastRv = $("form#dpl1000Form > #ticketLastRv").val();
 				if(!gfnIsNull(ticketLastRv)){
 					//파라미터 자동 세팅
-					if(!ADD_JOB_PARAM_LIST.hasOwnProperty(item.jenId)){
+					if(!ADD_JOB_PARAM_LIST[item.jenId]){
 						ADD_JOB_PARAM_LIST[item.jenId] = {};
+					}
+					if(!ADD_JOB_PARAM_LIST[item.jenId][item.jobId]){
+						ADD_JOB_PARAM_LIST[item.jenId][item.jobId] = [];
 					}
 					ADD_JOB_PARAM_LIST[item.jenId][item.jobId].push({
 		   				"jobParamKey": jobParamRevision,
@@ -207,7 +238,7 @@ $(document).ready(function() {
 		
 		jConfirm(addMsg+"선택 JOB("+item.jobId+")을 수동 실행 하시겠습니까?","알림창",
 			function(result) {
-				if (result) {					
+				if (result) {
 					//수동배포 시작
 					fnDplStart(item);
 					return;
@@ -260,6 +291,26 @@ $(document).ready(function() {
 				}
 			}
 		);
+	});
+	
+	//빌드중 버튼 클릭 이벤트
+	$("#btn_update_dplBlding").click(function(){
+		if(jobBldingInfo && jobBldingInfo.ticketId){
+			var modifyDtmStr = new Date(jobBldingInfo["modifyDtm"]).format("yyyy-MM-dd HH:mm:ss");
+			var bldEtmDurationTmStr = gfnHourCalc(jobBldingInfo["bldEtmDurationTm"]/1000);
+			
+			jAlert("다른 티켓에서 빌드중입니다.</br></br>[빌드 실행 정보]</br>티켓ID: "
+					+jobBldingInfo["ticketId"]
+					+"</br>빌드 실행자: "
+					+jobBldingInfo["regUsrId"]
+					+"</br>빌드 실행시간: "
+					+modifyDtmStr
+					+"</br>예상 소요시간: "
+					+bldEtmDurationTmStr
+					, "알림창");
+		}else{
+			jAlert("다른 티켓에서 빌드중입니다.", "알림창");
+		}
 	});
 	
 	//풀스크린 버튼
@@ -365,7 +416,19 @@ function fnJobStatusCheckLoop(){
 								fnJobBuildResultStatus(map);
 							}
 						}
+						//선택된 JOB일 때 마지막 빌드 번호와 다르고 현재 빌드중인경우
+						else if(!gfnIsNull(selJobInfo) 
+								&& selJobInfo["jenId"] == bldJobInfoData["jenId"] 
+								&& selJobInfo["jobId"] == bldJobInfoData["jobId"]
+								&& bldJobInfoData["bldNum"] != bldJobInfoData["lastBldNum"]){
+							//해당 job이 빌드중이거나 아직 빌드중 표시인경우 콘솔 로그 조회
+							if(bldJobInfoData["lastBldResultCd"] == "02" || $("#btn_update_dplBlding").css("display") == "inline-block"){
+								//콘솔 로그 조회
+								fnJobBuildResultStatus(map);
+							}
+						}
 					}
+					
 				});
 				
 				//그리드 데이터 변경된 경우
@@ -392,7 +455,7 @@ function fnJobBuildResultStatus(targetJobInfo){
 	if(!gfnIsNull(consoleTimer)){
 		clearTimeout(consoleTimer);
 	}
-	
+	var empId = $("form#dpl1000Form > #empId").val();
 	var targetJenId = targetJobInfo["jenId"];
 	var targetJobId = targetJobInfo["jobId"];
 	var targetBldNum = targetJobInfo["bldNum"];
@@ -427,12 +490,15 @@ function fnJobBuildResultStatus(targetJobInfo){
 		var bldChgList;
 		var bldChgFileList;
 		
+		//마지막 빌드 정보
+		var jobLastBldInfo = data.jobLastBldInfo;
+		
 		//JOB 정보
 		var jobInfo = data.jobMap;
 		
 		try{
 			//콘솔 로그 재 조회
-			var consoleRefreshFlag = false;
+			//var consoleRefreshFlag = false;
 			
 			//JOB 선택한 경우 콘솔로그 쓰기
 			if(!gfnIsNull(bldInfo)){
@@ -448,23 +514,33 @@ function fnJobBuildResultStatus(targetJobInfo){
 			//변경 정보 세팅
 			bldDetailFrameSet(jobInfo, bldInfo, bldChgList, bldChgFileList);
 			
+			//빌드 실행자
+			var bldStartUsrId = bldInfo["regUsrId"];
+			
 			//빌드 중인지 체크
-			if(!gfnIsNull(bldInfo["isBuilding"]) && bldInfo["isBuilding"]) {
+			if(!gfnIsNull(bldInfo["bldResultCd"]) && bldInfo["bldResultCd"] == "02") {
 				//수동배포 버튼 감추기
 				$("#btn_update_dplAction").hide();
-				//빌드중지 버튼 보이기
-				$("#btn_update_dplActionStop").show();
+				
+				//빌드 실행자가 자신인경우 
+				if(empId == bldStartUsrId){
+					//빌드중지 버튼 보이기
+					$("#btn_update_dplActionStop").show();
+				}
+				
+				//빌드중 버튼 감추기
+				$("#btn_update_dplBlding").hide();
 				
 				//building 표시
 				if(bldInfo["bldResultCd"] != selJobItem["bldResultCd"]){
 					dplJobGrid.setValue(selJobItem.__original_index, "bldResult", bldInfo["bldResult"]);
 					dplJobGrid.setValue(selJobItem.__original_index, "bldResultCd", bldInfo["bldResultCd"]);
 				}
-				
+				/* 
 				//빌드 중인경우 로딩 icon 추가
 				$("#buildConsoleLog").append('<i class="fa fa-spinner fa-spin"></i>');
 				$("#buildConsoleLog").scrollTop(9999999);
-				
+				 */
 				//게이지바 계산
 				var timestamp = bldInfo["bldStartDtm"];
 				var estimatedDuration = bldInfo["bldEtmDurationTm"];
@@ -489,52 +565,120 @@ function fnJobBuildResultStatus(targetJobInfo){
 						arrTime = 99;
 					}
 				}
+				//orange있는 경우 제거
+				if($("#bldProgressBar.progress .progress-bar").hasClass("bg-orange")){
+					$("#bldProgressBar.progress .progress-bar").removeClass("bg-orange").addClass("bg-blue");
+				}
 				//게이지바 적용
-				$("#bldProgressBar.progress .progress-bar").attr('data-transitiongoal', arrTime).progressbar2({display_text: 'center', percent_format: function(p) {return bldInfo["jobId"]+': ' + p+'%';}});
+				$("#bldProgressBar.progress .progress-bar").attr('data-transitiongoal', arrTime).progressbar2({display_text: 'center', percent_format: function(p) {return bldInfo["jobId"]+'('+bldInfo["bldNum"]+'): ' + p+'%';}});
 				
 				//콘솔로그 재 조회
-				consoleRefreshFlag = true;
+				//consoleRefreshFlag = true;
 			}else{
 				//Queue에 있거나 현재 빌드번호와 데이터 빌드번호가 다를때
 				if((!gfnIsNull(bldInfo["isInQueue"]) && bldInfo["isInQueue"]) || (!gfnIsNull(targetBldNum) && targetBldNum != bldInfo["bldNum"])){
 					//console.log("log 재 조회1");
 					//콘솔로그 재 조회
-					consoleRefreshFlag = true;
+					//consoleRefreshFlag = true;
 					//수동배포 버튼 감추기
 					$("#btn_update_dplAction").hide();
-					//빌드중지 버튼 보이기
-					$("#btn_update_dplActionStop").show();
+					
+					//빌드 실행자가 자신인경우 
+					if(empId == bldStartUsrId){
+						//빌드중지 버튼 보이기
+						$("#btn_update_dplActionStop").show();
+					}
+					
+					//빌드중 버튼 감추기
+					$("#btn_update_dplBlding").hide();
 				}else{
-					//console.log("target bldnum: "+targetBldNum+" / bldnum: "+bldInfo["bldNum"]);
-					//target 빌드 번호와 데이터 빌드 번호가 다른 경우 콘솔 재 조회
-					//console.log("기존 cd : "+selJobItem["bldResultCd"]+"  msg: "+selJobItem["bldResult"]);
-					//console.log("값 변경 cd : "+bldInfo["bldResultCd"]+"  msg: "+bldInfo["bldResult"]);
-					//그리드 갱신
-					dplJobGrid.setValue(selJobItem.__original_index, "bldResult", bldInfo["bldResult"]);
-					dplJobGrid.setValue(selJobItem.__original_index, "bldResultCd", bldInfo["bldResultCd"]);
-					dplJobGrid.setValue(selJobItem.__original_index, "bldNum", bldInfo["bldNum"]);
-					
-					$("#bldProgressBar.progress .progress-bar").attr('data-transitiongoal', 100).progressbar2({display_text: 'center', percent_format: function(p) {return bldInfo["jobId"]+': ' + p+'%';}});
+					//마지막 빌드 정보 있을 때 빌드 번호가 다르고 빌드중인 경우
+					if(jobLastBldInfo && jobLastBldInfo["bldResultCd"] == "02" && targetBldNum != jobLastBldInfo["bldNum"]){
+						//게이지바 계산
+						var timestamp = jobLastBldInfo["bldStartDtm"];
+						var estimatedDuration = jobLastBldInfo["bldEtmDurationTm"];
 						
-					//스크롤 맨 밑
-					$("#buildConsoleLog").scrollTop(9999999);
+						//현재 시점
+						var today = new Date().getTime();
+						
+						//흐른 시간
+						var durationTime = (today-parseInt(timestamp));
+						
+						//남은 시간
+						var arriveDurationTime = estimatedDuration-durationTime;
+						
+						//시간 지난 경우 99% 고정
+						var arrTime = 99;
+						
+						//시간 남은 경우
+						if(arriveDurationTime > 0){
+							//흐른 시간 값
+							var arrTime = (100*(durationTime/parseInt(estimatedDuration)));
+							if(arrTime > 99){
+								arrTime = 99;
+							}
+						}
+						//배경색 변경
+						$("#bldProgressBar.progress .progress-bar").removeClass("bg-blue").addClass("bg-orange");
+						
+						//게이지바 적용
+						$("#bldProgressBar.progress .progress-bar").attr('data-transitiongoal', arrTime).progressbar2({display_text: 'center', percent_format: function(p) {return jobLastBldInfo["jobId"]+'('+jobLastBldInfo["bldNum"]+'): ' + p+'%';}});
+						
+						//빌드 중 정보 넣기
+						jobBldingInfo = {
+							ticketId: jobLastBldInfo["ticketId"],
+							regUsrId: jobLastBldInfo["regUsrId"],
+							regDtm: jobLastBldInfo["regDtm"],
+							modifyDtm: jobLastBldInfo["modifyDtm"],
+							bldEtmDurationTm: jobLastBldInfo["bldEtmDurationTm"]
+						};
+						
+						//빌드중 버튼 보이기
+						$("#btn_update_dplBlding").show();
+						
+						//수동배포 버튼 감추기
+						$("#btn_update_dplAction").hide();
+						
+						//빌드중지 버튼 감추기
+						$("#btn_update_dplActionStop").hide();
+					}else{
+						//그리드 갱신
+						dplJobGrid.setValue(selJobItem.__original_index, "bldResult", bldInfo["bldResult"]);
+						dplJobGrid.setValue(selJobItem.__original_index, "bldResultCd", bldInfo["bldResultCd"]);
+						dplJobGrid.setValue(selJobItem.__original_index, "bldNum", bldInfo["bldNum"]);
+						
+						//orange있는 경우 제거
+						if($("#bldProgressBar.progress .progress-bar").hasClass("bg-orange")){
+							$("#bldProgressBar.progress .progress-bar").removeClass("bg-orange").addClass("bg-blue");
+						}
+						
+						$("#bldProgressBar.progress .progress-bar").attr('data-transitiongoal', 100).progressbar2({display_text: 'center', percent_format: function(p) {return bldInfo["jobId"]+'('+bldInfo["bldNum"]+'): ' + p+'%';}});
+							
+						//스크롤 맨 밑
+						//$("#buildConsoleLog").scrollTop(9999999);
+						
+						//수동배포 버튼 보이기
+						$("#btn_update_dplAction").show();
+						
+						//빌드중지 버튼 감추기
+						$("#btn_update_dplActionStop").hide();
+						
+						//빌드중 버튼 감추기
+						$("#btn_update_dplBlding").hide();
+					}
 					
-					//수동배포 버튼 보이기
-					$("#btn_update_dplAction").show();
 					
-					//빌드중지 버튼 감추기
-					$("#btn_update_dplActionStop").hide();
 				}
 			}
 			//빌드 실행 가능 유무인경우 버튼 제어
 			if(gfnIsNull(selJobItem["jobBldActionCd"]) || selJobItem["jobBldActionCd"] == "02"){
-				//수동배포 버튼 보이기
+				//수동배포 버튼 감추기
 				$("#btn_update_dplAction").hide();
 				
 				//빌드중지 버튼 감추기
 				$("#btn_update_dplActionStop").hide();
 			}
-			
+			/* 
 			//콘솔 로그 재 조회
 			if(consoleRefreshFlag){
 				consoleTimer = setTimeout(function(){fnJobBuildResultStatus(targetJobInfo);}, buildResultWaitTime);
@@ -543,6 +687,9 @@ function fnJobBuildResultStatus(targetJobInfo){
 				selJobStatusFlag = true;
 				return false;
 			}
+			 */
+			//콘솔 로그 조회 마치고 자동 모니터링 시작
+			selJobStatusFlag = true;
 		}catch(error){
 			//모니터링 중단 메시지 출력
 			//fnJobAutoCheckMsgChg(false,"배포 계획 JOB 빌드 정보 조회 중 오류가 발생했습니다. 자동 빌드 감지를 중지합니다.");
@@ -776,7 +923,7 @@ function fnInGridListSet(_pageNo,ajaxParam){
 	   	}
 	  
 	   	//로그 초기화
-		$("#buildConsoleLog").text("-");
+		//$("#buildConsoleLog").text("-");
 	});
 	
 	//AJAX 전송
@@ -1044,6 +1191,7 @@ function fnBldFormDataReset(){
 	$("form#dpl1000JobInfoForm #jenUrl").text("");
 	$("form#dpl1000JobInfoForm #jobId").text("");
 	$("form#dpl1000JobInfoForm #jobTypeNm").text("");
+	$("form#dpl1000JobInfoForm #bldStartUsrId").text("");
 	$("#btn_select_bldParam").hide();
 	
 	//job 빌드 정보 세팅
@@ -1055,10 +1203,10 @@ function fnBldFormDataReset(){
 	$("form#dpl1000JobInfoForm #buildResult").text("");
 	$("form#dpl1000JobInfoForm #buildDurationStr").text("");
 	$("form#dpl1000JobInfoForm #buildEstimatedDurationStr").text("");
-	$("form#dpl1000JobInfoForm #buildChgLog").html("");
+	$("form#dpl1000JobBldChgForm #buildChgLog").html("");
 	
 	//console 세팅
-	$("#buildConsoleLog").html("");
+	//$("#buildConsoleLog").html("");
 }
 
 /**
@@ -1101,10 +1249,11 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 	var buildResult = "-";
 	var buildDurationStr = "-";
 	var buildEstimatedDurationStr = "-";
-	var buildChgLog = "-";
+	var buildChgLog = "빌드 변경 내역 없음.";
 	var buildConsoleLog = "-";
 	var jobClass = "-";
 	var bldActionLog = "-";
+	var bldStartUsrId = "-";
 	$("#btn_select_bldParam").hide();
 	
 	if(!gfnIsNull(paramBldInfo)){
@@ -1125,9 +1274,10 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 			buildResult = paramBldInfo["bldResult"];
 			buildDurationStr = gfnHourCalc(paramBldInfo["bldDurationTm"]/1000);
 			buildEstimatedDurationStr = gfnHourCalc(paramBldInfo["bldEtmDurationTm"]/1000);
-			buildConsoleLog = paramBldInfo["bldConsoleLog"];
+			//buildConsoleLog = paramBldInfo["bldConsoleLog"];
 			bldActionLog = paramBldInfo["bldActionLog"];
-			
+			bldStartUsrId = paramBldInfo["regUsrId"];
+				
 			//actionlog 줄바꿈
 			if(!gfnIsNull(bldActionLog)){
 				bldActionLog = bldActionLog.replace(/\n/g,"</br>");
@@ -1219,12 +1369,13 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 		$("form#dpl1000JobInfoForm #buildResult").text(buildResult);
 		$("form#dpl1000JobInfoForm #buildDurationStr").text(buildDurationStr);
 		$("form#dpl1000JobInfoForm #buildEstimatedDurationStr").text(buildEstimatedDurationStr);
-		$("form#dpl1000JobInfoForm #buildChgLog").html(buildChgLog);
+		$("form#dpl1000JobInfoForm #bldStartUsrId").text(bldStartUsrId);
+		$("form#dpl1000JobBldChgForm #buildChgLog").html(buildChgLog);
 		//$("form#dpl1000JobInfoForm #bldActionLog").html(bldActionLog);
 		
 		//console 세팅
-		$("#buildConsoleLog").html(buildConsoleLog);
-		$("#buildConsoleLog").each(function(i, block) {hljs.highlightBlock(block);});
+		//$("#buildConsoleLog").html(buildConsoleLog);
+		//$("#buildConsoleLog").each(function(i, block) {hljs.highlightBlock(block);});
 	}
 }
 </script>
@@ -1261,6 +1412,7 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 						</div>
 						<button type="button" id="btn_update_dplAction" title="" placeholder="" style="width:90px;" class="AXButton searchButtonItem "><i class="fa fa-play-circle" aria-hidden="true"></i>&nbsp;<span>수동 실행</span></button>
 						<button type="button" id="btn_update_dplActionStop" title="" placeholder="" style="width:90px;display:none;" class="AXButton searchButtonItem "><i class="fa fa-stop-circle" aria-hidden="true"></i>&nbsp;<span>실행 중지</span></button>
+						<button type="button" id="btn_update_dplBlding" title="" placeholder="" style="width:90px;display:none;" class="AXButton searchButtonItem "><i class="fas fa-minus-circle"></i>&nbsp;<span>빌드 중</span></button>
 					</div>
 				</div>
 				<div class="jobDetailInfoFrame">
@@ -1331,9 +1483,9 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 							</div>
 						</div>
 						<div class="descSubFrame">
-							<div class="descLabelFrame"><label></label></div>
+							<div class="descLabelFrame"><label>빌드 실행자</label></div>
 							<div class="descValueFrame">
-								<span></span>
+								<span id="bldStartUsrId"></span>
 							</div>
 						</div>
 					</div>
@@ -1379,11 +1531,11 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 							</div>
 						</div>
 					</div>
+					<!-- 
 					<div class="descMainFrame descFullFrame">
 						<div class="descHeaderLabelFrame"><label>변경 내용</label></div>
 						<div class="descBodyValueFrame" id="buildChgLog"></div>
 					</div>
-					<!-- 
 					<div class="descMainFrame descFullFrame">
 						<div class="descHeaderLabelFrame"><label>빌드 로그</label></div>
 						<div class="descBodyValueFrame" id="bldActionLog"></div>
@@ -1394,17 +1546,27 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 			</div>
 			<div class="frame_contents right" fullmode="2" guide="dpl1000JobConsolLog">
 				<div class="sub_title">
-					빌드 실행 Console Log
+					빌드 변경 내용
 					<div class="sub_title_btn right">
+						<!-- 
 						<button type="button" id="btn_bldMainLog" title="" style="width:150px;" class="AXButton searchButtonItem bldLogBtn" logtype="main"><i class="fa fa-desktop" aria-hidden="true"></i>&nbsp;<span id="bldMainConsoleLog"></span></button>
 						<div class="dplFullScreanBtn" fullmode="2"><i class="fas fa-expand"></i></div>
+						 -->
+						 <div class="jenkinsConsolePopupBtn AXButton" id="jenkinsLogPopupBtn"><i class="fas fa-desktop"></i>&nbsp;JENKINS Log</div>
 					</div>
 				</div>
+				<div class="descMainFrame descFullFrame buildChgLogBox">
+					<form name="dpl1000JobBldChgForm" id="dpl1000JobBldChgForm" onsubmit="return false;">
+						<div class="descBodyValueFrame" id="buildChgLog"></div>
+					</form>
+				</div>
+				<!-- 
 				<div id="contentsFrame">
 					<pre>
 						<code id="buildConsoleLog">-</code>
 					</pre>
 				</div>
+				 -->
 			</div>
 		</div>
 	</div>

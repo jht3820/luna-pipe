@@ -88,11 +88,11 @@
 		<result property="bldCauses" column="BLD_CAUSES"/>
 		<result property="bldParamCnt" column="BLD_PARAM_CNT"/>
 		<result property="bldActionLog" column="BLD_ACTION_LOG"/>
-		<!-- 
 		<result property="regDtm" column="REG_DTM" />
-		<result property="regUsrId" column="REG_USR_ID" />
-		<result property="regUsrIp" column="REG_USR_IP" />
+		<result property="regUsrId" column="REG_USR_ID"/>
 		<result property="modifyDtm" column="MODIFY_DTM" />
+		<!-- 
+		<result property="regUsrIp" column="REG_USR_IP" />
 		<result property="modifyUsrId" column="MODIFY_USR_ID" />
 		<result property="modifyUsrIp" column="MODIFY_USR_IP" />
 		 -->
@@ -905,7 +905,21 @@
 			, A.BLD_CAUSES
 			, A.BLD_ACTION_LOG
 			, (SELECT COUNT(*) FROM JEN1203 WHERE JEN_ID = A.JEN_ID AND JOB_ID = A.JOB_ID AND BLD_NUM = A.BLD_NUM) AS BLD_PARAM_CNT
-		FROM JEN1200 A INNER JOIN (SELECT JEN_ID, JOB_ID, MAX(BLD_NUM) AS BLD_NUM FROM JEN1200 GROUP BY JEN_ID, JOB_ID) B
+			, A.REG_DTM
+			, A.REG_USR_ID
+			, A.MODIFY_DTM
+		FROM JEN1200 A INNER JOIN (
+			SELECT JEN_ID, JOB_ID, MAX(BLD_NUM) AS BLD_NUM
+			FROM JEN1200
+			WHERE 1=1
+			<isNotEmpty property="ciId">
+				AND CI_ID = #ciId#
+			</isNotEmpty>
+			<isNotEmpty property="ticketId">
+				AND TICKET_ID = #ticketId#
+			</isNotEmpty>
+			GROUP BY JEN_ID, JOB_ID
+			) B
 			ON ( A.JEN_ID = B.JEN_ID AND A.JOB_ID = B.JOB_ID AND A.BLD_NUM = B.BLD_NUM )
 		INNER JOIN JEN1000 C ON (A.JEN_ID = C.JEN_ID)
 		INNER JOIN JEN1100 D ON (A.JEN_ID = D.JEN_ID AND A.JOB_ID = D.JOB_ID)
@@ -950,6 +964,9 @@
 			, A.BLD_CAUSES
 			, A.BLD_ACTION_LOG
 			, (SELECT COUNT(*) FROM JEN1203 WHERE JEN_ID = A.JEN_ID AND JOB_ID = A.JOB_ID AND BLD_NUM = A.BLD_NUM) AS BLD_PARAM_CNT
+			, A.REG_DTM
+			, A.REG_USR_ID
+			, A.MODIFY_DTM
 		FROM JEN1200 A
 		INNER JOIN JEN1000 C ON (A.JEN_ID = C.JEN_ID)
 		INNER JOIN JEN1100 D ON (A.JEN_ID = D.JEN_ID AND A.JOB_ID = D.JOB_ID)

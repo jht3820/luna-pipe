@@ -14,7 +14,28 @@ var tktFileSearchObj;
 //선택된 소스저장소 데이터 목록
 var selRepData = [];
 
+//타입
+var callType = '${param.baseTarget}';
+
+if(gfnIsNull(callType)){
+	/* 
+	* [master] svn/github 모두 사용 : ticket -> trunk commit
+	* [operation] github만 사용 : trunk -> operation branch commit
+	*/
+	callType = "master";
+}
+
 $(function(){
+	//타이틀 세팅
+	//[master] svn/github 모두 사용 : ticket -> trunk commit
+	if(callType == "master"){
+		$("#rep1100Title").text("["+gfnEscapeHtml("${requestScope.ticketId}")+"] 티켓 변경 파일 목록");
+	}
+	//[operation] github만 사용 : trunk -> operation branch commit
+	else{
+		$("#rep1100Title").text("["+gfnEscapeHtml("${requestScope.ticketId}")+"] 티켓 소스저장소 Trunk 변경 파일 목록");
+	}
+	
 	//그리드 검색 호출
 	fnTktFileGridSetting();
 	fnSearchBoxControl();
@@ -57,6 +78,9 @@ $(function(){
 						, "repChgTypeCd": map.repChgTypeCd
 						, "repChgFileKind": map.repChgFileKind
 						, "empId": empId
+						, "repTypeCd": map.repTypeCd
+						, "gitCmtSha": map.gitCmtSha
+						, "gitBrcNm": map.gitBrcNm
 					};
 					
 					returnMap.push(tktFileInfo);
@@ -67,7 +91,8 @@ $(function(){
 					{"url":"<c:url value='/rep/rep1000/rep1100/insertRep1100SelTktFileCommitAjax.do'/>","loadingShow":true}
 					,{
 						//컨트롤러 전달 데이터
-						returnMap: JSON.stringify(returnMap),
+						returnMap: JSON.stringify(returnMap)
+						, "baseTarget" : callType
 					}
 				);
 				
@@ -87,7 +112,10 @@ $(function(){
 					
 					//결과 처리 성공
 					if(errorYn == "N"){
-						jAlert(data.message+"</br>성공 개수: "+data.succCnt+addMsg, "알림창");
+						jAlert(data.message+"</br>성공 개수: "+data.succCnt+addMsg, "알림창", function(){
+							//팝업 닫기 : github의 경우 ajax 완료되는 시점과 실제 데이터가 저장되는 시점이 다르기 때문에...
+							$("#repCloseBtn").click();
+						});
 						
 						//목록 재 조회
 						axdom("#" + tktFileSearchObj.getItemId("btn_search_rep")).click();
@@ -112,7 +140,7 @@ $(function(){
 //axisj5 그리드
 function fnTktFileGridSetting(){
 	tktFileGridObj = new ax5.ui.grid();
- 
+	
 	tktFileGridObj.setConfig({
 		target: $('[data-ax5grid="tktFileGridTarget"]'),
 		frozenColumnIndex: 3,
@@ -121,7 +149,7 @@ function fnTktFileGridSetting(){
 		header: {align:"center",columnHeight: 30},
 		columns: [
 			{key: "repNm", label: "저장소 명", width: 260, align: "center"},
-			{key: "repRv", label: "리비전", width: 80, align: "center"} ,
+			{key: "repRvn", label: "리비전", width: 80, align: "center"} ,
 			{key: "repChgFileNm", label: "변경 파일명", width: 240, align: "left"} ,
 			{key: "repCmtDate", label: "커밋 일시", width: 135, align: "center"
 				,formatter: function(){
@@ -170,14 +198,19 @@ function fnTktFileGridSetting(){
 					jAlert("대상이 파일인 경우에만 비교가 가능합니다.","알림");
 					return false;
 				}
+				
             	//파일 내용 비교
          		var data = {
            			"repId": item.repId
            			, "repTypeCd": item.repTypeCd
            			, "revision": item.repRv
-           			, "diffRevision": item.revision
+           			,"revisionNum" : item.repRvn
+           			, "commitId": item.gitCmtSha
            			, "path": item.repChgFilePath
            			, "fileName": item.repChgFileNm
+           			, "gitBrcNm": item.gitBrcNm
+           			, "gitCmtSha" : item.gitCmtSha
+           			, "baseTarget" : callType
             	};
          		gfnLayerPopupOpen('/rep/rep1000/rep1100/selectRep1101View.do',data,"1200","780",'scroll');
         	},
@@ -208,8 +241,9 @@ function fnTktFileGridSetting(){
                  'arrow': '<i class="fa fa-caret-right"></i>'
              },
              items: [
-                 {type: "trunkDiff", label: "trunk 소스 비교", icon:"<i class='fa fa-info-circle' aria-hidden='true'></i>"},
-             ],
+				{type: "fileDiff", label: "trunk 소스 비교", icon:"<i class='fa fa-info-circle' aria-hidden='true'></i>"},
+				{type: "revisionFileImprove", label: "Chat GPT", icon:"<i class='fa fa-info-circle' aria-hidden='true'></i>"},
+			],
              popupFilter: function (item, param) {
              	var selItem = tktFileGridObj.list[param.doindex];
              	//선택 개체 없는 경우 중지
@@ -225,21 +259,45 @@ function fnTktFileGridSetting(){
              onClick: function (item, param) {
              	var selItem = tktFileGridObj.list[param.doindex];
 
-             	//접속 확인
-				if(item.type == "trunkDiff"){
+             	//파일 비교
+				if(item.type == "fileDiff"){
 					var item = selItem;
-					
 	            	//파일 내용 비교
 	         		var data = {
 	           			"repId": item.repId
 	           			, "repTypeCd": item.repTypeCd
+	           			,"revisionNum" : item.repRvn
 	           			, "revision": item.repRv
-	           			, "diffRevision": item.revision
+	           			, "commitId": item.gitCmtSha
 	           			, "path": item.repChgFilePath
 	           			, "fileName": item.repChgFileNm
+	           			, "gitBrcNm": item.gitBrcNm
+	           			, "gitCmtSha" : item.gitCmtSha
+	           			, "baseTarget" : callType
 	            	};
+	            	
 	         		gfnLayerPopupOpen('/rep/rep1000/rep1100/selectRep1101View.do',data,"1200","780",'scroll');
 					
+				}
+				//chat gpt
+				else if(item.type == "revisionFileImprove"){
+					var item = selItem;
+					var data = {
+							"repId" : item.repId
+							,"revisionNum" : item.repRvn
+							,"revision" : item.repRv
+							,"path": item.repChgFilePath
+							,"fileName": item.repChgFileNm
+							,"repTypeCd": item.repTypeCd
+							,"gitBrcNm": item.gitBrcNm
+					};
+					
+					//svn이 아니면
+					if(item.repTypeCd != "02"){
+						data["commitId"] = item.repRv;
+					}
+					 
+					gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1008View.do',data,"1200","780",'scroll');
 				}
 				//닫기
 				tktFileGridObj.contextMenu.close();
@@ -265,8 +323,8 @@ function fnTktFileGridSetting(){
 //그리드 데이터 넣는 함수
 function fnInGridListSet(_pageNo,ajaxParam){
 	/* 그리드 데이터 가져오기 */
-   	//파라미터 세팅
-   	if(gfnIsNull(ajaxParam)){
+	//파라미터 세팅
+	if(gfnIsNull(ajaxParam)){
 		ajaxParam = $('form#rep1100Form').serialize();
 	}
    	
@@ -277,8 +335,10 @@ function fnInGridListSet(_pageNo,ajaxParam){
    		ajaxParam += "&pageNo="+tktFileGridObj.page.currentPage;
    	}
     
-   	//조회 typeCd 넘기기
-   	ajaxParam += "&repRvTypeCd=01";
+	//조회 typeCd 넘기기
+	ajaxParam += "&repRvTypeCd=01";
+	//조회 유형 넘기기
+	ajaxParam += "&baseTarget="+callType;
    	
    	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
@@ -405,9 +465,16 @@ function fnRep1100GuideShow(){
 	if(mainObj.length == 0){
 		return false;
 	}
-	//guide box setting
-	var guideBoxInfo = globals_guideContents["rep1100"];
-	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
+	
+	//master/operation에 따라
+	if(callType == "master"){
+		//guide box setting
+		var guideBoxInfo = globals_guideContents["rep1100Mst"];
+		gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
+	}else {
+		var guideBoxInfo = globals_guideContents["rep1100Ops"];
+		gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
+	}
 }
 </script>
 
@@ -418,9 +485,7 @@ function fnRep1100GuideShow(){
 		<input type="hidden" name="empId" id="empId" value="${requestScope.empId }"/>
 	</form>
 	<div class="tab_contents menu">
-		<div class="sub_title">
-			[<c:out value="${requestScope.ticketId}"/>] 티켓 변경 파일 목록
-		</div>
+		<div class="sub_title" id="rep1100Title"></div>
 		<div id="tktFileSearchTarget" guide="rep1100button" ></div>
 		<div data-ax5grid="tktFileGridTarget" data-ax5grid-config="{}" style="height: 600px;" guide="tktFileGridTarget"></div>
 		<div class="btnFrame">
