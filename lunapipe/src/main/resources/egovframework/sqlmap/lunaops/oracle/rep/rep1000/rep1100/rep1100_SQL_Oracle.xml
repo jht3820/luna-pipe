@@ -5,7 +5,7 @@
 	<typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
 	
 	
-    <resultMap id="resultRvListExt" class="HashMap">
+	<resultMap id="resultRvListExt" class="HashMap">
 		<result property="ticket_id"		column="TICKET_ID" />
 		<result property="rep_id" 			column="REP_ID" />
 		<result property="rep_rv" 			column="REP_RV" />
@@ -14,10 +14,13 @@
 		<result property="rep_cmt_date" 	column="REP_CMT_DATE" />
 		<result property="rep_cmt_author" 	column="REP_CMT_AUTHOR" />
 		<result property="rep_chg_file_cnt" column="REP_CHG_FILE_CNT" />
+		<result property="rep_rvn" 			column="REP_RVN" />
+		<result property="git_cmt_sha" 			column="GIT_CMT_SHA" />
+		<result property="git_brc_nm" 			column="GIT_BRC_NM" />
 	</resultMap>
 	
 	
-    <resultMap id="resultRvChgFileListExt" class="HashMap">
+	<resultMap id="resultRvChgFileListExt" class="HashMap">
 		<result property="ticket_id"		column="TICKET_ID" />
 		<result property="rep_id" 			column="REP_ID" />
 		<result property="rep_rv" 			column="REP_RV" />
@@ -29,10 +32,11 @@
 		<result property="rep_chg_file_nm"	column="REP_CHG_FILE_NM" />
 		<result property="rep_chg_file_kind" column="REP_CHG_FILE_KIND" />
 		<result property="commitEmpId" column="COMMIT_EMP_ID" />
+		<result property="rep_rvn" 			column="REP_RVN" />
 	</resultMap>
 	
 	
-    <resultMap id="resultDplChgFileListExt" class="HashMap">
+	<resultMap id="resultDplChgFileListExt" class="HashMap">
 		<result property="ticket_id"		column="TICKET_ID" />
 		<result property="rep_id" 			column="REP_ID" />
 		<result property="rep_rv" 			column="REP_RV" />
@@ -45,7 +49,119 @@
 		<result property="rep_chg_file_nm"	column="REP_CHG_FILE_NM" />
 		<result property="rep_chg_file_kind" column="REP_CHG_FILE_KIND" />
 		<result property="commit_emp_id" column="COMMIT_EMP_ID" />
+		<result property="rep_rvn" 			column="REP_RVN" />
 	</resultMap>
+	
+	
+	<sql id="selectRep1100RvList">
+		SELECT
+			A.REP_ID
+			<isNotEqual property="ticketId" compareValue="SYSTEM">
+				, A.TICKET_ID
+			</isNotEqual>
+			, A.REP_RV
+			, A.REP_RV_TYPE_CD
+			, A.REP_COMMENT
+			, TO_CHAR(A.REP_CMT_DATE, 'YYYY-MM-DD HH24:MI:SS') AS REP_CMT_DATE
+			, A.REP_CMT_AUTHOR
+			, A.REP_CHG_FILE_CNT
+			, A.REP_RVN
+			, A.GIT_CMT_SHA
+			, A.GIT_BRC_NM
+		FROM REP1100 A
+		WHERE 1=1
+		<isNotEqual property="ticketId" compareValue="SYSTEM">
+			<isEmpty property="ticketId">
+				AND A.TICKET_ID = 'SYSTEM'
+			</isEmpty>
+			<isNotEmpty property="ticketId">
+				AND A.TICKET_ID IN ('SYSTEM', #ticketId#)
+			</isNotEmpty>
+		</isNotEqual>
+		<isNotEmpty property="repId">
+			AND A.REP_ID = #repId#
+		</isNotEmpty>
+		<isNotEmpty property="repRv">
+			AND A.REP_RV = #repRv#
+		</isNotEmpty>
+		<isNotEmpty property="repRvn">
+			AND A.REP_RVN = #repRvn#
+		</isNotEmpty>
+		<isNotNull property="selectSearch">
+			<isNotEmpty property="selectSearch">
+				<isNotEmpty property="searchTxt">
+					<isEqual property="selectSearch" compareValue="author">
+						<![CDATA[
+							AND LOWER(A.REP_CMT_AUTHOR) LIKE '%'|| LOWER(#searchTxt#) ||'%'
+						]]>
+					</isEqual>
+					<isEqual property="selectSearch" compareValue="comment">
+						<![CDATA[
+							AND A.REP_COMMENT LIKE '%'|| #searchTxt# ||'%'
+						]]>
+					</isEqual>
+				</isNotEmpty>
+				<isEqual property="selectSearch" compareValue="logDate">
+					<isNotEmpty property="searchStDate">
+						AND A.REP_CMT_DATE &lt;= TO_DATE(#searchStDate#, 'YYYY-MM-DD HH24:MI:SS')
+					</isNotEmpty>
+					<isNotEmpty property="searchEdDate">
+						AND A.REP_CMT_DATE &gt;= TO_DATE(#searchEdDate#, 'YYYY-MM-DD HH24:MI:SS')
+					</isNotEmpty>
+				</isEqual>
+			</isNotEmpty>
+		</isNotNull>
+		<isNotNull property="startRevisionVal">
+			<isNotEmpty property="startRevisionVal">
+				AND A.REP_RVN &gt;= #startRevisionVal#
+			</isNotEmpty>
+		</isNotNull>
+		<isNotNull property="endRevisionVal">
+			<isNotEmpty property="endRevisionVal">
+				AND A.REP_RVN &lt;= #endRevisionVal#
+			</isNotEmpty>
+		</isNotNull>
+		<isNotNull property="selRepPath">
+			<isNotEmpty property="selRepPath">
+				<isNotEqual property="selRepPath" compareValue="/">
+					<![CDATA[
+						AND EXISTS (
+							SELECT SUB.*
+							FROM REP1101 SUB LEFT JOIN REP1000 B
+							ON (SUB.REP_ID = B.REP_ID)
+							WHERE 1 = 1
+							AND SUB.REP_RV = A.REP_RV
+					]]>
+							<isNotEqual property="ticketId" compareValue="SYSTEM">
+								<isNotEmpty property="ticketId">
+									AND SUB.TICKET_ID IN ('SYSTEM', #ticketId#)
+								</isNotEmpty>
+								<isEmpty property="ticketId">
+									AND SUB.TICKET_ID = 'SYSTEM'
+								</isEmpty>
+							</isNotEqual>
+							<isEqual property="ticketId" compareValue="SYSTEM">
+								AND SUB.TICKET_ID = 'SYSTEM'
+							</isEqual>
+							<isNotEmpty property="repId">
+								AND SUB.REP_ID = #repId#
+							</isNotEmpty>
+							
+					<![CDATA[
+							AND (
+								(B.REP_TYPE_CD = '02' AND (SUB.REP_CHG_FILE_PATH LIKE '/'||#selRepPath#||'/%' OR SUB.REP_CHG_FILE_PATH LIKE '/'||#selRepPath#)) 
+								OR (B.REP_TYPE_CD != '02' AND (SUB.REP_CHG_FILE_PATH LIKE #selRepPath#||'/%' OR SUB.REP_CHG_FILE_PATH LIKE #selRepPath#))
+							)
+					]]>
+						)
+				</isNotEqual>
+			</isNotEmpty>
+		</isNotNull>
+		<isEqual property="ticketId" compareValue="SYSTEM">
+			GROUP BY A.REP_ID , A.REP_RV , A.REP_RV_TYPE_CD , A.REP_COMMENT , A.REP_CMT_DATE , A.REP_CMT_AUTHOR , A.REP_CHG_FILE_CNT
+		</isEqual>
+		ORDER BY A.REP_RVN DESC
+	</sql>
 	
 	 
 	<sql id="selectRep1100List">
@@ -66,7 +182,12 @@
 			, A.REP_CHG_FILE_PATH
 			, A.REP_CHG_FILE_NM
 			, A.REP_CHG_FILE_KIND
+			, C.REP_RVN
+			, C.GIT_CMT_SHA
+			, C.GIT_BRC_NM
 		FROM REP1101 A
+		<!-- 
+		
 		INNER JOIN
 		(
 			SELECT REP_ID, MAX(TO_NUMBER(REP_RV)) AS MAX_REP_RV, REP_CHG_FILE_PATH, REP_CHG_FILE_NM
@@ -76,10 +197,36 @@
 			GROUP BY REP_ID, REP_CHG_FILE_PATH, REP_CHG_FILE_NM
 		) B
 		ON (A.REP_ID = B.REP_ID AND A.REP_RV = B.MAX_REP_RV AND A.REP_CHG_FILE_PATH = B.REP_CHG_FILE_PATH AND A.REP_CHG_FILE_NM = B.REP_CHG_FILE_NM)
-		INNER JOIN REP1100 C ON (A.REP_ID = C.REP_ID AND A.REP_RV = C.REP_RV AND C.TICKET_ID = A.TICKET_ID)
+		 -->
+		INNER JOIN
+		(
+			SELECT
+				IS1.*
+			FROM REP1101 IS1
+			LEFT JOIN REP1100 IS2
+			ON(IS1.REP_ID = IS2.REP_ID AND IS1.REP_RV = IS2.REP_RV)
+			WHERE (IS1.REP_ID, IS1.REP_CHG_FILE_PATH, IS1.REP_CHG_FILE_NM, IS2.REP_CMT_DATE)
+			IN (
+				SELECT
+					S1.REP_ID
+					,S1.REP_CHG_FILE_PATH
+					,S1.REP_CHG_FILE_NM
+					,MAX(S2.REP_CMT_DATE) AS REP_CMT_DATE
+				FROM REP1101 S1
+				INNER JOIN REP1100 S2
+				ON (S1.REP_ID = S2.REP_ID AND S1.REP_RV = S2.REP_RV)
+				WHERE  1 = 1
+				AND S1.TICKET_ID = #ticketId#
+				GROUP BY S1.REP_ID, S1.REP_CHG_FILE_PATH, S1.REP_CHG_FILE_NM
+			)
+		) B
+		ON (A.REP_ID = B.REP_ID AND A.REP_RV = B.REP_RV AND A.REP_CHG_FILE_PATH = B.REP_CHG_FILE_PATH AND A.REP_CHG_FILE_NM = B.REP_CHG_FILE_NM)
+		INNER JOIN REP1100 C ON (A.REP_ID = C.REP_ID AND A.REP_RV = C.REP_RV AND A.TICKET_ID = C.TICKET_ID)
 		INNER JOIN REP1000 D ON (A.REP_ID = D.REP_ID)
 		WHERE 1=1
 		AND A.TICKET_ID = #ticketId#
+		
+		AND C.GIT_BRC_NM NOT LIKE '%trunkCommit'
 		AND C.REP_RV_TYPE_CD = #repRvTypeCd#
 		AND NOT EXISTS
 		(
@@ -97,19 +244,22 @@
 		<isNotEmpty property="searchSelect">
 			<isNotEmpty property="searchTxt">
 			<isEqual property="searchSelect" compareValue="repNm"> 
-				AND		UPPER( D.REP_NM ) like '%'|| UPPER( #searchTxt#  )  ||'%'
+				AND		UPPER( D.REP_NM ) like '%'|| UPPER( #searchTxt# ) ||'%'
 			</isEqual>
 			<isEqual property="searchSelect" compareValue="repRv"> 
-				AND		UPPER( A.REP_RV )  like '%'|| UPPER( #searchTxt#  )  ||'%'
+				AND		UPPER( A.REP_RV ) like '%'|| UPPER( #searchTxt# ) ||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="repRvn"> 
+				AND		A.REP_RVN = #searchTxt#
 			</isEqual>
 			<isEqual property="searchSelect" compareValue="repChgFileNm"> 
-				AND		UPPER( A.REP_CHG_FILE_NM )  like '%'|| UPPER( #searchTxt#  )  ||'%'
+				AND		UPPER( A.REP_CHG_FILE_NM ) like '%'|| UPPER( #searchTxt# ) ||'%'
 			</isEqual>
 			<isEqual property="searchSelect" compareValue="repChgFilePath"> 
-				AND		UPPER( A.REP_CHG_FILE_PATH )  like '%'|| UPPER( #searchTxt#  )  ||'%'
+				AND		UPPER( A.REP_CHG_FILE_PATH ) like '%'|| UPPER( #searchTxt# ) ||'%'
 			</isEqual>
 			<isEqual property="searchSelect" compareValue="repCmtAuthor"> 
-				AND		UPPER( C.REP_CMT_AUTHOR )  like '%'|| UPPER( #searchTxt#  )  ||'%'
+				AND		UPPER( C.REP_CMT_AUTHOR ) like '%'|| UPPER( #searchTxt# ) ||'%'
 			</isEqual>
 			</isNotEmpty>
 		</isNotEmpty>
@@ -122,7 +272,117 @@
 		</isNotEmpty>
 		
 		ORDER BY C.REP_CMT_DATE DESC, A.REP_CHG_FILE_NM, A.REP_CHG_TYPE_CD
+	</sql>
 	
+	 
+	<sql id="selectRep1100OpsList">
+		SELECT
+			A.REP_ID
+			, E.REP_NM
+			, E.SVN_REP_URL
+			, E.REP_TYPE_CD
+			, A.REP_RV
+			, A.REP_TARGET_RV
+			, D.REP_COMMENT
+			, D.REP_CMT_DATE
+			, D.REP_CMT_AUTHOR
+			, A.REP_CHG_ID
+			, A.TICKET_ID
+			, A.REP_CHG_TYPE_CD
+			, SF_CMM1001_COM_CD_INFO('REP00004', A.REP_CHG_TYPE_CD, '1') AS REP_CHG_TYPE_NM
+			, A.REP_CHG_FILE_PATH
+			, A.REP_CHG_FILE_NM
+			, A.REP_CHG_FILE_KIND
+			, D.REP_RVN
+			, D.GIT_CMT_SHA
+			, D.GIT_BRC_NM
+		FROM REP1101 A
+		INNER JOIN (
+			SELECT * FROM REP1100
+			WHERE 1 = 1
+			AND TICKET_ID = #ticketId#
+			
+			AND GIT_BRC_NM LIKE '%trunkCommit'
+		) B
+		ON (A.REP_ID = B.REP_ID AND A.TICKET_ID = B.TICKET_ID AND A.REP_RV = B.REP_RV)
+		INNER JOIN (
+			SELECT
+				IS2.REP_ID
+				,IS2.REP_RV
+				,IS2.TICKET_ID
+				,IS1.REP_CHG_FILE_PATH
+				,IS1.REP_CHG_FILE_NM
+				,IS2.REP_RVN
+				,IS1.REP_TARGET_RV
+				,IS2.GIT_BRC_NM
+			FROM REP1101 IS1
+			LEFT JOIN REP1100 IS2
+			ON(IS1.REP_ID = IS2.REP_ID AND IS1.REP_RV = IS2.REP_RV)
+			WHERE (IS1.REP_ID, IS1.REP_CHG_FILE_PATH, IS1.REP_CHG_FILE_NM, IS2.REP_CMT_DATE)
+			IN (
+				SELECT
+					S1.REP_ID
+					,S1.REP_CHG_FILE_PATH
+					,S1.REP_CHG_FILE_NM
+					,MAX(S2.REP_CMT_DATE) AS REP_CMT_DATE
+				FROM REP1101 S1
+				INNER JOIN REP1100 S2
+				ON (S1.REP_ID = S2.REP_ID AND S1.REP_RV = S2.REP_RV)
+				WHERE  1 = 1
+				AND S2.GIT_BRC_NM LIKE '%trunkCommit'
+				AND S1.TICKET_ID = #ticketId#
+				GROUP BY S1.REP_ID, S1.REP_CHG_FILE_PATH, S1.REP_CHG_FILE_NM
+			)
+			AND IS2.GIT_BRC_NM NOT LIKE 'operation%'
+		) C
+		ON (A.REP_ID = C.REP_ID AND A.REP_RV = C.REP_RV AND A.TICKET_ID = C.TICKET_ID AND A.REP_CHG_FILE_PATH = C.REP_CHG_FILE_PATH AND A.REP_CHG_FILE_NM = C.REP_CHG_FILE_NM)
+		INNER JOIN REP1100 D ON (A.REP_ID = D.REP_ID AND A.REP_RV = D.REP_RV AND A.TICKET_ID = D.TICKET_ID)
+		INNER JOIN REP1000 E ON (A.REP_ID = E.REP_ID)
+		WHERE 1 = 1
+		AND NOT EXISTS
+		(
+			SELECT *
+			FROM REP1101
+			WHERE 1=1
+			AND REP_ID = A.REP_ID
+			AND TICKET_ID = A.TICKET_ID
+			AND REP_TARGET_RV = A.REP_RV
+			AND REP_TARGET_FILE_PATH = A.REP_CHG_FILE_PATH
+		)
+		<isNotEmpty property="repChgfileKind">
+			AND A.REP_CHG_FILE_KIND = #repChgfileKind#
+		</isNotEmpty>
+		<isNotEmpty property="searchSelect">
+			<isNotEmpty property="searchTxt">
+			<isEqual property="searchSelect" compareValue="repNm"> 
+				AND		UPPER( E.REP_NM ) like '%'|| UPPER( #searchTxt# ) ||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="repRv"> 
+				AND		UPPER( A.REP_RV ) like '%'|| UPPER( #searchTxt# ) ||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="repRvn"> 
+				AND		A.REP_RVN = #searchTxt#
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="repChgFileNm"> 
+				AND		UPPER( A.REP_CHG_FILE_NM ) like '%'|| UPPER( #searchTxt# ) ||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="repChgFilePath"> 
+				AND		UPPER( A.REP_CHG_FILE_PATH ) like '%'|| UPPER( #searchTxt# ) ||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="repCmtAuthor"> 
+				AND		UPPER( D.REP_CMT_AUTHOR ) like '%'|| UPPER( #searchTxt# ) ||'%'
+			</isEqual>
+			</isNotEmpty>
+		</isNotEmpty>
+		<isNotEmpty property="searchSelect">
+			<isNotEmpty property="searchCd">
+			<isEqual property="searchSelect" compareValue="repChgTypeCd">
+				AND		A.REP_CHG_TYPE_CD = #searchCd#
+			</isEqual>
+			</isNotEmpty>
+		</isNotEmpty>
+		
+		ORDER BY D.REP_CMT_DATE DESC, A.REP_CHG_FILE_NM ASC, A.REP_CHG_TYPE_CD ASC
 	</sql>
 	
 	 
@@ -147,6 +407,9 @@
 			, D.REP_NM
 			, D.DPL_REP_URL
 			, D.REP_TYPE_CD
+			, C.REP_RVN
+			, C.GIT_CMT_SHA
+			, C.GIT_BRC_NM
 		FROM REP1102 A
 		INNER JOIN
 		(
@@ -178,22 +441,25 @@
 		<isNotEmpty property="searchSelect">
 			<isNotEmpty property="searchTxt">
 			<isEqual property="searchSelect" compareValue="repNm"> 
-				AND		UPPER( D.REP_NM ) like '%'|| UPPER( #searchTxt#  )  ||'%'
+				AND		UPPER( D.REP_NM ) like '%'|| UPPER( #searchTxt# ) ||'%'
 			</isEqual>
 			<isEqual property="searchSelect" compareValue="repRv"> 
-				AND		UPPER( A.REP_RV )  like '%'|| UPPER( #searchTxt#  )  ||'%'
+				AND		UPPER( A.REP_RV ) like '%'|| UPPER( #searchTxt# ) ||'%'
+			</isEqual>
+			<isEqual property="searchSelect" compareValue="repRvn"> 
+				AND		UPPER( A.REP_RVN ) like '%'|| UPPER( #searchTxt# ) ||'%'
 			</isEqual>
 			<isEqual property="searchSelect" compareValue="repChgFileNm"> 
-				AND		UPPER( A.REP_CHG_FILE_NM )  like '%'|| UPPER( #searchTxt#  )  ||'%'
+				AND		UPPER( A.REP_CHG_FILE_NM ) like '%'|| UPPER( #searchTxt# ) ||'%'
 			</isEqual>
 			<isEqual property="searchSelect" compareValue="repChgFilePath"> 
-				AND		UPPER( A.REP_CHG_FILE_PATH )  like '%'|| UPPER( #searchTxt#  )  ||'%'
+				AND		UPPER( A.REP_CHG_FILE_PATH ) like '%'|| UPPER( #searchTxt# ) ||'%'
 			</isEqual>
 			<isEqual property="searchSelect" compareValue="repCmtAuthor"> 
-				AND		UPPER( C.REP_CMT_AUTHOR )  like '%'|| UPPER( #searchTxt#  )  ||'%'
+				AND		UPPER( C.REP_CMT_AUTHOR ) like '%'|| UPPER( #searchTxt# ) ||'%'
 			</isEqual>
 			<isEqual property="searchSelect" compareValue="bldNum"> 
-				AND		UPPER( A.BLD_NUM )  like '%'|| UPPER( #searchTxt#  )  ||'%'
+				AND		UPPER( A.BLD_NUM ) like '%'|| UPPER( #searchTxt# ) ||'%'
 			</isEqual>
 			</isNotEmpty>
 		</isNotEmpty>
@@ -215,6 +481,7 @@
 			, A.REP_CHG_FILE_NM
 			, A.REP_CHG_FILE_KIND
 			, A.COMMIT_EMP_ID
+			, A.REP_RVN
 		FROM REP1102 A
 		WHERE 1=1
 		AND A.TICKET_ID = #ticketId#
@@ -235,14 +502,57 @@
 			, A.REP_CMT_DATE
 			, A.REP_CMT_AUTHOR
 			, A.REP_CHG_FILE_CNT
+			, A.REP_RVN
+			, A.GIT_CMT_SHA
+			, A.GIT_BRC_NM
 		FROM REP1100 A
 		WHERE 1=1
 		AND A.TICKET_ID = #ticketId#
 		<isNotEmpty property="repId">
 			AND A.REP_ID = #repId#
 		</isNotEmpty>
+		<isNotEmpty property="gitBrcNm">
+			AND A.GIT_BRC_NM = #gitBrcNm#
+		</isNotEmpty>
 		<isNotEmpty property="repRv">
 			AND A.REP_RV = #repRv#
+		</isNotEmpty>
+	</select>
+	
+	 
+	<select id="rep1100DAO.selectRep1100RvListCnt" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		
+		SELECT
+			COUNT(*)
+		FROM
+		(
+			<include refid="selectRep1100RvList"/>
+		) T1
+	</select>
+	
+	 
+	<select id="rep1100DAO.selectRep1100RvList" parameterClass="java.util.Map" resultMap="resultRvListExt">
+		
+		SELECT T1.*
+		FROM
+		(
+			SELECT 
+				ROWNUM RN,
+				SUBT1.*
+				<isEqual property="ticketId" compareValue="SYSTEM">
+					
+					, #ticketId# AS TICKET_ID
+				</isEqual>
+			FROM
+			(
+				<include refid="selectRep1100RvList"/>
+			) SUBT1
+		) T1
+		WHERE 1= 1
+		<isNotEmpty property="firstIndex">
+			<isNotEmpty property="lastIndex">
+				
+			</isNotEmpty>
 		</isNotEmpty>
 	</select>
 	
@@ -261,6 +571,7 @@
 			, A.REP_TARGET_RV
 			, A.REP_TARGET_FILE_PATH
 			, A.COMMIT_EMP_ID
+			, A.REP_RVN
 		FROM REP1101 A
 		WHERE 1=1
 		AND A.TICKET_ID = #ticketId#
@@ -269,6 +580,9 @@
 		</isNotEmpty>
 		<isNotEmpty property="repRv">
 			AND A.REP_RV = #repRv#
+		</isNotEmpty>
+		<isNotEmpty property="repRvn">
+			AND A.REP_RVN = #repRvn#
 		</isNotEmpty>
 	</select>
 	
@@ -288,6 +602,7 @@
 			, A.REP_CHG_FILE_NM
 			, A.REP_CHG_FILE_KIND
 			, A.COMMIT_EMP_ID
+			, A.REP_RVN
 		FROM REP1102 A
 		WHERE 1=1
 		AND A.TICKET_ID = #ticketId#
@@ -306,13 +621,16 @@
 		<isNotEmpty property="repRv">
 			AND A.REP_RV = #repRv#
 		</isNotEmpty>
+		<isNotEmpty property="repRvn">
+			AND A.REP_RVN = #repRvn#
+		</isNotEmpty>
 		<isNotEmpty property="repChgSelCd">
 			AND A.REP_CHG_SEL_CD = #repChgSelCd#
 		</isNotEmpty>
 	</select>
 
 	 
-    <insert id="rep1100DAO.insertRep1100RvInfo" parameterClass="java.util.Map">
+	<insert id="rep1100DAO.insertRep1100RvInfo" parameterClass="java.util.Map">
 		 
 		INSERT INTO REP1100
 		(
@@ -324,6 +642,9 @@
 			, REP_CMT_DATE
 			, REP_CMT_AUTHOR
 			, REP_CHG_FILE_CNT
+			, REP_RVN
+			, GIT_CMT_SHA
+			, GIT_BRC_NM
 		)
 		VALUES
 		(
@@ -335,9 +656,12 @@
 			, TO_DATE(#repCmtDate#, 'YYYY-MM-DD HH24:MI:SS')
 			, #repCmtAuthor#
 			, #repChgFileCnt#
+			, #repRvn#
+			, #gitCmtSha#
+			, #gitBrcNm#
 		)
 	</insert>
-    
+	
 	
 	<update id="rep1100DAO.updateRep1100RvInfo" parameterClass="java.util.Map">
 		 
@@ -360,14 +684,14 @@
 			SELECT	NVL( 
 							SUBSTR(NEW_REP_CHG_ID, 1, 11) || LPAD( (TO_NUMBER(SUBSTR(NEW_REP_CHG_ID, 12, 5)) + 1) , 5, '0')
 						,	'CHG' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '00001'
-            		) AS NEW_REP_CHG_ID 
+					) AS NEW_REP_CHG_ID 
 			FROM	(
-			            SELECT	MAX(REP_CHG_ID)  AS NEW_REP_CHG_ID
-			            FROM	REP1101 A
-			            WHERE	1=1
-			          	AND		REP_ID = #repId#
-			          	AND		REP_RV = #repRv#
-			            AND		REP_CHG_ID LIKE 'CHG' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '%'
+						SELECT	MAX(REP_CHG_ID) AS NEW_REP_CHG_ID
+						FROM	REP1101 A
+						WHERE	1=1
+					 	AND		REP_ID = #repId#
+					 	AND		REP_RV = #repRv#
+						AND		REP_CHG_ID LIKE 'CHG' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '%'
 					)
 		]]>
 		</selectKey>
@@ -385,6 +709,7 @@
 			, REP_TARGET_RV
 			, REP_TARGET_FILE_PATH
 			, COMMIT_EMP_ID
+			, REP_RVN
 		)
 		VALUES
 		(
@@ -399,6 +724,7 @@
 			, #repTargetRv#
 			, #repTargetFilePath#
 			, #commitEmpId#
+			, #repRvn#
 		)
 	</insert>
 	
@@ -410,16 +736,16 @@
 			SELECT	NVL( 
 							SUBSTR(NEW_REP_CHG_ID, 1, 11) || LPAD( (TO_NUMBER(SUBSTR(NEW_REP_CHG_ID, 12, 5)) + 1) , 5, '0')
 						,	'CHG' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '00001'
-            		) AS NEW_REP_CHG_ID 
+					) AS NEW_REP_CHG_ID 
 			FROM	(
-			            SELECT	MAX(REP_CHG_ID)  AS NEW_REP_CHG_ID
-			            FROM	REP1102 A
-			            WHERE	1=1
-			            AND		TICKET_ID = #ticketId#
-			            AND		CI_ID = #ciId#
-			          	AND		REP_ID = #repId#
-			          	AND		REP_RV = #repRv#
-			            AND		REP_CHG_ID LIKE 'CHG' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '%'
+						SELECT	MAX(REP_CHG_ID) AS NEW_REP_CHG_ID
+						FROM	REP1102 A
+						WHERE	1=1
+						AND		TICKET_ID = #ticketId#
+						AND		CI_ID = #ciId#
+					 	AND		REP_ID = #repId#
+					 	AND		REP_RV = #repRv#
+						AND		REP_CHG_ID LIKE 'CHG' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '%'
 					)
 		]]>
 		</selectKey>
@@ -439,6 +765,7 @@
 			, REP_CHG_FILE_KIND
 			, REP_CHG_SEL_CD
 			, COMMIT_EMP_ID
+			, REP_RVN
 		)
 		VALUES
 		(
@@ -455,6 +782,7 @@
 			, #repChgFileKind#
 			, #repChgSelCd#
 			, #commitEmpId#
+			, #repRvn#
 		)
 	</insert>
 	
@@ -472,60 +800,88 @@
 	</delete>
 	
 	
-    <select id="rep1100DAO.selectRep1100TktRvFileChgList" parameterClass="java.util.Map"  resultClass="egovMap">
-	    
+	<select id="rep1100DAO.selectRep1100TktRvFileChgList" parameterClass="java.util.Map" resultClass="egovMap">
+		
 		SELECT *
 		FROM
 		(
-	   		SELECT 
-	   			ROWNUM RN,
+			SELECT 
+				ROWNUM RN,
 				SUBT1.*
-	   		FROM
-	   		(
+			FROM
+			(
 				<include refid="selectRep1100List"/>
-    		) SUBT1
-    	) T1
+			) SUBT1
+		) T1
 		WHERE T1.RN BETWEEN (#firstIndex#+1) AND #lastIndex#
-    </select>
-    
-    
-    <select id="rep1100DAO.selectRep1100TktRvFileChgListCnt" parameterClass="java.util.Map"  resultClass="java.lang.Integer">
-	    
-	    	SELECT
-	    		COUNT(*)
+	</select>
+	
+	
+	<select id="rep1100DAO.selectRep1100TktRvFileChgListCnt" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		
+			SELECT
+				COUNT(*)
 			FROM
 			(
 				<include refid="selectRep1100List"/>
 			) T1
-    </select>
-    
-    
-    <select id="rep1100DAO.selectRep1102TktDplFileChgList" parameterClass="java.util.Map"  resultClass="egovMap">
-	    
+	</select>
+	
+	
+	<select id="rep1100DAO.selectRep1100TktTrunkRvFileChgList" parameterClass="java.util.Map" resultClass="egovMap">
+		
 		SELECT *
 		FROM
 		(
-	   		<include refid="selectRep1102List"/>
-    	) T1
-    </select>
-    
-    
-    <select id="rep1100DAO.selectRep1102TktDplSelFileChgList" parameterClass="java.util.Map"  resultClass="egovMap">
-	    
+			SELECT 
+				ROWNUM RN,
+				SUBT1.*
+			FROM
+			(
+				<include refid="selectRep1100OpsList"/>
+			) SUBT1
+		) T1
+		WHERE T1.RN BETWEEN (#firstIndex#+1) AND #lastIndex#
+	</select>
+	
+	
+	<select id="rep1100DAO.selectRep1100TktTrunkRvFileChgListCnt" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		
+			SELECT
+				COUNT(*)
+			FROM
+			(
+				<include refid="selectRep1100OpsList"/>
+			) T1
+	</select>
+	
+	
+	<select id="rep1100DAO.selectRep1102TktDplFileChgList" parameterClass="java.util.Map" resultClass="egovMap">
+		
 		SELECT *
 		FROM
 		(
-	   		<include refid="selectRep1102SelList"/>
-    	) T1
-    </select>
-    
-    
-    <select id="rep1100DAO.selectRep1102TktFileRecentBldNumList" parameterClass="java.util.Map"  resultClass="egovMap">
-	    
+			<include refid="selectRep1102List"/>
+		) T1
+	</select>
+	
+	
+	<select id="rep1100DAO.selectRep1102TktDplSelFileChgList" parameterClass="java.util.Map" resultClass="egovMap">
+		
 		SELECT *
 		FROM
 		(
-	   		SELECT CI_ID, TICKET_ID, REP_ID, JOB_ID, MAX(BLD_NUM) AS MAX_BLD_NUM, REP_CHG_FILE_PATH
+			<include refid="selectRep1102SelList"/>
+		) T1
+	</select>
+	
+	
+	<select id="rep1100DAO.selectRep1102TktFileRecentBldNumList" parameterClass="java.util.Map" resultClass="egovMap">
+		
+		SELECT *
+		FROM
+		(
+	  		SELECT CI_ID, TICKET_ID, REP_ID, JOB_ID, MAX(BLD_NUM) AS MAX_BLD_NUM, REP_CHG_FILE_PATH
 			FROM REP1102
 			WHERE 1=1
 			AND CI_ID = #ciId#
@@ -534,10 +890,10 @@
 			AND JOB_ID = #jobId#
 			AND REP_CHG_FILE_PATH = #repChgFilePath#
 			GROUP BY CI_ID, TICKET_ID, REP_ID, JOB_ID, REP_CHG_FILE_PATH
-    	) T1
-    </select>
-    
-    
+		) T1
+	</select>
+	
+	
 	<update id="rep1100DAO.updateRep1102TktDplFileSelInfo" parameterClass="java.util.Map">
 		 
 		UPDATE REP1102 SET
@@ -550,14 +906,14 @@
 		AND REP_RV = #repRv#
 		AND REP_CHG_ID = #repChgId#
 	</update>
-	    
-    
-    <select id="rep1100DAO.selectRep1100TktChgMaxRv" parameterClass="java.util.Map"  resultClass="java.lang.Integer">
-	    
-	    	SELECT T1.*
+		
+	
+	<select id="rep1100DAO.selectRep1100TktChgMaxRv" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		
+			SELECT T1.*
 			FROM
 			(
-				SELECT MAX(A.REP_RV) AS MAX_REP_RV
+				SELECT MAX(A.REP_RVN) AS MAX_REP_RV
 				FROM REP1101 A
 				INNER JOIN REP1100 B ON (A.REP_ID = B.REP_ID AND A.TICKET_ID = B.TICKET_ID AND A.REP_RV = B.REP_RV)
 				WHERE 1=1
@@ -565,32 +921,32 @@
 				AND A.REP_ID = #repId#
 				AND B.REP_RV_TYPE_CD = '02'
 			) T1
-    </select>
-        
-    
-    <select id="rep1100DAO.selectRep1101TktChgFileLastRvNum" parameterClass="java.util.Map"  resultClass="egovMap">
-	    
-		SELECT MAX(REP_RV) AS MAX_REP_RV
+	</select>
+		
+	
+	<select id="rep1100DAO.selectRep1101TktChgFileLastRvNum" parameterClass="java.util.Map" resultClass="egovMap">
+		
+		SELECT MAX(REP_RVN) AS MAX_REP_RV
 		FROM REP1100
 		WHERE 1=1
 		AND TICKET_ID = #ticketId#
 		AND REP_RV_TYPE_CD = '02'
-    </select>
-    
-    
-    <select id="rep1100DAO.selectTempDataList" parameterClass="java.util.Map"  resultClass="egovMap">
-	    
+	</select>
+	
+	
+	<select id="rep1100DAO.selectTempDataList" parameterClass="java.util.Map" resultClass="egovMap">
+		
 		SELECT *
 		FROM
 		(
-	   		SELECT REP_ID, PATH, EMP_ID
+			SELECT REP_ID, PATH, EMP_ID
 			FROM TEMP
 			WHERE 1=1
 			AND SUCC_CD = '01'
-    	) T1
-    </select>
-    
-    
+		) T1
+	</select>
+	
+	
 	<update id="rep1100DAO.updateTempDataInfo" parameterClass="java.util.Map">
 		 
 		UPDATE TEMP SET
