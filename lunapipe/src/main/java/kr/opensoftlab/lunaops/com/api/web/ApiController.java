@@ -1,6 +1,7 @@
 package kr.opensoftlab.lunaops.com.api.web;
 
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import egovframework.com.cmm.service.EgovProperties;
 import egovframework.rte.fdl.property.EgovPropertyService;
@@ -248,8 +251,8 @@ public class ApiController {
 				model.addAttribute("result", "SUCCESS");
 				model.addAttribute("msg", "정상적으로 생성되었습니다.");
 			}else {
-				response.setStatus(500);
 				String errorCode = (String) rtnMap.get("error_code");
+				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -294,7 +297,7 @@ public class ApiController {
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
-				response.setStatus(500);
+				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -402,7 +405,7 @@ public class ApiController {
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
-				response.setStatus(500);
+				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -526,7 +529,7 @@ public class ApiController {
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
-				response.setStatus(500);
+				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -810,7 +813,7 @@ public class ApiController {
 			String errorCode = (String) rtnMap.get("error_code");
 			
 			if(!result) {
-				response.setStatus(500);
+				response.setStatus(Integer.parseInt("9"+errorCode));
 				model.addAttribute("result", "FAIL");
 				model.addAttribute("error_code", errorCode);
 				model.addAttribute("msg", OslErrorCode.getErrorMsg(errorCode));
@@ -884,6 +887,89 @@ public class ApiController {
 			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
 			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
 			Log.error("insertTempRepFileLock()", ex);
+		}
+		return new ModelAndView("jsonView");
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value="/api/gitHookPostPush", produces = "application/json; charset=urf8", method=RequestMethod.POST)
+	public ModelAndView gitHookPostPush(@RequestBody HashMap<String, Object> paramMap, HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			System.out.println(">>>>>>>>>>>>"+paramMap.entrySet());
+			
+			boolean deleted = (boolean) paramMap.get("deleted");
+			
+			Map headCommit = (Map)paramMap.get("head_commit");
+			if(headCommit == null) {
+				
+				return new ModelAndView("jsonView");
+			}
+			
+			
+			boolean distinct = (boolean) headCommit.get("distinct");
+			
+			
+			Map repoInfoMap = (Map)paramMap.get("repository");
+			String defaultBranchNm = (String) repoInfoMap.get("default_branch");
+			
+			String opsBranchNm = EgovProperties.getProperty("Globals.github.operation.branch");
+			if(!deleted) {
+				String cmtBranchNm = (String) paramMap.get("ref");
+				cmtBranchNm = cmtBranchNm.replace("refs/heads/", "");
+				
+				paramMap.put("actionType", "not");
+				
+				if(cmtBranchNm.indexOf(opsBranchNm) == 0 && cmtBranchNm.indexOf("trunkCommit") > -1 && distinct){
+					
+					paramMap.put("actionType", "operationMerge");
+					
+					Map rtnMap = apiService.insertRepRevisionInfoByGitHub(paramMap);
+					model.addAllAttributes(rtnMap);
+				}
+				
+				else if(cmtBranchNm.indexOf(opsBranchNm) == -1 && cmtBranchNm.indexOf("trunkCommit") > -1 && distinct) {
+					
+					paramMap.put("actionType", "masterMerge");
+					
+					Map rtnMap = apiService.insertRepRevisionInfoByGitHub(paramMap);
+					model.addAllAttributes(rtnMap);
+				}
+				
+				else if(!defaultBranchNm.equals(cmtBranchNm) && cmtBranchNm.indexOf("trunkCommit") == -1){
+					paramMap.put("actionType", "push");
+					
+					Map rtnMap = apiService.insertRepRevisionInfoByGitHub(paramMap);
+					model.addAllAttributes(rtnMap);
+				}
+			}
+		}catch(Exception ex){
+			model.addAttribute("result", "ERROR");
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+			Log.error("gitHookPostPush()", ex);
+		}
+		return new ModelAndView("jsonView");
+	}
+	
+	
+	
+	@RequestMapping(value="/api/getParam.do")
+	public ModelAndView getParam(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			
+			String data = URLEncoder.encode(CommonScrty.encryptedAria(new ObjectMapper().writeValueAsString(paramMap), "UKVPlQAJhoSV9Xf1yAthywKHptlTGk9k+PuKQiBQcXc="), "UTF-8");
+
+			model.addAttribute("data", data);
+			
+		}catch(Exception ex){
+			model.addAttribute("result", "ERROR");
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+			Log.error("gitHookPostPush()", ex);
 		}
 		return new ModelAndView("jsonView");
 	}

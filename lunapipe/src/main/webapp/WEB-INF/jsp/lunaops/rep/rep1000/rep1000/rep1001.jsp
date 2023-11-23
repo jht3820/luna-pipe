@@ -9,6 +9,9 @@
 .layer_popup_box .pop_left, .layer_popup_box .pop_right { height: 54px; }
 .required_info { color: red; }
 
+/* git 일 때 팝업 사이즈 강제 수정*/
+.rep1001-layer_popup_box--size {height: 635px !important;}
+
 /*익스플로러 적용 위해 !important 추가*/
 /* 팝업에 따라 pop_menu_col1, pop_menu_col2 높이 변경 */
 .pop_menu_row .pop_menu_col1 { width: 20% !important; height: 45px !important; padding-left: 6px !important; }
@@ -23,7 +26,8 @@
 .pop_dpl_div_sub.divDetail_sub_right {width: 400px;float: left;position: relative;/* height: 448px; */}
 
 /* 소스저장소 종류에따른 show/hide */
-.rep1001GitFrame{display:none;}
+/* .rep1001GitFrame{display:none;} */
+.rep1001SvnFrame{display:none;}
 .rep1001GitUsrAuthIdFrame{display:none;}
 .button_normal.button_col {
     width: 90%;
@@ -64,20 +68,29 @@ var fd = new FormData();
 //현재 비밀번호 저장
 var nowSvnPw = null;
 var nowGitPw = null;
+var nowGitTk = null;
 var nowDplPw = null;
 
 //zTree
 var zTreeRep1001;
 
 //접속 체크 플래그
-var svnConnCheckFlag = false;
+var repConnCheckFlag = false;
 
 //url, id, pw 변경 데이터 확인값
 var chgDataFlag = {
+		repTypeCd : "",
 		svnRepUrl: "",
 		svnUsrId: "",
-		svnUsrId: ""
+		svnUsrId: "",
+		gitRepUrl : "",
+		gitUsrId : "",
+		gitUsrPw : "",
+		gitUsrTk : ""
 };
+
+//수정일 때 체크로 사용 : 원래 정보
+var oriRepInfo = null;
 
 // input 유효성
 var arrChkObj = {	"repNm":{"type":"length","msg":"저장소 명은 500byte까지 입력이 가능합니다.","max":500},
@@ -103,12 +116,16 @@ $(document).ready(function() {
 	*/
 	// 팝업 공통코드 select 세팅
 	var commonCodeArr = [
+		{mstCd: "REP00001", useYn: "Y",targetObj: "#repTypeCd", comboType:"OS"}, // 저장소 유형
 		{mstCd: "REP00002", useYn: "Y",targetObj: "#gitUsrAuthTypeCd", comboType:"OS"}, // git 인증 타입
 		{mstCd: "CMM00001", useYn: "Y",targetObj: "#useCd", comboType:"OS"} // 사용유무
 	];
 	//공통코드 채우기
-	gfnGetMultiCommonCodeDataForm(commonCodeArr , true);
-	
+	var ajaxDone = gfnGetMultiCommonCodeDataForm(commonCodeArr , true);
+	ajaxDone.done(function(){
+		//소스저장소 종류 변경
+		$("#repTypeCd").trigger("change");
+	});
 	$("#repNm").focus();
 	
 	// 유효성 체크
@@ -149,6 +166,15 @@ $(document).ready(function() {
 		var strFormId = "rep1001PopupFrm";
 		var strCheckObjArr = ["repNm"];
 		var sCheckObjNmArr = ["저장소 명"];
+		
+		//수정일 때
+		if('${param.popupGb}' == 'update'){
+			//저장소 유형 변경, url은 변경 금지로, 강제 변경되었을 수 있으므로 여기서 초기화
+			$("#repTypeCd").val(oriRepInfo.repTypeCd).attr("disabled",true).trigger("change");
+        	$("#gitRepUrl").val(oriRepInfo.gitRepUrl).attr("readonly",true);
+        	$("#svnRepUrl").val(oriRepInfo.svnRepUrl).attr("readonly",true);
+        	$("#dplRepUrl").val(oriRepInfo.dplRepUrl).attr("readonly",true);
+		}
 		
 		//소스저장소 종류에 따라 필수 값 분기
 		var repTypeCd = $("#repTypeCd").val();
@@ -203,21 +229,55 @@ $(document).ready(function() {
 	$('#btn_cancle_popup').click(function() {
 		gfnLayerPopupClose();
 	});
-/* 
+
 	//소스저장소 종류 변경
 	$("#repTypeCd").on("change", function(){
 		fnRepTypeCdChg(this.value);
-	}); */
+		
+		//접속 중인경우
+		if(repConnCheckFlag){
+			//key값
+			var key = $(this).attr("id");
+			var value = this.value;
+		
+			//이전 데이터와 변경점 있는지 체크
+			if(chgDataFlag[key] != value){
+				//mask 보이기
+			    $("#repTreeListMask").show();
+				//트리 제거
+				zTreeRep1001.destroy();
+				//경로내용 제거
+				$("#selTreeNodeUrl").val("");
+			}
+		}
+	});
 	
 	//git 인증 방식 변경
 	$("#gitUsrAuthTypeCd").on("change", function(){
 		fnGitUsrAuthTypeCdChg(this.value);
+		
+		//접속 중인경우
+		if(repConnCheckFlag){
+			//key값
+			var key = $(this).attr("id");
+			var value = this.value;
+		
+			//이전 데이터와 변경점 있는지 체크
+			if(chgDataFlag[key] != value){
+				//mask 보이기
+			    $("#repTreeListMask").show();
+				//트리 제거
+				zTreeRep1001.destroy();
+				//경로내용 제거
+				$("#selTreeNodeUrl").val("");
+			}
+		}
 	});
 	
 	//url, user, pw 입력하는 경우 mask 생성
-	$("#svnRepUrl, #svnUsrId, #svnUsrPw").blur(function(){
+	$("#svnRepUrl, #svnUsrId, #svnUsrPw, #gitRepUrl, #gitUsrId, #gitUsrPw, #gitUsrTk").blur(function(){
 		//접속 중인경우
-		if(svnConnCheckFlag){
+		if(repConnCheckFlag){
 			//key값
 			var key = $(this).attr("id");
 			var value = this.value;
@@ -235,32 +295,60 @@ $(document).ready(function() {
 	});
 	
 	//접속 체크
-	$("#btnSvnConnCheck").click(function(){
+	$("#btnRepConnCheck").click(function(){
 		//현재 값 넣기
 		chgDataFlag["svnRepUrl"] = $("#svnRepUrl").val();
 		chgDataFlag["svnUsrId"] = $("#svnUsrId").val();
 		chgDataFlag["svnUsrPw"] = $("#svnUsrPw").val();
 		
-		selectRep1001SvnTreeSetting();
+		chgDataFlag["gitRepUrl"] = $("#gitRepUrl").val();
+		chgDataFlag["gitUsrId"] = $("#gitUsrId").val();
+		chgDataFlag["gitUsrPw"] = $("#gitUsrPw").val();
+		chgDataFlag["gitUsrTk"] = $("#gitUsrTk").val();
+
+		chgDataFlag["repTypeCd"] = $("#repTypeCd").val();
+		chgDataFlag["gitUsrAuthTypeCd"] = $("#gitUsrAuthTypeCd").val();
+		
+		selectRep1001RepTreeSetting();
 	})
 });
 
 	//소스저장소 종류 변경 함수
 	function fnRepTypeCdChg(chgValue){
-		//git
-		if(chgValue == "01"){
+		//github, gitlab
+		if(chgValue == "01" || chgValue == "03"){
 			$(".rep1001GitFrame").show();
 			$(".rep1001SvnFrame").hide();
+			
+			//사용여부 한줄 처리 및 스타일 변경
+			$("#useCdDiv").addClass("pop_menu_oneRow");
+			$("#useCdDiv > div:first-child").removeClass("menu_col1_subStyle pop_menu_col1_right").addClass("pop_oneRow_col1");
+			$("#useCdDiv > div:last-child").removeClass("menu_col2_subStyle").addClass("pop_oneRow_col2");
+			
+			//인증 방식 사용자 토큰으로 고정
+			$("#gitUsrAuthTypeCd").val("01").attr("disabled",true).trigger("change");
+			
+			//팝업 사이즈 변경
+			$("#rep1001PopupFrm").parents(".layer_popup_box").addClass("rep1001-layer_popup_box--size");
 		}
 		//svn
 		else if(chgValue == "02"){
 			$(".rep1001SvnFrame").show();
 			$(".rep1001GitFrame").hide();
-		}else if(chgValue == "03"){
-			$(".rep1001GitFrame").show();
-			$(".rep1001SvnFrame").hide();
+			
+			//사용여부 한줄 처리 및 스타일 변경
+			$("#useCdDiv").removeClass("pop_menu_oneRow");
+			$("#useCdDiv > div:first-child").addClass("menu_col1_subStyle pop_menu_col1_right").removeClass("pop_oneRow_col1");
+			$("#useCdDiv > div:last-child").addClass("menu_col2_subStyle").removeClass("pop_oneRow_col2");
+			
+			//인증 방식 사용자 토큰 고정 해제
+			$("#gitUsrAuthTypeCd").attr("disabled",false);
+			
+			//팝업 사이즈 변경
+			$("#rep1001PopupFrm").parents(".layer_popup_box").removeClass("rep1001-layer_popup_box--size");
 		}
 	}
+	
 	//git 인증 방식 변경 함수
 	function fnGitUsrAuthTypeCdChg(chgValue){
 		//사용자 토큰
@@ -270,8 +358,12 @@ $(document).ready(function() {
 		}
 		//사용자 id/pw
 		else if(chgValue == "02"){
-			$(".rep1001GitUsrAuthIdFrame").show();
-			$(".rep1001GitUsrAuthTkFrame").hide();
+			//비권장이며, 접근 권한에서 현재 에러가 나기 때문에 강제 토큰으로 변경
+			//svn이 아니면(01, 03)
+			if($("#repTypeCd").val() != "02"){
+				//인증 방식 사용자 토큰으로 고정
+				$("#gitUsrAuthTypeCd").val("01").attr("disabled",true).trigger("change");
+			}
 		}
 	}
 	/**
@@ -284,22 +376,21 @@ $(document).ready(function() {
 				,{ "repId" : repId });
 		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
+			oriRepInfo = data.repInfo;
         	//디테일폼 세팅
-        	gfnSetData2ParentObj(data.repInfo, "rep1001PopupFrm");
+        	gfnSetData2ParentObj(oriRepInfo, "rep1001PopupFrm");
         	
-        	var repTypeCd = data.repInfo.repTypeCd;
+        	var repTypeCd = oriRepInfo.repTypeCd;
         	
-        	//소스저장소 종류
-        	fnRepTypeCdChg(repTypeCd);
-        	if(repTypeCd == "01" || repTypeCd == "03"){
-	        	//git 인증 방식
-	        	fnGitUsrAuthTypeCdChg(data.repInfo.gitUsrAuthTypeCd);
-        	}
+        	//소스저장소 종류 변경
+			$("#repTypeCd").val(repTypeCd).trigger("change");
         	
         	//Deploy 사용 여부
-        	var dplUseCd = data.repInfo.dplUseCd;
+        	var dplUseCd = oriRepInfo.dplUseCd;
         	//Deploy 값 있는 경우
-        	if(!gfnIsNull(dplUseCd)){
+        	//임시) repTypeCd 가 02 svn일 때
+        	if(!gfnIsNull(dplUseCd) && repTypeCd == "02"){
+        		
         		//Deploy 사용 여부
 	        	var dplUseCdObj = document.getElementById("deployInsertChkBox");
 	        	if(dplUseCd == "01"){
@@ -310,9 +401,16 @@ $(document).ready(function() {
         		fnDeployInsertChg(dplUseCdObj);
         	}
 
-        	nowSvnPw = data.repInfo.svnUsrPw;
-        	nowGitPw = data.repInfo.gitUsrPw;
-        	nowDplPw = data.repInfo.dplUsrPw;
+        	nowSvnPw = oriRepInfo.svnUsrPw;
+        	nowGitPw = oriRepInfo.gitUsrPw;
+        	nowGitTk = oriRepInfo.gitUsrTk;
+        	nowDplPw = oriRepInfo.dplUsrPw;
+        	
+        	//저장소 유형 변경, url 변경 금지
+        	$("#repTypeCd").attr("disabled",true);
+        	$("#gitRepUrl").attr("readonly",true);
+        	$("#svnRepUrl").attr("readonly",true);
+        	$("#dplRepUrl").attr("readonly",true);
 		});
 		
 		//AJAX 전송
@@ -321,12 +419,39 @@ $(document).ready(function() {
 	
 	//소스저장소 등록 함수
 	function fnInsertReqInfoAjax(formId){
+		var reDisabled = false;
+		if($("#gitUsrAuthTypeCd").attr("disabled") == "disabled"){
+			$("#gitUsrAuthTypeCd").attr("disabled", false);
+			reDisabled = true;
+		}
+		//수정일 때
+		if('${param.popupGb}' == 'update'){
+			$("#repTypeCd").attr("disabled", false);
+        	$("#gitRepUrl").attr("readonly", false);
+        	$("#svnRepUrl").attr("readonly", false);
+        	$("#dplRepUrl").attr("readonly", false);
+		}
+		
 		//FormData에 input값 넣기
 		gfnFormDataAutoValue('rep1001PopupFrm',fd);
+		
+		//disabled 다시하기
+		if(reDisabled){
+			$("#gitUsrAuthTypeCd").attr("disabled", true);
+			reDisabled = false;
+		}
+		//수정일 때
+		if('${param.popupGb}' == 'update'){
+			$("#repTypeCd").attr("disabled", true);
+        	$("#gitRepUrl").attr("readonly", true);
+        	$("#svnRepUrl").attr("readonly", true);
+        	$("#dplRepUrl").attr("readonly", true);
+		}
 		
 		//기존 비밀번호 넘기기
 		fd.append("nowSvnPw",nowSvnPw);
 		fd.append("nowGitPw",nowGitPw);
+		fd.append("nowGitTk",nowGitTk);
 		fd.append("nowDplPw",nowDplPw);
 		
 		//depoy체크박스 값
@@ -390,26 +515,63 @@ $(document).ready(function() {
 	}
 	
 	
-	//svn 목록 트리 세팅하기
-	function selectRep1001SvnTreeSetting(){
-		//svn url, id, password
-		var svnRepUrl = $("#svnRepUrl").val();
-		var svnUsrId = $("#svnUsrId").val();
-		var svnUsrPw = $("#svnUsrPw").val();
-		var repTypeCd = $("#repTypeCd").val();
+	//repository 목록 트리 세팅하기
+	function selectRep1001RepTreeSetting(){
 		
-		//값이 없는 경우 중지
-		if(gfnIsNull(svnRepUrl)){
-			jAlert("SVN URL값을 입력해주세요.","알림");
-			return false;
+		//svn url, id, password
+		var svnRepUrl = chgDataFlag["svnRepUrl"];
+		var svnUsrId = chgDataFlag["svnUsrId"];
+		var svnUsrPw = chgDataFlag["svnUsrPw"];
+		//git url, token
+		var gitRepUrl = chgDataFlag["gitRepUrl"];
+		var gitUsrId = chgDataFlag["gitUsrId"];
+		var gitUsrPw = chgDataFlag["gitUsrPw"];
+		var gitUsrTk = chgDataFlag["gitUsrTk"];
+		
+		var repTypeCd = chgDataFlag["repTypeCd"];
+		var gitUsrAuthTypeCd = chgDataFlag["gitUsrAuthTypeCd"];
+		
+		//svn
+		if(repTypeCd == "02"){
+			//값이 없는 경우 중지
+			if(gfnIsNull(svnRepUrl)){
+				jAlert("SVN URL값을 입력해주세요.","알림");
+				return false;
+			}
+			if(gfnIsNull(svnUsrId)){
+				jAlert("SVN 사용자 ID값을 입력해주세요.","알림");
+				return false;
+			}
+			else if(gfnIsNull(svnUsrPw)){
+				jAlert("SVN 사용자 비밀번호 값을 입력해주세요.","알림");
+				return false;
+			}
 		}
-		else if(gfnIsNull(svnUsrId)){
-			jAlert("SVN 사용자 ID값을 입력해주세요.","알림");
-			return false;
-		}
-		else if(gfnIsNull(svnUsrPw)){
-			jAlert("SVN 사용자 비밀번호 값을 입력해주세요.","알림");
-			return false;
+		//github, gitlab
+		else{
+			//값이 없는 경우 중지
+			if(gfnIsNull(gitRepUrl)){
+				jAlert("GIT URL값을 입력해주세요.","알림");
+				return false;
+			}
+			//토큰 사용일 때
+			if(gitUsrAuthTypeCd == "01"){
+				if(gfnIsNull(gitUsrTk)){
+					jAlert("GIT 사용자 토큰 값을 입력해주세요.","알림");
+					return false;
+				}
+			}
+			//id/pw 사용일 때
+			else{
+				if(gfnIsNull(gitUsrId)){
+					jAlert("GIT 사용자 ID 값을 입력해주세요.","알림");
+					return false;
+				}
+				if(gfnIsNull(gitUsrPw)){
+					jAlert("GIT 사용자 비밀번호 값을 입력해주세요.","알림");
+					return false;
+				}
+			}
 		}
 		
 		//파라미터
@@ -418,7 +580,11 @@ $(document).ready(function() {
 				"svnUsrId": svnUsrId,
 				"svnUsrPw": svnUsrPw,
 				"nowSvnPw": nowSvnPw,
+				"gitRepUrl" : gitRepUrl,
+				"gitUsrTk" : gitUsrTk,
+				"nowGitTk" : nowGitTk,
 				"repTypeCd": repTypeCd,
+				"gitUsrAuthTypeCd" : gitUsrAuthTypeCd,
 				"type": '${param.popupGb}'
 			   };
 	
@@ -472,7 +638,7 @@ $(document).ready(function() {
 			var list = data.list;
 			
 		    $.each(list, function(idx, obj){
-				if(obj["type"] == 0){
+				if(obj["type"] == 0 || obj["type"] == "dir"){
 					obj.isParent = true;
 				}else{
 					obj.isParent = false;
@@ -490,7 +656,7 @@ $(document).ready(function() {
 		    $("#repTreeListMask").hide();
 		    
 		    //접속 중 값 변경
-		    svnConnCheckFlag = true;
+		    repConnCheckFlag = true;
 		});
 	
 		//AJAX 전송
@@ -520,7 +686,7 @@ $(document).ready(function() {
 		// 해당 옵션 추가해야  트리의  [+] 아이콘 클릭 시 한번에 트리가 펼쳐진다. 
 		$.each(childNodes, function(idx, node){
 			// 트리 노드가 부모형이 아닐 경우
-			if(node["type"] == 0){
+			if(node["type"] == 0 || node["type"] == "dir"){
 				node.isParent = true;
 			}
 			zTreeRep1001.updateNode(node);
@@ -551,7 +717,7 @@ $(document).ready(function() {
 	<input type="hidden" name="repId" id="repId" value="${param.repId}" />
 	<input type="hidden" name="empId" id="empId" value="${param.empId}" />
 	<input type="hidden" name="reqStatusCd" id="reqStatusCd" value="01"/>
-	<input type="hidden" name="repTypeCd" id="repTypeCd" value="02"/>
+	<!-- <input type="hidden" name="repTypeCd" id="repTypeCd" value="02"/> -->
 
 	<div class="pop_title">저장소 등록</div>
 	<div class="pop_sub">
@@ -560,6 +726,14 @@ $(document).ready(function() {
 				<div class="pop_menu_col1 pop_oneRow_col1"><label for="repNm">저장소 명</label><span class="required_info">&nbsp;*</span></div>
 				<div class="pop_menu_col2 pop_oneRow_col2">
 					<input type="text" title="저장소 명" class="input_txt" name="repNm" id="repNm" value="" maxlength="500" />
+				</div>
+			</div>
+			<div class="pop_menu_row pop_menu_oneRow">
+				<div class="pop_menu_col1 pop_oneRow_col1"><label for=repTypeCd>저장소 유형</label><span class="required_info">&nbsp;*</span></div>
+				<div class="pop_menu_col2 pop_oneRow_col2">
+					<span class="search_select">
+						<select class="select_useCd" name="repTypeCd" id="repTypeCd" value="01" style="height:100%;"></select>
+					</span>
 				</div>
 			</div>
 			<div class="rep1001SvnFrame">
@@ -597,7 +771,7 @@ $(document).ready(function() {
 						<div class="pop_menu_col1 pop_oneRow_col1"><label for="gitUsrAuthTypeCd">인증 방식</label><span class="required_info">&nbsp;*</span></div>
 						<div class="pop_menu_col2 pop_oneRow_col2">
 							<span class="search_select">
-								<select class="select_useCd" name="gitUsrAuthTypeCd" id="gitUsrAuthTypeCd" value="" style="height:100%; width:36%;"></select>
+								<select class="select_useCd" name="gitUsrAuthTypeCd" id="gitUsrAuthTypeCd" value="" style="height:100%; width:100%;"></select>
 							</span>
 						</div>
 					</div>
@@ -605,7 +779,7 @@ $(document).ready(function() {
 					<div class="pop_menu_row pop_menu_oneRow">
 						<div class="pop_menu_col1 pop_oneRow_col1"><label for="gitUsrTk">사용자 토큰</label><span class="required_info">&nbsp;*</span></div>
 						<div class="pop_menu_col2 pop_oneRow_col2" guide="gitUsrTk" >
-							<input type="text" title="사용자 토큰" class="input_txt" name="gitUsrTk" id="gitUsrTk" value=""  maxlength="500"  />
+							<input type="password" title="사용자 토큰" class="input_txt" name="gitUsrTk" id="gitUsrTk" value=""  maxlength="500"  />
 						</div>
 					</div>
 				</div>
@@ -621,7 +795,7 @@ $(document).ready(function() {
 				</div>
 			</div>
 			<div class="pop_menu_row pop_menu_oneRow">
-				<div class="pop_menu_row">
+				<div class="pop_menu_row rep1001SvnFrame">
 					<div class="pop_menu_col1 menu_col1_subStyle"><label>Deploy 저장소 등록</label></div>
 					<div class="pop_menu_col2 menu_col2_subStyle">
 						<div class="rep_chk"> 
@@ -630,7 +804,7 @@ $(document).ready(function() {
 						</div>
 					</div>
 				</div>
-				<div class="pop_menu_row">
+				<div class="pop_menu_row" id="useCdDiv">
 					<div class="pop_menu_col1 menu_col1_subStyle pop_menu_col1_right"><label for="useCd">사용여부</label><span class="required_info">&nbsp;*</span></div>
 					<div class="pop_menu_col2 menu_col2_subStyle">
 						<span class="search_select">
@@ -639,7 +813,7 @@ $(document).ready(function() {
 					</div>
 				</div>
 			</div>
-			<div class="rep1001DeployFrame">
+			<div class="rep1001DeployFrame rep1001SvnFrame">
 				<div class="svn_mask_content" id="repDplInputMask">Deploy 저장소 등록 체크시 입력이 가능합니다.</div>
 				<div class="pop_menu_row pop_menu_oneRow">
 					<div class="pop_menu_col1 pop_oneRow_col1"><label for="dplRepUrl">Deploy URL</label><span class="required_info">&nbsp;*</span></div>
@@ -671,7 +845,7 @@ $(document).ready(function() {
 				<input type="text" class="input_text" id="selTreeNodeUrl" name="selTreeNodeUrl" placeholder="선택한 노드의 전체 경로가 표시됩니다." readonly />
 			</div>
 			<div class="pop_menu_btn_row">
-				<div class="button_normal button_col" id="btnSvnConnCheck">접속 체크</div>
+				<div class="button_normal button_col" id="btnRepConnCheck">접속 체크</div>
 			</div>
 		</div>
 		<div class="btn_div">
