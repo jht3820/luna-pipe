@@ -1,6 +1,7 @@
 package kr.opensoftlab.lunaops.com.api.web;
 
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -942,6 +943,28 @@ public class ApiController {
 					model.addAllAttributes(rtnMap);
 				}
 			}
+		}catch(Exception ex){
+			model.addAttribute("result", "ERROR");
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+			Log.error("gitHookPostPush()", ex);
+		}
+		return new ModelAndView("jsonView");
+	}
+	
+	
+	
+	@RequestMapping(value="/api/getParam.do")
+	public ModelAndView getParam(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, true);
+			
+			
+			String data = URLEncoder.encode(CommonScrty.encryptedAria(new ObjectMapper().writeValueAsString(paramMap), "UKVPlQAJhoSV9Xf1yAthywKHptlTGk9k+PuKQiBQcXc="), "UTF-8");
+
+			model.addAttribute("data", data);
+			
 		}catch(Exception ex){
 			model.addAttribute("result", "ERROR");
 			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
