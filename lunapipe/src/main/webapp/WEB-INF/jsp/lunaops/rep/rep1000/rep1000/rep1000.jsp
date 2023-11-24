@@ -764,7 +764,6 @@ function fnRep1100View(type){
 		
 		<!-- TODO 제거 필요 -->
 		<div class="osl-test-view--div" onclick="fnRep1100View('master');">Branch -> Trunk commit 처리 화면 : 티켓-커밋 목록 : 개발 시 커밋된 목록이 표출 -> 선택한 파일만 소스저장소 master 브랜치에 커밋</div>
-		<div class="osl-test-view--div" onclick="fnRep1100View('operation');">Branch -> Trunk commit 처리 화면 : 마스터-커밋 목록 : 마스터에 커밋된 목록이 표출 -> 선택한 파일만 운영 브랜치에 커밋</div>
 	</div>
 </div>
 		

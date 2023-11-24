@@ -113,7 +113,7 @@ $(document).ready(function() {
 					jobUrl += "/";
 				}
 				
-				window.open(selDplInfo["jobUrl"]+selDplInfo["bldNum"]+"/console", "jenkinsLogPopup", "width=1280, height=860, status=no, menubar=no");
+				window.open(jobUrl+selDplInfo["bldNum"]+"/console", "jenkinsLogPopup", "width=1280, height=860, status=no, menubar=no");
 			}catch(e){
 				console.error(e);
 			}
@@ -238,7 +238,7 @@ $(document).ready(function() {
 		
 		jConfirm(addMsg+"선택 JOB("+item.jobId+")을 수동 실행 하시겠습니까?","알림창",
 			function(result) {
-				if (result) {					
+				if (result) {
 					//수동배포 시작
 					fnDplStart(item);
 					return;
