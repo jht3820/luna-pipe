@@ -237,7 +237,7 @@
 					             #repTypeCd#    , 
 					             #repTxt#		, 
 					             <isEqual property="repTypeCd" compareValue="01">
-						             'https://github.com/'||#gitRepUrl#		,
+						             'https://github.com/'||#gitRepUrl#||'.git'		,
 					             </isEqual>
 					             <isEqual property="repTypeCd" compareValue="02">
 						             #repUuid#		,
