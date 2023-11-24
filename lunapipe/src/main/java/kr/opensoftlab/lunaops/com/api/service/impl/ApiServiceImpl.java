@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.kohsuke.github.GHRepository;
 import org.springframework.stereotype.Service;
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.io.SVNRepository;
@@ -51,10 +53,10 @@ import kr.opensoftlab.sdf.jenkins.vo.BuildVO;
 import kr.opensoftlab.sdf.jenkins.vo.JenStatusVO;
 import kr.opensoftlab.sdf.rep.com.RepModule;
 import kr.opensoftlab.sdf.rep.com.vo.RepDataVO;
+import kr.opensoftlab.sdf.rep.com.vo.RepFileVO;
 import kr.opensoftlab.sdf.rep.com.vo.RepLockVO;
 import kr.opensoftlab.sdf.rep.com.vo.RepResultVO;
 import kr.opensoftlab.sdf.rep.com.vo.RepVO;
-import kr.opensoftlab.sdf.rep.svn.vo.SVNFileVO;
 import kr.opensoftlab.sdf.util.CommonScrty;
 import kr.opensoftlab.sdf.util.OslConnHttpClient;
 import kr.opensoftlab.sdf.util.OslUtil;
@@ -118,7 +120,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			
 			if(data.indexOf("%") != -1) {
 				
-				data = java.net.URLDecoder.decode(data,"utf-8");
+				data = URLDecoder.decode(data,"UTF-8");
 			}
 			
 			
@@ -336,15 +338,16 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 								jen1000Service.insertJen1101CIJobInfo(newMap);
 								
 								
-								String jobParamListStr = OslUtil.jsonGetString(jsonObj, "job_param_list");
+								String jobParamListStr = OslUtil.jsonGetString(inJsonObj, "job_param_list");
 								if(jobParamListStr != null) {
 									
 									JSONArray jobParamList = new JSONArray(jobParamListStr);
 									
 									for(int j=0;j<jobParamList.length();j++) {
+										JSONObject jobParamInfo =  jobParamList.getJSONObject(j);
 										
-										String jobParamKey = OslUtil.jsonGetString(jsonObj, "job_param_key");
-										String jobParamVal = OslUtil.jsonGetString(jsonObj, "job_param_val");
+										String jobParamKey = OslUtil.jsonGetString(jobParamInfo, "job_param_key");
+										String jobParamVal = OslUtil.jsonGetString(jobParamInfo, "job_param_val");
 										
 										newMap.put("jobParamKey", jobParamKey);
 										newMap.put("jobParamVal", jobParamVal);
@@ -663,6 +666,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 						
 						
 						String jobParamListStr = OslUtil.jsonGetString(inJsonObj, "job_param_list");
+						
 						if(jobParamListStr != null) {
 							
 							JSONArray jobParamJsonList = new JSONArray(jobParamListStr);
@@ -670,7 +674,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 							if(jobParamJsonList.length() > 0) {
 								
 								for(int j=0;j<jobParamJsonList.length();j++) {
-									JSONObject inParamJson = jsonArr.getJSONObject(i);
+									JSONObject inParamJson = jobParamJsonList.getJSONObject(i);
 									
 									
 									String jobParamKey = OslUtil.jsonGetString(inParamJson, "job_param_key");
@@ -1288,7 +1292,8 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 				RepDataVO rvInfo = rvInfoList.get(0);
 				
 				
-				List<SVNFileVO> chgFileList = rvInfo.getSvnFileList();
+				
+				List<RepFileVO> chgFileList = rvInfo.getRepFileList();
 				
 				
 				int chgFileCnt = 0;
@@ -1306,19 +1311,20 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 				Map newMap = new HashMap<>();
 				newMap.put("repId", repVo.getRepId());
 				newMap.put("repRv", rvInfo.getRevision());
+				newMap.put("repRvn", rvInfo.getRevisionNum());
 				newMap.put("repComment", rvInfo.getComment());
 				newMap.put("repCmtDate", sdf.format(rvInfo.getLogDate()));
 				newMap.put("repCmtAuthor", author);
 				newMap.put("repChgFileCnt", chgFileCnt);
 				
 				
+				
 				newMap.put("repRvTypeCd", "01");
 				
 				
 				if(rvInfo.getComment() != null) {
-					
 					String[] comments = rvInfo.getComment().split("\n");
-					String ticketId = comments[0];
+					String ticketId = comments[0].trim();
 					
 					
 					if(ticketId.indexOf("[insert_data_no-flag]") != -1) {
@@ -1348,7 +1354,8 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 					
 					
 					if(chgFileCnt > 0) {
-						for(SVNFileVO chgFileInfo : chgFileList) {
+						
+						for(RepFileVO chgFileInfo : chgFileList) {
 							try {
 								
 								String path = chgFileInfo.getPath();
@@ -1374,6 +1381,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 								newMap.put("repId", repVo.getRepId());
 								newMap.put("ticketId", ticketId);
 								newMap.put("repRv", rvInfo.getRevision());
+								newMap.put("repRvn", rvInfo.getRevisionNum());
 								newMap.put("repChgTypeCd", typeName);
 								newMap.put("repChgFilePath", path);
 								newMap.put("repChgFileNm", fileNm);
@@ -2115,7 +2123,8 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 				RepDataVO rvInfo = rvInfoList.get(0);
 				
 				
-				List<SVNFileVO> chgFileList = rvInfo.getSvnFileList();
+				
+				List<RepFileVO> chgFileList = rvInfo.getRepFileList();
 				
 				
 				int chgFileCnt = 0;
@@ -2128,9 +2137,8 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 				
 				
 				if(rvInfo.getComment() != null) {
-					
 					String[] comments = rvInfo.getComment().split("\n");
-					String ticketId = comments[0];
+					String ticketId = comments[0].trim();
 					
 					
 					if(ticketId.indexOf("[insert_data_no-flag]") != -1) {
@@ -2144,7 +2152,8 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 						
 						int execute = 0;
 						
-						for(SVNFileVO chgFileInfo : chgFileList) {
+						
+						for(RepFileVO chgFileInfo : chgFileList) {
 							try {
 								
 								String path = chgFileInfo.getPath();
@@ -2222,6 +2231,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 		rtnValue.put("result", true);
 		return rtnValue;
 	}
+	
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Map insertRepFileUnLock(Map paramMap) throws Exception {
@@ -2639,4 +2649,417 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 		rtnMap.put("etcMsg", etcMsg);
 		return rtnMap;
 	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Map insertRepRevisionInfoByGitHub(Map paramMap) throws Exception{
+		
+		Map rtnValue = new HashMap<>();
+		
+		
+		Map repoMap = (Map) paramMap.get("repository");
+		
+		
+		String repoUuid = (String) repoMap.get("clone_url");
+		
+		Map chkParamMap = new HashMap<>();
+		chkParamMap.put("repUuid", repoUuid);
+		
+		
+		RepVO repVo = rep1000Service.selectRep1000Info(chkParamMap);
+		
+		
+		RepResultVO repResultVO = repModule.repAuthCheck(repVo);
+		boolean repAuthCheck = repResultVO.isReturnValue();
+		
+		
+		String actionType = (String) paramMap.get("actionType");
+		
+		if(!repAuthCheck) {
+			
+			rtnValue.put("result", false);
+			
+			String resultCode = repResultVO.getResultCode();
+			rtnValue.put("error_code", OslErrorCode.REP_ID_INFO_NULL);
+			
+			
+			if(resultCode.equals(repResultVO.USER_AUTH_CHECK_FAIL)) {
+				rtnValue.put("etcMsg", "입력하신 소스저장소 사용자 인증에 실패했습니다.</br>입력된 값을 확인해주세요.");
+			}
+			
+			else if(resultCode.equals(repResultVO.REPOSITORY_NOT_ACCESS)) {
+				rtnValue.put("etcMsg", repResultVO.getResultMsg()+"</br>입력된 값을 확인해주세요.</br>");
+			}
+			else {
+				rtnValue.put("etcMsg", "입력하신 소스저장소 사용자 인증에 실패했습니다.</br>입력된 값을 확인해주세요.</br>"+repResultVO.getResultMsg());
+			}
+			return rtnValue;
+		}
+		
+		
+		String masterBranchNm = (String) repResultVO.getGitRepo().getDefaultBranch();
+		masterBranchNm = masterBranchNm.replace("refs/heads/", "");
+		
+		String branchNm = (String) paramMap.get("ref");
+		branchNm = branchNm.replace("refs/heads/", "");
+		
+		String opsBranchNm = EgovProperties.getProperty("Globals.github.operation.branch");
+		
+		
+		List<Map<String, Object>> commitList = (List<Map<String, Object>>) paramMap.get("commits");
+		
+		String startRv = "";
+		String lastRv = "";
+		
+		if(commitList == null || commitList.size() == 0) {
+			startRv = "-1";
+			lastRv = "HEAD";
+		}else if(commitList.size() != 0){
+			startRv = (String) ((Map) commitList.get(0)).get("id");
+			lastRv = (String) ((Map) commitList.get(commitList.size() -1)).get("id");
+		}
+		
+		Map headCmt = null;
+		boolean mergeYn = false;
+		if(paramMap.containsKey("head_commit")) {
+			headCmt = (Map) paramMap.get("head_commit");
+		}
+		
+		if(actionType.indexOf("Merge") > -1) {
+			mergeYn = true;
+		}
+		
+		
+		if(headCmt != null) {
+			if(headCmt.containsKey("message") && ((String) headCmt.get("message")).indexOf("Merge") == 0) {
+				
+				if("operationMerge".equals(actionType)) {
+					branchNm = opsBranchNm;
+				}
+				else {
+					branchNm = masterBranchNm;
+				}
+				startRv = "-1";
+				lastRv = "HEAD";
+			}
+		}
+		
+		Map<String, Object> commitFileList = new HashMap<>();
+		for(Object obj : commitList) {
+			Map commitInfo = (Map) obj;
+			for(String filePath : (List<String>) commitInfo.get("added")) {
+				if(!commitFileList.containsKey(filePath)) {
+					commitFileList.put(filePath, OffsetDateTime.parse((String) commitInfo.get("timestamp")));
+				}else {
+					
+					OffsetDateTime mapData = (OffsetDateTime) commitFileList.get("filePath");
+					
+					OffsetDateTime commitData = OffsetDateTime.parse((String) commitInfo.get("timestamp"));
+					
+					if(mapData == null && commitData != null) {
+						
+						commitFileList.put(filePath, commitData);
+					}else if(mapData.isAfter(commitData)) {
+						
+						commitFileList.put(filePath, commitData);
+					}
+				}
+			}
+			for(String filePath : (List<String>) commitInfo.get("removed")) {
+				if(!commitFileList.containsKey(filePath)) {
+					commitFileList.put(filePath, OffsetDateTime.parse((String) commitInfo.get("timestamp")));
+				}else {
+					
+					OffsetDateTime mapData = (OffsetDateTime) commitFileList.get("filePath");
+					
+					OffsetDateTime commitData = OffsetDateTime.parse((String) commitInfo.get("timestamp"));
+					if(mapData == null && commitData != null) {
+						
+						commitFileList.put(filePath, commitData);
+					}else if(mapData.isAfter(commitData)) {
+						
+						commitFileList.put(filePath, commitData);
+					}
+				}
+			}
+			for(String filePath : (List<String>) commitInfo.get("modified")) {
+				if(!commitFileList.containsKey(filePath)) {
+					commitFileList.put(filePath, OffsetDateTime.parse((String) commitInfo.get("timestamp")));
+				}else {
+					
+					OffsetDateTime mapData = (OffsetDateTime) commitFileList.get("filePath");
+					
+					OffsetDateTime commitData = OffsetDateTime.parse((String) commitInfo.get("timestamp"));
+					if(mapData == null && commitData != null) {
+						
+						commitFileList.put(filePath, commitData);
+					}else if(mapData.isAfter(commitData)) {
+						
+						commitFileList.put(filePath, commitData);
+					}
+				}
+			}
+		}
+		
+		
+		List<RepDataVO> rvInfoList = repModule.selectRepLogListByGitHub(repResultVO, branchNm, startRv ,lastRv, commitFileList);
+
+		
+		if(rvInfoList == null || rvInfoList.size() == 0) {
+			rtnValue.put("result", false);
+			rtnValue.put("error_code", OslErrorCode.REP_ID_INFO_NULL);
+			return rtnValue;
+		}
+		
+		
+		RepDataVO rvInfo = rvInfoList.get(0);
+		
+		
+		
+		List<RepFileVO> chgFileList = rvInfo.getRepFileList();
+		
+		
+		int chgFileCnt = 0;
+		if(commitList != null && commitList.size() != 0) {
+			chgFileCnt = chgFileList.size();
+		}else {
+			chgFileCnt = chgFileList.size();
+		}
+		
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
+		
+		
+		String author = rvInfo.getAuthor();
+		
+		
+		Map newMap = new HashMap<>();
+		newMap.put("repId", repVo.getRepId());
+		newMap.put("repRv", rvInfo.getRevision());
+		newMap.put("repRvn", repResultVO.getLastRevisionNum());
+		newMap.put("repComment", rvInfo.getComment());
+		newMap.put("repCmtDate", sdf.format(rvInfo.getLogDate()));
+		newMap.put("repCmtAuthor", author);
+		
+		if(author == null || "".equals(author)) {
+			author = "SYSTSEM";
+			newMap.put("repCmtAuthor", author);
+		}
+		newMap.put("repChgFileCnt", chgFileCnt);
+		newMap.put("gitCmtSha", rvInfo.getGitCmtSha());
+		newMap.put("gitBrcNm", rvInfo.getGitBrcNm());
+		
+		
+		if(rvInfo.getComment() != null) {
+			String[] comments = rvInfo.getComment().split("\n");
+			String ticketId = comments[0].trim();
+			
+			
+			for(String cmtMsg : comments) {
+				if(cmtMsg.trim().indexOf("ticket_id:") == 0) {
+					ticketId = cmtMsg.trim().replace("ticket_id:", "");
+					ticketId = ticketId.replaceAll("\\s+", "");
+					break;
+				}
+			}
+			
+			if("".equals(ticketId)) {
+				ticketId = "SYSTEM";
+			}
+			
+			
+			for(String cmtMsg : comments) {
+				if(cmtMsg.trim().indexOf("[insert_data_no-flag]") != -1) {
+					
+					rtnValue.put("result", true);
+					return rtnValue;
+				}
+			}
+			
+			
+			String bldNum = "1";
+			if("operationMerge".equals(actionType)) {
+				for(String cmtMsg : comments) {
+					if(cmtMsg.trim().indexOf("bld_num:") == 0) {
+						bldNum = cmtMsg.trim().replace("bld_num:", "");
+						bldNum = bldNum.replaceAll("\\s+", "");
+						
+						
+						
+						newMap.put("repRvTypeCd", "03");
+						break;
+					}
+				}
+			}
+			
+			
+			if("operationMerge".equals(actionType)) {
+				
+				newMap.put("repRvTypeCd", "03");
+				newMap.put("gitBrcNm", opsBranchNm);
+			}
+			else if("masterMerge".equals(actionType)){
+				
+				newMap.put("repRvTypeCd", "02");
+				newMap.put("gitBrcNm", masterBranchNm);
+			}
+			else if("push".equals(actionType)){
+				
+				newMap.put("repRvTypeCd", "01");
+				newMap.put("gitBrcNm", branchNm);
+			}
+			
+			
+			newMap.put("ticketId", ticketId);
+			
+			
+			if("operationMerge".equals(actionType)) {
+				
+				
+				
+					
+					rep1100Service.insertRep1100RvInfo(newMap);
+
+					
+					String opsBranchBuildNm = (String) paramMap.get("ref")+bldNum;
+					opsBranchBuildNm = opsBranchBuildNm.replace("refs/heads/", "");
+					List<Map> rep1102InsertList = rep1100Service.getRep1102List(opsBranchBuildNm);
+					
+						
+						for(Map rep1102InsertInfo : rep1102InsertList) {
+							rep1102InsertInfo.put("repRv", rvInfo.getGitCmtSha());
+							rep1100Service.insertRep1102RvChgInfo(rep1102InsertInfo);
+						}
+						
+						
+						rep1100Service.removeRep1102List(opsBranchBuildNm);
+					
+				
+			}
+			
+			else {
+				
+				Map dbRvInfo = rep1100Service.selectRep1100RvInfo(newMap);
+				
+				
+				if(dbRvInfo == null) {
+					rep1100Service.insertRep1100RvInfo(newMap);
+				}else {
+					
+					rep1100Service.updateRep1100RvInfo(newMap);
+					
+					
+					rep1100Service.deleteRep1101RvChgList(newMap);
+				}
+				
+				
+				if(chgFileCnt > 0) {
+					
+					for(RepFileVO chgFileInfo : chgFileList) {
+						try {
+							
+							String path = chgFileInfo.getPath();
+							
+							String fileNm = path.substring(path.lastIndexOf("/")+1, path.length());
+							
+							
+							char type = chgFileInfo.getType();
+							
+
+							String typeName = "";
+							if( 'A'==type ) {
+								typeName = "01";
+							}else if( 'M'==type ) {
+								typeName = "02";
+							}else if( 'D'==type ) {
+								typeName = "03";
+							}else {
+								typeName = "02";
+							}
+
+							newMap = new HashMap<>();
+							newMap.put("repId", repVo.getRepId());
+							newMap.put("ticketId", ticketId);
+							newMap.put("repRv", rvInfo.getRevision());
+							newMap.put("repRvn", repResultVO.getLastRevisionNum());
+							newMap.put("repChgTypeCd", typeName);
+							newMap.put("repChgFilePath", path);
+							newMap.put("repChgFileNm", fileNm);
+							newMap.put("repChgFileKind", chgFileInfo.getKind());
+							
+							
+							newMap.put("repTargetRv", chgFileInfo.getParentSha());
+							
+							
+							rep1100Service.insertRep1101RvChgInfo(newMap);
+						}
+						catch(Exception e) {
+							Log.debug(e);
+							continue;
+						}
+					}
+				}
+			}
+		}else {
+			
+			rtnValue.put("result", false);
+			rtnValue.put("error_code", OslErrorCode.PARAM_TICKET_ID_NULL);
+			return rtnValue;
+		}
+		
+		rtnValue.put("rvInfoList", rvInfoList);
+		return rtnValue;
+	}
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Map insertRepTempBranchByGitHub(Map paramMap) throws Exception{
+		
+		Map rtnValue = new HashMap<>();
+		
+		
+		Map repoMap = (Map) paramMap.get("repository");
+		String repoUuid = (String) repoMap.get("clone_url");
+		Map chkParamMap = new HashMap<>();
+		chkParamMap.put("repUuid", repoUuid);
+		
+		RepVO repVo = rep1000Service.selectRep1000Info(chkParamMap);
+		
+		RepResultVO repResultVO = repModule.repAuthCheck(repVo);
+		GHRepository repository = repResultVO.getGitRepo();
+		
+		String tempBranchNm = (String) paramMap.get("ref");
+		tempBranchNm = tempBranchNm.replace("refs/heads/", "");
+		
+		repository.getRef("heads/"+tempBranchNm).delete();
+		rtnValue.put("reslult", true);
+		
+		return rtnValue;
+	};
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Map deleteRepTempBranchByGitHub(Map paramMap) throws Exception{
+		
+		Map rtnValue = new HashMap<>();
+		
+		
+		Map repoMap = (Map) paramMap.get("repository");
+		String repoUuid = (String) repoMap.get("clone_url");
+		Map chkParamMap = new HashMap<>();
+		chkParamMap.put("repUuid", repoUuid);
+		
+		RepVO repVo = rep1000Service.selectRep1000Info(chkParamMap);
+		
+		RepResultVO repResultVO = repModule.repAuthCheck(repVo);
+		GHRepository repository = repResultVO.getGitRepo();
+		
+		String tempBranchNm = (String) paramMap.get("ref");
+		tempBranchNm = tempBranchNm.replace("refs/heads/", "");
+		
+		repository.getRef("heads/"+tempBranchNm).delete();
+		rtnValue.put("reslult", true);
+		
+		return rtnValue;
+	};
 }
