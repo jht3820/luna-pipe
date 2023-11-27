@@ -10,6 +10,16 @@
 	.defaultFont{color:#000 !important;}
 	.tab_contents.menu{width:1500px;}
 	
+	/*TODO 제거*/
+	.osl-test-view--div {
+		margin: 0px 5px;
+		padding: 5px;	
+	}
+	.osl-test-view--div:hover {
+		border-radius: 5px;
+		background-color: #a5a4ef;
+		cursor: pointer;
+	}
 </style>
 <script>
 var repGridObj;
@@ -751,6 +761,9 @@ function fnRep1100View(type){
 			<div class="mainPopupBtn" id="repDataSendBtn"><i class="fas fa-paperclip"></i>&nbsp;소스저장소 연결</div>
 			<div class="mainPopupBtn" id="repCloseBtn"><i class="fas fa-times-circle"></i>&nbsp;닫기</div>
 		</div>
+		
+		<!-- TODO 제거 필요 -->
+		<div class="osl-test-view--div" onclick="fnRep1100View('master');">Branch -> Trunk commit 처리 화면 : 티켓-커밋 목록 : 개발 시 커밋된 목록이 표출 -> 선택한 파일만 소스저장소 master 브랜치에 커밋</div>
 	</div>
 </div>
 		
