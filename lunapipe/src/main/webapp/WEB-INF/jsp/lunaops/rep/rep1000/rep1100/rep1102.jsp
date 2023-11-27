@@ -74,7 +74,7 @@ $(function(){
 				}
 				//해당 파일 빌드 번호가 현재 빌드 번호보다 높은 경우
 				else if(targetBldNum > map.bldNum) {
-					addMsg += "</br>["+map.filePath+"] 서택 파일 빌드번호("+map.bldNum+")보다 추가된 파일의 빌드 번호("+targetBldNum+")가 더 높습니다. ";
+					addMsg += "</br>["+map.filePath+"] 선택 파일 빌드번호("+map.bldNum+")보다 추가된 파일의 빌드 번호("+targetBldNum+")가 더 높습니다. ";
 				}
 				
 				overlapCnt++;
@@ -260,9 +260,11 @@ function fnTktChgDataGridSetting(){
 function fnInGridListSet(_pageNo){
 	/* 그리드 데이터 가져오기 */
 	ajaxParam = $('form#rep1102Form').serialize();
-   	
-   	//페이지 세팅
-   	if(typeof tktChgDataGridObj.page.currentPage != "undefined"){
+	
+	//페이지 세팅
+   	if(!gfnIsNull(_pageNo)){
+   		ajaxParam += "&pageNo="+_pageNo;
+   	}else if(typeof tktChgDataGridObj.page.currentPage != "undefined"){
    		ajaxParam += "&pageNo="+tktChgDataGridObj.page.currentPage;
    	}
    	
@@ -276,8 +278,17 @@ function fnInGridListSet(_pageNo){
 	//AJAX 전송 성공 함수
 	ajaxObj.setFnSuccess(function(data){
 		var list = data.list;
+		var page = data.page;
 		
-	   	tktChgDataGridObj.setData(list);
+		tktChgDataGridObj.setData({
+			list:list,
+			page: {
+				currentPage: _pageNo || 0,
+				pageSize: page.pageSize,
+				totalElements: page.totalElements,
+				totalPages: page.totalPages
+			}
+		});
 	});
 	
 	//AJAX 전송
@@ -480,7 +491,6 @@ function fuRsyncResultList(paramItem, paramSearchData){
 		//AJAX 전송
 		ajaxObj.send();
 	}
-	
 }
 //axisj5 그리드
 function fnCommitTargetDataGridSetting(){
