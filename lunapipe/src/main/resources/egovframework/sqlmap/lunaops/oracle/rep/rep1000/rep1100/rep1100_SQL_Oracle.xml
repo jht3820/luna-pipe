@@ -74,9 +74,14 @@
 			<isEmpty property="ticketId">
 				AND A.TICKET_ID = 'SYSTEM'
 			</isEmpty>
-			<isNotEmpty property="ticketId">
-				AND A.TICKET_ID IN ('SYSTEM', #ticketId#)
-			</isNotEmpty>
+			<isEqual property="onlyTicket" compareValue="true">
+				AND A.TICKET_ID = #ticketId#
+			</isEqual>
+			<isNotEqual property="onlyTicket" compareValue="true">
+				<isNotEmpty property="ticketId">
+					AND A.TICKET_ID IN ('SYSTEM', #ticketId#)
+				</isNotEmpty>
+			</isNotEqual>
 		</isNotEqual>
 		<isNotEmpty property="repId">
 			AND A.REP_ID = #repId#
