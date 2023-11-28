@@ -255,7 +255,7 @@ function fnRepGridSetting(){
         			}
         		}
              },
-             onDBLClick:function(){
+             onDBLClick:function(){ debugger;
             	 //암호화 값
             	 var enRepIdData = this.item.enRepIdData;
             	 
@@ -728,12 +728,6 @@ function fnRep1000GuideShow(){
 	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
 }
 
-function fnRep1100View(type){
-	var data = {
-			"baseTarget" : type
-	};
-	gfnLayerPopupOpen('/rep/rep1000/rep1100/selectRep1100View.do',data,"1440","800",'scroll');
-};
 </script>
 
 
@@ -761,9 +755,6 @@ function fnRep1100View(type){
 			<div class="mainPopupBtn" id="repDataSendBtn"><i class="fas fa-paperclip"></i>&nbsp;소스저장소 연결</div>
 			<div class="mainPopupBtn" id="repCloseBtn"><i class="fas fa-times-circle"></i>&nbsp;닫기</div>
 		</div>
-		
-		<!-- TODO 제거 필요 -->
-		<div class="osl-test-view--div" onclick="fnRep1100View('master');">Branch -> Trunk commit 처리 화면 : 티켓-커밋 목록 : 개발 시 커밋된 목록이 표출 -> 선택한 파일만 소스저장소 master 브랜치에 커밋</div>
 	</div>
 </div>
 		

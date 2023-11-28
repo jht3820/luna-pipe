@@ -674,13 +674,14 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 							if(jobParamJsonList.length() > 0) {
 								
 								for(int j=0;j<jobParamJsonList.length();j++) {
-									JSONObject inParamJson = jobParamJsonList.getJSONObject(i);
+									
+									JSONObject jobParamInfo =  jobParamJsonList.getJSONObject(j);
 									
 									
-									String jobParamKey = OslUtil.jsonGetString(inParamJson, "job_param_key");
+									String jobParamKey = OslUtil.jsonGetString(jobParamInfo, "job_param_key");
 									
 									
-									String jobParamVal = OslUtil.jsonGetString(inParamJson, "job_param_val");
+									String jobParamVal = OslUtil.jsonGetString(jobParamInfo, "job_param_val");
 									
 									
 									newMap.put("jobParamKey", jobParamKey);
