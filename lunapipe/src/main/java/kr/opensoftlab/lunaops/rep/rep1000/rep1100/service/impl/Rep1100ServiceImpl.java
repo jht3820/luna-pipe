@@ -235,8 +235,6 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		
 		String buildBranchNm = EgovProperties.getProperty("Globals.svn.buildBranchNm");
 		
-		String opsBranchNm = EgovProperties.getProperty("Globals.github.operation.branch");
-		
 		
 		String branchePath = "/branches/"+buildBranchNm;
 		
