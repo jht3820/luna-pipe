@@ -105,8 +105,11 @@ span.text-rep-del {background-color: #af3022;}
 }
 </style>
 <script>
-	
+
 	$(document).ready(function() {
+		$("#repoTargetLeftPrint").text("Branch");
+		$("#repoTargetRightPrint").text("Trunk");
+		
 		//var content = "${content}";
 		fnGetFileContent();
 		
@@ -126,7 +129,6 @@ span.text-rep-del {background-color: #af3022;}
 	function fnGetFileContent(){
 		//mask
 	 	$("#repFileDiffFrameMask").show();
-		
 	 	/* 그리드 데이터 가져오기 */
 	  	//AJAX 설정
 		var ajaxObj = new gfnAjaxRequestAction(
@@ -136,8 +138,12 @@ span.text-rep-del {background-color: #af3022;}
 				, "commitId" : '${param.commitId}'
 				, "path" : '${param.path}'
 				, "repId" : '${param.repId}'
+				, "repTypeCd" : '${param.repTypeCd}'
+				, "gitBrcNm" : '${param.gitBrcNm}'
+				, "gitCmtSha" : '${param.gitCmtSha}'
 			}
 		);
+	 	
 		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
 			//오류 없음
@@ -151,6 +157,25 @@ span.text-rep-del {background-color: #af3022;}
 				}else{
 					$("span#rep1101Revision").text(data.commitId);
 					$("span#rep1101DiffRevision").text(data.diffCommitId);
+				}
+				
+				//github
+				if(repTypeCd == "01"){
+					//리비전 정보 넣기
+					$("span#rep1101Revision").text('${param.revisionNum}'+"("+data.revision+")");
+					$("span#rep1101DiffRevision").text("HEAD");
+				}
+				//svn
+				else if(repTypeCd == "02"){
+					//리비전 정보 넣기
+					$("span#rep1006Revision").text(data.revision);
+					$("span#rep1006DiffRevision").text(data.diffRevision);
+				}
+				//gitlab
+				else if(repTypeCd == "03"){
+					//리비전 정보 넣기
+					$("span#rep1101Revision").text('${param.revisionNum}'+"("+data.revision+")");
+					$("span#rep1101DiffRevision").text("HEAD");
 				}
 				
 
@@ -306,12 +331,12 @@ span.text-rep-del {background-color: #af3022;}
 				<img class="fixed_loading" src="/images/loading.gif" style="width: 100px;height: 100px;">
 			</div>
 			<div id="contentsFrameLeft" class="contentsFrame">
-				<div class="contentTopRevisionInfo">[Branche] Revision: <span id="rep1101Revision"></span></div>
+				<div class="contentTopRevisionInfo">[<span id="repoTargetLeftPrint"></span>] Revision: <span id="rep1101Revision"></span></div>
 				<div class="codeLineFrame" id="codeLineFrameLeft"></div>
 				<pre id="preFileContentLeft"><code id="fileContentLeft"></code></pre>
 			</div>
 			<div id="contentsFrameRight" class="contentsFrame">
-				<div class="contentTopRevisionInfo">[Trunk] Revision: <span id="rep1101DiffRevision"></span></div>
+				<div class="contentTopRevisionInfo">[<span id="repoTargetRightPrint"></span>] Revision: <span id="rep1101DiffRevision"></span></div>
 				<div class="codeLineFrame" id="codeLineFrameRight"></div>
 				<pre id="preFileContentRight"><code id="fileContentRight"></code></pre>
 			</div>

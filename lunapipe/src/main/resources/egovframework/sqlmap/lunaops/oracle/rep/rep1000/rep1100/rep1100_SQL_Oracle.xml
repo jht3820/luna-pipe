@@ -74,9 +74,14 @@
 			<isEmpty property="ticketId">
 				AND A.TICKET_ID = 'SYSTEM'
 			</isEmpty>
-			<isNotEmpty property="ticketId">
-				AND A.TICKET_ID IN ('SYSTEM', #ticketId#)
-			</isNotEmpty>
+			<isEqual property="onlyTicket" compareValue="true">
+				AND A.TICKET_ID = #ticketId#
+			</isEqual>
+			<isNotEqual property="onlyTicket" compareValue="true">
+				<isNotEmpty property="ticketId">
+					AND A.TICKET_ID IN ('SYSTEM', #ticketId#)
+				</isNotEmpty>
+			</isNotEqual>
 		</isNotEqual>
 		<isNotEmpty property="repId">
 			AND A.REP_ID = #repId#
@@ -87,21 +92,21 @@
 		<isNotEmpty property="repRvn">
 			AND A.REP_RVN = #repRvn#
 		</isNotEmpty>
-		<isNotNull property="selectSearch">
-			<isNotEmpty property="selectSearch">
+		<isNotNull property="searchSelect">
+			<isNotEmpty property="searchSelect">
 				<isNotEmpty property="searchTxt">
-					<isEqual property="selectSearch" compareValue="author">
+					<isEqual property="searchSelect" compareValue="author">
 						<![CDATA[
 							AND LOWER(A.REP_CMT_AUTHOR) LIKE '%'|| LOWER(#searchTxt#) ||'%'
 						]]>
 					</isEqual>
-					<isEqual property="selectSearch" compareValue="comment">
+					<isEqual property="searchSelect" compareValue="comment">
 						<![CDATA[
 							AND A.REP_COMMENT LIKE '%'|| #searchTxt# ||'%'
 						]]>
 					</isEqual>
 				</isNotEmpty>
-				<isEqual property="selectSearch" compareValue="logDate">
+				<isEqual property="searchSelect" compareValue="logDate">
 					<isNotEmpty property="searchStDate">
 						AND A.REP_CMT_DATE &lt;= TO_DATE(#searchStDate#, 'YYYY-MM-DD HH24:MI:SS')
 					</isNotEmpty>
@@ -226,7 +231,7 @@
 		WHERE 1=1
 		AND A.TICKET_ID = #ticketId#
 		
-		AND C.GIT_BRC_NM NOT LIKE '%trunkCommit'
+		AND ( C.GIT_BRC_NM NOT LIKE '%trunkCommit' OR C.GIT_BRC_NM IS NULL )
 		AND C.REP_RV_TYPE_CD = #repRvTypeCd#
 		AND NOT EXISTS
 		(
@@ -302,7 +307,7 @@
 			WHERE 1 = 1
 			AND TICKET_ID = #ticketId#
 			
-			AND GIT_BRC_NM LIKE '%trunkCommit'
+			AND ( GIT_BRC_NM LIKE '%trunkCommit' OR GIT_BRC_NM IS NULL )
 		) B
 		ON (A.REP_ID = B.REP_ID AND A.TICKET_ID = B.TICKET_ID AND A.REP_RV = B.REP_RV)
 		INNER JOIN (
@@ -329,11 +334,13 @@
 				INNER JOIN REP1100 S2
 				ON (S1.REP_ID = S2.REP_ID AND S1.REP_RV = S2.REP_RV)
 				WHERE  1 = 1
-				AND S2.GIT_BRC_NM LIKE '%trunkCommit'
+				
+				AND ( S2.GIT_BRC_NM LIKE '%trunkCommit' OR S2.GIT_BRC_NM IS NULL )
 				AND S1.TICKET_ID = #ticketId#
 				GROUP BY S1.REP_ID, S1.REP_CHG_FILE_PATH, S1.REP_CHG_FILE_NM
 			)
-			AND IS2.GIT_BRC_NM NOT LIKE 'operation%'
+			
+			AND ( IS2.GIT_BRC_NM NOT LIKE 'operation%' OR IS2.GIT_BRC_NM IS NULL )
 		) C
 		ON (A.REP_ID = C.REP_ID AND A.REP_RV = C.REP_RV AND A.TICKET_ID = C.TICKET_ID AND A.REP_CHG_FILE_PATH = C.REP_CHG_FILE_PATH AND A.REP_CHG_FILE_NM = C.REP_CHG_FILE_NM)
 		INNER JOIN REP1100 D ON (A.REP_ID = D.REP_ID AND A.REP_RV = D.REP_RV AND A.TICKET_ID = D.TICKET_ID)
