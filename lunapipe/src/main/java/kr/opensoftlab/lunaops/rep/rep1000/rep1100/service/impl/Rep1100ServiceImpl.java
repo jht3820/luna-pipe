@@ -2788,6 +2788,8 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				RepResultVO repResultVo = null;
 				List repSelFileList = null;
 				
+				RepVO repVo = null;
+				
 				
 				if(!repInfoMap.containsKey(repId)) {
 					
@@ -2795,7 +2797,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 					newMap.put("repId", repId);
 					
 					
-					RepVO repVo = rep1000Service.selectRep1000Info(newMap);
+					repVo = rep1000Service.selectRep1000Info(newMap);
 					
 					
 					repResultVo = repModule.repAuthCheck(repVo);
@@ -2824,6 +2826,10 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				
 				repResultVo = repInfoMap.get(repId);
 				repSelFileList = repSelDplFileMap.get(repId);
+				
+				repVo = repResultVo.getRepVo();
+				
+				repTypeCd = repVo.getRepTypeCd();
 				
 				
 				if(!repResultVo.isReturnValue()) {
