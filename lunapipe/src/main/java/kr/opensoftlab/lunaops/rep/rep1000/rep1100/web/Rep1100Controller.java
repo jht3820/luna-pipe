@@ -83,6 +83,10 @@ public class Rep1100Controller {
 			
 			model.addAttribute("empId", empId);
 			model.addAttribute("ticketId", ticketId);
+			
+			
+			model.addAttribute("empId", "jhkang");
+			model.addAttribute("ticketId", "HOOK00001");
 		}catch(Exception e) {
 			Log.error(e);
 			e.printStackTrace();
@@ -219,8 +223,17 @@ public class Rep1100Controller {
 			paramMap.put("firstIndex", String.valueOf(pageVo.getFirstIndex()));
 			
 			
-			int totCnt = rep1100Service.selectRep1100TktRvFileChgListCnt(paramMap);
-
+			int totCnt = 0;
+			
+			
+			if(!paramMap.containsKey("baseTarget") || "master".equals((String)paramMap.get("baseTarget")) || "".equals((String)paramMap.get("baseTarget"))) {
+				totCnt = rep1100Service.selectRep1100TktRvFileChgListCnt(paramMap);
+			}
+			
+			else {
+				totCnt = rep1100Service.selectRep1100TktTrunkRvFileChgListCnt(paramMap);
+			}
+			
 			
 			if(type != null && "all".equals(type)) {
 				paramMap.put("lastIndex", String.valueOf(totCnt));
@@ -229,7 +242,17 @@ public class Rep1100Controller {
 			}
 			
 			
-			rep1100List =  rep1100Service.selectRep1100TktRvFileChgList(paramMap);
+			if(!paramMap.containsKey("baseTarget") || "master".equals((String)paramMap.get("baseTarget")) || "".equals((String)paramMap.get("baseTarget"))) {
+				
+				rep1100List =  rep1100Service.selectRep1100TktRvFileChgList(paramMap);
+			}
+			
+			else {
+				
+				rep1100List =  rep1100Service.selectRep1100TktTrunkRvFileChgList(paramMap);
+			}
+			
+			
 			paginationInfo.setTotalRecordCount(totCnt);
 			
 			model.addAttribute("list", rep1100List);
@@ -274,38 +297,131 @@ public class Rep1100Controller {
 			Map paramMap = RequestConvertor.requestParamToMap(request,true);
 			
 			
-			Long revision = Long.parseLong((String) paramMap.get("revision"));
+			Long revision =0l;
+			
+			if(paramMap.get("revision")!=null){
+				
+				try {
+					revision = Long.parseLong((String) paramMap.get("revision"));
+				}catch(NumberFormatException ne) {
+					
+				}
+			}
 			
 			
 			String path = (String) paramMap.get("path");
 			
 			
-			String buildBrancheNm = EgovProperties.getProperty("Globals.svn.buildBranchNm");
+			String buildBranchNm = EgovProperties.getProperty("Globals.svn.buildBranchNm");
+			
+			String opsBranchNm = EgovProperties.getProperty("Globals.github.operation.branch");
 			
 			
-			String branchePath = "/branches/"+buildBrancheNm;
+			String baseTarget = (String) paramMap.get("baseTarget");
 			
 			
-			if(branchePath.lastIndexOf("/") == (branchePath.length()-1)) {
+			String branchePath = "";
+			if(baseTarget == null || "".equals(baseTarget ) || "master".equals(baseTarget)) {
+				branchePath = "/branches/"+buildBranchNm;
+			}else {
+				branchePath = "/"+opsBranchNm;
+			}
+			
+			
+			String commitId = (String) paramMap.get("commitId");
+			
+			
+			String repTypeCd = (String) paramMap.get("repTypeCd");
+			
+			String branchNm = (String) paramMap.get("gitBrcNm");
+			
+			if("01".equals(repTypeCd)) {
 				
-				branchePath = branchePath.substring(0, branchePath.length()-1);
+				
+				if(!paramMap.containsKey("baseTarget") || "master".equals((String)paramMap.get("baseTarget")) || "".equals((String)paramMap.get("baseTarget"))) {
+					
+					
+					if(branchNm.indexOf(branchePath.substring(1)) == -1) {
+						model.addAttribute("errorYn", "Y");
+						model.addAttribute("message", "정상적인 빌드 브런치에서 변경 생성된 파일이 아닙니다.");
+						return new ModelAndView("jsonView");
+					}
+				}
+				
+				else {
+					
+					if(branchNm.indexOf("trunkCommit") == -1) {
+						model.addAttribute("errorYn", "Y");
+						model.addAttribute("message", "정상적인 빌드 브런치에서 변경 생성된 파일이 아닙니다.");
+						return new ModelAndView("jsonView");
+					}
+				}
+				
 			}
 			
-			
-			if(path.indexOf(branchePath) == -1) {
-				model.addAttribute("errorYn", "Y");
-				model.addAttribute("message", "정상적인 빌드 브런치에서 변경 생성된 파일이 아닙니다.");
-				return new ModelAndView("jsonView");
+			else if("02".equals(repTypeCd)) {
+				
+				if(branchePath.lastIndexOf("/") == (branchePath.length()-1)) {
+					
+					branchePath = branchePath.substring(0, branchePath.length()-1);
+				}
+				
+				
+				if(path.indexOf(branchePath) == -1) {
+					model.addAttribute("errorYn", "Y");
+					model.addAttribute("message", "정상적인 빌드 브런치에서 변경 생성된 파일이 아닙니다.");
+					return new ModelAndView("jsonView");
+				}
 			}
 			
+			else if("03".equals(repTypeCd)) {
+				
+			}
 			
-			String trunkPath = path.replace(branchePath, "/trunk");
-
 			
 			RepVO repVo = rep1000Service.selectRep1000Info(paramMap);
 			
 			
-			String diffContent = repModule.getFileContent(repVo, trunkPath, -1, null);
+			String content = null;
+			
+			if("01".equals(repTypeCd)) {
+				content = repModule.getFileContent(repVo, path, commitId, branchNm);
+			}
+			
+			else if("02".equals(repTypeCd)) {
+				content = repModule.getFileContent(repVo, path, revision);
+			}
+			
+			else if("03".equals(repTypeCd)) {
+				
+			}
+			
+			
+			String trunkPath = path.replace(branchePath, "/trunk");
+			
+			
+			String diffContent = null;
+			
+			if("01".equals(repTypeCd)) {
+				
+				if(!paramMap.containsKey("baseTarget") || "master".equals((String)paramMap.get("baseTarget")) || "".equals((String)paramMap.get("baseTarget"))) {
+					
+					diffContent= repModule.getFileContent(repVo, trunkPath, "-1", null);
+				}
+				
+				else {
+					
+					diffContent= repModule.getFileContent(repVo, trunkPath, "-1", opsBranchNm);
+				}
+			}
+			
+			else if("02".equals(repTypeCd)) {
+				diffContent= repModule.getFileContent(repVo, trunkPath, -1);
+			}
+			
+			else if("03".equals(repTypeCd)) {
+				
+			}
 			
 			
 			if(diffContent == null) {
@@ -313,9 +429,6 @@ public class Rep1100Controller {
 				model.addAttribute("message", "대상 경로 ("+trunkPath+")에 파일이 존재하지 않습니다.");
 				return new ModelAndView("jsonView");
 			}
-			
-			
-			String content = repModule.getFileContent(repVo, path, revision, null);
 			
 			
 			model.addAttribute("content", content);
@@ -328,7 +441,7 @@ public class Rep1100Controller {
 			model.addAttribute("errorYn", "N");
 			model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
 
-			return new ModelAndView("jsonView");
+			return new ModelAndView("jsonView", paramMap);
 		}
 		catch(Exception ex){
 			Log.error("selectRep1101FileDiffContentAjax()", ex);
@@ -532,7 +645,7 @@ public class Rep1100Controller {
 												
 												
 												if(fileChgPath.indexOf("/") != 0) {
-													fileChgPath += "/";
+													fileChgPath = "/"+fileChgPath;
 												}
 												
 												
@@ -554,7 +667,7 @@ public class Rep1100Controller {
 												}
 												
 												Map newMap = new HashMap<>();
-												newMap.put("fileRealPath", checkPath+fileChgPath);
+												newMap.put("fileRealPath", checkPath+"classTrunk"+fileChgPath);
 												newMap.put("filePath", fileChgPath);
 												newMap.put("fileTypeNm", fileTypeNm);
 												newMap.put("fileTypeCd", fileTypeCd);
