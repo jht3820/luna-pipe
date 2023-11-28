@@ -83,10 +83,6 @@ public class Rep1100Controller {
 			
 			model.addAttribute("empId", empId);
 			model.addAttribute("ticketId", ticketId);
-			
-			
-			model.addAttribute("empId", "jhkang");
-			model.addAttribute("ticketId", "HOOK00001");
 		}catch(Exception e) {
 			Log.error(e);
 			e.printStackTrace();
@@ -301,7 +297,9 @@ public class Rep1100Controller {
 			
 			String buildBranchNm = EgovProperties.getProperty("Globals.svn.buildBranchNm");
 			
-			String opsBranchNm = EgovProperties.getProperty("Globals.github.operation.branch");
+			String ticketId = (String) paramMap.get("ticketId");
+			buildBranchNm += "_"+ticketId;
+			
 			
 			
 			String branchePath = "/branches/"+buildBranchNm;
