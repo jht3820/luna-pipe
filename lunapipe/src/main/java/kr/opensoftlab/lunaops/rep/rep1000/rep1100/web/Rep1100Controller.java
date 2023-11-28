@@ -226,13 +226,7 @@ public class Rep1100Controller {
 			int totCnt = 0;
 			
 			
-			if(!paramMap.containsKey("baseTarget") || "master".equals((String)paramMap.get("baseTarget")) || "".equals((String)paramMap.get("baseTarget"))) {
-				totCnt = rep1100Service.selectRep1100TktRvFileChgListCnt(paramMap);
-			}
-			
-			else {
-				totCnt = rep1100Service.selectRep1100TktTrunkRvFileChgListCnt(paramMap);
-			}
+			totCnt = rep1100Service.selectRep1100TktRvFileChgListCnt(paramMap);
 			
 			
 			if(type != null && "all".equals(type)) {
@@ -242,15 +236,8 @@ public class Rep1100Controller {
 			}
 			
 			
-			if(!paramMap.containsKey("baseTarget") || "master".equals((String)paramMap.get("baseTarget")) || "".equals((String)paramMap.get("baseTarget"))) {
-				
-				rep1100List =  rep1100Service.selectRep1100TktRvFileChgList(paramMap);
-			}
 			
-			else {
-				
-				rep1100List =  rep1100Service.selectRep1100TktTrunkRvFileChgList(paramMap);
-			}
+			rep1100List =  rep1100Service.selectRep1100TktRvFileChgList(paramMap);
 			
 			
 			paginationInfo.setTotalRecordCount(totCnt);
@@ -317,15 +304,7 @@ public class Rep1100Controller {
 			String opsBranchNm = EgovProperties.getProperty("Globals.github.operation.branch");
 			
 			
-			String baseTarget = (String) paramMap.get("baseTarget");
-			
-			
-			String branchePath = "";
-			if(baseTarget == null || "".equals(baseTarget ) || "master".equals(baseTarget)) {
-				branchePath = "/branches/"+buildBranchNm;
-			}else {
-				branchePath = "/"+opsBranchNm;
-			}
+			String branchePath = "/branches/"+buildBranchNm;
 			
 			
 			String commitId = (String) paramMap.get("commitId");
@@ -338,25 +317,13 @@ public class Rep1100Controller {
 			if("01".equals(repTypeCd)) {
 				
 				
-				if(!paramMap.containsKey("baseTarget") || "master".equals((String)paramMap.get("baseTarget")) || "".equals((String)paramMap.get("baseTarget"))) {
-					
-					
-					if(branchNm.indexOf(branchePath.substring(1)) == -1) {
-						model.addAttribute("errorYn", "Y");
-						model.addAttribute("message", "정상적인 빌드 브런치에서 변경 생성된 파일이 아닙니다.");
-						return new ModelAndView("jsonView");
-					}
-				}
 				
-				else {
-					
-					if(branchNm.indexOf("trunkCommit") == -1) {
-						model.addAttribute("errorYn", "Y");
-						model.addAttribute("message", "정상적인 빌드 브런치에서 변경 생성된 파일이 아닙니다.");
-						return new ModelAndView("jsonView");
-					}
-				}
 				
+				if(branchNm.indexOf(branchePath.substring(1)) == -1) {
+					model.addAttribute("errorYn", "Y");
+					model.addAttribute("message", "정상적인 빌드 브런치에서 변경 생성된 파일이 아닙니다.");
+					return new ModelAndView("jsonView");
+				}
 			}
 			
 			else if("02".equals(repTypeCd)) {
@@ -404,15 +371,8 @@ public class Rep1100Controller {
 			
 			if("01".equals(repTypeCd)) {
 				
-				if(!paramMap.containsKey("baseTarget") || "master".equals((String)paramMap.get("baseTarget")) || "".equals((String)paramMap.get("baseTarget"))) {
-					
-					diffContent= repModule.getFileContent(repVo, trunkPath, "-1", null);
-				}
 				
-				else {
-					
-					diffContent= repModule.getFileContent(repVo, trunkPath, "-1", opsBranchNm);
-				}
+				diffContent= repModule.getFileContent(repVo, trunkPath, "-1", null);
 			}
 			
 			else if("02".equals(repTypeCd)) {
