@@ -74,9 +74,14 @@
 			<isEmpty property="ticketId">
 				AND A.TICKET_ID = 'SYSTEM'
 			</isEmpty>
-			<isNotEmpty property="ticketId">
-				AND A.TICKET_ID IN ('SYSTEM', #ticketId#)
-			</isNotEmpty>
+			<isEqual property="onlyTicket" compareValue="true">
+				AND A.TICKET_ID = #ticketId#
+			</isEqual>
+			<isNotEqual property="onlyTicket" compareValue="true">
+				<isNotEmpty property="ticketId">
+					AND A.TICKET_ID IN ('SYSTEM', #ticketId#)
+				</isNotEmpty>
+			</isNotEqual>
 		</isNotEqual>
 		<isNotEmpty property="repId">
 			AND A.REP_ID = #repId#
@@ -87,21 +92,21 @@
 		<isNotEmpty property="repRvn">
 			AND A.REP_RVN = #repRvn#
 		</isNotEmpty>
-		<isNotNull property="selectSearch">
-			<isNotEmpty property="selectSearch">
+		<isNotNull property="searchSelect">
+			<isNotEmpty property="searchSelect">
 				<isNotEmpty property="searchTxt">
-					<isEqual property="selectSearch" compareValue="author">
+					<isEqual property="searchSelect" compareValue="author">
 						<![CDATA[
 							AND LOWER(A.REP_CMT_AUTHOR) LIKE '%'|| LOWER(#searchTxt#) ||'%'
 						]]>
 					</isEqual>
-					<isEqual property="selectSearch" compareValue="comment">
+					<isEqual property="searchSelect" compareValue="comment">
 						<![CDATA[
 							AND A.REP_COMMENT LIKE '%'|| #searchTxt# ||'%'
 						]]>
 					</isEqual>
 				</isNotEmpty>
-				<isEqual property="selectSearch" compareValue="logDate">
+				<isEqual property="searchSelect" compareValue="logDate">
 					<isNotEmpty property="searchStDate">
 						AND A.REP_CMT_DATE &lt;= TO_DATE(#searchStDate#, 'YYYY-MM-DD HH24:MI:SS')
 					</isNotEmpty>
