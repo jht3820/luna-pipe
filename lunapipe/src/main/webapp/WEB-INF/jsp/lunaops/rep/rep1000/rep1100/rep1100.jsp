@@ -191,6 +191,7 @@ function fnTktFileGridSetting(){
            			, "fileName": item.repChgFileNm
            			, "gitBrcNm": item.gitBrcNm
            			, "gitCmtSha" : item.gitCmtSha
+           			, "ticketId": '${requestScope.ticketId}'
             	};
          		gfnLayerPopupOpen('/rep/rep1000/rep1100/selectRep1101View.do',data,"1200","780",'scroll');
         	},
@@ -253,6 +254,7 @@ function fnTktFileGridSetting(){
 	           			, "fileName": item.repChgFileNm
 	           			, "gitBrcNm": item.gitBrcNm
 	           			, "gitCmtSha" : item.gitCmtSha
+	           			, "ticketId": '${requestScope.ticketId}'
 	            	};
 	            	
 	         		gfnLayerPopupOpen('/rep/rep1000/rep1100/selectRep1101View.do',data,"1200","780",'scroll');
