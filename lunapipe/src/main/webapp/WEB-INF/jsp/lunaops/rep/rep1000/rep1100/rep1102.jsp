@@ -481,6 +481,7 @@ function fuRsyncResultList(paramItem, paramSearchData){
 				rsyncDataGridObj.setData([]);
 			}else{
 				var fileChgList = data.fileChgList;
+				
 				rsyncDataGridObj.setData(fileChgList);
 				
 				//결과 데이터 넣기
