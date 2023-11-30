@@ -21,7 +21,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.io.FileUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.kohsuke.github.GHCommit;
@@ -236,22 +235,8 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		
 		String buildBranchNm = EgovProperties.getProperty("Globals.svn.buildBranchNm");
 		
-		String opsBranchNm = EgovProperties.getProperty("Globals.github.operation.branch");
 		
-		
-		String baseTarget = (String) paramMap.get("baseTarget");
-		if(baseTarget == null || "".equals(baseTarget)) {
-			baseTarget = "master";
-		}
-		
-		
-		String branchePath = "";
-		if(baseTarget == null || "".equals(baseTarget ) || "master".equals(baseTarget)) {
-			branchePath = "/branches/"+buildBranchNm;
-		}else {
-			branchePath = "/"+opsBranchNm;
-		}
-		
+		String branchePath = "/branches/"+buildBranchNm;
 		
 		
 		if(branchePath.lastIndexOf("/") == (branchePath.length()-1)) {
@@ -345,8 +330,6 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				
 				Map newRepoMap = new HashMap<>();
 				newRepoMap.putAll(resultMap);
-				
-				newRepoMap.put("baseTarget", baseTarget);
 				newRepoMap.put("repResultVo", repResultVo);
 				
 				newRepoMap.put("makePathCheck", makePathCheck);
@@ -400,7 +383,6 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				RepVO repVo = repResultVo.getRepVo();
 				
 				Map newParamMap = new HashMap<>();
-				newParamMap.put("baseTarget", baseTarget);
 				newParamMap.put("repResultVo", repResultVo);
 				newParamMap.put("fileList", repFileMap.get(repId));
 				newParamMap.put("dirList", repDirMap.get(repId));
@@ -1085,18 +1067,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		
 		String opsBranchNm = EgovProperties.getProperty("Globals.github.operation.branch");
 		
-		String baseTarget = "master";
-		if(paramMap.containsKey("baseTarget") && !"".equals(paramMap.get("baseTarget"))) {
-			baseTarget = (String) paramMap.get("baseTarget");
-		}
-		
-		boolean baseOpsYn = false;
 		String baseTargetBranchNm = masterBranchNm;
-		if("operation".equals(baseTarget)) {
-			baseOpsYn = true;
-			baseTargetBranchNm = opsBranchNm;
-		}
-		
 		
 		
 		List<String> makePathCheck = (List) paramMap.get("makePathCheck");
@@ -1227,16 +1198,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 			try {
 				
 				
-				if(baseOpsYn) {
-					
-					content = repository.getFileContent(repChgFilePath, masterBranchNm);
-				}
-				
-				else {
-					
-					content = repository.getFileContent(repChgFilePath, branchNm);
-				}
-				
+				content = repository.getFileContent(repChgFilePath, branchNm);
 			}catch (GHFileNotFoundException notFileE) {
 				
 				try {
@@ -1422,18 +1384,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		
 		String opsBranchNm = EgovProperties.getProperty("Globals.github.operation.branch");
 		
-		String baseTarget = "master";
-		if(paramMap.containsKey("baseTarget") && !"".equals(paramMap.get("baseTarget"))) {
-			baseTarget = (String) paramMap.get("baseTarget");
-		}
-		
-		boolean baseOpsYn = false;
 		String baseTargetBranchNm = masterBranchNm;
-		if("operation".equals(baseTarget)) {
-			baseOpsYn = true;
-			baseTargetBranchNm = opsBranchNm;
-		}
-		
 				
 		
 		if(fileList == null || fileList.size() == 0) {
@@ -1470,12 +1421,6 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		
 		String newCommitBranch = branchePath+"_trunkCommit";
 		
-		
-		if(baseOpsYn) {
-			
-			newCommitBranch = opsBranchNm+"_trunkCommit";
-		}
-		
 		try {
 			
 			repository.createRef("refs/heads/"+newCommitBranch, targetBranchHeadSha);
@@ -1483,17 +1428,8 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 			
 			
 			
-			if(baseOpsYn) {
-				
-				GHRef opsRef = repository.getRef("heads/"+opsBranchNm);
-				repository.getRef("heads/"+newCommitBranch).updateTo(opsRef.getObject().getSha(),true);
-			}
-			
-			else {
-				
-				GHRef mstRef = repository.getRef("heads/"+masterBranchNm);
-				repository.getRef("heads/"+newCommitBranch).updateTo(mstRef.getObject().getSha(),true);
-			}
+			GHRef mstRef = repository.getRef("heads/"+masterBranchNm);
+			repository.getRef("heads/"+newCommitBranch).updateTo(mstRef.getObject().getSha(),true);
 		}
 		
 		
@@ -2852,6 +2788,8 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				RepResultVO repResultVo = null;
 				List repSelFileList = null;
 				
+				RepVO repVo = null;
+				
 				
 				if(!repInfoMap.containsKey(repId)) {
 					
@@ -2859,7 +2797,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 					newMap.put("repId", repId);
 					
 					
-					RepVO repVo = rep1000Service.selectRep1000Info(newMap);
+					repVo = rep1000Service.selectRep1000Info(newMap);
 					
 					
 					repResultVo = repModule.repAuthCheck(repVo);
@@ -2888,6 +2826,10 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				
 				repResultVo = repInfoMap.get(repId);
 				repSelFileList = repSelDplFileMap.get(repId);
+				
+				repVo = repResultVo.getRepVo();
+				
+				repTypeCd = repVo.getRepTypeCd();
 				
 				
 				if(!repResultVo.isReturnValue()) {

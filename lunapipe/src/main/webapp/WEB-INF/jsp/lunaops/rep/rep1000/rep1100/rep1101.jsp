@@ -106,26 +106,9 @@ span.text-rep-del {background-color: #af3022;}
 </style>
 <script>
 
-//타입
-var callType = '${param.baseTarget}';
-if(gfnIsNull(callType)){
-	/* 
-	* [master] svn/github 모두 사용 : ticket -> trunk commit
-	* [operation] github만 사용 : trunk -> operation branch commit
-	*/
-	callType = "master";
-}
-
 	$(document).ready(function() {
-		//위치 표출(Branch, Trunk, Operation)
-		if(callType == "master"){
-			$("#repoTargetLeftPrint").text("Branch");
-			$("#repoTargetRightPrint").text("Trunk");
-		}
-		else {
-			$("#repoTargetLeftPrint").text("Trunk");
-			$("#repoTargetRightPrint").text("Operation");
-		}
+		$("#repoTargetLeftPrint").text("Branch");
+		$("#repoTargetRightPrint").text("Trunk");
 		
 		//var content = "${content}";
 		fnGetFileContent();
@@ -158,7 +141,7 @@ if(gfnIsNull(callType)){
 				, "repTypeCd" : '${param.repTypeCd}'
 				, "gitBrcNm" : '${param.gitBrcNm}'
 				, "gitCmtSha" : '${param.gitCmtSha}'
-				, "baseTarget" : '${param.baseTarget}'
+				, "ticketId": '${param.ticketId}'
 			}
 		);
 	 	
