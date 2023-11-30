@@ -1,6 +1,7 @@
 package kr.opensoftlab.lunaops.com.api.web;
 
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import egovframework.com.cmm.service.EgovProperties;
@@ -942,6 +945,35 @@ public class ApiController {
 					model.addAllAttributes(rtnMap);
 				}
 			}
+		}catch(Exception ex){
+			model.addAttribute("result", "ERROR");
+			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);
+			model.addAttribute("msg", OslErrorCode.getErrorMsg(OslErrorCode.SERVER_ERROR));
+			Log.error("gitHookPostPush()", ex);
+		}
+		return new ModelAndView("jsonView");
+	}
+	
+	
+	
+	@RequestMapping(value="/getParam.do", method=RequestMethod.GET)
+	public ModelAndView getParam(HttpServletRequest request, HttpServletResponse response, ModelMap model ) throws Exception {
+		try{
+			
+			Map<String, String> paramMap = RequestConvertor.requestParamToMapAddSelInfo(request, false);
+			ObjectMapper objMapper = new ObjectMapper()
+					
+					.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+					.configure(JsonParser.Feature.IGNORE_UNDEFINED, true)
+					
+					.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false)
+					
+					.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+			
+			
+			String data = URLEncoder.encode(CommonScrty.encryptedAria(objMapper.writeValueAsString(paramMap), "UKVPlQAJhoSV9Xf1yAthywKHptlTGk9k+PuKQiBQcXc="), "UTF-8");
+			model.addAttribute("data", data);
+			
 		}catch(Exception ex){
 			model.addAttribute("result", "ERROR");
 			model.addAttribute("error_code", OslErrorCode.SERVER_ERROR);

@@ -10,6 +10,16 @@
 	.defaultFont{color:#000 !important;}
 	.tab_contents.menu{width:1500px;}
 	
+	/*TODO 제거*/
+	.osl-test-view--div {
+		margin: 0px 5px;
+		padding: 5px;	
+	}
+	.osl-test-view--div:hover {
+		border-radius: 5px;
+		background-color: #a5a4ef;
+		cursor: pointer;
+	}
 </style>
 <script>
 var repGridObj;
@@ -245,7 +255,7 @@ function fnRepGridSetting(){
         			}
         		}
              },
-             onDBLClick:function(){
+             onDBLClick:function(){ debugger;
             	 //암호화 값
             	 var enRepIdData = this.item.enRepIdData;
             	 
@@ -718,12 +728,6 @@ function fnRep1000GuideShow(){
 	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
 }
 
-function fnRep1100View(type){
-	var data = {
-			"baseTarget" : type
-	};
-	gfnLayerPopupOpen('/rep/rep1000/rep1100/selectRep1100View.do',data,"1440","800",'scroll');
-};
 </script>
 
 
