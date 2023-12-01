@@ -2672,6 +2672,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				
 				
 				
+				
 				removeRep1102List(newOpsBranch);
 				
 				errorMsg.add("Pull Request에 실패하였습니다. "+masterBranchNm+"에 커밋할 수 없습니다.");
