@@ -100,8 +100,22 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
 			if(data.MSG_CD=="JENKINS_OK"){
+				//제외 해하는 paramList를 제외한 param
+				var jobParamList = [];
+
 				//jobParamList 세팅
-				var jobParamList = data.list;
+				var paramList = data.list;
+				
+				if(!gfnIsNull(paramList)){
+					$.each(paramList, function(idx, paramInfo){
+						if(paramInfo.hasOwnProperty("jobParamKey") && paramInfo["jobParamKey"] == "ticket_id"){
+							return;
+						}
+						
+						jobParamList.push(paramInfo);
+					});
+				}
+				
 				if(!gfnIsNull(jobParamList)){
 					// html
 					var paramHtml = "";
@@ -251,7 +265,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 					var listLength = jobParamList.length;
 					var targetHeight;
 					
-
+					
 					$('.layer_popup_box[layerurl="/jen/jen1000/jen1000/selectJen1005View.do"]').height(popupHeight + 206);
 					
 					if(popupHeight > 780){
@@ -263,6 +277,12 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 										+'	<div class="pop_menu_col1"></div>'
 										+'	<div class="pop_menu_col2 pop_oneRow_col2"></div>'
 										+'</div>';
+					}
+					
+					//없는 경우
+					if(gfnIsNull(paramHtml)){
+						paramHtml = "<span class='param-no-data'>빌드 파라미터가 없습니다.</span>";
+						$("#btnPopJen1005Select").hide();
 					}
 					
 					$("#jobParameterDiv").html(paramHtml);

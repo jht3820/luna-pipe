@@ -992,7 +992,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 			
 			
 			
-			String jobKey = OslUtil.jsonGetString(jsonObj, "jobKey");
+			String jobKey = OslUtil.jsonGetString(jsonObj, "job_Key");
 			
 			
 			if(jobKey == null) {
@@ -2960,6 +2960,8 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 						try {
 							
 							String path = chgFileInfo.getPath();
+							
+							System.out.println(">>>>>>>>>>>>>>>chgFilePath: "+path);
 							
 							String fileNm = path.substring(path.lastIndexOf("/")+1, path.length());
 							
