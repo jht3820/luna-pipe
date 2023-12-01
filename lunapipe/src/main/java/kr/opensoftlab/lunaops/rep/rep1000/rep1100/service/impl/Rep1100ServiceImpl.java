@@ -2664,11 +2664,12 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 						System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>PULL REQUEST START>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 						System.out.println("param map : "+paramMap.entrySet());
 						
-						repository.createPullRequest(commitComment, newOpsBranch, opsBranchNm,  commitComment).merge(commitComment, newOpsBranch, MergeMethod.MERGE);
+						repository.createPullRequest(commitComment, newOpsBranch, opsBranchNm,  commitComment).merge(commitComment);
 						System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>PULL REQUEST END>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 				}
 			}catch (Exception e) {
 				e.printStackTrace();
+				
 				
 				
 				
