@@ -100,7 +100,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
 			if(data.MSG_CD=="JENKINS_OK"){
-				//제외 해하는 paramList를 제외한 param
+				//제외해야하는 paramList를 제외한 param
 				var jobParamList = [];
 
 				//jobParamList 세팅
@@ -108,8 +108,17 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 				
 				if(!gfnIsNull(paramList)){
 					$.each(paramList, function(idx, paramInfo){
-						if(paramInfo.hasOwnProperty("jobParamKey") && paramInfo["jobParamKey"] == "ticket_id"){
-							return;
+						//job이 운영 빌드일 때
+						if(!gfnIsNull(jobTypeCd) && jobTypeCd == "04"){
+							if(paramInfo.hasOwnProperty("jobParamKey") && paramInfo["jobParamKey"] == '<c:out value="${requestScope.jobParamTicketId}"/>'){
+								return;
+							}
+						}
+						//job이 운영 배포,원복일때
+						else if(!gfnIsNull(jobTypeCd) && (jobTypeCd == "05" || jobTypeCd == "06" || jobTypeCd == "07" || jobTypeCd == "08")){
+							if(paramInfo.hasOwnProperty("jobParamKey") && paramInfo["jobParamKey"] == '<c:out value="${requestScope.jobParamDplId}"/>'){
+								return;
+							}
 						}
 						
 						jobParamList.push(paramInfo);
@@ -281,7 +290,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 					
 					//없는 경우
 					if(gfnIsNull(paramHtml)){
-						paramHtml = "<span class='param-no-data'>빌드 파라미터가 없습니다.</span>";
+						paramHtml = "<span class='param-no-data'>입력 가능한 빌드 파라미터가 없습니다.</span>";
 						$("#btnPopJen1005Select").hide();
 					}
 					
@@ -291,7 +300,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 					
 				}else{
 					//파라미터가 없는 경우 html
-					var paramHtml = "<span class='param-no-data'>빌드 파라미터가 없습니다.</span>";
+					var paramHtml = "<span class='param-no-data'>입력 가능한 빌드 파라미터가 없습니다.</span>";
 					$("#btnPopJen1005Select").hide();
 					$("#jobParameterDiv").html(paramHtml);
 				}
