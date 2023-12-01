@@ -235,8 +235,6 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		
 		String buildBranchNm = EgovProperties.getProperty("Globals.svn.buildBranchNm");
 		
-		String opsBranchNm = EgovProperties.getProperty("Globals.github.operation.branch");
-		
 		
 		String branchePath = "/branches/"+buildBranchNm;
 		
@@ -2674,6 +2672,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				
 				
 				
+				
 				removeRep1102List(newOpsBranch);
 				
 				errorMsg.add("Pull Request에 실패하였습니다. "+masterBranchNm+"에 커밋할 수 없습니다.");
@@ -2790,6 +2789,8 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				RepResultVO repResultVo = null;
 				List repSelFileList = null;
 				
+				RepVO repVo = null;
+				
 				
 				if(!repInfoMap.containsKey(repId)) {
 					
@@ -2797,7 +2798,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 					newMap.put("repId", repId);
 					
 					
-					RepVO repVo = rep1000Service.selectRep1000Info(newMap);
+					repVo = rep1000Service.selectRep1000Info(newMap);
 					
 					
 					repResultVo = repModule.repAuthCheck(repVo);
@@ -2826,6 +2827,10 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				
 				repResultVo = repInfoMap.get(repId);
 				repSelFileList = repSelDplFileMap.get(repId);
+				
+				repVo = repResultVo.getRepVo();
+				
+				repTypeCd = repVo.getRepTypeCd();
 				
 				
 				if(!repResultVo.isReturnValue()) {
