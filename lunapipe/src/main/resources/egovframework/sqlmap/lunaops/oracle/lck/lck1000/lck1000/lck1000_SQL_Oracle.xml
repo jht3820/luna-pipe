@@ -40,7 +40,6 @@
 				, A.LOCK_FORCE
 				, A.TICKET_ID
 				, A.LOCK_TARGET_RV
-				, A.REP_TYPE
 				, A.REG_DTM 
 	            , A.REG_USR_ID 
 	            , A.REG_USR_IP 
@@ -120,7 +119,6 @@
 				REP_ID					,LOCK_ID						,LOCK_PATH
 				,LOCK_STATE_CD			,LOCK_USR_ID					,LOCK_COMMENT
 				,LOCK_FORCE				,TICKET_ID						,LOCK_TARGET_RV
-				,REP_TYPE
 				,REG_DTM				,REG_USR_ID						,REG_USR_IP
 					    
 			)
@@ -129,7 +127,7 @@
 				#repId#					,#lockId#						,#lockPath#
 				,#lockStateCd#			,#lockUsrId#					,#lockComment#
 				,#lockForce#			,#ticketId#						,#lockTargetRv#
-				,#repType#
+				
 				,SYSDATE				,#lockUsrId#					,#regUsrIp#
 			)
 		]]>
