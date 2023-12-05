@@ -100,8 +100,31 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 		//AJAX 전송 성공 함수
 		ajaxObj.setFnSuccess(function(data){
 			if(data.MSG_CD=="JENKINS_OK"){
+				//제외해야하는 paramList를 제외한 param
+				var jobParamList = [];
+
 				//jobParamList 세팅
-				var jobParamList = data.list;
+				var paramList = data.list;
+				
+				if(!gfnIsNull(paramList)){
+					$.each(paramList, function(idx, paramInfo){
+						//job이 운영 빌드일 때
+						if(!gfnIsNull(jobTypeCd) && jobTypeCd == "04"){
+							if(paramInfo.hasOwnProperty("jobParamKey") && paramInfo["jobParamKey"] == '<c:out value="${requestScope.jobParamTicketId}"/>'){
+								return;
+							}
+						}
+						//job이 운영 배포,원복일때
+						else if(!gfnIsNull(jobTypeCd) && (jobTypeCd == "05" || jobTypeCd == "06" || jobTypeCd == "07" || jobTypeCd == "08")){
+							if(paramInfo.hasOwnProperty("jobParamKey") && paramInfo["jobParamKey"] == '<c:out value="${requestScope.jobParamDplId}"/>'){
+								return;
+							}
+						}
+						
+						jobParamList.push(paramInfo);
+					});
+				}
+				
 				if(!gfnIsNull(jobParamList)){
 					// html
 					var paramHtml = "";
@@ -251,7 +274,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 					var listLength = jobParamList.length;
 					var targetHeight;
 					
-
+					
 					$('.layer_popup_box[layerurl="/jen/jen1000/jen1000/selectJen1005View.do"]').height(popupHeight + 206);
 					
 					if(popupHeight > 780){
@@ -265,13 +288,19 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 										+'</div>';
 					}
 					
+					//없는 경우
+					if(gfnIsNull(paramHtml)){
+						paramHtml = "<span class='param-no-data'>입력 가능한 빌드 파라미터가 없습니다.</span>";
+						$("#btnPopJen1005Select").hide();
+					}
+					
 					$("#jobParameterDiv").html(paramHtml);
 					jen1005ParamList = jobParamList;
 					ADD_JOB_PARAM_LIST[jenId][jobId] = jobParamList;
 					
 				}else{
 					//파라미터가 없는 경우 html
-					var paramHtml = "<span class='param-no-data'>빌드 파라미터가 없습니다.</span>";
+					var paramHtml = "<span class='param-no-data'>입력 가능한 빌드 파라미터가 없습니다.</span>";
 					$("#btnPopJen1005Select").hide();
 					$("#jobParameterDiv").html(paramHtml);
 				}

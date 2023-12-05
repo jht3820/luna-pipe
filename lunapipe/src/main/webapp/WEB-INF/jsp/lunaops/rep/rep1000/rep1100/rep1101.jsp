@@ -141,6 +141,7 @@ span.text-rep-del {background-color: #af3022;}
 				, "repTypeCd" : '${param.repTypeCd}'
 				, "gitBrcNm" : '${param.gitBrcNm}'
 				, "gitCmtSha" : '${param.gitCmtSha}'
+				, "ticketId": '${param.ticketId}'
 			}
 		);
 	 	
