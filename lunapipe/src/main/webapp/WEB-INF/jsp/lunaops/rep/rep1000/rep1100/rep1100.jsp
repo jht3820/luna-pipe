@@ -14,27 +14,9 @@ var tktFileSearchObj;
 //선택된 소스저장소 데이터 목록
 var selRepData = [];
 
-//타입
-var callType = '${param.baseTarget}';
-
-if(gfnIsNull(callType)){
-	/* 
-	* [master] svn/github 모두 사용 : ticket -> trunk commit
-	* [operation] github만 사용 : trunk -> operation branch commit
-	*/
-	callType = "master";
-}
-
 $(function(){
 	//타이틀 세팅
-	//[master] svn/github 모두 사용 : ticket -> trunk commit
-	if(callType == "master"){
 		$("#rep1100Title").text("["+gfnEscapeHtml("${requestScope.ticketId}")+"] 티켓 변경 파일 목록");
-	}
-	//[operation] github만 사용 : trunk -> operation branch commit
-	else{
-		$("#rep1100Title").text("["+gfnEscapeHtml("${requestScope.ticketId}")+"] 티켓 소스저장소 Trunk 변경 파일 목록");
-	}
 	
 	//그리드 검색 호출
 	fnTktFileGridSetting();
@@ -92,7 +74,6 @@ $(function(){
 					,{
 						//컨트롤러 전달 데이터
 						returnMap: JSON.stringify(returnMap)
-						, "baseTarget" : callType
 					}
 				);
 				
@@ -210,7 +191,7 @@ function fnTktFileGridSetting(){
            			, "fileName": item.repChgFileNm
            			, "gitBrcNm": item.gitBrcNm
            			, "gitCmtSha" : item.gitCmtSha
-           			, "baseTarget" : callType
+           			, "ticketId": '${requestScope.ticketId}'
             	};
          		gfnLayerPopupOpen('/rep/rep1000/rep1100/selectRep1101View.do',data,"1200","780",'scroll');
         	},
@@ -273,7 +254,7 @@ function fnTktFileGridSetting(){
 	           			, "fileName": item.repChgFileNm
 	           			, "gitBrcNm": item.gitBrcNm
 	           			, "gitCmtSha" : item.gitCmtSha
-	           			, "baseTarget" : callType
+	           			, "ticketId": '${requestScope.ticketId}'
 	            	};
 	            	
 	         		gfnLayerPopupOpen('/rep/rep1000/rep1100/selectRep1101View.do',data,"1200","780",'scroll');
@@ -337,8 +318,6 @@ function fnInGridListSet(_pageNo,ajaxParam){
     
 	//조회 typeCd 넘기기
 	ajaxParam += "&repRvTypeCd=01";
-	//조회 유형 넘기기
-	ajaxParam += "&baseTarget="+callType;
    	
    	//AJAX 설정
 	var ajaxObj = new gfnAjaxRequestAction(
@@ -465,16 +444,9 @@ function fnRep1100GuideShow(){
 	if(mainObj.length == 0){
 		return false;
 	}
-	
-	//master/operation에 따라
-	if(callType == "master"){
-		//guide box setting
-		var guideBoxInfo = globals_guideContents["rep1100Mst"];
-		gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
-	}else {
-		var guideBoxInfo = globals_guideContents["rep1100Ops"];
-		gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
-	}
+	//guide box setting
+	var guideBoxInfo = globals_guideContents["rep1100Mst"];
+	gfnGuideBoxDraw(true,mainObj,guideBoxInfo);
 }
 </script>
 
