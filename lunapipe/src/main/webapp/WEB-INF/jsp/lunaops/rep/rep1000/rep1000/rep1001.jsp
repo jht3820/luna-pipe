@@ -410,7 +410,13 @@ $(document).ready(function() {
         	$("#repTypeCd").attr("disabled",true);
         	$("#gitRepUrl").attr("readonly",true);
         	$("#svnRepUrl").attr("readonly",true);
-        	$("#dplRepUrl").attr("readonly",true);
+        	
+        	//기존 정보가 없었다면
+        	if(gfnIsNull(oriRepInfo.dplRepUrl)){
+	        	$("#dplRepUrl").attr("readonly",false);
+        	}else{
+	        	$("#dplRepUrl").attr("readonly",true);
+        	}
 		});
 		
 		//AJAX 전송
