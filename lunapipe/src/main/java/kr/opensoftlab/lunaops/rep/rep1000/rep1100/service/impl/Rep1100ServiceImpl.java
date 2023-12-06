@@ -454,6 +454,9 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		
 		
 		String buildBranchNm = EgovProperties.getProperty("Globals.svn.buildBranchNm");
+		String ticketId = (String) paramMap.get("ticketId");
+		
+		buildBranchNm += "_"+ticketId;
 		
 		String branchePath = "/branches/"+buildBranchNm;
 		
@@ -672,9 +675,12 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		SVNRepository repository = repResultVo.getSvnRepo();
 		
 		
-		List<JSONObject> fileList = (List<JSONObject>) paramMap.get("fileList");
 		
-		List<JSONObject> dirList = (List<JSONObject>) paramMap.get("dirList");
+		
+		List<Map> fileList = (List<Map>) paramMap.get("fileList");
+		
+		
+		List<Map> dirList = (List<Map>) paramMap.get("dirList");
 		
 		
 		boolean isLockFile = false;
@@ -683,6 +689,8 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		String repId = repVo.getRepId();
 		
 		String buildBranchNm = EgovProperties.getProperty("Globals.svn.buildBranchNm");
+		
+		buildBranchNm += "_"+ticketId;
 		
 		String branchePath = "/branches/"+buildBranchNm;
 		
@@ -693,7 +701,8 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		}
 				
 		
-		for(JSONObject fileInfo: fileList) {
+		
+		for(Map fileInfo: fileList) {
 			try {
 				
 				String repChgFilePath = (String) fileInfo.get("repChgFilePath");
@@ -805,7 +814,9 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		}
 		
 		
-		for(JSONObject dirInfo: dirList) {
+		
+		
+		for(Map dirInfo: dirList) {
 			
 			String repChgFilePath = (String) dirInfo.get("repChgFilePath");
 			
@@ -823,7 +834,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 			
 			if("03".equals(repChgTypeCd)) {
 				
-				if(!dirInfo.has("delSkip")) {
+				if(!dirInfo.containsKey("delSkip")) {
 					
 					editor.deleteEntry(trunkPath, -1);
 				}
@@ -849,7 +860,9 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		}
 		
 		
-		for(JSONObject fileInfo: fileList) {
+		
+		
+		for(Map fileInfo: fileList) {
 			
 			String repChgFilePath = (String) fileInfo.get("repChgFilePath");
 			
@@ -2669,6 +2682,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 				}
 			}catch (Exception e) {
 				e.printStackTrace();
+				
 				
 				
 				
