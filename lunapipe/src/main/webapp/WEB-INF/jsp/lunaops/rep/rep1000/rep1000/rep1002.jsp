@@ -38,14 +38,14 @@
 	//리비전 파일 내용 목록 출력 갯수
 	var revisionFilePahtListCnt = 30;
 	var repNm = '<c:out value="${repInfo.repNm}"/>';
-	
+
 	//선택 리비전 중복 체크
 	var overlapRevision = {};
 	
 	//스크립트 초기화
 	$(document).ready(function(){
 		//소스저장소 명
-		$("form#rep1002PopupFrm > #repNm").val(repNm);
+		$(".rep1002RightFrame #repNm").html(repNm);
 		//소스저장소 타입
 		repTypeCd = $("form#rep1002PopupFrm > #repTypeCd").val();
 		
@@ -332,7 +332,7 @@
 					onAsyncError: fnAsyncError,
 					onClick: function(event, treeId, treeNode){
 						var treeNodePath = treeNode.path;
-						debugger;
+						
 						//path가 있는 경우
 						if(!gfnIsNull(treeNodePath)){
 							//path변경
@@ -875,7 +875,7 @@
 				좌측에서 리비전 목록 대상을 선택해주세요.
 			</div>
 			<div class="sub_title">
-			소스저장소 상세정보 [ 선택 저장소: <span id="repNm"> </span> ]
+				소스저장소 상세정보 [ 선택 저장소: <span id="repNm"> </span> ]
 			</div>
 			<div class="rep1002SearchFrame rep1002FrameBox" id="repSearchTarget" guide="rep1002RepBtn"></div>
 			<div class="rep1002RevisionFrame rep1002FrameBox">
