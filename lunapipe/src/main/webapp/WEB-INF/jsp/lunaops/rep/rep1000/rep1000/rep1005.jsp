@@ -154,13 +154,14 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 						 var data = {
 								"repId" : "${param.repId}",
 								"revision" : selItem.revision,
+								"revisionNum" : selItem.revisionNum,
 								"commitId": selItem.commitId,
 								"path": "<c:out value='${param.filePath}'/>",
 								"fileName": "<c:out value='${param.fileName}'/>",
 								"repTypeCd": selItem.repTypeCd,
 								"gitBrcNm": selItem.gitBrcNm
 						 }
-						 
+						 console.log("dddd", data);
 						 gfnLayerPopupOpen('/rep/rep1000/rep1000/selectRep1008View.do',data,"1200","780",'scroll');
 					}
 					
