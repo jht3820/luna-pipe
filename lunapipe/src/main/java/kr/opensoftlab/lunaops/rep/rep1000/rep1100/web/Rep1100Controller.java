@@ -625,7 +625,15 @@ public class Rep1100Controller {
 												}
 												
 												Map newMap = new HashMap<>();
-												newMap.put("fileRealPath", checkPath+"classTrunk"+fileChgPath);
+												if("02".equals((String) repInfo.getRepTypeCd())) {
+													
+													if(checkPath.lastIndexOf("/") == checkPath.length() - 1 ) {
+														checkPath = checkPath.substring(0, checkPath.lastIndexOf("/")-1);
+													}
+													newMap.put("fileRealPath", checkPath+fileChgPath);
+												}else {
+													newMap.put("fileRealPath", checkPath+"classTrunk"+fileChgPath);
+												}
 												newMap.put("filePath", fileChgPath);
 												newMap.put("fileTypeNm", fileTypeNm);
 												newMap.put("fileTypeCd", fileTypeCd);
