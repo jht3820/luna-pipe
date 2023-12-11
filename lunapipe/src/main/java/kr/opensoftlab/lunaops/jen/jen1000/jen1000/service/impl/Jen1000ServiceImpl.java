@@ -279,7 +279,8 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 				for(int i=0;i<jobArr.length();i++) {
 					JSONObject jobObj = jobArr.getJSONObject(i);
 					String jobId = jobObj.getString("jobId");
-					
+					String jobUrl = jobObj.getString("jobUrl");
+
 					
 					currentJobId = jobId;
 					paramMap.put("jobId", jobId);
@@ -290,6 +291,9 @@ public class Jen1000ServiceImpl  extends EgovAbstractServiceImpl implements Jen1
 					if(jobCheck > 0){
 						throw new UserDefineException("[job_id="+jobId+"] 이미 추가된 JOB입니다.");
 					}
+					
+					
+					paramMap.put("jobUrl", jobUrl);
 					
 					
 					jen1000DAO.insertJen1100JobInfo(paramMap);
