@@ -39,7 +39,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 	//비교 대상 리비전 선택
 	function fnRevisionSelect(){
 		var item = (!gfnIsNull(Object.keys(rep1005PathGrid.focusedColumn)))? rep1005PathGrid.list[rep1005PathGrid.focusedColumn[Object.keys(rep1005PathGrid.focusedColumn)].doindex]:null;
-		debugger;
+
 		if(gfnIsNull(item)){
 			toast.push('비교 대상 리비전을 선택해주세요.');
 			return;
@@ -131,7 +131,7 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 				},
 				onClick: function (item, param) {
 					var selItem = rep1005PathGrid.list[param.doindex];
-					debugger;
+
 					//diff
 					if(item.type == "revisionFileDiff"){
 						//파일 내용 비교
