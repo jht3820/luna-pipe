@@ -121,7 +121,7 @@ $(document).ready(function() {
 		{mstCd: "CMM00001", useYn: "Y",targetObj: "#useCd", comboType:"OS"} // 사용유무
 	];
 	//공통코드 채우기
-	var ajaxDone = gfnGetMultiCommonCodeDataForm(commonCodeArr , true);
+	var ajaxDone = gfnGetMultiCommonCodeDataForm(commonCodeArr , false);
 	ajaxDone.done(function(){
 		//소스저장소 종류 변경
 		$("#repTypeCd").trigger("change");
@@ -410,7 +410,13 @@ $(document).ready(function() {
         	$("#repTypeCd").attr("disabled",true);
         	$("#gitRepUrl").attr("readonly",true);
         	$("#svnRepUrl").attr("readonly",true);
-        	$("#dplRepUrl").attr("readonly",true);
+        	
+        	//기존 정보가 없었다면
+        	if(gfnIsNull(oriRepInfo.dplRepUrl)){
+	        	$("#dplRepUrl").attr("readonly",false);
+        	}else{
+	        	$("#dplRepUrl").attr("readonly",true);
+        	}
 		});
 		
 		//AJAX 전송
