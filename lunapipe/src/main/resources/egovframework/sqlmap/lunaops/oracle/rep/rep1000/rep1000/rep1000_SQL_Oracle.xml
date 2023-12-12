@@ -346,6 +346,7 @@
 			, B.REP_NM
 			, B.REP_TXT
 			, B.SVN_REP_URL 
+			, B.GIT_REP_URL
 			<!-- 
 			, B.USE_CD
 			, A.REG_DTM
