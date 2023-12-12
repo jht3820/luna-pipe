@@ -29,6 +29,9 @@ import org.springframework.stereotype.Service;
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.io.SVNRepository;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.model.Build;

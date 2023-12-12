@@ -123,9 +123,13 @@ div.pop_sub .pop_right {width:72%;} /* common.css pop_left width값 오버라이
 					else if(item.type == "revisionFileImprove"){
 						//소스저장소 id , 리비전 id, 커밋 id
                     	var paramRepId = $("form#rep1004PopupFrm > #repId").val();
+                    	var paramRevision = $("form#rep1004PopupFrm > #revision").val();
+                    	var paramRevisionNum = $("form#rep1004PopupFrm > #revisionNum").val();
+                    	
 						var data = {
 								"repId" : paramRepId,
-								"revisionNum" : selItem.revisionNum,
+								"revision" : paramRevision,
+								"revisionNum" : paramRevisionNum,
 								"commitId": selItem.commitId,
 								"path": selItem.path,
 								"fileName": selItem.name,
