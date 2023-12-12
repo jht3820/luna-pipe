@@ -236,6 +236,16 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		String buildBranchNm = EgovProperties.getProperty("Globals.svn.buildBranchNm");
 		
 		
+		JSONObject jsonInfoIdx0 = null;
+		String ticketIdIdx0 = "";
+		if(jsonArr != null && jsonArr.length() > 0) {
+			jsonInfoIdx0 = jsonArr.getJSONObject(0);
+			ticketIdIdx0 = (String) jsonInfoIdx0.get("ticketId");
+			
+			buildBranchNm += "_"+ticketIdIdx0;
+		}
+		
+		
 		String branchePath = "/branches/"+buildBranchNm;
 		
 		
