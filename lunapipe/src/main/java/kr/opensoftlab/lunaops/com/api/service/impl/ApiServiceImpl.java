@@ -29,6 +29,9 @@ import org.springframework.stereotype.Service;
 import org.tmatesoft.svn.core.SVNLock;
 import org.tmatesoft.svn.core.io.SVNRepository;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.model.Build;
@@ -2925,7 +2928,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 					String opsBranchBuildNm = (String) paramMap.get("ref")+bldNum;
 					opsBranchBuildNm = opsBranchBuildNm.replace("refs/heads/", "");
 					List<Map> rep1102InsertList = rep1100Service.getRep1102List(opsBranchBuildNm);
-					
+					if(rep1102InsertList != null && rep1102InsertList.size() > 0) {
 						
 						for(Map rep1102InsertInfo : rep1102InsertList) {
 							rep1102InsertInfo.put("repRv", rvInfo.getGitCmtSha());
@@ -2934,7 +2937,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 						
 						
 						rep1100Service.removeRep1102List(opsBranchBuildNm);
-					
+					}
 				
 			}
 			
