@@ -108,10 +108,10 @@
 				</isNotEmpty>
 				<isEqual property="searchSelect" compareValue="logDate">
 					<isNotEmpty property="searchStDate">
-						AND A.REP_CMT_DATE &lt;= TO_DATE(#searchStDate#, 'YYYY-MM-DD HH24:MI:SS')
+						AND A.REP_CMT_DATE &gt;= TO_DATE(#searchStDate# || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
 					</isNotEmpty>
 					<isNotEmpty property="searchEdDate">
-						AND A.REP_CMT_DATE &gt;= TO_DATE(#searchEdDate#, 'YYYY-MM-DD HH24:MI:SS')
+						AND A.REP_CMT_DATE &lt;= TO_DATE(#searchEdDate# || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
 					</isNotEmpty>
 				</isEqual>
 			</isNotEmpty>
@@ -163,7 +163,11 @@
 			</isNotEmpty>
 		</isNotNull>
 		<isEqual property="ticketId" compareValue="SYSTEM">
-			GROUP BY A.REP_ID , A.REP_RV , A.REP_RV_TYPE_CD , A.REP_COMMENT , A.REP_CMT_DATE , A.REP_CMT_AUTHOR , A.REP_CHG_FILE_CNT
+			GROUP BY A.REP_ID , A.REP_RV ,A.REP_RVN , A.REP_RV_TYPE_CD , A.REP_COMMENT , A.REP_CMT_DATE , A.REP_CMT_AUTHOR , A.REP_CHG_FILE_CNT
+			, A.GIT_CMT_SHA , A.GIT_BRC_NM
+			<isNotEqual property="ticketId" compareValue="SYSTEM">
+				, A.TICKET_ID
+			</isNotEqual>
 		</isEqual>
 		ORDER BY A.REP_RVN DESC
 	</sql>
