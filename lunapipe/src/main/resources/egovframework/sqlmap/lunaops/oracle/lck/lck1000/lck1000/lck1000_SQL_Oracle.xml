@@ -127,7 +127,6 @@
 				#repId#					,#lockId#						,#lockPath#
 				,#lockStateCd#			,#lockUsrId#					,#lockComment#
 				,#lockForce#			,#ticketId#						,#lockTargetRv#
-				
 				,SYSDATE				,#lockUsrId#					,#regUsrIp#
 			)
 		]]>
