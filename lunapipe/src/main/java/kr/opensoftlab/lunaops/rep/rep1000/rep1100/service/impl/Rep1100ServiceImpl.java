@@ -685,10 +685,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		SVNRepository repository = repResultVo.getSvnRepo();
 		
 		
-		
-		
 		List<Map> fileList = (List<Map>) paramMap.get("fileList");
-		
 		
 		List<Map> dirList = (List<Map>) paramMap.get("dirList");
 		
@@ -710,7 +707,6 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 			branchePath = branchePath.substring(0, branchePath.length()-1);
 		}
 				
-		
 		
 		for(Map fileInfo: fileList) {
 			try {
@@ -868,9 +864,6 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 			
 			succCnt++;
 		}
-		
-		
-		
 		
 		for(Map fileInfo: fileList) {
 			
