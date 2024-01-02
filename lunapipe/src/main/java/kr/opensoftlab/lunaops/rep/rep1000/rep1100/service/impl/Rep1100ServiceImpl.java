@@ -236,6 +236,16 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		String buildBranchNm = EgovProperties.getProperty("Globals.svn.buildBranchNm");
 		
 		
+		JSONObject jsonInfoIdx0 = null;
+		String ticketIdIdx0 = "";
+		if(jsonArr != null && jsonArr.length() > 0) {
+			jsonInfoIdx0 = jsonArr.getJSONObject(0);
+			ticketIdIdx0 = (String) jsonInfoIdx0.get("ticketId");
+			
+			buildBranchNm += "_"+ticketIdIdx0;
+		}
+		
+		
 		String branchePath = "/branches/"+buildBranchNm;
 		
 		
@@ -675,10 +685,7 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 		SVNRepository repository = repResultVo.getSvnRepo();
 		
 		
-		
-		
 		List<Map> fileList = (List<Map>) paramMap.get("fileList");
-		
 		
 		List<Map> dirList = (List<Map>) paramMap.get("dirList");
 		
@@ -700,7 +707,6 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 			branchePath = branchePath.substring(0, branchePath.length()-1);
 		}
 				
-		
 		
 		for(Map fileInfo: fileList) {
 			try {
@@ -858,9 +864,6 @@ public class Rep1100ServiceImpl extends EgovAbstractServiceImpl implements Rep11
 			
 			succCnt++;
 		}
-		
-		
-		
 		
 		for(Map fileInfo: fileList) {
 			

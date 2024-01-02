@@ -138,6 +138,7 @@ $(document).ready(function() {
 	if('${param.popupGb}' == 'insert'){
 		$(".pop_title").text("저장소 등록");
 		$("#btn_update_popup").text('등록');
+		fnRepTypeCdChg("01");
 	}
 	else if('${param.popupGb}' == 'update'){
 		$(".pop_title").text("저장소 수정");
@@ -315,24 +316,8 @@ $(document).ready(function() {
 
 	//소스저장소 종류 변경 함수
 	function fnRepTypeCdChg(chgValue){
-		//github, gitlab
-		if(chgValue == "01" || chgValue == "03"){
-			$(".rep1001GitFrame").show();
-			$(".rep1001SvnFrame").hide();
-			
-			//사용여부 한줄 처리 및 스타일 변경
-			$("#useCdDiv").addClass("pop_menu_oneRow");
-			$("#useCdDiv > div:first-child").removeClass("menu_col1_subStyle pop_menu_col1_right").addClass("pop_oneRow_col1");
-			$("#useCdDiv > div:last-child").removeClass("menu_col2_subStyle").addClass("pop_oneRow_col2");
-			
-			//인증 방식 사용자 토큰으로 고정
-			$("#gitUsrAuthTypeCd").val("01").attr("disabled",true).trigger("change");
-			
-			//팝업 사이즈 변경
-			$("#rep1001PopupFrm").parents(".layer_popup_box").addClass("rep1001-layer_popup_box--size");
-		}
-		//svn
-		else if(chgValue == "02"){
+		
+		if(chgValue == "02"){
 			$(".rep1001SvnFrame").show();
 			$(".rep1001GitFrame").hide();
 			
@@ -346,6 +331,22 @@ $(document).ready(function() {
 			
 			//팝업 사이즈 변경
 			$("#rep1001PopupFrm").parents(".layer_popup_box").removeClass("rep1001-layer_popup_box--size");
+		}
+		//github, gitlab
+		else {
+			$(".rep1001GitFrame").show();
+			$(".rep1001SvnFrame").hide();
+			
+			//사용여부 한줄 처리 및 스타일 변경
+			$("#useCdDiv").addClass("pop_menu_oneRow");
+			$("#useCdDiv > div:first-child").removeClass("menu_col1_subStyle pop_menu_col1_right").addClass("pop_oneRow_col1");
+			$("#useCdDiv > div:last-child").removeClass("menu_col2_subStyle").addClass("pop_oneRow_col2");
+			
+			//인증 방식 사용자 토큰으로 고정
+			$("#gitUsrAuthTypeCd").val("01").attr("disabled",true).trigger("change");
+			
+			//팝업 사이즈 변경
+			$("#rep1001PopupFrm").parents(".layer_popup_box").addClass("rep1001-layer_popup_box--size");
 		}
 	}
 	

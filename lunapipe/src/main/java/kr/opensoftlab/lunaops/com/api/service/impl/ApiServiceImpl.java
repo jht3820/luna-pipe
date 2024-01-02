@@ -2925,7 +2925,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 					String opsBranchBuildNm = (String) paramMap.get("ref")+bldNum;
 					opsBranchBuildNm = opsBranchBuildNm.replace("refs/heads/", "");
 					List<Map> rep1102InsertList = rep1100Service.getRep1102List(opsBranchBuildNm);
-					
+					if(rep1102InsertList != null && rep1102InsertList.size() > 0) {
 						
 						for(Map rep1102InsertInfo : rep1102InsertList) {
 							rep1102InsertInfo.put("repRv", rvInfo.getGitCmtSha());
@@ -2934,7 +2934,7 @@ public class ApiServiceImpl  extends EgovAbstractServiceImpl implements ApiServi
 						
 						
 						rep1100Service.removeRep1102List(opsBranchBuildNm);
-					
+					}
 				
 			}
 			
