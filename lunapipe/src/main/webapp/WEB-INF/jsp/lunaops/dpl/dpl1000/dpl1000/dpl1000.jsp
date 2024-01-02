@@ -174,7 +174,7 @@ $(document).ready(function() {
 			return;
 		}
 		var addMsg = "";
-		
+
 		//선택 JOB이 운영빌드일때
 		if(item.jobTypeCd == "04"){
 			//파라미터 체크 진행했는지
@@ -197,7 +197,8 @@ $(document).ready(function() {
 		   				"jobParamVal": ticketLastRv
 		   			});
 				}else{
-					addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br>";
+					//TODO 추후 github에서 지정 리비전으로 운영 빌드 가능하면 수정 필요
+					addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br></br>소스저장소가 github인 경우, 리비전 값은 최종리비전값(HEAD) 고정입니다.</br></br>";
 				}
 				
 			}else{
@@ -207,7 +208,8 @@ $(document).ready(function() {
 					if(map.jobParamKey == jobParamRevision){
 						//값 입력 체크
 						if(gfnIsNull(map.jobParamVal)){
-							addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br>";
+							//TODO 추후 github에서 지정 리비전으로 운영 빌드 가능하면 수정 필요
+							addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br></br>소스저장소가 github인 경우, 리비전 값은 최종리비전값(HEAD) 고정입니다.</br></br>";
 						}
 						paramCheckFlag = true;
 						return false;
@@ -216,7 +218,8 @@ $(document).ready(function() {
 				
 				//파라미터 체크 안된 경우
 				if(!paramCheckFlag){
-					addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br>";
+					//TODO 추후 github에서 지정 리비전으로 운영 빌드 가능하면 수정 필요
+					addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br></br>소스저장소가 github인 경우, 리비전 값은 최종리비전값(HEAD) 고정입니다.</br></br>";
 				}
 			}
 			
