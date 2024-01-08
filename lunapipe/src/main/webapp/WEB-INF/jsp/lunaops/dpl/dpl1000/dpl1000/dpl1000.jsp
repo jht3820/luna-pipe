@@ -83,11 +83,6 @@ $(document).ready(function() {
 	ticketList = $("form#dpl1000Form #ticketList").val();
 	eGeneDplId = $("form#dpl1000Form #eGeneDplId").val();
 	
-	/* 
-	//모니터링 메시지 출력
-	fnJobAutoCheckMsgChg(true);
-	*/
-	
 	//빌드 실행 정보 체크
 	fnJobStatusCheckLoop();
 	
@@ -121,51 +116,6 @@ $(document).ready(function() {
 			jAlert("로그 확인을 위해 JOB을 선택해주세요.","알림");
 		}
 	});
-	/* 
-	//log button
-	$(".bldLogBtn").click(function(){
-		var logType = $(this).attr("logtype");
-		
-		//선택 JobGrid
-		var selJobInfo = dplJobGrid.getList('selected')[0];
-		
-		//main Log
-		if(logType == "main"){
-			//log있는지 체크
-			if(jobConsoleLog.hasOwnProperty("bldConsoleLog")){
-				//빈값체크
-				if(gfnIsNull(jobConsoleLog.bldConsoleLog)){
-					$('#buildConsoleLog').text("-");
-				}else{
-					//Log 세팅
-					$('#buildConsoleLog').html(jobConsoleLog.bldConsoleLog);
-					$('#buildConsoleLog').each(function(i, block) {hljs.highlightBlock(block);});
-					$("#buildConsoleLog").scrollTop(9999999);
-				}
-			}
-		}
-		//sub log
-		else if(logType == "sub"){
-			//log있는지 체크
-			if(jobConsoleLog.hasOwnProperty("bldConsoleRestoreLog")){
-				//빈값체크
-				if(gfnIsNull(jobConsoleLog.bldConsoleRestoreLog)){
-					$('#buildConsoleLog').text("-");
-				}else{
-					//Log 세팅
-					$('#buildConsoleLog').html(jobConsoleLog.bldConsoleRestoreLog);
-					$('#buildConsoleLog').each(function(i, block) {hljs.highlightBlock(block);});
-					$("#buildConsoleLog").scrollTop(9999999);
-				}
-			}
-		}
-		
-		//버튼 클릭 처리
-		$("button.logBtnActive").removeClass("logBtnActive");
-		//메인 로그 active
-		$(this).addClass("logBtnActive");
-	});
-	 */
 	//수동배포 시작
 	$("#btn_update_dplAction").click(function(){
 		var item = dplJobGrid.getList('selected')[0];
@@ -197,7 +147,7 @@ $(document).ready(function() {
 		   				"jobParamVal": ticketLastRv
 		   			});
 				}else{
-					//TODO 추후 github에서 지정 리비전으로 운영 빌드 가능하면 수정 필요
+					
 					addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br></br>소스저장소가 github인 경우, 리비전 값은 최종리비전값(HEAD) 고정입니다.</br></br>";
 				}
 				
@@ -208,7 +158,7 @@ $(document).ready(function() {
 					if(map.jobParamKey == jobParamRevision){
 						//값 입력 체크
 						if(gfnIsNull(map.jobParamVal)){
-							//TODO 추후 github에서 지정 리비전으로 운영 빌드 가능하면 수정 필요
+							
 							addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br></br>소스저장소가 github인 경우, 리비전 값은 최종리비전값(HEAD) 고정입니다.</br></br>";
 						}
 						paramCheckFlag = true;
@@ -218,7 +168,7 @@ $(document).ready(function() {
 				
 				//파라미터 체크 안된 경우
 				if(!paramCheckFlag){
-					//TODO 추후 github에서 지정 리비전으로 운영 빌드 가능하면 수정 필요
+					
 					addMsg += "운영 빌드에 필요한 리비전 정보 파라미터("+jobParamRevision+")가 없습니다.</br>리비전 정보 미 입력 시 최종 리비전 값(HEAD)으로 빌드 실행됩니다.</br></br>소스저장소가 github인 경우, 리비전 값은 최종리비전값(HEAD) 고정입니다.</br></br>";
 				}
 			}
@@ -1180,8 +1130,6 @@ function fnJobAutoCheckSwitch(onOffValue){
 	//중지
 	else{
 		fnJobAutoCheckMsgChg(false,"사용자에 의해 중지되었습니다.");
-		//모니터링 중지 없음 - 20200113
-		//userJobStatusFlag = false;
 	}
 }
 
@@ -1374,11 +1322,7 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 		$("form#dpl1000JobInfoForm #buildEstimatedDurationStr").text(buildEstimatedDurationStr);
 		$("form#dpl1000JobInfoForm #bldStartUsrId").text(bldStartUsrId);
 		$("form#dpl1000JobBldChgForm #buildChgLog").html(buildChgLog);
-		//$("form#dpl1000JobInfoForm #bldActionLog").html(bldActionLog);
 		
-		//console 세팅
-		//$("#buildConsoleLog").html(buildConsoleLog);
-		//$("#buildConsoleLog").each(function(i, block) {hljs.highlightBlock(block);});
 	}
 }
 </script>
@@ -1534,16 +1478,6 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 							</div>
 						</div>
 					</div>
-					<!-- 
-					<div class="descMainFrame descFullFrame">
-						<div class="descHeaderLabelFrame"><label>변경 내용</label></div>
-						<div class="descBodyValueFrame" id="buildChgLog"></div>
-					</div>
-					<div class="descMainFrame descFullFrame">
-						<div class="descHeaderLabelFrame"><label>빌드 로그</label></div>
-						<div class="descBodyValueFrame" id="bldActionLog"></div>
-					</div>
-					 -->
 					</form>
 				</div>
 			</div>
@@ -1551,10 +1485,6 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 				<div class="sub_title">
 					빌드 변경 내용
 					<div class="sub_title_btn right">
-						<!-- 
-						<button type="button" id="btn_bldMainLog" title="" style="width:150px;" class="AXButton searchButtonItem bldLogBtn" logtype="main"><i class="fa fa-desktop" aria-hidden="true"></i>&nbsp;<span id="bldMainConsoleLog"></span></button>
-						<div class="dplFullScreanBtn" fullmode="2"><i class="fas fa-expand"></i></div>
-						 -->
 						 <div class="jenkinsConsolePopupBtn AXButton" id="jenkinsLogPopupBtn"><i class="fas fa-desktop"></i>&nbsp;JENKINS Log</div>
 					</div>
 				</div>
@@ -1563,13 +1493,6 @@ function bldDetailFrameSet(paramJobInfo, paramBldInfo, paramBldChgList, paramBld
 						<div class="descBodyValueFrame" id="buildChgLog"></div>
 					</form>
 				</div>
-				<!-- 
-				<div id="contentsFrame">
-					<pre>
-						<code id="buildConsoleLog">-</code>
-					</pre>
-				</div>
-				 -->
 			</div>
 		</div>
 	</div>
