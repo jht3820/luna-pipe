@@ -600,7 +600,7 @@ function fnRsyncDataSearchSetting() {
 										//선택 빌드 데이터
 										var selData = buildDataGridObj.getList("selected");
 										if(selData && selData.length){
-											debugger;
+											
 											/* 검색 조건 설정 후 reload */
 								            fuRsyncResultList(selData[0], rsyncDataSearchObj.getParam());
 										}else{
